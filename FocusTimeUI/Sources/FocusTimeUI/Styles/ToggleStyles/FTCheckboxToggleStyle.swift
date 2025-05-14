@@ -12,20 +12,19 @@ import SwiftUI
 ///
 /// Usage examples:
 /// ```swift
-/// // Basic checkbox with green tint and default spacing
 /// Toggle("Enable notifications?", isOn: $isOn)
 ///     .toggleStyle(
 ///         FTCheckboxToggleStyle(color: .green)
 ///             .labelsHidden()
 ///     )
 ///
-/// // Checkbox with green tint, custom spacing, and bold label
 /// Toggle("Enable notifications?", isOn: $isOn)
 ///     .toggleStyle(
 ///         FTCheckboxToggleStyle(color: .green, spacing: 30)
 ///     )
 ///     .bold()
 /// ```
+///  - Note: The `.labelsHidden` modifier is applied to the style, not the view.
 ///
 /// Managing multiple items in a list of options:
 /// ```swift
@@ -51,7 +50,7 @@ import SwiftUI
 /// }
 /// ```
 public struct FTCheckboxToggleStyle: ToggleStyle {
-    /// Whether the toggle’s label is visible.
+    /// Controls visibility of the toggle’s label.
     private var showsLabel: Bool
 
     /// Color used for checkbox border and fill.
@@ -60,7 +59,7 @@ public struct FTCheckboxToggleStyle: ToggleStyle {
     /// Horizontal spacing between the checkbox and label.
     private let spacing: CGFloat
 
-    /// Underlying shape of the checkbox.
+    /// Base shape for the checkbox.
     private let rectangle = RoundedRectangle(cornerRadius: 2)
 
     /// View for the unchecked state (border only).
@@ -119,7 +118,7 @@ public struct FTCheckboxToggleStyle: ToggleStyle {
 }
 
 public extension FTCheckboxToggleStyle {
-    /// Returns a copy of this style with the label hidden.
+    /// Hide the label when rendering the checkbox.
     func labelsHidden() -> Self {
         var copy = self
         copy.showsLabel = false
