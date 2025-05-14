@@ -7,39 +7,70 @@
 
 import SwiftUI
 
-/// A custom toggle style rendering a checkbox with optional label.
+/// A toggle style that displays a checkbox in place of the system switch,
+/// with optional text label and configurable color and spacing.
+///
+/// Usage examples:
 /// ```swift
+/// // Basic checkbox with green tint and default spacing
 /// Toggle("Enable notifications?", isOn: $isOn)
 ///     .toggleStyle(
 ///         FTCheckboxToggleStyle(color: .green)
 ///             .labelsHidden()
 ///     )
 ///
+/// // Checkbox with green tint, custom spacing, and bold label
 /// Toggle("Enable notifications?", isOn: $isOn)
 ///     .toggleStyle(
 ///         FTCheckboxToggleStyle(color: .green, spacing: 30)
 ///     )
 ///     .bold()
 /// ```
+///
+/// Managing multiple items in a list of options:
+/// ```swift
+/// struct ExampleOption: Identifiable {
+///     let id = UUID()
+///     var title: String
+///     var isSelected: Bool
+/// }
+///
+/// @Previewable @State private var options = [
+///     ExampleOption(title: "Hello", isSelected: false),
+///     ExampleOption(title: "This", isSelected: false),
+///     ExampleOption(title: "Is", isSelected: false),
+///     ExampleOption(title: "A", isSelected: false),
+///     ExampleOption(title: "Test", isSelected: false)
+/// ]
+///
+/// VStack(alignment: .leading) {
+///     ForEach($options) { $option in
+///         Toggle(option.title, isOn: $option.isSelected)
+///             .toggleStyle(FTCheckboxToggleStyle())
+///     }
+/// }
+/// ```
 public struct FTCheckboxToggleStyle: ToggleStyle {
-    /// Controls visibility of the toggle’s label.
+    /// Whether the toggle’s label is visible.
     private var showsLabel: Bool
-    /// Tint color for the checkbox stroke and fill.
+
+    /// Color used for checkbox border and fill.
     private let color: Color
-    /// Spacing between checkbox and label.
+
+    /// Horizontal spacing between the checkbox and label.
     private let spacing: CGFloat
-    
-    /// Base shape for the checkbox.
+
+    /// Underlying shape of the checkbox.
     private let rectangle = RoundedRectangle(cornerRadius: 2)
-    
-    /// Unchecked checkbox view.
+
+    /// View for the unchecked state (border only).
     private var offState: some View {
         rectangle
             .stroke(lineWidth: 1.4)
             .foregroundStyle(color)
     }
-    
-    /// Checked checkbox view with checkmark.
+
+    /// View for the checked state (filled with checkmark overlay).
     private var onState: some View {
         rectangle
             .foregroundStyle(color)
@@ -48,11 +79,12 @@ public struct FTCheckboxToggleStyle: ToggleStyle {
                     .font(.system(size: 12))
             }
     }
-    
-    /// Create a new checkbox style with given color and spacing.
+
+    /// Initializes a checkbox style.
+    ///
     /// - Parameters:
-    ///   - color: Tint color for the checkbox (default: blue).
-    ///   - spacing: Gap between checkbox and label (default: 8).
+    ///   - color: Tint for the checkbox border and fill (default: `.blue`).
+    ///   - spacing: Gap between the checkbox and its label (default: `8`).
     public init(
         color: Color = .blue,
         spacing: CGFloat = 8
@@ -61,21 +93,24 @@ public struct FTCheckboxToggleStyle: ToggleStyle {
         self.color = color
         self.spacing = spacing
     }
-    
-    /// Build the toggle body combining checkbox and label.
+
+    /// Builds the toggle body combining the checkbox button and optional label.
     public func makeBody(configuration: Configuration) -> some View {
         HStack(spacing: spacing) {
             Button {
                 configuration.isOn.toggle()
             } label: {
-                switch configuration.isOn {
-                case true: onState
-                case false: offState
+                Group {
+                    if configuration.isOn {
+                        onState
+                    } else {
+                        offState
+                    }
                 }
             }
             .frame(width: 20, height: 20)
             .buttonStyle(.plain)
-            
+
             if showsLabel {
                 configuration.label
             }
@@ -84,7 +119,7 @@ public struct FTCheckboxToggleStyle: ToggleStyle {
 }
 
 public extension FTCheckboxToggleStyle {
-    /// Hide the label when rendering the checkbox.
+    /// Returns a copy of this style with the label hidden.
     func labelsHidden() -> Self {
         var copy = self
         copy.showsLabel = false
