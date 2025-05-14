@@ -6,9 +6,12 @@
 //
 
 import SwiftUI
+import FocusTimeUI
 
 struct ContentView: View {
     var body: some View {
+        Button("Test") { }
+            .buttonStyle(FTPrimaryButtonStyle())
         VStack {
             Image(systemName: "globe")
                 .imageScale(.large)
@@ -21,4 +24,5 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
+        .preferredColorScheme(.dark)
 }
