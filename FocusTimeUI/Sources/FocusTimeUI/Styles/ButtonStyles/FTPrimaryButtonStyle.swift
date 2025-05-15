@@ -14,8 +14,6 @@ import SwiftUI
 ///   - Shape: capsule-clip for rounded ends.
 ///   - Expands to the maximum available width of its container.
 ///
-/// - Important: Use `.init(paddingDisabled: true)` to use your custom padding instead.
-///
 /// - Usage:
 ///   Apply this style to any SwiftUI `Button` where you need a prominent call-to-action. For example:
 ///   ```swift
@@ -23,21 +21,17 @@ import SwiftUI
 ///       .buttonStyle(FTPrimaryButtonStyle())
 ///   ```
 public struct FTPrimaryButtonStyle: ButtonStyle {
-    private let paddingDisabled: Bool
+    
+    /// Initializes the primary button style.
+    public init() { }
 
+    /// Builds the button's body.
     public func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .frame(maxWidth: .infinity)
             .padding(.vertical, 7)
             .background(Color.blue)
             .clipShape(Capsule())
-            .padding(.horizontal, paddingDisabled ? 0 : fTUniversalPadding)
-    }
-    
-    /// Initializes the primary button style.
-    ///
-    /// - Parameter paddingDisabled: If `true`, disables the package-provided horizontal padding.
-    public init(paddingDisabled: Bool = false) {
-        self.paddingDisabled = paddingDisabled
+            .opacity(configuration.isPressed ? 0.8 : 1)
     }
 }

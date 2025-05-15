@@ -52,23 +52,23 @@ import SwiftUI
 public struct FTCheckboxToggleStyle: ToggleStyle {
     /// Controls visibility of the toggle’s label.
     private var showsLabel: Bool
-
+    
     /// Color used for checkbox border and fill.
     private let color: Color
-
+    
     /// Horizontal spacing between the checkbox and label.
     private let spacing: CGFloat
-
+    
     /// Base shape for the checkbox.
     private let rectangle = RoundedRectangle(cornerRadius: 2)
-
+    
     /// View for the unchecked state (border only).
     private var offState: some View {
         rectangle
             .stroke(lineWidth: 1.4)
             .foregroundStyle(color)
     }
-
+    
     /// View for the checked state (filled with checkmark overlay).
     private var onState: some View {
         rectangle
@@ -78,7 +78,7 @@ public struct FTCheckboxToggleStyle: ToggleStyle {
                     .font(.system(size: 12))
             }
     }
-
+    
     /// Initializes a checkbox style.
     ///
     /// - Parameters:
@@ -92,24 +92,22 @@ public struct FTCheckboxToggleStyle: ToggleStyle {
         self.color = color
         self.spacing = spacing
     }
-
+    
     /// Builds the toggle body combining the checkbox button and optional label.
     public func makeBody(configuration: Configuration) -> some View {
         HStack(spacing: spacing) {
             Button {
                 configuration.isOn.toggle()
             } label: {
-                Group {
-                    if configuration.isOn {
-                        onState
-                    } else {
-                        offState
-                    }
+                if configuration.isOn {
+                    onState
+                } else {
+                    offState
                 }
             }
             .frame(width: 20, height: 20)
             .buttonStyle(.plain)
-
+            
             if showsLabel {
                 configuration.label
             }

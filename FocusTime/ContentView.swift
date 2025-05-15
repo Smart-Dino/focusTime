@@ -10,13 +10,13 @@ import FocusTimeUI
 
 struct ContentView: View {
     var body: some View {
-        Button("Test") { }
-            .buttonStyle(FTPrimaryButtonStyle())
         VStack {
             Image(systemName: "globe")
                 .imageScale(.large)
                 .foregroundStyle(.tint)
             Text("Hello, world!")
+            Button("Test") { }
+                .buttonStyle(FTPrimaryButtonStyle())
         }
         .padding()
     }
