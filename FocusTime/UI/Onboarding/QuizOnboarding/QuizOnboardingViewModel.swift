@@ -6,26 +6,42 @@
 //
 
 import Foundation
+import Observation
 
-// MARK: - ViewModel
 /// ViewModel for managing quiz onboarding logic and state.
+/// This ViewModel is designed to be used with SwiftUI views for quiz onboarding.
+/// It holds the available quiz options and encapsulates the onboarding state.
 
-/// Represents a selectable quiz option with a unique ID and a display title.
-struct QuizOption: Identifiable {
-    let id = UUID()
-    let title: String
-}
+/// Uses Swift’s new `@Observable` macro for reactive data binding (iOS 17+).
 
-/// Currently holds a list of predefined quiz options for display.
-class QuizOnboardingViewModel: ObservableObject {
+@MainActor
+@Observable
+final class QuizOnboardingViewModel {
     
-    /// Published list of quiz options to be shown in the UI.
-    /// This can be expanded or modified in the future to support dynamic content.
-    @Published var options: [QuizOption] = [
-        QuizOption(title: "📩 Notifications and messages"),
-        QuizOption(title: "📱 Social media"),
-        QuizOption(title: "💻 Work distractions"),
-        QuizOption(title: "📋 Lack of structure"),
-        QuizOption(title: "🧘 Mental fatigue")
-    ]
+    // MARK: - Nested Types
+        
+    /// Represents a single quiz option.
+    /// Conforms to `Identifiable` so it can be used in SwiftUI lists.
+    struct QuizOption: Identifiable {
+        let id = UUID()
+        let title: String
+    }
+    
+    // MARK: - State
+        
+    /// Encapsulates the UI state for the quiz onboarding screen.
+    /// Contains all mutable data the view will observe.
+    struct State {
+        /// List of quiz options available for selection.
+        var options: [QuizOption] = [
+            QuizOption(title: "📩 Notifications and messages"),
+            QuizOption(title: "📱 Social media"),
+            QuizOption(title: "💻 Work distractions"),
+            QuizOption(title: "📋 Lack of structure"),
+            QuizOption(title: "🧘 Mental fatigue")
+        ]
+    }
+    /// The current state of the onboarding quiz.
+    /// Read-only outside the ViewModel to maintain encapsulation.
+    private(set) var state = State()
 }

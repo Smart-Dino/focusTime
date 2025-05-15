@@ -12,7 +12,7 @@ import SwiftUI
 
 struct QuizOnboardingView: View {
     // MARK: - Properties
-    @StateObject private var viewModel = QuizOnboardingViewModel()
+    @State private var viewModel = QuizOnboardingViewModel()
     
     // MARK: - Body
     var body: some View {
@@ -29,10 +29,13 @@ struct QuizOnboardingView: View {
                     /// Title and subtitle
                     VStack(alignment: .center, spacing: 11){
                         Text("What challenges your focus most often?")
-                            .font(.system(size: 17, weight: .bold, design: .default))
+                            .font(.title3.bold())
+                            .multilineTextAlignment(.center)
                         
                         Text("Add one or more options that work for you.")
-                            .font(.system(size: 13, weight: .regular, design: .default))
+                            .font(.body)
+                            .multilineTextAlignment(.center)
+                        
                     }
                     .foregroundColor(Color.white)
                     .padding(.bottom, 40)
@@ -41,7 +44,7 @@ struct QuizOnboardingView: View {
                     /// Scrollable in case more options are added later
                     ScrollView{
                         VStack(alignment: .leading, spacing: 42){
-                            ForEach(viewModel.options) { option in
+                            ForEach(viewModel.state.options) { option in
                                 HStack{
                                     
                                     /// Placeholder for checkbox before packages are available
@@ -55,6 +58,7 @@ struct QuizOnboardingView: View {
                             }
                         }
                     }
+                    .scrollBounceBehavior(.basedOnSize, axes: [.vertical])
                 }
                 
                 // MARK: - Placeholder for "Next" Button
@@ -67,6 +71,7 @@ struct QuizOnboardingView: View {
                     .padding()
             }
         }
+        .dynamicTypeSize(...DynamicTypeSize.large)
     }
 }
 
