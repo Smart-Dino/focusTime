@@ -96,6 +96,8 @@ struct OnboardingPaywallView: View {
     @ToolbarContentBuilder
     private var toolbarItems: some ToolbarContent {
         ToolbarItem(placement: .topBarTrailing) {
+            // This will get adressed on the stage of incorporating
+            // the business logic.
 #warning("Dismiss action is empty.")
             Button(
                 Paywall.Onboarding.Strings.dismissButtonTitle,
