@@ -33,7 +33,7 @@ final class QuizOnboardingViewModel {
     /// Contains all mutable data the view will observe.
     struct State {
         /// List of quiz options available for selection.
-        var options: [QuizOption] = [
+        let options: [QuizOption] = [
             QuizOption(title: "📩 Notifications and messages"),
             QuizOption(title: "📱 Social media"),
             QuizOption(title: "💻 Work distractions"),
