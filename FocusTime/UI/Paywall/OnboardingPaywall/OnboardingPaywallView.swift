@@ -11,7 +11,7 @@ import FocusTimeUI
 /// `PaywallView`, which displays the app's list of features and controls to subscribe.
 struct OnboardingPaywallView: View {
     // MARK: - Properties
-    @State var viewModel: OnboardingPaywallViewModel
+    var viewModel: OnboardingPaywallViewModel
     
     // MARK: - Body
     var body: some View {
@@ -28,7 +28,7 @@ struct OnboardingPaywallView: View {
                 // Text replicating Navigation Title, since
                 // the Navigation Title does not support
                 // multiline text.
-                Text("Get started with\n a 3 day free trial")
+                Text(Paywall.Onboarding.Strings.navigationTitle)
                     .font(.system(
                         size: Paywall.Onboarding.FontSize.navigationTitle,
                         weight: .bold
@@ -57,6 +57,9 @@ struct OnboardingPaywallView: View {
         }
         // Anything beyond Large breaks the UI on smaller screens.
         .dynamicTypeSize(...DynamicTypeSize.large)
+        .toolbar {
+            toolbarItems
+        }
     }
     
     // MARK: - Computed properties
@@ -88,10 +91,26 @@ struct OnboardingPaywallView: View {
     /// This section includes the subscribe button as well as the text on top of it.
     private var subscribeButtonSection: some View {
         VStack {
-            Text("3-day free trial, then $3 / month, cancel anytime")
+            Text(Paywall.Onboarding.Strings.trialTerms)
                 .font(.caption)
-            Button("Try free and subscribe.", action: viewModel.subscribe)
-                .buttonStyle(FTPrimaryButtonStyle())
+            Button(
+                Paywall.Onboarding.Strings.tryButtonTitle,
+                action: viewModel.subscribe
+            )
+            .buttonStyle(FTPrimaryButtonStyle())
+        }
+    }
+    
+    /// Toolbar items.
+    @ToolbarContentBuilder
+    private var toolbarItems: some ToolbarContent {
+        ToolbarItem(placement: .topBarTrailing) {
+            Button(
+                Paywall.Onboarding.Strings.dismissButtonTitle,
+                systemImage: "xmark",
+                action: {}
+            )
+            .buttonStyle(PlainButtonStyle())
         }
     }
 }
