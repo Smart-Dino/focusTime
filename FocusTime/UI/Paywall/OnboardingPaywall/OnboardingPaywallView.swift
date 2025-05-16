@@ -8,7 +8,7 @@
 import SwiftUI
 import FocusTimeUI
 
-/// `PaywallView`, which displays the app's list of features and controls to subscribe.
+/// View, which displays the app's list of features and controls to subscribe.
 struct OnboardingPaywallView: View {
     // MARK: - Properties
     var viewModel: OnboardingPaywallViewModel
@@ -41,8 +41,12 @@ struct OnboardingPaywallView: View {
                         VStack {
                             features
                             
-                            subscribeButtonSection
-                                .padding()
+                            FTSubscribeButtonView(
+                                terms: Paywall.Onboarding.Strings.trialTerms,
+                                buttonTitle: Paywall.Onboarding.Strings.tryButtonTitle,
+                                buttonAction: viewModel.subscribe
+                            )
+                            .padding()
                             
                             FTSubscriptionUtilityLinksView(
                                 onTermsTapped: viewModel.openTermsOfService,
@@ -88,23 +92,11 @@ struct OnboardingPaywallView: View {
         }
     }
     
-    /// This section includes the subscribe button as well as the text on top of it.
-    private var subscribeButtonSection: some View {
-        VStack {
-            Text(Paywall.Onboarding.Strings.trialTerms)
-                .font(.caption)
-            Button(
-                Paywall.Onboarding.Strings.tryButtonTitle,
-                action: viewModel.subscribe
-            )
-            .buttonStyle(FTPrimaryButtonStyle())
-        }
-    }
-    
     /// Toolbar items.
     @ToolbarContentBuilder
     private var toolbarItems: some ToolbarContent {
         ToolbarItem(placement: .topBarTrailing) {
+#warning("Dismiss action is empty.")
             Button(
                 Paywall.Onboarding.Strings.dismissButtonTitle,
                 systemImage: "xmark",

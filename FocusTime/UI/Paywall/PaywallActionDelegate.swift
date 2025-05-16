@@ -12,6 +12,8 @@ protocol PaywallActionDelegate: AnyObject {
     func didTapSubscribe()
     /// Called when the user taps the restore purchase action.
     func didTapRestorePurchase()
+    /// Called when the user taps to view all plans.
+    func didTapViewAllPlans()
     /// Called when the user taps to open terms of service.
     func didTapOpenTermsOfService()
     /// Called when the user taps to open the privacy policy.

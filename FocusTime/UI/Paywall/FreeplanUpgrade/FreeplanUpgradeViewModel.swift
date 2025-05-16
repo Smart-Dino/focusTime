@@ -1,17 +1,17 @@
 //
-//  PaywallViewModel.swift
+//  FreeplanUpgradeViewModel.swift
 //  FocusTime
 //
-//  Created by Maksym Horobets on 15.05.2025.
+//  Created by Maksym Horobets on 16.05.2025.
 //
 
 import Foundation
 
-/// ViewModel, responsible for managing logic on the ``OnboardingPaywallView``.
-/// - Note: Use it in the ``OnboadingPaywallView``.
+/// ViewModel, responsible for managing logic on the ``FreeplanUpgradeView``.
+/// - Note: Use it in the ``FreeplanUpgradeView``.
 @MainActor
 @Observable
-final class OnboardingPaywallViewModel {
+final class FreeplanUpgradeViewModel {
     // MARK: - Nested declarations
     struct State {
         
@@ -24,15 +24,6 @@ final class OnboardingPaywallViewModel {
     // Made this property private becase it is injected
     // through the initializer, not a property.
     private weak var actionDelegate: PaywallActionDelegate?
-    
-    /// Main features of the paid 
-    let featureItems: [PaywallFeatureItem] = [
-        PaywallFeatureItem(title: "Unlimited repeating sessions"),
-        PaywallFeatureItem(title: "Unlimited number of blocking apps"),
-        PaywallFeatureItem(title: "Deep Focus mode"),
-        PaywallFeatureItem(title: "White noise for better concentration"),
-        PaywallFeatureItem(title: "Priority updates and new features")
-    ]
     
     // MARK: - Initializers
     init(
@@ -52,6 +43,10 @@ final class OnboardingPaywallViewModel {
         actionDelegate?.didTapRestorePurchase()
     }
     
+    func viewAllPlans() {
+        actionDelegate?.didTapViewAllPlans()
+    }
+    
     func openTermsOfService() {
         actionDelegate?.didTapOpenTermsOfService()
     }
@@ -61,3 +56,4 @@ final class OnboardingPaywallViewModel {
     }
     
 }
+
