@@ -53,6 +53,11 @@ enum Paywall {
     }
     
     enum Upgrade {
+        // MARK: - FreeplanUpgrade Layout
+        enum Spacings {
+            static let offerView: CGFloat = 15
+        }
+        // MARK: - FreeplanUpgrade Strings
         enum Strings {
             /// Body message of the upgrade view.
             static var upgradeMessage: AttributedString {

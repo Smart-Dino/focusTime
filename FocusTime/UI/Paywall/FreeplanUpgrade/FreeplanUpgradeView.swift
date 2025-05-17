@@ -23,7 +23,7 @@ struct FreeplanUpgradeView: View {
             // VStack to push the elements down with a spacer.
             VStack {
                 Spacer()
-                VStack(spacing: 15) {
+                VStack(spacing: Paywall.Upgrade.Spacings.offerView) {
                     upgradePromptSection
                     
                     actionButtons
