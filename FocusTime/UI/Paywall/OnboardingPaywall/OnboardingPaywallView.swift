@@ -28,9 +28,9 @@ struct OnboardingPaywallView: View {
                 // Text replicating Navigation Title, since
                 // the Navigation Title does not support
                 // multiline text.
-                Text(Paywall.Onboarding.Strings.navigationTitle)
+                Text(OnboardingPaywall.Strings.navigationTitle)
                     .font(.system(
-                        size: Paywall.Onboarding.FontSize.navigationTitle,
+                        size: OnboardingPaywall.FontSize.navigationTitle,
                         weight: .bold
                     ))
                     .foregroundColor(Color.white)
@@ -42,8 +42,8 @@ struct OnboardingPaywallView: View {
                             features
                             
                             FTSubscribeButtonView(
-                                terms: Paywall.Onboarding.Strings.trialTerms,
-                                buttonTitle: Paywall.Onboarding.Strings.tryButtonTitle,
+                                terms: OnboardingPaywall.Strings.trialTerms,
+                                buttonTitle: OnboardingPaywall.Strings.tryButtonTitle,
                                 buttonAction: viewModel.subscribe
                             )
                             .padding()
@@ -76,8 +76,8 @@ struct OnboardingPaywallView: View {
             })
             .clipShape(
                 .rect(
-                    topLeadingRadius: Paywall.Onboarding.CornerRadius.card,
-                    topTrailingRadius: Paywall.Onboarding.CornerRadius.card
+                    topLeadingRadius: OnboardingPaywall.CornerRadius.card,
+                    topTrailingRadius: OnboardingPaywall.CornerRadius.card
                 )
             )
     }
@@ -87,7 +87,7 @@ struct OnboardingPaywallView: View {
         VStack(alignment: .leading) {
             ForEach(viewModel.featureItems) { item in
                 FTCheckmarkListItemView(item.title)
-                    .padding(.vertical, Paywall.Onboarding.Padding.featureList)
+                    .padding(.vertical, OnboardingPaywall.Padding.featureList)
             }
         }
     }
@@ -100,7 +100,7 @@ struct OnboardingPaywallView: View {
             // the business logic.
 #warning("Dismiss action is empty.")
             Button(
-                Paywall.Onboarding.Strings.dismissButtonTitle,
+                OnboardingPaywall.Strings.dismissButtonTitle,
                 systemImage: "xmark",
                 action: {}
             )
