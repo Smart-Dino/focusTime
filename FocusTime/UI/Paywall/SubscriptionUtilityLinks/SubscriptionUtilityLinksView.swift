@@ -13,10 +13,6 @@ import SwiftUI
 /// Tapping on each link triggers a corresponding closure provided during initialization.
 /// The overall font for the links is `.callout`.
 public struct SubscriptionUtilityLinksView: View {
-    // MARK: - UI Constants
-    private let separatorDotFontSize: CGFloat = 20
-    private let horizontalSpacing: CGFloat = 20
-    
     // MARK: - Closure properties
     public var onTermsTapped: () -> Void
     public var onPrivacyTapped: () -> Void
@@ -38,13 +34,13 @@ public struct SubscriptionUtilityLinksView: View {
     }
 
     public var body: some View {
-        HStack(spacing: horizontalSpacing) {
+        HStack(spacing: SubscriptionUtilityLinksConstants.horizontalSpacing) {
             Button("Terms") {
                 onTermsTapped() // Call the provided closure
             }
             Text("•")
                 .font(.system(
-                    size: separatorDotFontSize,
+                    size: SubscriptionUtilityLinksConstants.separatorDotFontSize,
                     weight: .heavy
                 ))
             Button("Privacy") {
@@ -52,7 +48,7 @@ public struct SubscriptionUtilityLinksView: View {
             }
             Text("•")
                 .font(.system(
-                    size: separatorDotFontSize,
+                    size: SubscriptionUtilityLinksConstants.separatorDotFontSize,
                     weight: .heavy
                 ))
             Button("Restore Purchase") {
