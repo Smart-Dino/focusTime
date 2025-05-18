@@ -29,7 +29,7 @@ struct FreeplanUpgradeView: View {
                     actionButtons
                         .padding(.vertical)
                     
-                    FTSubscriptionUtilityLinksView(
+                    SubscriptionUtilityLinksView(
                         onTermsTapped: viewModel.openTermsOfService,
                         onPrivacyTapped: viewModel.openPrivacy,
                         onRestoreTapped: viewModel.restorePurchase
@@ -94,7 +94,7 @@ struct FreeplanUpgradeView: View {
 #Preview {
     NavigationStack {
         FreeplanUpgradeView(
-            viewModel: FreeplanUpgradeViewModel(actionDelegate: nil)
+            viewModel: .init(paymentManager: MockPaymentManager())
         )
         .preferredColorScheme(.dark)
     }

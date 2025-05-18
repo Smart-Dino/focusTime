@@ -7,14 +7,14 @@
 
 import Foundation
 
-/// ViewModel, responsible for managing logic on the ``FreeplanUpgradeView``.
+/// ViewModel, responsible for managing the logic on ``FreeplanUpgradeView``.
 /// - Note: Use it in the ``FreeplanUpgradeView``.
 @MainActor
 @Observable
 final class FreeplanUpgradeViewModel {
     // MARK: - Nested declarations
     struct State {
-        
+        var error: Error?
     }
     
     // MARK: - Properties
@@ -23,36 +23,54 @@ final class FreeplanUpgradeViewModel {
     
     // Made this property private becase it is injected
     // through the initializer, not a property.
-    private weak var actionDelegate: PaywallActionDelegate?
+    private let paymentManager: PaymentManager?
     
     // MARK: - Initializers
     init(
         state: State = State(),
-        actionDelegate: PaywallActionDelegate?
+        paymentManager: PaymentManager
     ) {
         self.state = state
-        self.actionDelegate = actionDelegate
+        self.paymentManager = paymentManager
     }
     
     // MARK: - Methods
+    func viewAllPlans() {
+        // Show all plans
+    }
+    
     func subscribe() {
-        actionDelegate?.didTapSubscribe()
+//        Task {
+//            do {
+//                try await paymentManager?.purchase(Product)
+//            } catch {
+//                state.error = error
+//            }
+//        }
     }
     
     func restorePurchase() {
-        actionDelegate?.didTapRestorePurchase()
-    }
-    
-    func viewAllPlans() {
-        actionDelegate?.didTapViewAllPlans()
+        // I've decided to make this method sync to keep the visual harmony of
+        // SubscriptionUtilityLinksView(
+        //      onTermsTapped: viewModel.openTermsOfService,
+        //      onPrivacyTapped: viewModel.openPrivacy,
+        //      onRestoreTapped: viewModel.restorePurchase
+        // )
+        Task {
+            do {
+                try await paymentManager?.restorePurchases()
+            } catch {
+                state.error = error
+            }
+        }
     }
     
     func openTermsOfService() {
-        actionDelegate?.didTapOpenTermsOfService()
+        // Open ToS
     }
     
     func openPrivacy() {
-        actionDelegate?.didTapOpenPrivacy()
+        // Open Privacy
     }
     
 }
