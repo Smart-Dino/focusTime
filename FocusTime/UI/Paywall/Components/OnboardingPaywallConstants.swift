@@ -52,6 +52,5 @@ enum OnboardingPaywallConstants {
         static let dismissButtonTitle = "Dismiss current screen."
     }
     
-    // Other paywall views...
 }
 
