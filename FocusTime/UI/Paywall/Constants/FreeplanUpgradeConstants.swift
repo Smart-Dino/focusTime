@@ -1,5 +1,5 @@
 //
-//  FreeplanUpgradeConstants.swift
+//  FreePlanUpgradeConstants.swift
 //  FocusTime
 //
 //  Created by Maksym Horobets on 17.05.2025.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-/// Organized and sorted ``FreeplanUpgradeView``-related constants.
+/// Organized and sorted ``FreePlanUpgradeView``-related constants.
 enum FreePlanUpgradeConstants {
     // MARK: - FreeplanUpgrade Layout
     enum Spacings {

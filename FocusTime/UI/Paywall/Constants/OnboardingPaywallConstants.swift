@@ -1,5 +1,5 @@
 //
-//  PaywallConstants.swift
+//  OnboardingPaywallConstants.swift
 //  FocusTime
 //
 //  Created by Maksym Horobets on 15.05.2025.

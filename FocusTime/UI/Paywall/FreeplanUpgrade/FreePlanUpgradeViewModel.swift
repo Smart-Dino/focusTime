@@ -7,8 +7,8 @@
 
 import Foundation
 
-/// ViewModel, responsible for managing the logic on ``FreeplanUpgradeView``.
-/// - Note: Use it in the ``FreeplanUpgradeView``.
+/// ViewModel, responsible for managing the logic on ``FreePlanUpgradeView``.
+/// - Note: Use it in the ``FreePlanUpgradeView``.
 @MainActor
 @Observable
 final class FreePlanUpgradeViewModel {
