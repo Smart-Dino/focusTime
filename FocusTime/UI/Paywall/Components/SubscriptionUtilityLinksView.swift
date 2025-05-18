@@ -12,7 +12,7 @@ import SwiftUI
 /// This view arranges the links horizontally, separated by bold dots.
 /// Tapping on each link triggers a corresponding closure provided during initialization.
 /// The overall font for the links is `.callout`.
-public struct FTSubscriptionUtilityLinksView: View {
+public struct SubscriptionUtilityLinksView: View {
     // MARK: - UI Constants
     private let separatorDotFontSize: CGFloat = 20
     private let horizontalSpacing: CGFloat = 20

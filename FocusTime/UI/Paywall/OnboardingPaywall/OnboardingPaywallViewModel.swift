@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import StoreKit
 
 /// `PaywallViewModel`, responsible for managing logic on the `PaywallView`.
 /// - Note: Use it in the `PaywallView`.
@@ -14,7 +15,9 @@ import Foundation
 final class OnboardingPaywallViewModel {
     // MARK: - Nested declarations
     struct State {
-        
+        var error: Error?
+        /// Main features of the paid version,
+        let featureItems = OnboardingPaywallConstants.FeatureItems.allCases
     }
     
     // MARK: - Properties
@@ -23,41 +26,50 @@ final class OnboardingPaywallViewModel {
     
     // Made this property private becase it is injected
     // through the initializer, not a property.
-    private weak var actionDelegate: PaywallActionDelegate?
-    
-    /// Main features of the paid 
-    let featureItems: [PaywallFeatureItem] = [
-        PaywallFeatureItem(title: "Unlimited repeating sessions"),
-        PaywallFeatureItem(title: "Unlimited number of blocking apps"),
-        PaywallFeatureItem(title: "Deep Focus mode"),
-        PaywallFeatureItem(title: "White noise for better concentration"),
-        PaywallFeatureItem(title: "Priority updates and new features")
-    ]
+    private let paymentManager: PaymentManager?
     
     // MARK: - Initializers
     init(
         state: State = State(),
-        actionDelegate: PaywallActionDelegate?
+        paymentManager: PaymentManager
     ) {
         self.state = state
-        self.actionDelegate = actionDelegate
+        self.paymentManager = paymentManager
     }
     
     // MARK: - Methods
     func subscribe() {
-        actionDelegate?.didTapSubscribe()
+//        Task {
+//            do {
+//                try await paymentManager?.purchase(Product)
+//            } catch {
+//                state.error = error
+//            }
+//        }
     }
     
     func restorePurchase() {
-        actionDelegate?.didTapRestorePurchase()
+        // I've decided to make this method sync to keep the visual harmony of
+        // SubscriptionUtilityLinksView(
+        //      onTermsTapped: viewModel.openTermsOfService,
+        //      onPrivacyTapped: viewModel.openPrivacy,
+        //      onRestoreTapped: viewModel.restorePurchase
+        // )
+        Task {
+            do {
+                try await paymentManager?.restorePurchases()
+            } catch {
+                state.error = error
+            }
+        }
     }
     
     func openTermsOfService() {
-        actionDelegate?.didTapOpenTermsOfService()
+        // Open ToS
     }
     
     func openPrivacy() {
-        actionDelegate?.didTapOpenPrivacy()
+        // Open Privacy
     }
     
 }

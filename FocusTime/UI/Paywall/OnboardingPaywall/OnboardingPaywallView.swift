@@ -8,52 +8,53 @@
 import SwiftUI
 import FocusTimeUI
 
-/// `PaywallView`, which displays the app's list of features and controls to subscribe.
+/// View, which displays the app's list of features and controls to subscribe.
 struct OnboardingPaywallView: View {
     // MARK: - Properties
     var viewModel: OnboardingPaywallViewModel
     
     // MARK: - Body
     var body: some View {
-        ZStack {
-            // Background image pushed to the top of the view.
+        ZStack(alignment: .leading) {
+            Image(.debugNightMountain)
+                .resizable()
+                .scaledToFill()
+            // Used to prevent image from shifting off the screen
+                .containerRelativeFrame([.horizontal])
+                .ignoresSafeArea()
             VStack {
-                Image(.debugNightMountain)
-                    .resizable()
-                    .ignoresSafeArea()
-                    .scaledToFit()
                 Spacer()
+                ZStack {
+                    contentCard
+                    VStack {
+                        features
+                        
+                        subscribeButtonSection
+                            .padding()
+                        
+                        SubscriptionUtilityLinksView(
+                            onTermsTapped: viewModel.openTermsOfService,
+                            onPrivacyTapped: viewModel.openPrivacy,
+                            onRestoreTapped: viewModel.restorePurchase
+                        )
+                    }
+                    .padding()
+                }
             }
-            VStack(alignment: .leading) {
+            .ignoresSafeArea()
+            VStack {
                 // Text replicating Navigation Title, since
                 // the Navigation Title does not support
                 // multiline text.
-                Text(Paywall.Onboarding.Strings.navigationTitle)
+                Text(OnboardingPaywallConstants.Strings.navigationTitle)
                     .font(.system(
-                        size: Paywall.Onboarding.FontSize.navigationTitle,
+                        size: OnboardingPaywallConstants.FontSize.navigationTitle,
                         weight: .bold
                     ))
                     .foregroundColor(Color.white)
                     .padding()
                 Spacer()
-                contentCard
-                    .overlay {
-                        VStack {
-                            features
-                            
-                            subscribeButtonSection
-                                .padding()
-                            
-                            FTSubscriptionUtilityLinksView(
-                                onTermsTapped: viewModel.openTermsOfService,
-                                onPrivacyTapped: viewModel.openPrivacy,
-                                onRestoreTapped: viewModel.restorePurchase
-                            )
-                        }
-                        .padding()
-                    }
             }
-            .ignoresSafeArea(edges: .bottom)
         }
         // Anything beyond Large breaks the UI on smaller screens.
         .dynamicTypeSize(...DynamicTypeSize.large)
@@ -72,8 +73,8 @@ struct OnboardingPaywallView: View {
             })
             .clipShape(
                 .rect(
-                    topLeadingRadius: Paywall.Onboarding.CornerRadius.card,
-                    topTrailingRadius: Paywall.Onboarding.CornerRadius.card
+                    topLeadingRadius: OnboardingPaywallConstants.CornerRadius.card,
+                    topTrailingRadius: OnboardingPaywallConstants.CornerRadius.card
                 )
             )
     }
@@ -81,9 +82,9 @@ struct OnboardingPaywallView: View {
     /// List of features.
     private var features: some View {
         VStack(alignment: .leading) {
-            ForEach(viewModel.featureItems) { item in
-                FTCheckmarkListItemView(item.title)
-                    .padding(.vertical, Paywall.Onboarding.Padding.featureList)
+            ForEach(viewModel.state.featureItems) { item in
+                FTCheckmarkListItemView(item.rawValue)
+                    .padding(.vertical, OnboardingPaywallConstants.Padding.featureList)
             }
         }
     }
@@ -91,10 +92,10 @@ struct OnboardingPaywallView: View {
     /// This section includes the subscribe button as well as the text on top of it.
     private var subscribeButtonSection: some View {
         VStack {
-            Text(Paywall.Onboarding.Strings.trialTerms)
+            Text(OnboardingPaywallConstants.Strings.trialTerms)
                 .font(.caption)
             Button(
-                Paywall.Onboarding.Strings.tryButtonTitle,
+                OnboardingPaywallConstants.Strings.tryButtonTitle,
                 action: viewModel.subscribe
             )
             .buttonStyle(FTPrimaryButtonStyle())
@@ -106,7 +107,7 @@ struct OnboardingPaywallView: View {
     private var toolbarItems: some ToolbarContent {
         ToolbarItem(placement: .topBarTrailing) {
             Button(
-                Paywall.Onboarding.Strings.dismissButtonTitle,
+                OnboardingPaywallConstants.Strings.dismissButtonTitle,
                 systemImage: "xmark",
                 action: {}
             )
@@ -118,7 +119,7 @@ struct OnboardingPaywallView: View {
 #Preview {
     NavigationStack {
         OnboardingPaywallView(
-            viewModel: OnboardingPaywallViewModel(actionDelegate: nil)
+            viewModel: .init(paymentManager: MockPaymentManager())
         )
         .preferredColorScheme(.dark)
     }
