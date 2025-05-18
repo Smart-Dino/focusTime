@@ -8,7 +8,7 @@
 import Foundation
 
 /// Organized and sorted ``FreeplanUpgradeView``-related constants.
-enum UpgradePaywall {
+enum FreePlanUpgradeConstants {
     // MARK: - FreeplanUpgrade Layout
     enum Spacings {
         static let offerView: CGFloat = 15
@@ -25,6 +25,7 @@ enum UpgradePaywall {
         }
         /// Title of the view.
         static let title = "You're on a Free Plan"
+#warning("Implement server-side pricing.")
         /// Trial terms displayed above the try button.
         static let trialTerms = "3-day free trial, then $3 / month, cancel anytime"
         // Buttons

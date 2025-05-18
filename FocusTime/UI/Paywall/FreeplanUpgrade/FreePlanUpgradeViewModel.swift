@@ -11,7 +11,7 @@ import Foundation
 /// - Note: Use it in the ``FreeplanUpgradeView``.
 @MainActor
 @Observable
-final class FreeplanUpgradeViewModel {
+final class FreePlanUpgradeViewModel {
     // MARK: - Nested declarations
     struct State {
         var error: Error?

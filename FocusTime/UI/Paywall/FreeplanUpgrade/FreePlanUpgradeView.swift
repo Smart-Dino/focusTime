@@ -9,9 +9,9 @@ import SwiftUI
 import FocusTimeUI
 
 /// View, which displays the app's list of features and controls to subscribe.
-struct FreeplanUpgradeView: View {
+struct FreePlanUpgradeView: View {
     // MARK: - Properties
-    var viewModel: FreeplanUpgradeViewModel
+    var viewModel: FreePlanUpgradeViewModel
     
     // MARK: - Body
     var body: some View {
@@ -23,7 +23,7 @@ struct FreeplanUpgradeView: View {
             // VStack to push the elements down with a spacer.
             VStack {
                 Spacer()
-                VStack(spacing: UpgradePaywall.Spacings.offerView) {
+                VStack(spacing: FreePlanUpgradeConstants.Spacings.offerView) {
                     upgradePromptSection
                     
                     actionButtons
@@ -50,9 +50,9 @@ struct FreeplanUpgradeView: View {
     /// Text to upsell the user.
     private var upgradePromptSection: some View {
         Group {
-            Text(UpgradePaywall.Strings.title)
+            Text(FreePlanUpgradeConstants.Strings.title)
                 .font(.title.bold())
-            Text(UpgradePaywall.Strings.upgradeMessage)
+            Text(FreePlanUpgradeConstants.Strings.upgradeMessage)
         }
     }
     
@@ -60,12 +60,12 @@ struct FreeplanUpgradeView: View {
     private var actionButtons: some View {
         VStack {
             FTSubscribeButtonView(
-                terms: UpgradePaywall.Strings.trialTerms,
-                buttonTitle: UpgradePaywall.Strings.tryButtonTitle,
+                terms: FreePlanUpgradeConstants.Strings.trialTerms,
+                buttonTitle: FreePlanUpgradeConstants.Strings.tryButtonTitle,
                 buttonAction: {}
             )
             Button(
-                UpgradePaywall.Strings.viewPlansButton,
+                FreePlanUpgradeConstants.Strings.viewPlansButton,
                 action: viewModel.viewAllPlans
             )
             .buttonStyle(PlainButtonStyle())
@@ -81,7 +81,7 @@ struct FreeplanUpgradeView: View {
             // the business logic.
 #warning("Dismiss action is empty.")
             Button(
-                UpgradePaywall.Strings.dismissButtonTitle,
+                FreePlanUpgradeConstants.Strings.dismissButtonTitle,
                 systemImage: "xmark",
                 action: {}
             )
@@ -93,7 +93,7 @@ struct FreeplanUpgradeView: View {
 
 #Preview {
     NavigationStack {
-        FreeplanUpgradeView(
+        FreePlanUpgradeView(
             viewModel: .init(paymentManager: MockPaymentManager())
         )
         .preferredColorScheme(.dark)
