@@ -55,6 +55,7 @@ struct OnboardingPaywallView: View {
         .toolbar {
             toolbarItems
         }
+        .onAppear(perform: viewModel.loadPricing)
     }
     
     // MARK: - Computed properties
@@ -86,7 +87,7 @@ struct OnboardingPaywallView: View {
     /// This section includes the subscribe button as well as the text on top of it.
     private var subscribeButtonSection: some View {
         VStack {
-            Text(OnboardingPaywallConstants.Strings.trialTerms)
+            Text(viewModel.state.trialTerms)
                 .font(.caption)
             Button(
                 OnboardingPaywallConstants.Strings.tryButtonTitle,

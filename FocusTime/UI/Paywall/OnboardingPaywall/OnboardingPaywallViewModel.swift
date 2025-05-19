@@ -18,6 +18,11 @@ final class OnboardingPaywallViewModel {
         var error: Error?
         /// Main features of the paid version,
         let featureItems = OnboardingPaywallConstants.FeatureItems.allCases
+        
+        var formattedPrice: String?
+        var trialTerms: String {
+            "3-day free trial, then \(formattedPrice ?? "...") / month, cancel anytime"
+        }
     }
     
     // MARK: - Properties
@@ -38,14 +43,27 @@ final class OnboardingPaywallViewModel {
     }
     
     // MARK: - Methods
+    func loadPricing() {
+        Task {
+            do {
+                let products = try await paymentManager?.getProducts()
+                state.formattedPrice = products?.first(where: {
+                    $0.subscriptionPeriod == .monthly
+                })?.priceString
+            } catch {
+                state.error = error
+            }
+        }
+    }
+
     func subscribe() {
-//        Task {
-//            do {
-//                try await paymentManager?.purchase(Product)
-//            } catch {
-//                state.error = error
-//            }
-//        }
+        Task {
+            do {
+                let _ = try await paymentManager?.purchase(FTProduct.mockMonthly)
+            } catch {
+                state.error = error
+            }
+        }
     }
     
     func restorePurchase() {

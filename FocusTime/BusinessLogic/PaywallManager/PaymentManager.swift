@@ -8,19 +8,39 @@
 import Foundation
 import StoreKit
 
-// MARK: This is unfinished and will be so on the stage of implementing Business Logic.
-protocol PaymentManager: Actor {
+enum PaymentError: LocalizedError {
+    case failedVerification
+    case purchaseInProgress
+    case productNotFound
+    case unknown
 
+    /// A human-readable description for each payment error.
+    var errorDescription: String {
+        switch self {
+        case .failedVerification:
+            return "The purchase could not be verified. Please try again later."
+        case .purchaseInProgress:
+            return "A purchase is already in progress. Please wait until it completes."
+        case .productNotFound:
+            return "The requested product could not be found."
+        case .unknown:
+            return "An unknown error occurred during the purchase."
+        }
+    }
+}
+
+// MARK: This is unfinished and will be done on the stage of implementing Business Logic.
+protocol PaymentManager: Actor {
     /// Fetches and returns a list of products available for purchase.
     /// - Returns: An array of ``Product`` objects.
     /// - Throws: An error if fetching products fails.
-    func getProducts() async throws -> [Product]
+    func getProducts() async throws -> [FTProduct]
 
     /// Attempts to purchase the specified ``Product``.
     /// - Parameter product: The ``Product`` to purchase.
     /// - Returns: A `Product.PurchaseResult?` indicating the outcome (success, pending, userCancelled).
     /// - Throws: An error if the purchase process itself encounters a critical issue.
-    func purchase(_ product: Product) async throws -> Product.PurchaseResult?
+    func purchase(_ product: FTProduct) async throws -> FTProduct.PurchaseResult?
 
     /// Attempts to restore previously made purchases.
     /// - Throws: An error if the restoration process encounters a critical issue.
@@ -32,20 +52,31 @@ protocol PaymentManager: Actor {
 }
 
 actor MockPaymentManager: PaymentManager {
-    func getProducts() async throws -> [Product] {
+    private var products: [FTProduct]
+    
+    func getProducts() async throws(PaymentError) -> [FTProduct] {
         print("getProducts invoked")
-        throw NSError() // Use NSError for now
+        return products
     }
     
-    func purchase(_ product: Product) async throws -> Product.PurchaseResult? {
+    func purchase(_ product: FTProduct) async throws(PaymentError) -> FTProduct.PurchaseResult? {
         print("purchase invoked")
-        throw NSError() // Use NSError for now
+        print("Description: \(product)")
+        print("Formatted price: \(product.priceString)")
+        throw .unknown
     }
     
-    func restorePurchases() async throws {
+    func restorePurchases() async throws(PaymentError) {
         print("restorePurchases invoked")
-        throw NSError() // Use NSError for now
+        throw .unknown
     }
     
+    init() {
+        // Get products
+        self.products = [
+            FTProduct.mockMonthly,
+            FTProduct.mockYearly
+        ]
+    }
     
 }
