@@ -13,12 +13,8 @@ import StoreKit
 struct FTProduct: Identifiable, Equatable {
     // MARK: - Nested declarations
     struct SubscriptionPeriod: Equatable {
-        /// The order is matched with `StoreKit.Product.SubcriptionPeriod.Unit`.
-        enum Unit: Int, Equatable {
-            case day   = 0
-            case week  = 1
-            case month = 2
-            case year  = 3
+        enum Unit: Equatable {
+            case day, week, month, year
         }
         let value: Int
         let unit: Self.Unit
