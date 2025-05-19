@@ -45,6 +45,7 @@ struct FreePlanUpgradeView: View {
         .toolbar {
             toolbarItems
         }
+        .onAppear(perform: viewModel.loadPricing)
     }
     
     /// Text to upsell the user.
@@ -60,7 +61,7 @@ struct FreePlanUpgradeView: View {
     private var actionButtons: some View {
         VStack {
             FTSubscribeButtonView(
-                terms: FreePlanUpgradeConstants.Strings.trialTerms,
+                terms: viewModel.state.trialTerms,
                 buttonTitle: FreePlanUpgradeConstants.Strings.tryButtonTitle,
                 buttonAction: {}
             )

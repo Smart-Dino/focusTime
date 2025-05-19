@@ -44,9 +44,6 @@ enum OnboardingPaywallConstants {
                        Get started with
                        a 3 day free trial
                        """
-#warning("Implement server-side pricing.")
-        /// Trial terms displayed above the try button.
-        static let trialTerms = "3-day free trial, then $3 / month, cancel anytime"
         /// Title text for the subscription trial button.
         static let tryButtonTitle = "Try free and subscribe."
         /// Title text for the button that dismisses the view.

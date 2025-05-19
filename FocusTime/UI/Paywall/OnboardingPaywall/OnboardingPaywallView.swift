@@ -22,30 +22,7 @@ struct OnboardingPaywallView: View {
             // Used to prevent image from shifting off the screen
                 .containerRelativeFrame([.horizontal])
                 .ignoresSafeArea()
-            VStack {
-                Spacer()
-                ZStack {
-                    contentCard
-                    VStack {
-                        features
-                        
-                        subscribeButtonSection
-                            .padding()
-                        
-                        SubscriptionUtilityLinksView(
-                            onTermsTapped: viewModel.openTermsOfService,
-                            onPrivacyTapped: viewModel.openPrivacy,
-                            onRestoreTapped: viewModel.restorePurchase
-                        )
-                    }
-                    .padding()
-                }
-            }
-            .ignoresSafeArea()
-            VStack {
-                // Text replicating Navigation Title, since
-                // the Navigation Title does not support
-                // multiline text.
+            VStack(alignment: .leading) {
                 Text(OnboardingPaywallConstants.Strings.navigationTitle)
                     .font(.system(
                         size: OnboardingPaywallConstants.FontSize.navigationTitle,
@@ -54,13 +31,31 @@ struct OnboardingPaywallView: View {
                     .foregroundColor(Color.white)
                     .padding()
                 Spacer()
+                contentCard
+                    .overlay {
+                        VStack {
+                            features
+                            
+                            subscribeButtonSection
+                                .padding()
+                            
+                            SubscriptionUtilityLinksView(
+                                onTermsTapped: viewModel.openTermsOfService,
+                                onPrivacyTapped: viewModel.openPrivacy,
+                                onRestoreTapped: viewModel.restorePurchase
+                            )
+                        }
+                        .padding()
+                    }
             }
+            .ignoresSafeArea(edges: [.horizontal, .bottom])
         }
         // Anything beyond Large breaks the UI on smaller screens.
         .dynamicTypeSize(...DynamicTypeSize.large)
         .toolbar {
             toolbarItems
         }
+        .onAppear(perform: viewModel.loadPricing)
     }
     
     // MARK: - Computed properties
@@ -92,7 +87,7 @@ struct OnboardingPaywallView: View {
     /// This section includes the subscribe button as well as the text on top of it.
     private var subscribeButtonSection: some View {
         VStack {
-            Text(OnboardingPaywallConstants.Strings.trialTerms)
+            Text(viewModel.state.trialTerms)
                 .font(.caption)
             Button(
                 OnboardingPaywallConstants.Strings.tryButtonTitle,
