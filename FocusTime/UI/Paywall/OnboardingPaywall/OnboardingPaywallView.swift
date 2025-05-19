@@ -11,7 +11,7 @@ import FocusTimeUI
 /// View, which displays the app's list of features and controls to subscribe.
 struct OnboardingPaywallView: View {
     // MARK: - Properties
-    var viewModel: OnboardingPaywallViewModel
+    @State var viewModel: OnboardingPaywallViewModel
     
     // MARK: - Body
     var body: some View {

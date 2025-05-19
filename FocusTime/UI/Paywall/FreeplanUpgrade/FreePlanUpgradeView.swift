@@ -11,7 +11,7 @@ import FocusTimeUI
 /// View, which displays the app's list of features and controls to subscribe.
 struct FreePlanUpgradeView: View {
     // MARK: - Properties
-    var viewModel: FreePlanUpgradeViewModel
+    @State var viewModel: FreePlanUpgradeViewModel
     
     // MARK: - Body
     var body: some View {
