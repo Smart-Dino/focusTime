@@ -25,6 +25,7 @@ final class QuizOnboardingViewModel {
     struct QuizOption: Identifiable {
         let id = UUID()
         let title: String
+        var isSelected: Bool
     }
     
     // MARK: - State
@@ -33,15 +34,15 @@ final class QuizOnboardingViewModel {
     /// Contains all mutable data the view will observe.
     struct State {
         /// List of quiz options available for selection.
-        let options: [QuizOption] = [
-            QuizOption(title: "📩 Notifications and messages"),
-            QuizOption(title: "📱 Social media"),
-            QuizOption(title: "💻 Work distractions"),
-            QuizOption(title: "📋 Lack of structure"),
-            QuizOption(title: "🧘 Mental fatigue")
+        var options: [QuizOption] = [
+            QuizOption(title: "📩 Notifications and messages", isSelected: false),
+            QuizOption(title: "📱 Social media", isSelected: false),
+            QuizOption(title: "💻 Work distractions", isSelected: false),
+            QuizOption(title: "📋 Lack of structure", isSelected: false),
+            QuizOption(title: "🧘 Mental fatigue", isSelected: false)
         ]
     }
     /// The current state of the onboarding quiz.
     /// Read-only outside the ViewModel to maintain encapsulation.
-    private(set) var state = State()
+    var state = State()
 }
