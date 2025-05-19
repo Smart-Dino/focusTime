@@ -1,17 +1,17 @@
 //
-//  OnboardingPaywallView.swift
+//  PlanSelectionPaywallView.swift
 //  FocusTime
 //
-//  Created by Maksym Horobets on 15.05.2025.
+//  Created by Maksym Horobets on 19.05.2025.
 //
 
 import SwiftUI
 import FocusTimeUI
 
 /// View, which displays the app's list of features and controls to subscribe.
-struct OnboardingPaywallView: View {
+struct PlanSelectionPaywallView: View {
     // MARK: - Properties
-    @State var viewModel: OnboardingPaywallViewModel
+    @State var viewModel: PlanSelectionPaywallViewModel
     
     // MARK: - Body
     var body: some View {
@@ -22,14 +22,7 @@ struct OnboardingPaywallView: View {
             // Used to prevent image from shifting off the screen
                 .containerRelativeFrame([.horizontal])
                 .ignoresSafeArea()
-            VStack(alignment: .leading) {
-                Text(OnboardingPaywallConstants.Strings.navigationTitle)
-                    .font(.system(
-                        size: OnboardingPaywallConstants.FontSize.navigationTitle,
-                        weight: .bold
-                    ))
-                    .foregroundColor(Color.white)
-                    .padding()
+            VStack(alignment: .center) {
                 Spacer()
                 contentCard
                     .overlay {
@@ -37,7 +30,7 @@ struct OnboardingPaywallView: View {
                             features
                             
                             FTSubscribeButtonView(
-                                terms: viewModel.state.trialTerms,
+                                terms: "No payment due now!",
                                 buttonTitle: FreePlanUpgradeConstants.Strings.tryButtonTitle,
                                 buttonAction: {}
                             )
@@ -59,7 +52,9 @@ struct OnboardingPaywallView: View {
         .toolbar {
             toolbarItems
         }
-        .onAppear(perform: viewModel.loadPricing)
+        .navigationTitle("Get DeepWave Pro")
+        .navigationBarTitleDisplayMode(.inline)
+//        .onAppear(perform: viewModel.loadPricing)
     }
     
     // MARK: - Computed properties
@@ -68,23 +63,27 @@ struct OnboardingPaywallView: View {
         Rectangle()
             .foregroundStyle(Color.ftBackground)
             .containerRelativeFrame(.vertical, { amount, axis in
-                amount / 1.7
+                amount / 1.8
             })
-            .clipShape(
-                .rect(
-                    topLeadingRadius: OnboardingPaywallConstants.CornerRadius.card,
-                    topTrailingRadius: OnboardingPaywallConstants.CornerRadius.card
-                )
-            )
     }
     
     /// List of features.
     private var features: some View {
-        VStack(alignment: .leading) {
-            ForEach(viewModel.state.featureItems) { item in
-                FTCheckmarkListItemView(item.rawValue)
-                    .padding(.vertical, OnboardingPaywallConstants.Padding.featureList)
-            }
+        VStack(alignment: .leading, spacing: 20) {
+            FTProductOptionView(
+                leadingTitle: "Monthly",
+                leadingSubtitle: "3 USD/month",
+                trailingDescription: "Try Free For 3 days",
+            )
+            .descriptionStyle(Color.secondary)
+            FTProductOptionView(
+                leadingTitle: "Weekly",
+                trailingDescription: "0.37 USD",
+            )
+            FTProductOptionView(
+                leadingTitle: "Lifetime",
+                trailingDescription: "399.9 USD",
+            )
         }
     }
     
@@ -104,7 +103,7 @@ struct OnboardingPaywallView: View {
 
 #Preview {
     NavigationStack {
-        OnboardingPaywallView(
+        PlanSelectionPaywallView(
             viewModel: .init(paymentManager: MockPaymentManager())
         )
         .preferredColorScheme(.dark)

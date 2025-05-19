@@ -1,0 +1,92 @@
+//
+//  PlanSelectionPaywallViewModel.swift
+//  FocusTime
+//
+//  Created by Maksym Horobets on 19.05.2025.
+//
+import Foundation
+import StoreKit
+
+/// ViewModel, responsible for managing the logic on ``PlanSelectionPaywallView``.
+/// - Note: Use it in the ``PlanSelectionPaywallView``.
+@MainActor
+@Observable
+final class PlanSelectionPaywallViewModel {
+    // MARK: - Nested declarations
+    struct State {
+        var error: Error?
+        /// Main features of the paid version,
+        let featureItems = OnboardingPaywallConstants.FeatureItems.allCases
+        
+        var formattedPrice: String?
+        var trialTerms: String {
+            "3-day free trial, then \(formattedPrice ?? "...") / month, cancel anytime"
+        }
+    }
+    
+    // MARK: - Properties
+    /// Property contatining values that may trigger UI redraw.
+    private(set) var state: State
+    
+    // Made this property private becase it is injected
+    // through the initializer, not a property.
+    private let paymentManager: PaymentManager?
+    
+    // MARK: - Initializers
+    init(
+        state: State = State(),
+        paymentManager: PaymentManager
+    ) {
+        self.state = state
+        self.paymentManager = paymentManager
+    }
+    
+    // MARK: - Methods
+    func loadPricing() {
+        Task {
+            do {
+                let products = try await paymentManager?.getProducts()
+                state.formattedPrice = products?.first(where: {
+                    $0.subscriptionPeriod == .monthly
+                })?.priceString
+            } catch {
+                state.error = error
+            }
+        }
+    }
+
+    func subscribe() {
+        Task {
+            do {
+                let _ = try await paymentManager?.purchase(FTProduct.mockMonthly)
+            } catch {
+                state.error = error
+            }
+        }
+    }
+    
+    func restorePurchase() {
+        // I've decided to make this method sync to keep the visual harmony of
+        // SubscriptionUtilityLinksView(
+        //      onTermsTapped: viewModel.openTermsOfService,
+        //      onPrivacyTapped: viewModel.openPrivacy,
+        //      onRestoreTapped: viewModel.restorePurchase
+        // )
+        Task {
+            do {
+                try await paymentManager?.restorePurchases()
+            } catch {
+                state.error = error
+            }
+        }
+    }
+    
+    func openTermsOfService() {
+        // Open ToS
+    }
+    
+    func openPrivacy() {
+        // Open Privacy
+    }
+    
+}

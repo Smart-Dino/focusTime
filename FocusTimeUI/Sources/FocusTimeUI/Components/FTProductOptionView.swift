@@ -1,0 +1,108 @@
+//
+//  FTProductOptionView.swift
+//  FocusTimeUI
+//
+//  Created by Maksym Horobets on 19.05.2025.
+//
+
+import SwiftUI
+
+/// View, used for displaying subscription options.
+///
+/// The view maintains a consistent height regardless of whether the `leadingSubtitle` is present.
+/// If `leadingSubtitle` is nil, the `leadingTitle` is vertically centered within the space
+/// that would have been occupied by both a title and a subtitle.
+///
+/// ```swift
+/// FTProductOptionView(
+///     leadingTitle: "Monthly",
+///     leadingSubtitle: "2.99 USD/month",
+///     trailingDescription: "Try Free For 3 days",
+/// )
+///
+/// FTProductOptionView(
+///     leadingTitle: "Annual",
+///     // leadingSubtitle is nil here
+///     trailingDescription: "Save 20%",
+/// )
+/// .descriptionStyle(Color.green)
+/// ```
+public struct FTProductOptionView: View {
+    // Leading
+    private let leadingTitle: String
+    private let leadingSubtitle: String?
+    
+    // Trailing
+    private let trailingDescription: String
+    
+    // Modified values
+    private var descriptionColor: AnyShapeStyle = .init(Color.primary)
+    
+    public var body: some View {
+        HStack {
+            // Leading VStack
+            VStack(alignment: .leading) {
+                Text(leadingTitle)
+                    .font(.title3)
+                if let leadingSubtitle {
+                    Text(leadingSubtitle)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            
+            Spacer()
+            // Placeholder values to keep the view vertically
+            // consistent despite leadingSubtitle presence.
+            VStack {
+                Text("\u{00A0}")
+                Text("\u{00A0}")
+            }
+            
+            Spacer()
+            // Trailing
+            Text(trailingDescription)
+                .font(.title3)
+                .foregroundStyle(descriptionColor)
+        }
+        .padding(.horizontal)
+        .padding(.vertical, 10)
+        .background {
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(lineWidth: 2)
+        }
+    }
+    
+    /// Initializes a view for displaying a product or subscription option.
+    ///
+    /// This view is designed to maintain a consistent overall height. If a `leadingSubtitle`
+    /// is not provided, the `leadingTitle` will be vertically centered within the space
+    /// that would have been occupied by both a title and a subtitle, ensuring visual
+    /// consistency when displayed in a list or grid.
+    ///
+    /// - Parameters:
+    ///   - leadingTitle: The main title for the option (e.g., "Monthly Subscription").
+    ///   - leadingSubtitle: An optional subtitle providing additional details.
+    ///                      If `nil`, space is still reserved, and the `leadingTitle` is centered.
+    ///   - trailingDescription: A description, price, or call to action displayed on the trailing side (e.g., "$9.99" or "Save 10%").
+    public init(
+        leadingTitle: String,
+        leadingSubtitle: String? = nil,
+        trailingDescription: String,
+    ) {
+        self.leadingTitle = leadingTitle
+        self.leadingSubtitle = leadingSubtitle
+        self.trailingDescription = trailingDescription
+    }
+}
+
+public extension FTProductOptionView {
+    /// Changes the color of the description of the view.
+    /// - Parameter style: The color of the `trailingDescription` text. Defaults to `.primary`.
+    /// - Returns: Modifed view.
+    func descriptionStyle<S: ShapeStyle>(_ style: S) -> FTProductOptionView {
+        var copy = self
+        copy.descriptionColor = AnyShapeStyle(style)
+        return copy
+    }
+}
