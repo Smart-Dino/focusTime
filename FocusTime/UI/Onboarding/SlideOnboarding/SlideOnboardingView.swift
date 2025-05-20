@@ -13,6 +13,7 @@ import FocusTimeUI
 struct SlideOnboardingView: View {
     // MARK: - Properties
     @State private var viewModel = SlideOnboardingViewModel()
+    @State private var showSkipConfirmation = false
     
     // MARK: - Body
     var body: some View {
@@ -29,7 +30,7 @@ struct SlideOnboardingView: View {
                     .foregroundColor(.cyan)
                     .background(Color.red)
             }
-             
+            
             // MARK: - Image Section
             /// Displays current step's image, fills the frame and clips overflow
             // TODO: - Update image with actual image
@@ -61,9 +62,9 @@ struct SlideOnboardingView: View {
                         viewModel.goToNextStep()
                     }
                     .buttonStyle(FTPrimaryButtonStyle())
-                                        
+                    
                     Button("Skip") {
-                        viewModel.skipOnboarding()
+                        showSkipConfirmation = true
                     }
                 }
                 .frame(height: 78)
@@ -79,7 +80,15 @@ struct SlideOnboardingView: View {
         }
         .animation(.easeInOut, value: viewModel.currentStep)
         .preferredColorScheme(.dark)
-    }
+        
+        // MARK: - Skip Confirmation Alert
+        .alert("Do you really want to skip onboarding?", isPresented: $showSkipConfirmation) {
+            Button("Skip", role: .destructive) {
+                viewModel.skipOnboarding()
+            }
+            Button("No", role: .cancel) {}
+        }
+    } 
 }
 
 
