@@ -44,7 +44,6 @@ struct QuizOnboardingView: View {
                             Toggle(option.title, isOn: $option.isSelected)
                                 .toggleStyle(FTCheckboxToggleStyle(color: .blue))
                                 .font(.body)
-                                .foregroundColor(.white)
                         }
                     }
                 }
