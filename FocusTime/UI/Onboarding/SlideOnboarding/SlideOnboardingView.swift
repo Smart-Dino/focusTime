@@ -13,7 +13,6 @@ import FocusTimeUI
 struct SlideOnboardingView: View {
     // MARK: - Properties
     @State private var viewModel = SlideOnboardingViewModel()
-    @State private var showSkipConfirmation = false
     
     // MARK: - Body
     var body: some View {
@@ -37,7 +36,9 @@ struct SlideOnboardingView: View {
             Image(viewModel.currentStep.imageName)
                 .resizable()
                 .scaledToFill()
-                .frame(width: 393, height: 430)
+                .containerRelativeFrame(.vertical, { amount, axis in
+                    amount / 1.8
+                })
                 .clipped()
                 .padding(.top, 20)
             
@@ -56,15 +57,15 @@ struct SlideOnboardingView: View {
             
             // MARK: - Buttons
             /// Shows 'Next' and 'Skip' buttons for first 3 steps
-            if viewModel.currentStep != .step4 {
+            if !viewModel.currentStep.isLast {
                 VStack(spacing: 16) {
-                    Button("Next") {
+                    Button("Next") { 
                         viewModel.goToNextStep()
                     }
                     .buttonStyle(FTPrimaryButtonStyle())
                     
                     Button("Skip") {
-                        showSkipConfirmation = true
+                        viewModel.showSkipConfirmation = true
                     }
                 }
                 .frame(height: 78)
@@ -82,7 +83,7 @@ struct SlideOnboardingView: View {
         .preferredColorScheme(.dark)
         
         // MARK: - Skip Confirmation Alert
-        .alert("Do you really want to skip onboarding?", isPresented: $showSkipConfirmation) {
+        .alert("Do you really want to skip onboarding?", isPresented: $viewModel.showSkipConfirmation) {
             Button("Skip", role: .destructive) {
                 viewModel.skipOnboarding()
             }
