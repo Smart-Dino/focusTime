@@ -28,7 +28,7 @@ final class FreePlanUpgradeViewModel {
     
     // Made this property private becase it is injected
     // through the initializer, not a property.
-    private let paymentManager: PaymentManager?
+    private let paymentManager: PaymentManager
     
     // MARK: - Initializers
     init(
@@ -47,8 +47,8 @@ final class FreePlanUpgradeViewModel {
     func loadPricing() {
         Task {
             do {
-                let products = try await paymentManager?.getProducts()
-                state.formattedPrice = products?.first(where: {
+                let products = try await paymentManager.getProducts()
+                state.formattedPrice = products.first(where: {
                     $0.subscriptionPeriod == .monthly
                 })?.priceString
             } catch {
@@ -60,7 +60,7 @@ final class FreePlanUpgradeViewModel {
     func subscribe() {
         Task {
             do {
-                let _ = try await paymentManager?.purchase(FTProduct.mockMonthly)
+                let _ = try await paymentManager.purchase(FTProduct.mockMonthly)
             } catch {
                 state.error = error
             }
@@ -76,7 +76,7 @@ final class FreePlanUpgradeViewModel {
         // )
         Task {
             do {
-                try await paymentManager?.restorePurchases()
+                try await paymentManager.restorePurchases()
             } catch {
                 state.error = error
             }

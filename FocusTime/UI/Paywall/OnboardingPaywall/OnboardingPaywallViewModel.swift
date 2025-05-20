@@ -31,7 +31,7 @@ final class OnboardingPaywallViewModel {
     
     // Made this property private becase it is injected
     // through the initializer, not a property.
-    private let paymentManager: PaymentManager?
+    private let paymentManager: PaymentManager
     
     // MARK: - Initializers
     init(
@@ -46,8 +46,8 @@ final class OnboardingPaywallViewModel {
     func loadPricing() {
         Task {
             do {
-                let products = try await paymentManager?.getProducts()
-                state.formattedPrice = products?.first(where: {
+                let products = try await paymentManager.getProducts()
+                state.formattedPrice = products.first(where: {
                     $0.subscriptionPeriod == .monthly
                 })?.priceString
             } catch {
@@ -59,7 +59,7 @@ final class OnboardingPaywallViewModel {
     func subscribe() {
         Task {
             do {
-                let _ = try await paymentManager?.purchase(FTProduct.mockMonthly)
+                let _ = try await paymentManager.purchase(FTProduct.mockMonthly)
             } catch {
                 state.error = error
             }
@@ -75,7 +75,7 @@ final class OnboardingPaywallViewModel {
         // )
         Task {
             do {
-                try await paymentManager?.restorePurchases()
+                try await paymentManager.restorePurchases()
             } catch {
                 state.error = error
             }

@@ -35,8 +35,9 @@ public struct FTProductOptionView: View {
     // Trailing
     private let trailingDescription: String
     
-    // Modified values
+    // Modifiable
     private var descriptionColor: AnyShapeStyle = .init(Color.primary)
+    private var isSelected: Bool = false
     
     public var body: some View {
         HStack {
@@ -68,8 +69,14 @@ public struct FTProductOptionView: View {
         .padding(.horizontal)
         .padding(.vertical, 10)
         .background {
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(lineWidth: 2)
+            ZStack {
+                if isSelected {
+                RoundedRectangle(cornerRadius: 16)
+                        .opacity(0.1)
+                }
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(lineWidth: 2)
+            }
         }
     }
     
@@ -100,9 +107,15 @@ public extension FTProductOptionView {
     /// Changes the color of the description of the view.
     /// - Parameter style: The color of the `trailingDescription` text. Defaults to `.primary`.
     /// - Returns: Modifed view.
-    func descriptionStyle<S: ShapeStyle>(_ style: S) -> FTProductOptionView {
+    func descriptionStyle<S: ShapeStyle>(_ style: S) -> Self {
         var copy = self
         copy.descriptionColor = AnyShapeStyle(style)
+        return copy
+    }
+    
+    func selected(_ isSelected: Bool) -> Self {
+        var copy = self
+        copy.isSelected = isSelected
         return copy
     }
 }

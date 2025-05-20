@@ -31,6 +31,8 @@ enum PaymentError: LocalizedError {
 
 // MARK: This is unfinished and will be done on the stage of implementing Business Logic.
 protocol PaymentManager: Actor {
+    /// Returns `Bool` based on if the user has used his trial period.
+    var trialUsed: Bool { get }
     /// Fetches and returns a list of products available for purchase.
     /// - Returns: An array of ``Product`` objects.
     /// - Throws: An error if fetching products fails.
@@ -53,6 +55,8 @@ protocol PaymentManager: Actor {
 
 actor MockPaymentManager: PaymentManager {
     private var products: [FTProduct]
+    // This will have to be a computed property in LivePaymentManager
+    private(set) var trialUsed: Bool
     
     func getProducts() async throws(PaymentError) -> [FTProduct] {
         print("getProducts invoked")
@@ -71,12 +75,15 @@ actor MockPaymentManager: PaymentManager {
         throw .unknown
     }
     
-    init() {
+    init(trialUsed: Bool = false) {
         // Get products
         self.products = [
+//            FTProduct.mockWeekly,
             FTProduct.mockMonthly,
-            FTProduct.mockYearly
+            FTProduct.mockYearly,
+            FTProduct.mockLifetime
         ]
+        self.trialUsed = trialUsed
     }
     
 }

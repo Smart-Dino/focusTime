@@ -9,43 +9,32 @@ import Foundation
 
 /// Organized and sorted ``PlanSelectionPaywallView`` constants.
 enum PlanSelectionPaywallConstants {
-    // MARK: - Feature Items
-    /// Main selling points of the app.
-    enum FeatureItems: String, CaseIterable, Identifiable {
-        case unlimitedSessions = "Unlimited repeating sessions"
-        case unlimitedApps     = "Unlimited number of blocking apps"
-        case deepFocus         = "Deep Focus mode"
-        case whiteNoise        = "White noise for better concentration"
-        case priorityFeatures  = "Priority updates and new features"
-        
-        var id: String { rawValue }
-    }
     // MARK: - Typography
-    enum FontSize {
-        /// Title in navigation bar.
-        static let navigationTitle: CGFloat = 34
-    }
+    enum FontSize { }
     
     // MARK: - Layout
     enum Padding {
-        /// Padding around each feature in the list.
-        static let featureList: CGFloat = 10
+        /// Spacing between the subscription list's offerings.
+        static let featuresSpacing: CGFloat = 20
     }
     
-    enum CornerRadius {
-        /// Corner radius for primary container.
-        static let card: CGFloat = 40
-    }
+    enum CornerRadius { }
     
     // MARK: - Strings
     enum Strings {
-        /// Navigation title.
-        static let navigationTitle = """
-                       Get started with
-                       a 3 day free trial
-                       """
+        static let navigationTitle = "Get DeepWave Pro"
+        static let loadingMessage = "Loading..."
         /// Title text for the subscription trial button.
-        static let tryButtonTitle = "Try free and subscribe."
+        static let startFreeTrial = "Start Free Trial"
+        static let subscribeButtonTitle = "Subscribe"
+        
+        /// Trial-related
+        static let trialDescription = "Try Free For 3 days"
+        static let noPaymentMessage = "No payment due now!"
+        
+        /// Lifetime
+        static let paidOnce = "Paid once"
+        
         /// Title text for the button that dismisses the view.
         static let dismissButtonTitle = "Dismiss current screen."
     }

@@ -4,7 +4,7 @@
 //
 //  Created by Maksym Horobets on 19.05.2025.
 //
-import Foundation
+import SwiftUI
 import StoreKit
 
 /// ViewModel, responsible for managing the logic on ``PlanSelectionPaywallView``.
@@ -14,23 +14,37 @@ import StoreKit
 final class PlanSelectionPaywallViewModel {
     // MARK: - Nested declarations
     struct State {
-        var error: Error?
-        /// Main features of the paid version,
-        let featureItems = OnboardingPaywallConstants.FeatureItems.allCases
+        static let loadingMessage = PlanSelectionPaywallConstants.Strings.loadingMessage
         
-        var formattedPrice: String?
-        var trialTerms: String {
-            "3-day free trial, then \(formattedPrice ?? "...") / month, cancel anytime"
-        }
+        var error: Error?
+        // Background Images
+        let backgroudImages: [ImageResource] = [
+            .debugNightMountain,
+            .debugDayMountain
+        ]
+        var selectedImage: Int = .zero
+        // Product-related
+        var products: [FTProduct] = []
+        /// - Important:
+        /// Set this property through the `PlanSelectionPaywallViewModel.selectProduct(_:)`.
+        fileprivate(set) var selectedProduct: FTProduct?
+        
+        // Trial view
+        var isTrialUsed: Bool = false
+        var trialOfferSubtitle: String = loadingMessage
+        
+        // Other
+        var primaryButtonTitle: String = loadingMessage
+        var subscribeButtonTerms: String = loadingMessage
     }
     
     // MARK: - Properties
     /// Property contatining values that may trigger UI redraw.
-    private(set) var state: State
+    var state: State
     
     // Made this property private becase it is injected
     // through the initializer, not a property.
-    private let paymentManager: PaymentManager?
+    private let paymentManager: PaymentManager
     
     // MARK: - Initializers
     init(
@@ -42,23 +56,45 @@ final class PlanSelectionPaywallViewModel {
     }
     
     // MARK: - Methods
-    func loadPricing() {
-        Task {
-            do {
-                let products = try await paymentManager?.getProducts()
-                state.formattedPrice = products?.first(where: {
-                    $0.subscriptionPeriod == .monthly
-                })?.priceString
-            } catch {
-                state.error = error
-            }
+    func selectProduct(_ product: FTProduct?) {
+        // Set selected product if not nil
+        guard let product else { return }
+        state.selectedProduct = product
+        
+        // Just a shortcut to constants
+        let strShortcut = PlanSelectionPaywallConstants.Strings.self
+        
+        // Set title for subscribe button based on selected product
+        state.primaryButtonTitle = product.isTrialable
+        ? strShortcut.startFreeTrial
+        : strShortcut.subscribeButtonTitle
+        
+        // Set terms above the subscribe button based on selected product
+        state.subscribeButtonTerms = product.isTrialable
+        ? strShortcut.noPaymentMessage
+        : product.trialOfferSubtitle ?? strShortcut.paidOnce
+    }
+    
+    func checkTrialAvailability() async {
+        self.state.isTrialUsed = await paymentManager.trialUsed
+    }
+    
+    func loadOffers() async {
+        do {
+            // Load products
+            let products = try await paymentManager.getProducts()
+            state.products = products
+            // Set initial selected product
+            selectProduct(products.first(where: { $0.isTrialable }))
+        } catch {
+            state.error = error
         }
     }
-
+    
     func subscribe() {
         Task {
             do {
-                let _ = try await paymentManager?.purchase(FTProduct.mockMonthly)
+                let _ = try await paymentManager.purchase(FTProduct.mockMonthly)
             } catch {
                 state.error = error
             }
@@ -74,7 +110,7 @@ final class PlanSelectionPaywallViewModel {
         // )
         Task {
             do {
-                try await paymentManager?.restorePurchases()
+                try await paymentManager.restorePurchases()
             } catch {
                 state.error = error
             }

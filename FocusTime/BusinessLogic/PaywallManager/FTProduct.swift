@@ -33,11 +33,43 @@ struct FTProduct: Identifiable, Equatable {
     let price: Decimal // Using Decimal to avoid binary rounding.
     let priceFormatStyle: Decimal.FormatStyle.Currency
     let subscriptionPeriod: Self.SubscriptionPeriod?
+    /// Declares whether this product has a trial option on it.
+    let isTrialable: Bool
     
     // MARK: Computed properties
     /// Returns a string for a price matching locale.
     var priceString: String {
         price.formatted(priceFormatStyle)
+    }
+    var trialOfferSubtitle: String? {
+        guard let subscriptionPeriodString else { return nil }
+        return price.description + " " + priceFormatStyle.currencyCode + "/" + subscriptionPeriodString
+    }
+    /// Returns a human-readable string describing the subscription period.
+    /// Examples: "month", "every 2 months", "year".
+    /// Returns `nil` if `subscriptionPeriod` is `nil`.
+    var subscriptionPeriodString: String? {
+        guard let period = subscriptionPeriod else {
+            return nil
+        }
+        
+        let unitName: String
+        switch period.unit {
+        case .day:
+            unitName = period.value == 1 ? "day" : "days"
+        case .week:
+            unitName = period.value == 1 ? "week" : "weeks"
+        case .month:
+            unitName = period.value == 1 ? "month" : "months"
+        case .year:
+            unitName = period.value == 1 ? "year" : "years"
+        }
+        
+        if period.value == 1 {
+            return unitName
+        } else {
+            return "every \(period.value) \(unitName)"
+        }
     }
     
     // MARK: - Initializer
@@ -51,13 +83,15 @@ struct FTProduct: Identifiable, Equatable {
     ///   - priceLocale:      The `Locale` used to format the `price` (currency, numbering, etc.).
     ///   - subscriptionPeriod: An optional subscription period describing the billing interval
     ///                         (nil for one‑time purchases).
+    ///   - trialable:        Declares whether this product has a trial option on it.
     init(
-        id: String,
+        id: String = UUID().uuidString,
         title: String,
         description: String,
         price: Decimal,
         priceFormatStyle: Decimal.FormatStyle.Currency,
-        subscriptionPeriod: Self.SubscriptionPeriod? = nil
+        subscriptionPeriod: Self.SubscriptionPeriod? = nil,
+        isTrialable: Bool = false
     ) {
         self.id                 = id
         self.title              = title
@@ -65,6 +99,7 @@ struct FTProduct: Identifiable, Equatable {
         self.price              = price
         self.priceFormatStyle   = priceFormatStyle
         self.subscriptionPeriod = subscriptionPeriod
+        self.isTrialable        = isTrialable
     }
 }
 
@@ -125,18 +160,22 @@ extension FTProduct.SubscriptionPeriod {
 
 // MARK: - Adapter Extensions
 extension FTProduct {
-    /// 2) A convenience initializer to wrap a real StoreKit Product.
-    init(skProduct: StoreKit.Product) {
+    /// A convenience initializer to wrap a real StoreKit Product.
+    init(skProduct: StoreKit.Product, isTrialable: Bool = false) {
         self.id                 = skProduct.id
         self.title              = skProduct.displayName
         self.description        = skProduct.description
         self.price              = skProduct.price as Decimal
         self.priceFormatStyle   = skProduct.priceFormatStyle
-        self.subscriptionPeriod = Self.SubscriptionPeriod(skPeriod: skProduct.subscription?.subscriptionPeriod)
+        self.subscriptionPeriod = Self.SubscriptionPeriod(
+            skPeriod: skProduct.subscription?.subscriptionPeriod
+        )
+        self.isTrialable        = isTrialable
     }
 }
 
 extension FTProduct.SubscriptionPeriod {
+    /// A convenience initializer to wrap a real StoreKit Product.SubscriptionPeriod.
     init?(skPeriod: StoreKit.Product.SubscriptionPeriod?) {
         guard let skPeriod else { return nil }
         
@@ -154,6 +193,7 @@ extension FTProduct.SubscriptionPeriod {
 }
 
 extension FTProduct.PurchaseResult {
+    /// A convenience initializer to wrap a real StoreKit Product.PurchaseResult.
     init(skResult: StoreKit.Product.PurchaseResult) throws {
         self = switch skResult {
         case .success(let verificationResult): .success
@@ -166,21 +206,32 @@ extension FTProduct.PurchaseResult {
 
 // MARK: - Mocks
 extension FTProduct {
-    /// 3) A handy “mock” you can use in tests or previews
+    static let mockWeekly = FTProduct(
+        title:    "Weekly",
+        description: "Unlock pro features for a month",
+        price:    0.37,
+        priceFormatStyle: .currency(code: "USD"),
+        subscriptionPeriod: .weekly
+    )
     static let mockMonthly = FTProduct(
-        id:       "com.yourapp.monthly",
-        title:    "Monthly Pro",
+        title:    "Monthly",
         description: "Unlock pro features for a month",
         price:    2.99,
         priceFormatStyle: .currency(code: "USD"),
-        subscriptionPeriod: .monthly
+        subscriptionPeriod: .monthly,
+        isTrialable: true
     )
     static let mockYearly = FTProduct(
-        id:       "com.yourapp.yearly",
-        title:    "Yearly Pro",
+        title:    "Yearly",
         description: "Unlock pro features for a year",
         price:    29.99,
         priceFormatStyle: .currency(code: "USD"),
         subscriptionPeriod: .yearly
+    )
+    static let mockLifetime = FTProduct(
+        title:    "Lifetime",
+        description: "Unlock this app forever",
+        price:    399.99,
+        priceFormatStyle: .currency(code: "USD")
     )
 }
