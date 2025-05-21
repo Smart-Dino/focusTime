@@ -17,7 +17,7 @@ final class OnboardingPaywallViewModel {
     struct State {
         var error: Error?
         /// Main features of the paid version,
-        let featureItems = OnboardingPaywallConstants.FeatureItems.allCases
+        let featureItems = OnboardingPaywallView.Constants.FeatureItems.allCases
         
         var formattedPrice: String?
         var trialTerms: String {

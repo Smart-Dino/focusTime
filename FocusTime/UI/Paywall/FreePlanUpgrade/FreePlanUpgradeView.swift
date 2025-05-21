@@ -23,7 +23,7 @@ struct FreePlanUpgradeView: View {
             // VStack to push the elements down with a spacer.
             VStack {
                 Spacer()
-                VStack(spacing: FreePlanUpgradeConstants.Spacings.offerView) {
+                VStack(spacing: Constants.Spacings.offerView) {
                     upgradePromptSection
                     
                     actionButtons
@@ -51,9 +51,9 @@ struct FreePlanUpgradeView: View {
     /// Text to upsell the user.
     private var upgradePromptSection: some View {
         Group {
-            Text(FreePlanUpgradeConstants.Strings.title)
+            Text(Constants.Strings.title)
                 .font(.title.bold())
-            Text(FreePlanUpgradeConstants.Strings.upgradeMessage)
+            Text(Constants.Strings.upgradeMessage)
         }
     }
     
@@ -62,11 +62,11 @@ struct FreePlanUpgradeView: View {
         VStack {
             FTSubscribeButtonView(
                 terms: viewModel.state.trialTerms,
-                buttonTitle: FreePlanUpgradeConstants.Strings.tryButtonTitle,
+                buttonTitle: Constants.Strings.tryButtonTitle,
                 buttonAction: {}
             )
             Button(
-                FreePlanUpgradeConstants.Strings.viewPlansButton,
+                Constants.Strings.viewPlansButton,
                 action: viewModel.viewAllPlans
             )
             .buttonStyle(PlainButtonStyle())
@@ -82,7 +82,7 @@ struct FreePlanUpgradeView: View {
             // the business logic or navigation.
 #warning("Dismiss action is empty.")
             Button(
-                FreePlanUpgradeConstants.Strings.dismissButtonTitle,
+                Constants.Strings.dismissButtonTitle,
                 systemImage: "xmark",
                 action: {}
             )

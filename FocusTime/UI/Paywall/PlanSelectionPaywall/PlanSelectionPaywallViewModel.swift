@@ -14,7 +14,7 @@ import StoreKit
 final class PlanSelectionPaywallViewModel {
     // MARK: - Nested declarations
     struct State {
-        static let loadingMessage = PlanSelectionPaywallConstants.Strings.loadingMessage
+        static let loadingMessage = PlanSelectionPaywallView.Constants.Strings.loadingMessage
         
         var error: Error?
         // Background Images
@@ -62,7 +62,7 @@ final class PlanSelectionPaywallViewModel {
         state.selectedProduct = product
         
         // Just a shortcut to constants
-        let strShortcut = PlanSelectionPaywallConstants.Strings.self
+        let strShortcut = PlanSelectionPaywallView.Constants.Strings.self
         
         // Set title for subscribe button based on selected product
         state.primaryButtonTitle = product.isTrialable

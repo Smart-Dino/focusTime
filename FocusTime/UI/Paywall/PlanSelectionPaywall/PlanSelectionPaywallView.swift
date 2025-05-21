@@ -27,7 +27,7 @@ struct PlanSelectionPaywallView: View {
             }
             .tabViewStyle(PageTabViewStyle())
             .indexViewStyle(PageIndexViewStyle(backgroundDisplayMode: .always))
-            // This line fixes image shifing up when switching images
+            // This line fixes image shifting up when switching images
             // using the PageIndex
             // See: https://developer.apple.com/forums/thread/762286?page=1#840153022
             .background(.red.opacity(0.001))
@@ -63,7 +63,7 @@ struct PlanSelectionPaywallView: View {
             toolbarItems
         }
         .navigationTitle(
-            PlanSelectionPaywallConstants.Strings.navigationTitle
+            Constants.Strings.navigationTitle
         )
         .navigationBarTitleDisplayMode(.inline)
         .task {
@@ -85,7 +85,7 @@ struct PlanSelectionPaywallView: View {
     /// List of features.
     private var features: some View {
         ScrollView(.vertical) {
-            VStack(spacing: PlanSelectionPaywallConstants.Padding.featuresSpacing) {
+            VStack(spacing: Constants.Padding.featuresSpacing) {
                 ForEach(viewModel.state.products) { product in
                     // Check if the user hasn't tried trial yet and offer him one
                     let isTrial = product.isTrialable && !viewModel.state.isTrialUsed
@@ -95,7 +95,7 @@ struct PlanSelectionPaywallView: View {
                         : nil
 
                     let descriptionText: String = isTrial
-                        ? PlanSelectionPaywallConstants.Strings.trialDescription
+                        ? Constants.Strings.trialDescription
                         : product.priceString
                     // View
                     FTProductOptionView(
@@ -126,7 +126,7 @@ struct PlanSelectionPaywallView: View {
             // the business logic or navigation.
 #warning("Dismiss action is empty.")
             Button(
-                OnboardingPaywallConstants.Strings.dismissButtonTitle,
+                Constants.Strings.dismissButtonTitle,
                 systemImage: "xmark",
                 action: {}
             )

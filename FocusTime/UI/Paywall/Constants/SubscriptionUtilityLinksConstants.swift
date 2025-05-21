@@ -7,9 +7,11 @@
 
 import Foundation
 
-/// Constants namespace for ``SubscriptionUtilityLinksView``.
-enum SubscriptionUtilityLinksConstants {
-    // MARK: - UI Constants
-    static let separatorDotFontSize: CGFloat = 20
-    static let horizontalSpacing: CGFloat = 20
+extension SubscriptionUtilityLinksView {
+    /// Constants namespace for ``SubscriptionUtilityLinksView``.
+    enum Constants {
+        // MARK: - UI Constants
+        static let separatorDotFontSize: CGFloat = 20
+        static let horizontalSpacing: CGFloat = 20
+    }
 }

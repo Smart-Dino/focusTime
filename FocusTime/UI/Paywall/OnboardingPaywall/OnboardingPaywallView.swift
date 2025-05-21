@@ -23,9 +23,9 @@ struct OnboardingPaywallView: View {
                 .containerRelativeFrame([.horizontal])
                 .ignoresSafeArea()
             VStack(alignment: .leading) {
-                Text(OnboardingPaywallConstants.Strings.navigationTitle)
+                Text(Constants.Strings.navigationTitle)
                     .font(.system(
-                        size: OnboardingPaywallConstants.FontSize.navigationTitle,
+                        size: Constants.FontSize.navigationTitle,
                         weight: .bold
                     ))
                     .foregroundColor(Color.white)
@@ -38,7 +38,7 @@ struct OnboardingPaywallView: View {
                             
                             FTSubscribeButtonView(
                                 terms: viewModel.state.trialTerms,
-                                buttonTitle: FreePlanUpgradeConstants.Strings.tryButtonTitle,
+                                buttonTitle: Constants.Strings.tryButtonTitle,
                                 buttonAction: {}
                             )
                             .padding()
@@ -72,8 +72,8 @@ struct OnboardingPaywallView: View {
             })
             .clipShape(
                 .rect(
-                    topLeadingRadius: OnboardingPaywallConstants.CornerRadius.card,
-                    topTrailingRadius: OnboardingPaywallConstants.CornerRadius.card
+                    topLeadingRadius: Constants.CornerRadius.card,
+                    topTrailingRadius: Constants.CornerRadius.card
                 )
             )
     }
@@ -83,7 +83,7 @@ struct OnboardingPaywallView: View {
         VStack(alignment: .leading) {
             ForEach(viewModel.state.featureItems) { item in
                 FTCheckmarkListItemView(item.rawValue)
-                    .padding(.vertical, OnboardingPaywallConstants.Padding.featureList)
+                    .padding(.vertical, Constants.Padding.featureList)
             }
         }
     }
@@ -96,7 +96,7 @@ struct OnboardingPaywallView: View {
             // the business logic or navigation.
 #warning("Dismiss action is empty.")
             Button(
-                OnboardingPaywallConstants.Strings.dismissButtonTitle,
+                Constants.Strings.dismissButtonTitle,
                 systemImage: "xmark",
                 action: {}
             )

@@ -34,13 +34,13 @@ public struct SubscriptionUtilityLinksView: View {
     }
 
     public var body: some View {
-        HStack(spacing: SubscriptionUtilityLinksConstants.horizontalSpacing) {
+        HStack(spacing: Constants.horizontalSpacing) {
             Button("Terms") {
                 onTermsTapped() // Call the provided closure
             }
             Text("•")
                 .font(.system(
-                    size: SubscriptionUtilityLinksConstants.separatorDotFontSize,
+                    size: Constants.separatorDotFontSize,
                     weight: .heavy
                 ))
             Button("Privacy") {
@@ -48,7 +48,7 @@ public struct SubscriptionUtilityLinksView: View {
             }
             Text("•")
                 .font(.system(
-                    size: SubscriptionUtilityLinksConstants.separatorDotFontSize,
+                    size: Constants.separatorDotFontSize,
                     weight: .heavy
                 ))
             Button("Restore Purchase") {
