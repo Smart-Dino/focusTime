@@ -19,7 +19,7 @@ public struct FTPageControlView<Items: Collection>: View {
     // Static
     private let items: Items
     // Dynamic
-    @Binding private var selectedItem: Int
+    @Binding private var selectedItem: Int?
     @State private var maxWidth: CGFloat = .zero
     // Modifiable
     private var foregroundTint: AnyShapeStyle = .init(Color.white)
@@ -68,7 +68,7 @@ public struct FTPageControlView<Items: Collection>: View {
     ///   - selectedItem: A binding parameter reflecting which item is currently selected.
     public init(
         _ items: Items,
-        selectedItem: Binding<Int>
+        selectedItem: Binding<Int?>
     ) {
         self.items = items
         self._selectedItem = selectedItem
@@ -76,7 +76,7 @@ public struct FTPageControlView<Items: Collection>: View {
     
 }
 
-extension FTPageControlView {
+public extension FTPageControlView {
     func foregroundTint<S: ShapeStyle>(_ style: S) -> Self {
         var copy = self
         copy.foregroundTint = AnyShapeStyle(style)

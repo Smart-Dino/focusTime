@@ -16,23 +16,48 @@ struct PlanSelectionPaywallView: View {
     // MARK: - Body
     var body: some View {
         // Won't add zero to constants since it will never change
-        VStack(alignment: .leading, spacing: .zero) {
-            
-            TabView {
-                ForEach(viewModel.state.backgroudImages, id: \.self) { imageResource in
-                    Image(imageResource)
-                        .resizable()
-                        .scaledToFill()
-                }
+        ZStack(alignment: .leading) {            
+            let selectedImageIndex = Binding {
+                viewModel.state.selectedImageIndex
+            } set: { num in
+                viewModel.state.selectedImageIndex = num
             }
-            .tabViewStyle(PageTabViewStyle())
-            .indexViewStyle(PageIndexViewStyle(backgroundDisplayMode: .always))
-            // This line fixes image shifting up when switching images
-            // using the PageIndex
-            // See: https://developer.apple.com/forums/thread/762286?page=1#840153022
-            .background(.red.opacity(0.001))
+            
+            VStack {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: .zero) {
+                        // Cound use Array(zip(items.indices, items)
+                        // but that is harder to understand...
+                        ForEach(viewModel.state.backgroudImages.indices, id: \.self) { index in
+                            let imageResource = viewModel.state.backgroudImages[index]
+                            Image(imageResource)
+                                .resizable()
+                                .scaledToFit()
+                                .containerRelativeFrame(.horizontal)
+                        }
+                    }
+                    .scrollTargetLayout()
+                }
+                .scrollTargetBehavior(.paging)
+                .scrollPosition(id: selectedImageIndex)
+                
+                // The images are behind the bottom VStack
+                // and pushed to the top of the view
+                Spacer()
+            }
             
             VStack(alignment: .center) {
+                // The content card is above the images
+                // and pushed to the bottom
+                Spacer()
+                
+                FTPageControlView(
+                    viewModel.state.backgroudImages,
+                    selectedItem: selectedImageIndex
+                )
+                // Should tell the design team to make it brighter?
+                .foregroundTint(Color.ftPageControlBlue)
+                
                 contentCard
                     .overlay {
                         VStack {
@@ -88,15 +113,15 @@ struct PlanSelectionPaywallView: View {
             VStack(spacing: Constants.Padding.featuresSpacing) {
                 ForEach(viewModel.state.products) { product in
                     // Check if the user hasn't tried trial yet and offer him one
-                    let isTrial = product.isTrialable && !viewModel.state.isTrialUsed
+                    let isTrial = product.isTrialable && !(viewModel.state.isTrialUsed ?? true)
                     // Precompute to flatten the call site:
                     let subtitle: String? = isTrial
-                        ? product.trialOfferSubtitle
-                        : nil
-
+                    ? product.trialOfferSubtitle
+                    : nil
+                    
                     let descriptionText: String = isTrial
-                        ? Constants.Strings.trialDescription
-                        : product.priceString
+                    ? Constants.Strings.trialDescription
+                    : product.priceString
                     // View
                     FTProductOptionView(
                         leadingTitle: product.title,
@@ -105,7 +130,9 @@ struct PlanSelectionPaywallView: View {
                     )
                     .selected(viewModel.state.selectedProduct == product)
                     .onTapGesture {
-                        viewModel.selectProduct(product)
+                        Task {
+                            await viewModel.selectProduct(product)
+                        }
                     }
                 }
             }

@@ -15,25 +15,26 @@ final class PlanSelectionPaywallViewModel {
     // MARK: - Nested declarations
     struct State {
         static let loadingMessage = PlanSelectionPaywallView.Constants.Strings.loadingMessage
+        var error: Error? // Alerts are not implemented yet
         
-        var error: Error?
-        // Background Images
+        // MARK: Background Images
         let backgroudImages: [ImageResource] = [
             .debugNightMountain,
             .debugDayMountain
         ]
-        var selectedImage: Int = .zero
-        // Product-related
+        var selectedImageIndex: Int? = .zero
+        
+        // MARK: Product-related
         var products: [FTProduct] = []
         /// - Important:
         /// Set this property through the `PlanSelectionPaywallViewModel.selectProduct(_:)`.
         fileprivate(set) var selectedProduct: FTProduct?
         
-        // Trial view
-        var isTrialUsed: Bool = false
+        // MARK: Trial view
+        var isTrialUsed: Bool?
         var trialOfferSubtitle: String = loadingMessage
         
-        // Other
+        // MARK: Other
         var primaryButtonTitle: String = loadingMessage
         var subscribeButtonTerms: String = loadingMessage
     }
@@ -56,23 +57,38 @@ final class PlanSelectionPaywallViewModel {
     }
     
     // MARK: - Methods
-    func selectProduct(_ product: FTProduct?) {
-        // Set selected product if not nil
+    func selectProduct(_ product: FTProduct?) async {
         guard let product else { return }
         state.selectedProduct = product
-        
+
+        // Suspend here until trial check completes
+        // if for some reason it is empty
+        if state.isTrialUsed == nil {
+            await checkTrialAvailability()
+        }
+
+        applyButtonState(for: product)
+    }
+
+    private func applyButtonState(for product: FTProduct) {
+        // This should never be nil whenever this method is called
+        // but we will still make sure it is not
+        guard let isTrialUsed = state.isTrialUsed else { return }
         // Just a shortcut to constants
-        let strShortcut = PlanSelectionPaywallView.Constants.Strings.self
+        let S = PlanSelectionPaywallView.Constants.Strings.self
+        // If this product is trialable and the user hasn't used
+        // their trial yet - we say it is available
+        let trialAvailable: Bool = product.isTrialable && !isTrialUsed
         
         // Set title for subscribe button based on selected product
-        state.primaryButtonTitle = product.isTrialable
-        ? strShortcut.startFreeTrial
-        : strShortcut.subscribeButtonTitle
-        
+        state.primaryButtonTitle = trialAvailable
+            ? S.startFreeTrial
+            : S.subscribeButtonTitle
+
         // Set terms above the subscribe button based on selected product
-        state.subscribeButtonTerms = product.isTrialable
-        ? strShortcut.noPaymentMessage
-        : product.trialOfferSubtitle ?? strShortcut.paidOnce
+        state.subscribeButtonTerms = trialAvailable
+            ? S.noPaymentMessage
+            : (product.trialOfferSubtitle ?? S.paidOnce)
     }
     
     func checkTrialAvailability() async {
@@ -85,7 +101,7 @@ final class PlanSelectionPaywallViewModel {
             let products = try await paymentManager.getProducts()
             state.products = products
             // Set initial selected product
-            selectProduct(products.first(where: { $0.isTrialable }))
+            await selectProduct(products.first(where: { $0.isTrialable }))
         } catch {
             state.error = error
         }

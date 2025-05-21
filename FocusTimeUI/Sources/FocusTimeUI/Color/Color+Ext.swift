@@ -14,6 +14,7 @@ public extension Color {
     // 2. Make all the letters lowercase and remove # -> 1d1b20
     // 3. Add 0x at the start to turn it into a number -> 0x1db20
     static let ftBackground: Color = .init(hex: 0x1d1b20)
+    static let ftPageControlBlue: Color = .init(hex: 0x098ce4)
 }
 
 // MARK: - Hex extension
