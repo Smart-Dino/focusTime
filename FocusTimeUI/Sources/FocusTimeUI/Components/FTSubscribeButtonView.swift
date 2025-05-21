@@ -18,7 +18,7 @@ public struct FTSubscribeButtonView: View {
             Text(terms)
                 .font(.caption)
             Button(buttonTitle, action: buttonAction)
-                .buttonStyle(FTPrimaryButtonStyle())
+                .buttonStyle(.ftPrimary)
         }
     }
 

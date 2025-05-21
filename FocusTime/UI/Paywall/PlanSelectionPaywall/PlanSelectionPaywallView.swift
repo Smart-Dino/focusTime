@@ -157,7 +157,7 @@ struct PlanSelectionPaywallView: View {
                 systemImage: "xmark",
                 action: {}
             )
-            .buttonStyle(PlainButtonStyle())
+            .buttonStyle(.plain)
         }
     }
 }

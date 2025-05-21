@@ -55,7 +55,7 @@ public struct SubscriptionUtilityLinksView: View {
                 onRestoreTapped() // Call the provided closure
             }
         }
-        .buttonStyle(PlainButtonStyle())
+        .buttonStyle(.plain)
         .font(.callout)
     }
 }
