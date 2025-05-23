@@ -1,23 +1,20 @@
 //
-//  OnboardingPaywallViewModel.swift
+//  FreeplanUpgradeViewModel.swift
 //  FocusTime
 //
-//  Created by Maksym Horobets on 15.05.2025.
+//  Created by Maksym Horobets on 16.05.2025.
 //
 
 import Foundation
-import StoreKit
 
-/// ViewModel, responsible for managing the logic on ``OnboardingPaywallView``.
-/// - Note: Use it in the ``OnboadingPaywallView``.
+/// ViewModel, responsible for managing the logic on ``FreePlanUpgradeView``.
+/// - Note: Use it in the ``FreePlanUpgradeView``.
 @MainActor
 @Observable
-final class OnboardingPaywallViewModel {
+final class FreePlanUpgradeViewModel {
     // MARK: - Nested declarations
     struct State {
         var error: Error?
-        /// Main features of the paid version,
-        let featureItems = OnboardingPaywallConstants.FeatureItems.allCases
         
         var formattedPrice: String?
         var trialTerms: String {
@@ -43,6 +40,10 @@ final class OnboardingPaywallViewModel {
     }
     
     // MARK: - Methods
+    func viewAllPlans() {
+        // Show all plans
+    }
+    
     func loadPricing() {
         Task {
             do {
@@ -91,3 +92,4 @@ final class OnboardingPaywallViewModel {
     }
     
 }
+

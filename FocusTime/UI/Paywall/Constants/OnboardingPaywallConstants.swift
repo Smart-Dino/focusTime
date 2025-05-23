@@ -1,5 +1,5 @@
 //
-//  PaywallConstants.swift
+//  OnboardingPaywallConstants.swift
 //  FocusTime
 //
 //  Created by Maksym Horobets on 15.05.2025.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-/// Organized and sorted paywall-related constants.
+/// Organized and sorted ``OnboardingPaywallView`` constants.
 enum OnboardingPaywallConstants {
     // MARK: - Feature Items
     /// Main selling points of the app.
@@ -51,4 +51,3 @@ enum OnboardingPaywallConstants {
     }
     
 }
-
