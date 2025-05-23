@@ -16,7 +16,7 @@ struct ContentView: View {
                 .foregroundStyle(.tint)
             Text("Hello, world!")
             Button("Test") { }
-                .buttonStyle(FTPrimaryButtonStyle())
+                .buttonStyle(.ftPrimary)
         }
         .padding()
     }

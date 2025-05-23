@@ -69,7 +69,7 @@ struct FreePlanUpgradeView: View {
                 Constants.Strings.viewPlansButton,
                 action: viewModel.viewAllPlans
             )
-            .buttonStyle(PlainButtonStyle())
+            .buttonStyle(.plain)
             .opacity(0.8)
         }
     }
@@ -86,7 +86,7 @@ struct FreePlanUpgradeView: View {
                 systemImage: "xmark",
                 action: {}
             )
-            .buttonStyle(PlainButtonStyle())
+            .buttonStyle(.plain)
         }
     }
     
