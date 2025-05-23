@@ -36,6 +36,7 @@ struct OnboardingPaywallView: View {
                         VStack {
                             features
                             
+#warning("Action is empty")
                             FTSubscribeButtonView(
                                 terms: viewModel.state.trialTerms,
                                 buttonTitle: Constants.Strings.tryButtonTitle,
@@ -59,7 +60,10 @@ struct OnboardingPaywallView: View {
         .toolbar {
             toolbarItems
         }
-        .onAppear(perform: viewModel.loadPricing)
+        .onAppear() {
+            // This will display an error if monthy product isn't found
+            viewModel.loadPricing(for: .monthly)
+        }
     }
     
     // MARK: - Computed properties

@@ -66,7 +66,7 @@ actor MockPaymentManager: PaymentManager {
     func purchase(_ product: FTProduct) async throws(PaymentError) -> FTProduct.PurchaseResult? {
         print("purchase invoked")
         print("Description: \(product)")
-        print("Formatted price: \(product.priceString)")
+        print("Formatted price: \(product.price.description)")
         throw .unknown
     }
     
@@ -79,9 +79,9 @@ actor MockPaymentManager: PaymentManager {
         // Get products
         self.products = [
 //            FTProduct.mockWeekly,
-            FTProduct.mockMonthly,
-            FTProduct.mockYearly,
-            FTProduct.mockLifetime
+            FTProduct.Mocks.monthly.product,
+            FTProduct.Mocks.yearly.product,
+            FTProduct.Mocks.lifetime.product
         ]
         self.trialUsed = trialUsed
     }

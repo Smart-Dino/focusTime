@@ -43,23 +43,34 @@ final class OnboardingPaywallViewModel {
     }
     
     // MARK: - Methods
-    func loadPricing() {
+    func fetchPrice(for period: PeriodConverter) async throws -> String? {
+        let products = try await paymentManager.getProducts()
+        
+        if let targetProduct = products.first(
+            where: { $0.subscriptionPeriod == period.durationInSeconds }
+        ) {
+            let formatter = FTProductFormatter(targetProduct)
+            return formatter.priceString
+        }
+        throw NSError()
+    }
+
+    func loadPricing(for period: PeriodConverter) {
         Task {
             do {
-                let products = try await paymentManager.getProducts()
-                state.formattedPrice = products.first(where: {
-                    $0.subscriptionPeriod == .monthly
-                })?.priceString
+                if let priceDescription = try await fetchPrice(for: period) {
+                    state.formattedPrice = priceDescription
+                }
             } catch {
                 state.error = error
             }
         }
     }
 
-    func subscribe() {
+    func subscribe(with product: FTProduct) {
         Task {
             do {
-                let _ = try await paymentManager.purchase(FTProduct.mockMonthly)
+                let _ = try await paymentManager.purchase(product)
             } catch {
                 state.error = error
             }

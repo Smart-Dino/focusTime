@@ -57,8 +57,7 @@ final class PlanSelectionPaywallViewModel {
     }
     
     // MARK: - Methods
-    func selectProduct(_ product: FTProduct?) async {
-        guard let product else { return }
+    func selectProduct(_ product: FTProduct) async {
         state.selectedProduct = product
 
         // Suspend here until trial check completes
@@ -67,28 +66,43 @@ final class PlanSelectionPaywallViewModel {
             await checkTrialAvailability()
         }
 
-        applyButtonState(for: product)
+        configureBottomSectionForSelectedPtoduct(product)
     }
-
-    private func applyButtonState(for product: FTProduct) {
+    
+    private func configureBottomSectionForSelectedPtoduct(_ product: FTProduct) {
+        // Just a shortcut to constants
+        let S = PlanSelectionPaywallView.Constants.Strings.self
         // This should never be nil whenever this method is called
         // but we will still make sure it is not
         guard let isTrialUsed = state.isTrialUsed else { return }
-        // Just a shortcut to constants
-        let S = PlanSelectionPaywallView.Constants.Strings.self
         // If this product is trialable and the user hasn't used
         // their trial yet - we say it is available
-        let trialAvailable: Bool = product.isTrialable && !isTrialUsed
+        let useTrial: Bool = product.isTrialable && !isTrialUsed
         
-        // Set title for subscribe button based on selected product
-        state.primaryButtonTitle = trialAvailable
-            ? S.startFreeTrial
-            : S.subscribeButtonTitle
-
-        // Set terms above the subscribe button based on selected product
-        state.subscribeButtonTerms = trialAvailable
-            ? S.noPaymentMessage
-            : (product.trialOfferSubtitle ?? S.paidOnce)
+        if useTrial {
+            state.primaryButtonTitle = S.startFreeTrial
+            state.subscribeButtonTerms = S.noPaymentMessage
+        } else {
+            var terms: String
+            
+            if product.isSubscription {
+                let formatter = FTProductFormatter(product)
+                // Should never fail since isSubscription
+                // propery is only true when the product has
+                // a subscription period
+                terms = formatter.subscriptionPeriodString!
+            } else {
+                terms = S.paidOnce
+            }
+            
+            state.primaryButtonTitle = S.subscribeButtonTitle
+            state.subscribeButtonTerms = terms
+        }
+    }
+    
+    func getTrialOfferSubtitle(for product: FTProduct) -> String? {
+        let formatter = FTProductFormatter(product)
+        return formatter.subscriptionPeriodString
     }
     
     func checkTrialAvailability() async {
@@ -100,17 +114,23 @@ final class PlanSelectionPaywallViewModel {
             // Load products
             let products = try await paymentManager.getProducts()
             state.products = products
+            
             // Set initial selected product
-            await selectProduct(products.first(where: { $0.isTrialable }))
+            // If there are no products - we don't select anything
+            if let trialableProduct = products.first(where: { $0.isTrialable }) {
+                await selectProduct(trialableProduct)
+            } else if let product = products.first {
+                await selectProduct(product)
+            }
         } catch {
             state.error = error
         }
     }
     
-    func subscribe() {
+    func subscribe(with product: FTProduct) {
         Task {
             do {
-                let _ = try await paymentManager.purchase(FTProduct.mockMonthly)
+                let _ = try await paymentManager.purchase(product)
             } catch {
                 state.error = error
             }

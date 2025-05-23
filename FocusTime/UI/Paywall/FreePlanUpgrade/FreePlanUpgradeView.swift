@@ -45,7 +45,10 @@ struct FreePlanUpgradeView: View {
         .toolbar {
             toolbarItems
         }
-        .onAppear(perform: viewModel.loadPricing)
+        .onAppear() {
+            // This will display an error if monthy product isn't found
+            viewModel.loadPricing(for: .monthly)
+        }
     }
     
     /// Text to upsell the user.

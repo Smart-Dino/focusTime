@@ -63,6 +63,7 @@ struct PlanSelectionPaywallView: View {
                         VStack {
                             features
                             
+#warning("Action is empty")
                             FTSubscribeButtonView(
                                 terms: viewModel.state.subscribeButtonTerms,
                                 buttonTitle: viewModel.state.primaryButtonTitle,
@@ -116,12 +117,12 @@ struct PlanSelectionPaywallView: View {
                     let isTrial = product.isTrialable && !(viewModel.state.isTrialUsed ?? true)
                     // Precompute to flatten the call site:
                     let subtitle: String? = isTrial
-                    ? product.trialOfferSubtitle
+                    ? viewModel.getTrialOfferSubtitle(for: product)
                     : nil
                     
                     let descriptionText: String = isTrial
                     ? Constants.Strings.trialDescription
-                    : product.priceString
+                    : product.price.description
                     // View
                     FTProductOptionView(
                         leadingTitle: product.title,
