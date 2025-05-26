@@ -51,11 +51,10 @@ final class FreePlanUpgradeViewModel {
             if let targetProduct = products.first(
                 where: { $0.isTrialable }
             ) {
-                let formatter = FTProductFormatter(targetProduct)
-                if let periodString = formatter.periodString {
-                    state.formattedPrice = formatter.priceString + " / " + periodString
+                if let periodString = targetProduct.periodString {
+                    state.formattedPrice = targetProduct.priceString + " / " + periodString
                 } else {
-                    state.formattedPrice = formatter.priceString
+                    state.formattedPrice = targetProduct.priceString
                 }
                 return
             }

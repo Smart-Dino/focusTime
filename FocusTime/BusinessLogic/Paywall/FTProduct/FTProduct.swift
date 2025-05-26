@@ -24,10 +24,16 @@ struct FTProduct: Identifiable, Equatable, Sendable {
     let description: String
     let price: Decimal // Using Decimal to avoid binary rounding
     let priceFormatStyle: Decimal.FormatStyle.Currency
-    let subscriptionPeriod: Int? // Now an Int, representing number of seconds
+    let subscriptionPeriod: Int?
     /// Declares whether this product has a trial option on it.
     let isTrialable: Bool
     /// Tells if this product is meant to be a subscription.
+    
+    // MARK: - UI-specific properties
+    let priceString: String
+    let periodString: String?
+    let trialOfferSubtitle: String?
+    let subscriptionPeriodString: String?
     
     // MARK: - Initializer
     /// Initializes a new `FTProduct` with the provided metadata and optional subscription period.
@@ -57,6 +63,23 @@ struct FTProduct: Identifiable, Equatable, Sendable {
         self.priceFormatStyle   = priceFormatStyle
         self.subscriptionPeriod = subscriptionPeriod
         self.isTrialable        = isTrialable
+        
+        // Set convenience UI properties
+        self.priceString = price.formatted(priceFormatStyle)
+        
+        if let subscriptionPeriod {
+            self.periodString = PeriodConverter
+                .approximateComponents(seconds: subscriptionPeriod)
+                .descriptiveLargestUnitString
+            
+            self.trialOfferSubtitle = "\(price.description) \(priceFormatStyle.currencyCode)/\(periodString!)"
+            self.subscriptionPeriodString = price.description + " " + priceFormatStyle.currencyCode + "/" + periodString!
+        } else {
+            self.periodString = nil
+            self.trialOfferSubtitle = nil
+            self.subscriptionPeriodString = nil
+        }
+        
     }
 }
 

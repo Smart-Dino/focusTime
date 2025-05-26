@@ -49,6 +49,8 @@ enum PeriodConverter: Sendable {
         }
     }
     
+    // This method cannot be an extension on DateComponents,
+    // since it relies on static properties of PeriodConverter
     /// Convert seconds back to approximate time components for display purposes.
     /// - Parameter seconds: The total duration in seconds
     /// - Returns: DateComponents with years, months, and days set

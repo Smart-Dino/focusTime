@@ -92,11 +92,10 @@ final class PlanSelectionPaywallViewModel {
             var terms: String
             
             if product.subscriptionPeriod != nil {
-                let formatter = FTProductFormatter(product)
                 // Should never fail since isSubscription
                 // propery is only true when the product has
                 // a subscription period
-                terms = formatter.subscriptionPeriodString!
+                terms = product.subscriptionPeriodString!
             } else {
                 terms = S.paidOnce
             }
@@ -107,8 +106,7 @@ final class PlanSelectionPaywallViewModel {
     }
     
     func getTrialOfferSubtitle(for product: FTProduct) -> String? {
-        let formatter = FTProductFormatter(product)
-        return formatter.subscriptionPeriodString
+        product.subscriptionPeriodString
     }
     
     func checkTrialAvailability() async {
