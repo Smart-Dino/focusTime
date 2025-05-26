@@ -13,32 +13,23 @@ import SwiftUI
 /// Highlights the current active segment and shows others as inactive.
 public struct FTProgressBarView<Item: Hashable>: View {
 
-    /// All items representing each step of the progress.
     public let items: [Item]
 
-    /// The currently selected (active) item.
-    public let selectedItem: Item
+    @Binding public var selectedItem: Item
 
-    /// Colour used for the active segment.
     private let activeColor: Color
 
-    /// Colour used for inactive segments.
     private let inactiveColor: Color
 
-    /// Initialises the progress bar.
-    /// - Parameters:
-    ///   - items: Array of hashable items representing the steps.
-    ///   - selectedItem: The currently active item.
-    ///   - activeColor: Color for the active segment. Default is `.blue`.
-    ///   - inactiveColor: Color for inactive segments. Default is `.gray.opacity(0.3)`.
+
     public init(
         items: [Item],
-        selectedItem: Item,
+        selectedItem: Binding<Item>,
         activeColor: Color = .blue,
         inactiveColor: Color = Color.gray.opacity(0.3)
     ) {
         self.items = items
-        self.selectedItem = selectedItem
+        self._selectedItem = selectedItem
         self.activeColor = activeColor
         self.inactiveColor = inactiveColor
     }
