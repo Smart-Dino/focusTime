@@ -23,25 +23,26 @@ struct QuizOnboardingView: View {
             VStack(alignment: .leading){
                 
                 /// Title and subtitle
-                VStack(alignment: .center, spacing: 11){
-                    Text("What challenges your focus most often?")
+                VStack(alignment: .center, spacing: Constants.Layout.titleSpacing) {
+                    Text(Constants.Strings.title)
                         .font(.title3.bold())
                         .multilineTextAlignment(.center)
-                    
-                    Text("Add one or more options that work for you.")
+
+                    Text(Constants.Strings.subtitle)
                         .font(.body)
                         .multilineTextAlignment(.center)
-                    
                 }
-                .foregroundColor(Color.white)
-                .padding(.bottom, 40)
+                .foregroundColor(.white)
+                .padding(.bottom, Constants.Layout.bottomPadding)
                 
                 // MARK: - Scrollable Quiz Section
-                /// Scrollable in case more options are added later
                 ScrollView {
                     VStack(alignment: .leading, spacing: 42) {
-                        ForEach($viewModel.state.options) { $option in
-                            Toggle(option.title, isOn: $option.isSelected)
+                        ForEach(viewModel.state.options) { option in
+                            Toggle(option.title, isOn: Binding(
+                                get: { viewModel.isOptionSelected(option)},
+                                set: {_ in viewModel.toggleSelection(for: option)}
+                            ))
                                 .toggleStyle(FTCheckboxToggleStyle(color: .blue))
                                 .font(.body)
                         }
