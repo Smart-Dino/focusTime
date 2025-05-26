@@ -19,6 +19,7 @@ import SwiftUI
 ///     leadingSubtitle: "2.99 USD/month",
 ///     trailingDescription: "Try Free For 3 days",
 /// )
+/// .environment(\.layoutDirection, .rightToLeft) // Compliments layoutDirection
 ///
 /// FTProductOptionView(
 ///     leadingTitle: "Annual",
@@ -45,21 +46,24 @@ public struct FTProductOptionView: View {
             VStack(alignment: .leading) {
                 Text(leadingTitle)
                     .font(.title3)
-                if let leadingSubtitle {
-                    Text(leadingSubtitle)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                // Still needs some text to have an impact on the height
+                // 0.description in this example
+                Text(leadingSubtitle ?? 0.description)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+            .foregroundStyle(Color.clear)
+            .overlay {
+                VStack(alignment: .leading) {
+                    Text(leadingTitle)
+                        .font(.title3)
+                    if let leadingSubtitle {
+                        Text(leadingSubtitle)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
                 }
             }
-            
-            Spacer()
-            // Placeholder values to keep the view vertically
-            // consistent despite leadingSubtitle presence.
-            VStack {
-                Text("\u{00A0}")
-                Text("\u{00A0}")
-            }
-            
             Spacer()
             // Trailing
             Text(trailingDescription)
