@@ -64,7 +64,7 @@ struct OnboardingPaywallView: View {
             toolbarItems
         }
         .alert(
-            "An error occured.",
+            Constants.Strings.errorHeader,
             isPresented: Binding(get: {
                 viewModel.state.error != nil
             }, set: { showError in

@@ -44,7 +44,10 @@ extension OnboardingPaywallView {
                        a 3 day free trial
                        """
             static let tryButtonTitle = "Try free and subscribe."
-            static let dismissButtonTitle = "Dismiss current screen."
+            static let dismissButtonTitle = SharedPaywallConstants.Strings.dismissButtonTitle
+            
+            // Error
+            static let errorHeader = SharedPaywallConstants.Strings.errorHeader
         }
         
     }

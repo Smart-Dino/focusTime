@@ -19,25 +19,26 @@ extension PlanSelectionPaywallView {
             static let featuresSpacing: CGFloat = 20
         }
         
-        enum CornerRadius { }
-        
         // MARK: - Strings
         enum Strings {
             static let navigationTitle = "Get DeepWave Pro"
-            static let loadingMessage = "Loading..."
-            /// Title text for the subscription trial button.
+            static let loadingMessage = SharedPaywallConstants.Strings.loadingMessage
+            // Title text for the subscription trial button.
             static let startFreeTrial = "Start Free Trial"
-            static let subscribeButtonTitle = "Subscribe"
+            static let subscribeButtonTitle = SharedPaywallConstants.Strings.subscribeButtonTitle
             
-            /// Trial-related
+            // Trial-related
             static let trialDescription = "Try Free For 3 days"
             static let noPaymentMessage = "No payment due now!"
             
-            /// Lifetime
+            // Lifetime
             static let paidOnce = "Paid once"
             
-            /// Title text for the button that dismisses the view.
-            static let dismissButtonTitle = "Dismiss current screen."
+            // Title text for the button that dismisses the view.
+            static let dismissButtonTitle = SharedPaywallConstants.Strings.dismissButtonTitle
+            
+            // Error
+            static let errorHeader = SharedPaywallConstants.Strings.errorHeader
         }
         
     }

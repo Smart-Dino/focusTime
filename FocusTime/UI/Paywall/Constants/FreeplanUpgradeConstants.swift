@@ -24,12 +24,17 @@ extension FreePlanUpgradeView {
                 }
                 return string
             }
-            /// Title of the view.
+            
+            // Title of the view.
             static let title = "You're on a Free Plan"
+            
             // Buttons
             static let tryButtonTitle = "Try For $0,00"
-            static let viewPlansButton = "View All Plans"
-            static let dismissButtonTitle = "Dismiss current screen."
+            static let viewPlansButton = SharedPaywallConstants.Strings.viewPlansButton
+            static let dismissButtonTitle = SharedPaywallConstants.Strings.dismissButtonTitle
+            
+            // Error
+            static let errorHeader = SharedPaywallConstants.Strings.errorHeader
         }
     }
 }
