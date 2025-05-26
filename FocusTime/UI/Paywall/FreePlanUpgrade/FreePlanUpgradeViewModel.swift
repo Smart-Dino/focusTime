@@ -39,6 +39,13 @@ final class FreePlanUpgradeViewModel {
         self.paymentManager = paymentManager
     }
     
+    // MARK: - State setter methods
+    func updateError(showError: Bool) {
+        if !showError {
+            state.error = nil
+        }
+    }
+    
     // MARK: - Methods
     func viewAllPlans() {
         // Show all plans

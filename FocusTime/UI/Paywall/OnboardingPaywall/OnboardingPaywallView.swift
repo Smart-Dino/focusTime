@@ -63,6 +63,18 @@ struct OnboardingPaywallView: View {
         .toolbar {
             toolbarItems
         }
+        .alert(
+            "An error occured.",
+            isPresented: Binding(get: {
+                viewModel.state.error != nil
+            }, set: { showError in
+                viewModel.updateError(showError: showError)
+            }), actions: {
+                // OK dismissal button by default
+            }, message: {
+                Text(viewModel.state.error?.localizedDescription ?? "")
+            }
+        )
         .task {
             await viewModel.loadFirstTrialOffer()
         }

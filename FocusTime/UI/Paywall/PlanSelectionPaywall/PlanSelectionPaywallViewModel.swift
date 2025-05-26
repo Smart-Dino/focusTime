@@ -57,9 +57,14 @@ final class PlanSelectionPaywallViewModel {
     }
     
     // MARK: - State setter methods
-    
     func updateSelectedImageIndex(index: Int?) {
         state.selectedImageIndex = index
+    }
+    
+    func updateError(showError: Bool) {
+        if !showError {
+            state.error = nil
+        }
     }
     
     // MARK: - Methods

@@ -42,6 +42,13 @@ final class OnboardingPaywallViewModel {
         self.paymentManager = paymentManager
     }
     
+    // MARK: - State setter methods
+    func updateError(showError: Bool) {
+        if !showError {
+            state.error = nil
+        }
+    }
+    
     // MARK: - Methods
     func loadFirstTrialOffer() async {
         do {

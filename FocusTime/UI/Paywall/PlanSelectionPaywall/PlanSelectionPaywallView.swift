@@ -88,13 +88,25 @@ struct PlanSelectionPaywallView: View {
         .ignoresSafeArea(edges: .vertical)
         // Anything beyond Large breaks the UI on smaller screens.
         .dynamicTypeSize(...DynamicTypeSize.xLarge)
-        .toolbar {
-            toolbarItems
-        }
         .navigationTitle(
             Constants.Strings.navigationTitle
         )
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            toolbarItems
+        }
+        .alert(
+            "An error occured.",
+            isPresented: Binding(get: {
+                viewModel.state.error != nil
+            }, set: { showError in
+                viewModel.updateError(showError: showError)
+            }), actions: {
+                // OK dismissal button by default
+            }, message: {
+                Text(viewModel.state.error?.localizedDescription ?? "")
+            }
+        )
         .task {
             await viewModel.checkTrialAvailability()
             await viewModel.loadOffers()
