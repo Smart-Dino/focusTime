@@ -14,7 +14,7 @@ import Observation
 
 /// Represents each step in the onboarding flow.
 /// Each case provides associated subtitles and image name.
-enum SlideOnboardingStep: Int, CaseIterable {
+enum SlideOnboardingStep: CaseIterable {
     case step1, step2, step3, step4
 
     /// The first subtitle text for the step.
@@ -73,18 +73,22 @@ enum SlideOnboardingStep: Int, CaseIterable {
 class SlideOnboardingViewModel {
     
     /// The current onboarding step shown in the view.
-    var currentStep: SlideOnboardingStep = .step1
+    var currentIndex: Int = 0
     var showSkipConfirmation: Bool = false
+    
+    var currentStep: SlideOnboardingStep {
+        SlideOnboardingStep.allCases[currentIndex]
+    }
 
     /// Advances to the next onboarding step if not at the last step.
     func goToNextStep() {
-        if currentStep.rawValue < SlideOnboardingStep.allCases.count - 1 {
-            currentStep = SlideOnboardingStep(rawValue: currentStep.rawValue + 1) ?? currentStep
+        if currentIndex < SlideOnboardingStep.allCases.count - 1 {
+            currentIndex += 1
         }
     }
 
     /// Skips directly to the last onboarding step.
     func skipOnboarding() {
-        currentStep = .step4
+        currentIndex = SlideOnboardingStep.allCases.count - 1
     }
 }

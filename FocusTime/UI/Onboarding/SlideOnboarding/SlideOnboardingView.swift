@@ -80,16 +80,18 @@ struct SlideOnboardingView: View {
             }
         }
         .animation(.easeInOut, value: viewModel.currentStep)
-        .preferredColorScheme(.dark)
+        .preferredColorScheme(.dark) 
         
         // MARK: - Skip Confirmation Alert
-        .alert("Do you really want to skip onboarding?", isPresented: $viewModel.showSkipConfirmation) {
-            Button("Skip", role: .destructive) {
+        .alert("Before you go...", isPresented: $viewModel.showSkipConfirmation) {
+            Button("Skip anyway", role: .destructive) {
                 viewModel.skipOnboarding()
             }
-            Button("No", role: .cancel) {}
+            Button("Go back", role: .cancel) {}
+        } message: {
+            Text("Are you sure you want to skip the onboarding?")
         }
-    } 
+    }
 }
 
 
