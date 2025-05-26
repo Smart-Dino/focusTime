@@ -76,23 +76,30 @@ final class PlanSelectionPaywallViewModel {
         if state.isTrialUsed == nil {
             await checkTrialAvailability()
         }
+        
+        guard let isTrialUsed = state.isTrialUsed else {
+            state.error = PlanSelectionPaywallError.missingTrialInfo
+            return
+        }
+        
+        configureBottomSectionForSelectedPtoduct(product, isTrialUsed: isTrialUsed)
 
-        configureBottomSectionForSelectedPtoduct(product)
     }
     
-    private func configureBottomSectionForSelectedPtoduct(_ product: FTProduct) {
+    private func configureBottomSectionForSelectedPtoduct(
+        _ product: FTProduct,
+        isTrialUsed: Bool
+    ) {
         // Just a shortcut to constants
-        let S = PlanSelectionPaywallView.Constants.Strings.self
-        // This should never be nil whenever this method is called
-        // but we will still make sure it is not
-        guard let isTrialUsed = state.isTrialUsed else { return }
+        let shortcut = PlanSelectionPaywallView.Constants.Strings.self
+        
         // If this product is trialable and the user hasn't used
         // their trial yet - we say it is available
         let useTrial: Bool = product.isTrialable && !isTrialUsed
         
         if useTrial {
-            state.primaryButtonTitle = S.startFreeTrial
-            state.subscribeButtonTerms = S.noPaymentMessage
+            state.primaryButtonTitle = shortcut.startFreeTrial
+            state.subscribeButtonTerms = shortcut.noPaymentMessage
         } else {
             var terms: String
             
@@ -102,10 +109,10 @@ final class PlanSelectionPaywallViewModel {
                 // a subscription period
                 terms = product.subscriptionPeriodString!
             } else {
-                terms = S.paidOnce
+                terms = shortcut.paidOnce
             }
             
-            state.primaryButtonTitle = S.subscribeButtonTitle
+            state.primaryButtonTitle = shortcut.subscribeButtonTitle
             state.subscribeButtonTerms = terms
         }
     }

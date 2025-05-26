@@ -179,7 +179,7 @@ struct PlanSelectionPaywallView: View {
     NavigationStack {
         PlanSelectionPaywallView(
             viewModel: .init(
-                paymentManager: MockPaymentManager(trialUsed: false)
+                paymentManager: MockPaymentManagerWithPurchaseError(trialUsed: false)
             )
         )
         .preferredColorScheme(.dark)
@@ -190,7 +190,7 @@ struct PlanSelectionPaywallView: View {
     NavigationStack {
         PlanSelectionPaywallView(
             viewModel: .init(
-                paymentManager: MockPaymentManager(trialUsed: true)
+                paymentManager: MockPaymentManagerWithPurchaseError(trialUsed: true)
             )
         )
         .preferredColorScheme(.dark)

@@ -123,7 +123,9 @@ struct OnboardingPaywallView: View {
 #Preview {
     NavigationStack {
         OnboardingPaywallView(
-            viewModel: .init(paymentManager: MockPaymentManager())
+            viewModel: .init(
+                paymentManager: MockPaymentManagerWithPurchaseError()
+            )
         )
         .preferredColorScheme(.dark)
     }

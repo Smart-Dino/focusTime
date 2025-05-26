@@ -109,7 +109,9 @@ struct FreePlanUpgradeView: View {
 #Preview {
     NavigationStack {
         FreePlanUpgradeView(
-            viewModel: .init(paymentManager: MockPaymentManager())
+            viewModel: .init(
+                paymentManager: MockPaymentManagerWithPurchaseError()
+            )
         )
         .preferredColorScheme(.dark)
     }

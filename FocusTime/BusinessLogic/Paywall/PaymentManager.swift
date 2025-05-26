@@ -53,7 +53,8 @@ protocol PaymentManager: Actor {
     // TODO: Implement Entitlements when wiring up business logic.
 }
 
-actor MockPaymentManager: PaymentManager {
+/// This instance of ``PaymentManager`` only succeeds on `getProducts()` method.
+actor MockPaymentManagerWithPurchaseError: PaymentManager {
     private var products: [FTProduct]
     // This will have to be a computed property in LivePaymentManager
     private(set) var trialUsed: Bool
