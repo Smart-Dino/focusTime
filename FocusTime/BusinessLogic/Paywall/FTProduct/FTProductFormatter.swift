@@ -21,8 +21,8 @@ struct FTProductFormatter: Sendable {
     var periodString: String? {
         guard let period = product.subscriptionPeriod else { return nil }
         
-        let components = PeriodConverter.components(
-            fromSubscriptionSeconds: period
+        let components = PeriodConverter.approximateComponents(
+            seconds: period
         )
         
         let formatter = DateComponentsFormatter()

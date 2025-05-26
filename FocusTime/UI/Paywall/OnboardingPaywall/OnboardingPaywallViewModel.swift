@@ -21,7 +21,7 @@ final class OnboardingPaywallViewModel {
         
         var formattedPrice: String?
         var trialTerms: String {
-            "3-day free trial, then \(formattedPrice ?? "...") / month, cancel anytime"
+            "3-day free trial, then \(formattedPrice ?? "..."), cancel anytime"
         }
     }
     
@@ -43,30 +43,28 @@ final class OnboardingPaywallViewModel {
     }
     
     // MARK: - Methods
-    func fetchPrice(for period: PeriodConverter) async throws -> String? {
-        let products = try await paymentManager.getProducts()
-        
-        if let targetProduct = products.first(
-            where: { $0.subscriptionPeriod == period.durationInSeconds }
-        ) {
-            let formatter = FTProductFormatter(targetProduct)
-            return formatter.priceString
-        }
-        throw NSError()
-    }
-
-    func loadPricing(for period: PeriodConverter) {
-        Task {
-            do {
-                if let priceDescription = try await fetchPrice(for: period) {
-                    state.formattedPrice = priceDescription
+    func loadFirstTrialOffer() async {
+        do {
+            let products = try await paymentManager.getProducts()
+            
+            if let targetProduct = products.first(
+                where: { $0.isTrialable }
+            ) {
+                let formatter = FTProductFormatter(targetProduct)
+                if let periodString = formatter.periodString {
+                    state.formattedPrice = formatter.priceString + " / " + periodString
+                } else {
+                    state.formattedPrice = formatter.priceString
                 }
-            } catch {
-                state.error = error
+                return
             }
+            
+            state.error = OnboardingPaywallError.noTrialOption
+        } catch {
+            state.error = error
         }
     }
-
+    
     func subscribe(with product: FTProduct) {
         Task {
             do {

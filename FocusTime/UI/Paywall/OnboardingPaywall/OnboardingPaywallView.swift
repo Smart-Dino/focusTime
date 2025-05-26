@@ -31,27 +31,30 @@ struct OnboardingPaywallView: View {
                     .foregroundColor(Color.white)
                     .padding()
                 Spacer()
-                contentCard
-                    .overlay {
-                        VStack {
-                            features
-                            
+                VStack {
+                    features
+                    
 #warning("Action is empty")
-                            FTSubscribeButtonView(
-                                terms: viewModel.state.trialTerms,
-                                buttonTitle: Constants.Strings.tryButtonTitle,
-                                buttonAction: {}
-                            )
-                            .padding()
-                            
-                            SubscriptionUtilityLinksView(
-                                onTermsTapped: viewModel.openTermsOfService,
-                                onPrivacyTapped: viewModel.openPrivacy,
-                                onRestoreTapped: viewModel.restorePurchase
-                            )
-                        }
-                        .padding()
-                    }
+                    FTSubscribeButtonView(
+                        terms: viewModel.state.trialTerms,
+                        buttonTitle: Constants.Strings.tryButtonTitle,
+                        buttonAction: {}
+                    )
+                    .padding()
+                    
+                    SubscriptionUtilityLinksView(
+                        onTermsTapped: viewModel.openTermsOfService,
+                        onPrivacyTapped: viewModel.openPrivacy,
+                        onRestoreTapped: viewModel.restorePurchase
+                    )
+                }
+                .containerRelativeFrame(.vertical, { amount, axis in
+                    amount / 1.8
+                })
+                .padding()
+                .background {
+                    contentCard
+                }
             }
             .ignoresSafeArea(edges: [.horizontal, .bottom])
         }
@@ -60,9 +63,8 @@ struct OnboardingPaywallView: View {
         .toolbar {
             toolbarItems
         }
-        .onAppear() {
-            // This will display an error if monthy product isn't found
-            viewModel.loadPricing(for: .monthly)
+        .task {
+            await viewModel.loadFirstTrialOffer()
         }
     }
     
@@ -71,9 +73,6 @@ struct OnboardingPaywallView: View {
     private var contentCard: some View {
         Rectangle()
             .foregroundStyle(Color.ftBackground)
-            .containerRelativeFrame(.vertical, { amount, axis in
-                amount / 1.7
-            })
             .clipShape(
                 .rect(
                     topLeadingRadius: Constants.CornerRadius.card,

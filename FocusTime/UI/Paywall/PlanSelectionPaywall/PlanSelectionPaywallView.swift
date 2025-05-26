@@ -16,11 +16,11 @@ struct PlanSelectionPaywallView: View {
     // MARK: - Body
     var body: some View {
         // Won't add zero to constants since it will never change
-        ZStack(alignment: .leading) {            
+        ZStack(alignment: .leading) {
             let selectedImageIndex = Binding {
                 viewModel.state.selectedImageIndex
-            } set: { num in
-                viewModel.state.selectedImageIndex = num
+            } set: { index in
+                viewModel.updateSelectedImageIndex(index: index)
             }
             
             VStack {
@@ -58,28 +58,31 @@ struct PlanSelectionPaywallView: View {
                 // Should tell the design team to make it brighter?
                 .foregroundTint(Color.ftPageControlBlue)
                 
-                contentCard
-                    .overlay {
-                        VStack {
-                            features
-                            
+                VStack(spacing: .zero) {
+                    features
+                    
 #warning("Action is empty")
-                            FTSubscribeButtonView(
-                                terms: viewModel.state.subscribeButtonTerms,
-                                buttonTitle: viewModel.state.primaryButtonTitle,
-                                buttonAction: {}
-                            )
-                            .padding()
-                            
-                            SubscriptionUtilityLinksView(
-                                onTermsTapped: viewModel.openTermsOfService,
-                                onPrivacyTapped: viewModel.openPrivacy,
-                                onRestoreTapped: viewModel.restorePurchase
-                            )
-                        }
-                        .padding()
-                        .padding(.bottom) // Padding, so we don't hit the safe area
-                    }
+                    FTSubscribeButtonView(
+                        terms: viewModel.state.subscribeButtonTerms,
+                        buttonTitle: viewModel.state.primaryButtonTitle,
+                        buttonAction: {}
+                    )
+                    .padding()
+                    
+                    SubscriptionUtilityLinksView(
+                        onTermsTapped: viewModel.openTermsOfService,
+                        onPrivacyTapped: viewModel.openPrivacy,
+                        onRestoreTapped: viewModel.restorePurchase
+                    )
+                }
+                .containerRelativeFrame(.vertical, { amount, axis in
+                    amount / 2
+                })
+                .padding()
+                .padding(.bottom) // Padding, so we don't hit the safe area
+                .background {
+                    contentCard
+                }
             }
         }
         .ignoresSafeArea(edges: .vertical)
@@ -103,9 +106,6 @@ struct PlanSelectionPaywallView: View {
     private var contentCard: some View {
         Rectangle()
             .foregroundStyle(Color.ftBackground)
-            .containerRelativeFrame(.vertical, { amount, axis in
-                amount / 1.8
-            })
     }
     
     /// List of features.

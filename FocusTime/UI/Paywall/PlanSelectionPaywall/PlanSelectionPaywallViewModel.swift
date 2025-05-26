@@ -41,7 +41,7 @@ final class PlanSelectionPaywallViewModel {
     
     // MARK: - Properties
     /// Property contatining values that may trigger UI redraw.
-    var state: State
+    private(set) var state: State
     
     // Made this property private becase it is injected
     // through the initializer, not a property.
@@ -54,6 +54,12 @@ final class PlanSelectionPaywallViewModel {
     ) {
         self.state = state
         self.paymentManager = paymentManager
+    }
+    
+    // MARK: - State setter methods
+    
+    func updateSelectedImageIndex(index: Int?) {
+        state.selectedImageIndex = index
     }
     
     // MARK: - Methods
@@ -85,7 +91,7 @@ final class PlanSelectionPaywallViewModel {
         } else {
             var terms: String
             
-            if product.isSubscription {
+            if product.subscriptionPeriod != nil {
                 let formatter = FTProductFormatter(product)
                 // Should never fail since isSubscription
                 // propery is only true when the product has

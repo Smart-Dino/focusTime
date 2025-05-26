@@ -28,7 +28,6 @@ struct FTProduct: Identifiable, Equatable, Sendable {
     /// Declares whether this product has a trial option on it.
     let isTrialable: Bool
     /// Tells if this product is meant to be a subscription.
-    let isSubscription: Bool
     
     // MARK: - Initializer
     /// Initializes a new `FTProduct` with the provided metadata and optional subscription period.
@@ -58,8 +57,6 @@ struct FTProduct: Identifiable, Equatable, Sendable {
         self.priceFormatStyle   = priceFormatStyle
         self.subscriptionPeriod = subscriptionPeriod
         self.isTrialable        = isTrialable
-        
-        self.isSubscription = subscriptionPeriod != nil
     }
 }
 
@@ -75,38 +72,37 @@ extension FTProduct {
         var product: FTProduct {
             switch self {
             case .weekly:
-                FTProduct(
-                    title: "Weekly",
-                    description: "Unlock pro features for a week",
-                    price: 0.37,
-                    priceFormatStyle: .currency(code: "USD"),
-                    subscriptionPeriod: PeriodConverter.weekly.durationInSeconds
-                )
+                try! FTProductBuilder()
+                    .set(title: "Weekly")
+                    .set(description: "Unlock pro features for a week")
+                    .set(price: 0.37)
+                    .set(currency: .currency(code: "USD"))
+                    .set(subscriptionPeriod: PeriodConverter.weekly.durationInSeconds)
+                    .build()
             case .monthly:
-                FTProduct(
-                    title: "Monthly",
-                    description: "Unlock pro features for a month",
-                    price: 2.99,
-                    priceFormatStyle: .currency(code: "USD"),
-                    subscriptionPeriod: PeriodConverter.monthly.durationInSeconds,
-                    isTrialable: true
-                )
+                try! FTProductBuilder()
+                    .set(title: "Monthly")
+                    .set(description: "Unlock pro features for a month")
+                    .set(price: 2.99)
+                    .set(currency: .currency(code: "USD"))
+                    .set(subscriptionPeriod: PeriodConverter.monthly.durationInSeconds)
+                    .set(isTrialable: true)
+                    .build()
             case .yearly:
-                FTProduct(
-                    title: "Yearly",
-                    description: "Unlock pro features for a year",
-                    price: 29.99,
-                    priceFormatStyle: .currency(code: "USD"),
-                    subscriptionPeriod: PeriodConverter.yearly.durationInSeconds
-                )
+                try! FTProductBuilder()
+                    .set(title: "Yearly")
+                    .set(description: "Unlock pro features for a year")
+                    .set(price: 29.99)
+                    .set(currency: .currency(code: "USD"))
+                    .set(subscriptionPeriod: PeriodConverter.yearly.durationInSeconds)
+                    .build()
             case .lifetime:
-                FTProduct(
-                    title: "Lifetime",
-                    description: "Unlock this app forever",
-                    price: 399.99,
-                    priceFormatStyle: .currency(code: "USD")
-                    // subscriptionPeriod is nil for lifetime
-                )
+                try! FTProductBuilder()
+                    .set(title: "Lifetime")
+                    .set(description: "Unlock this app forever")
+                    .set(price: 399.99)
+                    .set(currency: .currency(code: "USD"))
+                    .build()
             }
         }
     }
