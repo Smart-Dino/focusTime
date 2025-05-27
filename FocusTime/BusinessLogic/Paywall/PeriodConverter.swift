@@ -16,7 +16,7 @@ enum PeriodConverter: Sendable {
     case weekly
     case monthly
     case yearly
-    case customByUnit(value: Int, unit: Unit)
+    case customByUnit(value: Int?, unit: Unit?)
     case customSeconds(seconds: Int)
     
     // Constants for time calculations
@@ -25,7 +25,7 @@ enum PeriodConverter: Sendable {
     private static let averageDaysPerYear = 365.25 // Accounts for leap years
     
     /// Get the value in seconds using simple multiplication.
-    var durationInSeconds: Int {
+    var durationInSeconds: Int? {
         switch self {
         case .weekly:
             return 7 * Self.secondsPerDay
@@ -34,6 +34,7 @@ enum PeriodConverter: Sendable {
         case .yearly:
             return Int(Self.averageDaysPerYear * Double(Self.secondsPerDay))
         case .customByUnit(value: let value, unit: let unit):
+            guard let value, let unit else { return nil }
             switch unit {
             case .day:
                 return value * Self.secondsPerDay
