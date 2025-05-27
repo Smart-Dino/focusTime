@@ -8,11 +8,13 @@
 
 /* Begin PBXBuildFile section */
 		E96207822DD4EF2B002F037F /* FocusTimeUI in Frameworks */ = {isa = PBXBuildFile; productRef = E96207812DD4EF2B002F037F /* FocusTimeUI */; };
+		E9C047352DE5F11200E70B16 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E9C047342DE5F11200E70B16 /* StoreKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		674FA6A02DB05ACE0002FDC1 /* FocusTime.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FocusTime.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E962077F2DD4D1E5002F037F /* FocusTimeUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = FocusTimeUI; sourceTree = "<group>"; };
+		E9C047342DE5F11200E70B16 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -29,6 +31,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E96207822DD4EF2B002F037F /* FocusTimeUI in Frameworks */,
+				E9C047352DE5F11200E70B16 /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -40,6 +43,7 @@
 			children = (
 				E962077F2DD4D1E5002F037F /* FocusTimeUI */,
 				674FA6A22DB05ACE0002FDC1 /* FocusTime */,
+				E9C047332DE5F11200E70B16 /* Frameworks */,
 				674FA6A12DB05ACE0002FDC1 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -50,6 +54,14 @@
 				674FA6A02DB05ACE0002FDC1 /* FocusTime.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		E9C047332DE5F11200E70B16 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				E9C047342DE5F11200E70B16 /* StoreKit.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

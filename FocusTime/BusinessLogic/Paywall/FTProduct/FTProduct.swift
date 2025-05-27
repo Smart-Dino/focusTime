@@ -73,7 +73,7 @@ struct FTProduct: Identifiable, Equatable, Sendable {
                 .descriptiveLargestUnitString
             
             self.trialOfferSubtitle = "\(price.description) \(priceFormatStyle.currencyCode)/\(periodString!)"
-            self.subscriptionPeriodString = price.description + " " + priceFormatStyle.currencyCode + "/" + periodString!
+            self.subscriptionPeriodString = price.description + " " + priceFormatStyle.currencyCode + " / " + periodString!
         } else {
             self.periodString = nil
             self.trialOfferSubtitle = nil

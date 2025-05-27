@@ -38,7 +38,9 @@ struct OnboardingPaywallView: View {
                     FTSubscribeButtonView(
                         terms: viewModel.state.trialTerms,
                         buttonTitle: Constants.Strings.tryButtonTitle,
-                        buttonAction: {}
+                        buttonAction: {
+                            viewModel.subscribeToFreeTrial()
+                        }
                     )
                     .padding()
                     
@@ -109,7 +111,7 @@ struct OnboardingPaywallView: View {
         ToolbarItem(placement: .topBarTrailing) {
             // This will get adressed on the stage of incorporating
             // the business logic or navigation.
-#warning("Dismiss action is empty.")
+#warning("Dismiss action is empty")
             Button(
                 Constants.Strings.dismissButtonTitle,
                 systemImage: "xmark",

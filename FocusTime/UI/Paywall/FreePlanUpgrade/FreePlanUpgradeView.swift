@@ -77,7 +77,9 @@ struct FreePlanUpgradeView: View {
             FTSubscribeButtonView(
                 terms: viewModel.state.trialTerms,
                 buttonTitle: Constants.Strings.tryButtonTitle,
-                buttonAction: {}
+                buttonAction: {
+                    viewModel.subscribeToFreeTrial()
+                }
             )
             Button(
                 Constants.Strings.viewPlansButton,
@@ -94,7 +96,7 @@ struct FreePlanUpgradeView: View {
         ToolbarItem(placement: .topBarTrailing) {
             // This will get adressed on the stage of incorporating
             // the business logic or navigation.
-#warning("Dismiss action is empty.")
+#warning("Dismiss action is empty")
             Button(
                 Constants.Strings.dismissButtonTitle,
                 systemImage: "xmark",
@@ -106,11 +108,22 @@ struct FreePlanUpgradeView: View {
     
 }
 
-#Preview {
+#Preview("MockPaymentManagerWithError") {
     NavigationStack {
         FreePlanUpgradeView(
             viewModel: .init(
                 paymentManager: MockPaymentManagerWithPurchaseError()
+            )
+        )
+        .preferredColorScheme(.dark)
+    }
+}
+
+#Preview("StoreKitPaymentManager") {
+    NavigationStack {
+        FreePlanUpgradeView(
+            viewModel: .init(
+                paymentManager: StoreKitPaymentManager()
             )
         )
         .preferredColorScheme(.dark)

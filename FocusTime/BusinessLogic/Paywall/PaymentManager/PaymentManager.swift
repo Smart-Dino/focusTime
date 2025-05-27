@@ -31,12 +31,14 @@ enum PaymentError: LocalizedError {
 
 // MARK: This is unfinished and will be done on the stage of implementing Business Logic.
 protocol PaymentManager: Actor {
+    /// A list of all products available for purchase, typically sorted for display.
+    var products: [FTProduct] { get }
+
+    /// A list of products that the user has already purchased and are currently entitled to.
+    var purchasedProducts: [FTProduct] { get }
+    
     /// Returns `Bool` based on if the user has used his trial period.
     var trialUsed: Bool { get }
-    /// Fetches and returns a list of products available for purchase.
-    /// - Returns: An array of ``Product`` objects.
-    /// - Throws: An error if fetching products fails.
-    func getProducts() async throws -> [FTProduct]
 
     /// Attempts to purchase the specified ``Product``.
     /// - Parameter product: The ``Product`` to purchase.
@@ -49,13 +51,26 @@ protocol PaymentManager: Actor {
     /// After a successful call, the user's entitlements should be re-checked
     /// using `hasEntitlement(:)` or `getAllActiveEntitlements()`.
     func restorePurchases() async throws
+    
+    /// Checks if a specific product has been purchased by the user.
+    ///
+    /// - Parameter product: The `FTProduct` to check.
+    /// - Returns: `true` if the product is found in the `purchasedProducts` list, `false` otherwise.
+    /// - Throws: An error if there's an issue checking the purchase status (though typically this might just access local state).
+    func isPurchased(_ product: FTProduct) async throws -> Bool
 
     // TODO: Implement Entitlements when wiring up business logic.
 }
 
+
 /// This instance of ``PaymentManager`` only succeeds on `getProducts()` method.
 actor MockPaymentManagerWithPurchaseError: PaymentManager {
-    private var products: [FTProduct]
+    private(set) var products: [FTProduct]
+    var purchasedProducts: [FTProduct] = []
+    
+    func isPurchased(_ product: FTProduct) async throws -> Bool {
+        purchasedProducts.contains(product)
+    }
     // This will have to be a computed property in LivePaymentManager
     private(set) var trialUsed: Bool
     

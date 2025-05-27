@@ -164,7 +164,7 @@ struct PlanSelectionPaywallView: View {
         ToolbarItem(placement: .topBarTrailing) {
             // This will get adressed on the stage of incorporating
             // the business logic or navigation.
-#warning("Dismiss action is empty.")
+#warning("Dismiss action is empty")
             Button(
                 Constants.Strings.dismissButtonTitle,
                 systemImage: "xmark",
@@ -191,6 +191,17 @@ struct PlanSelectionPaywallView: View {
         PlanSelectionPaywallView(
             viewModel: .init(
                 paymentManager: MockPaymentManagerWithPurchaseError(trialUsed: true)
+            )
+        )
+        .preferredColorScheme(.dark)
+    }
+}
+
+#Preview("StoreKit Manager") {
+    NavigationStack {
+        PlanSelectionPaywallView(
+            viewModel: .init(
+                paymentManager: StoreKitPaymentManager()
             )
         )
         .preferredColorScheme(.dark)

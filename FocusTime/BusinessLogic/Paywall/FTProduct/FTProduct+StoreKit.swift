@@ -12,7 +12,7 @@ extension FTProduct {
     /// Builds an FTProduct via LiveFTProductBuilder.
     ///
     /// - Throws: Any FTProductBuilderError if mandatory fields are missing.
-    static func fromStoreKit(_ skProduct: StoreKit.Product) throws -> FTProduct {
+    static func fromStoreKit(_ skProduct: StoreKit.Product) -> FTProduct {
         let unit: PeriodConverter.Unit? = switch skProduct.subscription?.subscriptionPeriod.unit {
         case .day: .day
         case .week: .week
@@ -28,7 +28,7 @@ extension FTProduct {
             unit: unit
         ).durationInSeconds
         
-        return try FTProductBuilder()
+        return try! FTProductBuilder()
             .set(id: skProduct.id)
             .set(title: skProduct.displayName)
             .set(description: skProduct.description)

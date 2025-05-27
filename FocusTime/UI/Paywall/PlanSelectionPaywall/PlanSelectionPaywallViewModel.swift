@@ -70,7 +70,7 @@ final class PlanSelectionPaywallViewModel {
     // MARK: - Methods
     func selectProduct(_ product: FTProduct) async {
         state.selectedProduct = product
-
+        
         // Suspend here until trial check completes
         // if for some reason it is empty
         if state.isTrialUsed == nil {
@@ -83,7 +83,7 @@ final class PlanSelectionPaywallViewModel {
         }
         
         configureBottomSectionForSelectedPtoduct(product, isTrialUsed: isTrialUsed)
-
+        
     }
     
     private func configureBottomSectionForSelectedPtoduct(
@@ -126,20 +126,16 @@ final class PlanSelectionPaywallViewModel {
     }
     
     func loadOffers() async {
-        do {
-            // Load products
-            let products = try await paymentManager.getProducts()
-            state.products = products
-            
-            // Set initial selected product
-            // If there are no products - we don't select anything
-            if let trialableProduct = products.first(where: { $0.isTrialable }) {
-                await selectProduct(trialableProduct)
-            } else if let product = products.first {
-                await selectProduct(product)
-            }
-        } catch {
-            state.error = error
+        // Load products
+        let products = await paymentManager.products
+        state.products = products
+        
+        // Set initial selected product
+        // If there are no products - we don't select anything
+        if let trialableProduct = products.first(where: { $0.isTrialable }) {
+            await selectProduct(trialableProduct)
+        } else if let product = products.first {
+            await selectProduct(product)
         }
     }
     

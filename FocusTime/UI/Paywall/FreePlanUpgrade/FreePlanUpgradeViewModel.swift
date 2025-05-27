@@ -16,6 +16,7 @@ final class FreePlanUpgradeViewModel {
     struct State {
         var error: Error?
         
+        var trialProduct: FTProduct?
         var formattedPrice: String?
         var trialTerms: String {
             "3-day free trial, then \(formattedPrice ?? "..."), cancel anytime"
@@ -52,27 +53,28 @@ final class FreePlanUpgradeViewModel {
     }
     
     func loadFirstTrialOffer() async {
-        do {
-            let products = try await paymentManager.getProducts()
-            
-            if let targetProduct = products.first(
-                where: { $0.isTrialable }
-            ) {
-                if let periodString = targetProduct.periodString {
-                    state.formattedPrice = targetProduct.priceString + " / " + periodString
-                } else {
-                    state.formattedPrice = targetProduct.priceString
-                }
-                return
+        let products = await paymentManager.products
+        
+        if let targetProduct = products.first(
+            where: { $0.isTrialable }
+        ) {
+            if let periodString = targetProduct.periodString {
+                state.formattedPrice = targetProduct.priceString + " / " + periodString
+            } else {
+                state.formattedPrice = targetProduct.priceString
             }
-            
-            state.error = OnboardingPaywallError.noTrialOption
-        } catch {
-            state.error = error
+            state.trialProduct = targetProduct
+            return
         }
+        
+        state.error = OnboardingPaywallError.noTrialOption
     }
-
-    func subscribe(with product: FTProduct) {
+    
+    func subscribeToFreeTrial() {
+        guard let product = state.trialProduct else {
+            state.error = OnboardingPaywallError.noTrialOption
+            return
+        }
         Task {
             do {
                 let _ = try await paymentManager.purchase(product)

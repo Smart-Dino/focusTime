@@ -23,7 +23,13 @@ extension DateComponents {
             return months == 1 ? "month" : "\(months) months"
         }
         if let days = self.day, days != 0 {
-            return days == 1 ? "day" : "\(days) days"
+            if days == 7 {
+                return "week"
+            } else if days == 1 {
+                return "day"
+            } else {
+                return "\(days) days"
+            }
         }
         if let hours = self.hour, hours != 0 {
             return hours == 1 ? "hour" : "\(hours) hours"
