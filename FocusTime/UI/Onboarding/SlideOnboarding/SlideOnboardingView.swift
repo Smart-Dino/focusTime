@@ -21,15 +21,16 @@ struct SlideOnboardingView: View {
         VStack {
             // MARK: - Header Section
             VStack {
-                Text("RIDE THE WAVES OF PRODUCTIVITY")
+                Text(Constants.Strings.title)
                     .font(.title3.bold())
                     .multilineTextAlignment(.center)
                  
                 FTProgressBarView(
                     items: progressItems,
                     selectedItem: Binding(
-                        get: { progressItems[viewModel.currentIndex] },
+                        get: { progressItems[viewModel.state.currentIndex] },
                         set: { _ in } ))
+                .padding(.top, Constants.Layout.progressBarTopPadding)
             }
             
             // MARK: - Image Section
@@ -40,8 +41,11 @@ struct SlideOnboardingView: View {
                 .containerRelativeFrame(.vertical, { amount, axis in
                     amount / 1.8
                 })
-                .clipped() 
-                .padding(.top, 20)
+                .clipped()
+                .padding(.top, Constants.Layout.topPadding)
+                .id(viewModel.currentStep.imageName)
+                .transition(.opacity)
+                .animation(.easeInOut, value: viewModel.currentStep.imageName)
             
             // MARK: - Subtitle Section
             VStack {
@@ -50,43 +54,43 @@ struct SlideOnboardingView: View {
                 Text(viewModel.currentStep.subtitle2)
                     .font(.subheadline)
             }
-            .frame(height: 152)
+            .frame(height: Constants.Layout.subtitleSectionHeight)
             .multilineTextAlignment(.center)
             
             
             // MARK: - Buttons
             if !viewModel.currentStep.isLast {
-                VStack(spacing: 16) {
-                    Button("Next") { 
+                VStack(spacing: Constants.Layout.buttonSpacing) {
+                    Button(Constants.Strings.nextButton) {
                         viewModel.goToNextStep()
                     }
                     .buttonStyle(FTPrimaryButtonStyle())
                     
-                    Button("Skip") {
-                        viewModel.showSkipConfirmation = true
+                    Button(Constants.Strings.skipButton) {
+                        viewModel.state.showSkipConfirmation = true
                     }
                 }
-                .frame(height: 78)
+                .frame(height: Constants.Layout.buttonSectionHeight)
                 
             } else {
-                Button("Start Focusing") {
+                Button(Constants.Strings.startButton) {
                     // TODO: - Navigate to main app flow
                 }
-                .frame(height: 78)
+                .frame(height: Constants.Layout.buttonSectionHeight)
                 .buttonStyle(FTPrimaryButtonStyle())
             }
         }
         .animation(.easeInOut, value: viewModel.currentStep)
-        .preferredColorScheme(.dark) 
+        .preferredColorScheme(.dark)
         
         // MARK: - Skip Confirmation Alert
-        .alert("Before you go...", isPresented: $viewModel.showSkipConfirmation) {
-            Button("Skip anyway", role: .destructive) {
+        .alert(Constants.Strings.alertTitle, isPresented: $viewModel.state.showSkipConfirmation) {
+            Button(Constants.Strings.skipAnyway, role: .destructive) {
                 viewModel.skipOnboarding()
             }
-            Button("Go back", role: .cancel) {}
+            Button(Constants.Strings.goBack, role: .cancel) {}
         } message: {
-            Text("Are you sure you want to skip the onboarding?")
+            Text(Constants.Strings.alertMessage)
         }
     }
 }

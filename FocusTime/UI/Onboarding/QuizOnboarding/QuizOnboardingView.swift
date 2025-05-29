@@ -53,7 +53,7 @@ struct QuizOnboardingView: View {
             
             // MARK: - "Next" Button
             /// Button to proceed after selecting options
-            Button("Next") {
+            Button(Constants.Strings.nextButton) {
                 // TODO: - Add navigation action
             }
             .buttonStyle(FTPrimaryButtonStyle())
