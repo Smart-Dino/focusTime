@@ -37,7 +37,7 @@ struct QuizOnboardingView: View {
                 
                 // MARK: - Scrollable Quiz Section
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 42) {
+                    VStack(alignment: .leading, spacing: Constants.Layout.quizSpacing) {
                         ForEach(viewModel.state.options) { option in
                             Toggle(option.title, isOn: Binding(
                                 get: { viewModel.isOptionSelected(option)},

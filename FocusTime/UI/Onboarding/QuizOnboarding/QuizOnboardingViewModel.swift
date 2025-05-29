@@ -19,7 +19,7 @@ final class QuizOnboardingViewModel {
         case unselected
     }
 
-    struct QuizOption: Identifiable, Equatable {
+    struct QuizOption: Identifiable, Equatable, Hashable {
         let id = UUID()
         let title: String
     }
@@ -33,17 +33,20 @@ final class QuizOnboardingViewModel {
             QuizOption(title: "🧘 Mental fatigue")
         ]
         
-        var selectionStates: [UUID: SelectionState] = [:]
+        var selectionStates: Set<QuizOption> = []
     }
 
     var state = State()
 
     func toggleSelection(for option: QuizOption) {
-        let current = state.selectionStates[option.id] ?? .unselected
-        state.selectionStates[option.id] = (current == .selected) ? .unselected : .selected
+        if state.selectionStates.contains(option) {
+            state.selectionStates.remove(option)
+        } else {
+            state.selectionStates.insert(option)
+        }
     }
 
     func isOptionSelected(_ option: QuizOption) -> Bool {
-        state.selectionStates[option.id] == .selected
+        state.selectionStates.contains(option)
     }
 }
