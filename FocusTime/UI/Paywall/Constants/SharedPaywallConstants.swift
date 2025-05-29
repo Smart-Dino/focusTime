@@ -16,6 +16,8 @@ enum SharedPaywallConstants {
         static let viewPlansButton = "View All Plans"
         static let loadingMessage = "Loading..."
         static let subscribeButtonTitle = "Subscribe"
+        // Lifetime
+        static let paidOnce = "Paid once"
     }
     
 }

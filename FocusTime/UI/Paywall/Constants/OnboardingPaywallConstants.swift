@@ -39,11 +39,12 @@ extension OnboardingPaywallView {
         
         // MARK: - Strings
         enum Strings {
-            static let navigationTitle = """
-                       Get started with
-                       a 3 day free trial
-                       """
+            // Product terms
+            static let paidOnce = SharedPaywallConstants.Strings.paidOnce
             static let tryButtonTitle = "Try free and subscribe."
+            
+            // UI
+            static let loadingMessage = SharedPaywallConstants.Strings.loadingMessage
             static let dismissButtonTitle = SharedPaywallConstants.Strings.dismissButtonTitle
             
             // Error

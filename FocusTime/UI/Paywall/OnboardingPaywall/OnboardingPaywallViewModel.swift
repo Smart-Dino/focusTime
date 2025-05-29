@@ -18,11 +18,10 @@ final class OnboardingPaywallViewModel {
         var error: Error?
         /// Main features of the paid version,
         let featureItems = OnboardingPaywallView.Constants.FeatureItems.allCases
+        var navigationTitle = OnboardingPaywallView.Constants.Strings.loadingMessage
         
+        var trialProduct: FTProduct?
         var formattedPrice: String?
-        var trialTerms: String {
-            "3-day free trial, then \(formattedPrice ?? "..."), cancel anytime"
-        }
     }
     
     // MARK: - Properties
@@ -54,18 +53,18 @@ final class OnboardingPaywallViewModel {
         do {
             let products = try await paymentManager.getProducts()
             
-            if let targetProduct = products.first(
-                where: { $0.isTrialable }
+            if let trialProduct = products.first(
+                where: { $0.trialPeriod != nil }
             ) {
-                if let periodString = targetProduct.periodString {
-                    state.formattedPrice = targetProduct.priceString + " / " + periodString
-                } else {
-                    state.formattedPrice = targetProduct.priceString
-                }
-                return
+                state.trialProduct = trialProduct
+                state.navigationTitle = """
+                       Get started with
+                       a \(trialProduct.trialPeriodString ?? "0 days") free trial
+                       """
+                state.formattedPrice = trialProduct.priceAndPeriodString ?? trialProduct.priceString
+            } else {
+                state.error = OnboardingPaywallError.noTrialOption
             }
-            
-            state.error = OnboardingPaywallError.noTrialOption
         } catch {
             state.error = error
         }

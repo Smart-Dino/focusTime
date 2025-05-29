@@ -95,7 +95,7 @@ final class PlanSelectionPaywallViewModel {
         
         // If this product is trialable and the user hasn't used
         // their trial yet - we say it is available
-        let useTrial: Bool = product.isTrialable && !isTrialUsed
+        let useTrial: Bool = product.trialPeriod != nil && !isTrialUsed
         
         if useTrial {
             state.primaryButtonTitle = shortcut.startFreeTrial
@@ -103,11 +103,8 @@ final class PlanSelectionPaywallViewModel {
         } else {
             var terms: String
             
-            if product.subscriptionPeriod != nil {
-                // Should never fail since isSubscription
-                // propery is only true when the product has
-                // a subscription period
-                terms = product.subscriptionPeriodString!
+            if let periodDescription = product.subscriptionPeriodDescription {
+                terms = periodDescription
             } else {
                 terms = shortcut.paidOnce
             }
@@ -117,12 +114,12 @@ final class PlanSelectionPaywallViewModel {
         }
     }
     
-    func getTrialOfferSubtitle(for product: FTProduct) -> String? {
-        product.subscriptionPeriodString
-    }
-    
     func checkTrialAvailability() async {
         self.state.isTrialUsed = await paymentManager.trialUsed
+    }
+    
+    func getTrialTerms(for product: FTProduct) -> String {
+        "Get \(product.trialPeriodString ?? "0 days") for free!"
     }
     
     func loadOffers() async {
@@ -133,7 +130,7 @@ final class PlanSelectionPaywallViewModel {
             
             // Set initial selected product
             // If there are no products - we don't select anything
-            if let trialableProduct = products.first(where: { $0.isTrialable }) {
+            if let trialableProduct = products.first(where: { $0.trialPeriod != nil }) {
                 await selectProduct(trialableProduct)
             } else if let product = products.first {
                 await selectProduct(product)

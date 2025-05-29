@@ -126,15 +126,15 @@ struct PlanSelectionPaywallView: View {
             VStack(spacing: Constants.Padding.featuresSpacing) {
                 ForEach(viewModel.state.products) { product in
                     // Check if the user hasn't tried trial yet and offer him one
-                    let isTrial = product.isTrialable && !(viewModel.state.isTrialUsed ?? true)
+                    let isTrial = (product.trialPeriod != nil) && !(viewModel.state.isTrialUsed ?? true)
                     // Precompute to flatten the call site:
                     let subtitle: String? = isTrial
-                    ? viewModel.getTrialOfferSubtitle(for: product)
+                    ? product.subscriptionPeriodDescription
                     : nil
                     
                     let descriptionText: String = isTrial
-                    ? Constants.Strings.trialDescription
-                    : product.price.description
+                    ? viewModel.getTrialTerms(for: product)
+                    : product.priceString
                     // View
                     FTProductOptionView(
                         leadingTitle: product.title,
