@@ -15,18 +15,22 @@ import Observation
 final class QuizOnboardingViewModel {
     
     typealias QuizOption = QuizOnboardingView.Constants.QuizOption
-        
-    var selectionStates: Set<QuizOption> = []
+    
+    struct State {
+        var selectionStates: Set<QuizOption> = []
+    }
+    
+    var state = State()
     
     func toggleSelection(for option: QuizOption) {
-        if selectionStates.contains(option) {
-            selectionStates.remove(option)
+        if state.selectionStates.contains(option) {
+            state.selectionStates.remove(option)
         } else {
-            selectionStates.insert(option)
+            state.selectionStates.insert(option)
         }
     }
-
+    
     func isOptionSelected(_ option: QuizOption) -> Bool {
-        selectionStates.contains(option)
+        state.selectionStates.contains(option)
     }
 }
