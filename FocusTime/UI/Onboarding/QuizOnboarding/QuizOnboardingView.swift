@@ -27,7 +27,7 @@ struct QuizOnboardingView: View {
                     Text(Constants.Strings.title)
                         .font(.title3.bold())
                         .multilineTextAlignment(.center)
-
+                    
                     Text(Constants.Strings.subtitle)
                         .font(.body)
                         .multilineTextAlignment(.center)
@@ -38,13 +38,13 @@ struct QuizOnboardingView: View {
                 // MARK: - Scrollable Quiz Section
                 ScrollView {
                     VStack(alignment: .leading, spacing: Constants.Layout.quizSpacing) {
-                        ForEach(viewModel.state.options) { option in
-                            Toggle(option.title, isOn: Binding(
-                                get: { viewModel.isOptionSelected(option)},
-                                set: {_ in viewModel.toggleSelection(for: option)}
+                        ForEach(Constants.QuizOption.allCases) { option in
+                            Toggle(option.rawValue, isOn: Binding(
+                                get: { viewModel.isOptionSelected(option) },
+                                set: { _ in viewModel.toggleSelection(for: option) }
                             ))
-                                .toggleStyle(FTCheckboxToggleStyle(color: .blue))
-                                .font(.body)
+                            .toggleStyle(FTCheckboxToggleStyle(color: .blue))
+                            .font(.body)
                         }
                     }
                 }
