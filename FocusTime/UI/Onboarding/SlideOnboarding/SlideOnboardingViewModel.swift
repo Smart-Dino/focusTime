@@ -1,0 +1,40 @@
+//
+//  SlideOnboardingViewModel.swift
+//  FocusTime
+//
+//  Created by Keto Nioradze on 19.05.25.
+//
+
+// OnboardingViewModel.swift
+
+import SwiftUI
+import Observation
+
+// MARK: - SlideOnboardingViewModel
+
+@MainActor
+@Observable
+final class SlideOnboardingViewModel {
+    
+    struct State {
+        var currentIndex: Int = 0
+        var showSkipConfirmation: Bool = false
+    }
+    
+    var state = State()
+    
+    var currentStep: SlideOnboardingStep {
+        SlideOnboardingStep.allCases[state.currentIndex]
+    }
+    
+    func goToNextStep() {
+        if state.currentIndex < SlideOnboardingStep.allCases.count - 1 {
+            state.currentIndex += 1
+        }
+    }
+
+    func skipOnboarding() {
+        // TODO: - Navigate to main app flow
+        state.currentIndex = SlideOnboardingStep.allCases.count - 1
+    }
+}
