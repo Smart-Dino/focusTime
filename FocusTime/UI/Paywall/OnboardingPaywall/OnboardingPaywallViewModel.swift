@@ -1,0 +1,107 @@
+//
+//  OnboardingPaywallViewModel.swift
+//  FocusTime
+//
+//  Created by Maksym Horobets on 15.05.2025.
+//
+
+import Foundation
+import StoreKit
+
+/// ViewModel, responsible for managing the logic on ``OnboardingPaywallView``.
+/// - Note: Use it in the ``OnboadingPaywallView``.
+@MainActor
+@Observable
+final class OnboardingPaywallViewModel {
+    // MARK: - Nested declarations
+    struct State {
+        var error: Error?
+        /// Main features of the paid version,
+        let featureItems = OnboardingPaywallView.Constants.FeatureItems.allCases
+        var navigationTitle = OnboardingPaywallView.Constants.Strings.loadingMessage
+        
+        var trialProduct: FTProduct?
+        var formattedPrice: String?
+    }
+    
+    // MARK: - Properties
+    /// Property contatining values that may trigger UI redraw.
+    private(set) var state: State
+    
+    // Made this property private becase it is injected
+    // through the initializer, not a property.
+    private let paymentManager: PaymentManager
+    
+    // MARK: - Initializers
+    init(
+        state: State = State(),
+        paymentManager: PaymentManager
+    ) {
+        self.state = state
+        self.paymentManager = paymentManager
+    }
+    
+    // MARK: - State setter methods
+    func updateError(showError: Bool) {
+        if !showError {
+            state.error = nil
+        }
+    }
+    
+    // MARK: - Methods
+    func loadFirstTrialOffer() async {
+        do {
+            let products = try await paymentManager.getProducts()
+            
+            if let trialProduct = products.first(
+                where: { $0.trialPeriod != nil }
+            ) {
+                state.trialProduct = trialProduct
+                state.navigationTitle = """
+                       Get started with
+                       a \(trialProduct.trialPeriodString ?? "0 days") free trial
+                       """
+                state.formattedPrice = trialProduct.priceAndPeriodString ?? trialProduct.priceString
+            } else {
+                state.error = OnboardingPaywallError.noTrialOption
+            }
+        } catch {
+            state.error = error
+        }
+    }
+    
+    func subscribe(with product: FTProduct) {
+        Task {
+            do {
+                let _ = try await paymentManager.purchase(product)
+            } catch {
+                state.error = error
+            }
+        }
+    }
+    
+    func restorePurchase() {
+        // I've decided to make this method sync to keep the visual harmony of
+        // SubscriptionUtilityLinksView(
+        //      onTermsTapped: viewModel.openTermsOfService,
+        //      onPrivacyTapped: viewModel.openPrivacy,
+        //      onRestoreTapped: viewModel.restorePurchase
+        // )
+        Task {
+            do {
+                try await paymentManager.restorePurchases()
+            } catch {
+                state.error = error
+            }
+        }
+    }
+    
+    func openTermsOfService() {
+        // Open ToS
+    }
+    
+    func openPrivacy() {
+        // Open Privacy
+    }
+    
+}
