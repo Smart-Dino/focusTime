@@ -74,7 +74,7 @@ final class PlanSelectionPaywallViewModel {
         // Suspend here until trial check completes
         // if for some reason it is empty
         if state.isTrialUsed == nil {
-            await checkTrialAvailability()
+            state.isTrialUsed = try? await paymentManager.eligibleForIntro(product: product)
         }
         
         guard let isTrialUsed = state.isTrialUsed else {
@@ -114,10 +114,6 @@ final class PlanSelectionPaywallViewModel {
         }
     }
     
-    func checkTrialAvailability() async {
-        self.state.isTrialUsed = await paymentManager.trialUsed
-    }
-    
     func getTrialTerms(for product: FTProduct) -> String {
         "Get \(product.trialPeriodString ?? "0 days") for free!"
     }
@@ -147,12 +143,6 @@ final class PlanSelectionPaywallViewModel {
     }
     
     func restorePurchase() {
-        // I've decided to make this method sync to keep the visual harmony of
-        // SubscriptionUtilityLinksView(
-        //      onTermsTapped: viewModel.openTermsOfService,
-        //      onPrivacyTapped: viewModel.openPrivacy,
-        //      onRestoreTapped: viewModel.restorePurchase
-        // )
         Task {
             do {
                 try await paymentManager.restorePurchases()

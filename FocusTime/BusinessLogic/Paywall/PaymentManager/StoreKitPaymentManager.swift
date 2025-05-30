@@ -15,19 +15,17 @@ actor StoreKitPaymentManager: PaymentManager {
         category: String(describing: StoreKitPaymentManager.self)
     )
     
+    // FTProduct
     private(set) var products: [FTProduct]
     private(set) var purchasedProducts: [FTProduct]
     
+    // StoreKit-related
     private var skProducts: [Product]
-    
     private let productIdentifiers: [String: String]
     
+    // Async updates
     private var updateListenerTask: Task<Void, Error>? = nil
-    
-    var trialUsed: Bool {
-        // StoreKit check
-        return false
-    }
+    private var continuation: AsyncStream<[FTProduct]>.Continuation?
     
     init() {
         // FTProducts
@@ -51,8 +49,79 @@ actor StoreKitPaymentManager: PaymentManager {
         }
     }
     
+    // MARK: - Public methods
+    func stream() -> AsyncStream<[FTProduct]> {
+        AsyncStream<[FTProduct]> { continuation in
+            self.continuation = continuation
+        }
+    }
+    
+    func restorePurchases() async throws {
+        try await AppStore.sync()
+    }
+    
+    func isPurchased(_ product: FTProduct) async -> Bool {
+        purchasedProducts.contains(product)
+    }
+    
+    func eligibleForIntro(product: FTProduct) async throws(PaymentError) -> Bool {
+        guard let skProduct = skProduct(for: product) else { throw .productNotFound }
+        
+        guard let renewableSubscription = skProduct.subscription else {
+            // No renewable subscription is available for this product.
+            return false
+        }
+        if await renewableSubscription.isEligibleForIntroOffer {
+            // The product is eligible for an introductory offer.
+            return true
+        }
+        return false
+    }
+    
+    // MARK: - Private methods
     private func setTask(_ task: Task<Void, Error>) {
         self.updateListenerTask = task
+    }
+    
+    private func skProduct(for ftProduct: FTProduct) -> Product? {
+        skProducts.first(where: { $0.id == ftProduct.id })
+    }
+    
+    private func checkVerified<T>(_ result: VerificationResult<T>) throws(PaymentError) -> T {
+        // Check whether the JWS passes StoreKit verification.
+        switch result {
+        case .unverified:
+            // StoreKit parses the JWS, but it fails verification.
+            throw .failedVerification
+        case .verified(let safe):
+            // The result is verified. Return the unwrapped value.
+            return safe
+        }
+    }
+    
+    private func updateCustomerProductStatus() async {
+        var purchasedProducts: [Product] = []
+        
+        // Iterate through all of the user's purchased products.
+        for await result in Transaction.currentEntitlements {
+            do {
+                // Check whether the transaction is verified. If it isn’t, catch `failedVerification` error.
+                let transaction = try checkVerified(result)
+                
+                // Get the corresponding product from the store.
+                if let product = skProducts.first(where: { $0.id == transaction.productID }) {
+                    purchasedProducts.append(product)
+                }
+            } catch {
+                Self.logger.critical("Could not validate the transaction: \(error.localizedDescription)")
+            }
+        }
+        
+        Self.logger.trace("Successfully updated customer's products with \(purchasedProducts.count) products")
+        self.purchasedProducts = purchasedProducts.map {
+            FTProduct.fromStoreKit($0)
+        }
+        continuation?.yield(self.purchasedProducts)
     }
     
     private static func loadProductIdentifiers() -> [String: String] {
@@ -109,7 +178,7 @@ actor StoreKitPaymentManager: PaymentManager {
     }
     
     func purchase(_ product: FTProduct) async throws -> FTProduct.PurchaseResult? {
-        let skProduct = skProducts.first(where: { $0.id == product.id })
+        let skProduct = skProduct(for: product)
         
         let result = try await skProduct?.purchase()
         
@@ -131,49 +200,5 @@ actor StoreKitPaymentManager: PaymentManager {
         default:
             return nil
         }
-    }
-    
-    private func checkVerified<T>(_ result: VerificationResult<T>) throws(PaymentError) -> T {
-        //Check whether the JWS passes StoreKit verification.
-        switch result {
-        case .unverified:
-            //StoreKit parses the JWS, but it fails verification.
-            throw .failedVerification
-        case .verified(let safe):
-            //The result is verified. Return the unwrapped value.
-            return safe
-        }
-    }
-    
-    private func updateCustomerProductStatus() async {
-        var purchasedProducts: [Product] = []
-        
-        // Iterate through all of the user's purchased products.
-        for await result in Transaction.currentEntitlements {
-            do {
-                // Check whether the transaction is verified. If it isn’t, catch `failedVerification` error.
-                let transaction = try checkVerified(result)
-                
-                // Get the corresponding product from the store.
-                if let product = skProducts.first(where: { $0.id == transaction.productID }) {
-                    purchasedProducts.append(product)
-                }
-            } catch {
-                Self.logger.critical("Could not validate the transaction: \(error.localizedDescription)")
-            }
-        }
-        
-        Self.logger.trace("Successfully updated customer's products with \(purchasedProducts.count) products")
-        self.purchasedProducts = purchasedProducts.map {
-            FTProduct.fromStoreKit($0)
-        }
-    }
-    
-    func restorePurchases() async throws {
-        #warning("Empty method")
-    }
-    
-    func isPurchased(_ product: FTProduct) async throws -> Bool {
-        purchasedProducts.contains(product)
     }
 }

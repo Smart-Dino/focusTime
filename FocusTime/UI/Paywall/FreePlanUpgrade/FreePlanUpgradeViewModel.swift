@@ -17,7 +17,10 @@ final class FreePlanUpgradeViewModel {
         var error: Error?
         
         var trialProduct: FTProduct?
+        var isSubscribed: Bool = false
+        
         var formattedPrice: String?
+        var trialPeriodDescription: String = FreePlanUpgradeView.Constants.Strings.paidOnce
     }
     
     // MARK: - Properties
@@ -49,23 +52,36 @@ final class FreePlanUpgradeViewModel {
         // Show all plans
     }
     
+    func startListeningToSubscriptionUpdates() async {
+        let stream = await paymentManager.stream()
+        for await update in stream {
+            if let trialProduct = state.trialProduct {
+                state.isSubscribed = await paymentManager.isPurchased(trialProduct)
+            }
+        }
+    }
+    
     func loadFirstTrialOffer() async {
         let products = await paymentManager.products
-        
-        if let targetProduct = products.first(
-            where: { $0.trialPeriod != nil }
-        ) {
-            if let periodString = targetProduct.periodString {
-                state.formattedPrice = targetProduct.priceString + " / " + periodString
-            } else {
-                state.formattedPrice = targetProduct.priceString
-            }
-            state.trialProduct = targetProduct
+
+        guard let trialProduct = products.first(where: { $0.trialPeriod != nil }) else {
+            state.error = OnboardingPaywallError.noTrialOption
             return
         }
+
+        let price = trialProduct.priceString
+        let period = trialProduct.periodString ?? ""
+        state.formattedPrice = period.isEmpty ? price : "\(price) / \(period)"
+
+        if let description = trialProduct.trialPeriodDescription {
+            state.trialPeriodDescription = description
+        }
         
-        state.error = OnboardingPaywallError.noTrialOption
+        state.isSubscribed = await paymentManager.isPurchased(trialProduct)
+
+        state.trialProduct = trialProduct
     }
+
     
     func subscribeToFreeTrial() {
             guard let product = state.trialProduct else {

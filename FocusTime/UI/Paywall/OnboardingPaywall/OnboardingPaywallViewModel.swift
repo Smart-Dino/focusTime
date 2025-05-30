@@ -51,19 +51,21 @@ final class OnboardingPaywallViewModel {
     // MARK: - Methods
     func loadFirstTrialOffer() async {
         let products = await paymentManager.products
-        
-        if let trialProduct = products.first(
-            where: { $0.trialPeriod != nil }
-        ) {
-            state.trialProduct = trialProduct
-            state.navigationTitle = """
-                       Get started with
-                       a \(trialProduct.trialPeriodString ?? "0 days") free trial
-                       """
-            state.formattedPrice = trialProduct.priceAndPeriodString ?? trialProduct.priceString
-        } else {
+
+        guard let trialProduct = products.first(where: { $0.trialPeriod != nil }) else {
             state.error = OnboardingPaywallError.noTrialOption
+            return
         }
+
+        state.trialProduct = trialProduct
+
+        let trialDuration = trialProduct.trialPeriodString ?? "0 days"
+        state.navigationTitle = """
+        Get started with
+        a \(trialDuration) free trial
+        """
+
+        state.formattedPrice = trialProduct.priceAndPeriodString ?? trialProduct.priceString
     }
     
     func subscribeToFreeTrial() {
@@ -81,12 +83,6 @@ final class OnboardingPaywallViewModel {
     }
     
     func restorePurchase() {
-        // I've decided to make this method sync to keep the visual harmony of
-        // SubscriptionUtilityLinksView(
-        //      onTermsTapped: viewModel.openTermsOfService,
-        //      onPrivacyTapped: viewModel.openPrivacy,
-        //      onRestoreTapped: viewModel.restorePurchase
-        // )
         Task {
             do {
                 try await paymentManager.restorePurchases()

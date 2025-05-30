@@ -13,7 +13,7 @@ struct StoreKitPaymentManagerDebugView: View {
     
     @State private var products: [FTProduct] = []
     @State private var purchasedProducts: [FTProduct] = []
-    @State private var trialUsed: Bool = false
+    @State private var eligibleForTrial: Bool = false
     @State private var isRefreshing: Bool = false
     @State private var errorMessage: String?
     @State private var lastRefresh: Date = Date()
@@ -21,13 +21,20 @@ struct StoreKitPaymentManagerDebugView: View {
     var body: some View {
         NavigationStack {
             List {
+                Section("Paywall views") {
+                    NavigationLink("FreePlanUpgradeView") {
+                        let viewModel = FreePlanUpgradeViewModel(paymentManager: paymentManager)
+                        FreePlanUpgradeView(viewModel: viewModel)
+                    }
+                }
+                
                 // Status Section
                 Section("Manager Status") {
                     StatusRow(
-                        title: "Trial Used",
-                        value: trialUsed ? "Yes" : "No",
-                        systemImage: trialUsed ? "checkmark.circle.fill" : "xmark.circle.fill",
-                        color: trialUsed ? .red : .green
+                        title: "Eligible for trial?",
+                        value: eligibleForTrial ? "Yes" : "No",
+                        systemImage: eligibleForTrial ? "checkmark.circle.fill" : "xmark.circle.fill",
+                        color: eligibleForTrial ? .green : .red
                     )
                     
                     StatusRow(
@@ -118,6 +125,10 @@ struct StoreKitPaymentManagerDebugView: View {
         }
         .task {
             await loadInitialData()
+            for await update in await paymentManager.stream() {
+                print("New update")
+                self.purchasedProducts = update
+            }
         }
     }
     
@@ -134,15 +145,20 @@ struct StoreKitPaymentManagerDebugView: View {
         // Fetch all data from the actor
         async let productsTask = paymentManager.products
         async let purchasedTask = paymentManager.purchasedProducts
-        async let trialUsedTask = paymentManager.trialUsed
+        
+        var fetchedEligibleForTrial: Bool?
+        for product in await productsTask {
+            if product.trialPeriod != nil {
+                fetchedEligibleForTrial = try? await paymentManager.eligibleForIntro(product: product)
+            }
+        }
         
         let fetchedProducts = await productsTask
         let fetchedPurchased = await purchasedTask
-        let fetchedTrialUsed = await trialUsedTask
         
         products = fetchedProducts
         purchasedProducts = fetchedPurchased
-        trialUsed = fetchedTrialUsed
+        eligibleForTrial = fetchedEligibleForTrial ?? true
         lastRefresh = Date()
         
         isRefreshing = false

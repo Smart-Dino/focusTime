@@ -59,6 +59,7 @@ struct FreePlanUpgradeView: View {
         )
         .task {
             await viewModel.loadFirstTrialOffer()
+            await viewModel.startListeningToSubscriptionUpdates()
         }
     }
     
@@ -75,8 +76,9 @@ struct FreePlanUpgradeView: View {
     private var actionButtons: some View {
         VStack {
             FTSubscribeButtonView(
-                terms: viewModel.state.trialProduct?.trialPeriodDescription ?? Constants.Strings.paidOnce,
+                terms: viewModel.state.trialPeriodDescription,
                 buttonTitle: Constants.Strings.tryButtonTitle,
+                isSubscribed: viewModel.state.isSubscribed,
                 buttonAction: {
                     viewModel.subscribeToFreeTrial()
                 }
@@ -100,7 +102,9 @@ struct FreePlanUpgradeView: View {
             Button(
                 Constants.Strings.dismissButtonTitle,
                 systemImage: "xmark",
-                action: {}
+                action: {
+                    // Dismiss this view with Flow Control in mind
+                }
             )
             .buttonStyle(.plain)
         }

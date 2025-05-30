@@ -8,14 +8,15 @@
 import Foundation
 import StoreKit
 
+/// Represents errors that can occur during the payment process.
 enum PaymentError: LocalizedError {
     case failedVerification
     case purchaseInProgress
     case productNotFound
     case unknown
 
-    /// A human-readable description for each payment error.
-    var errorDescription: String {
+    /// A user-friendly description for each payment error.
+    var errorDescription: String? {
         switch self {
         case .failedVerification:
             return "The purchase could not be verified. Please try again later."
@@ -29,76 +30,103 @@ enum PaymentError: LocalizedError {
     }
 }
 
-// MARK: This is unfinished and will be done on the stage of implementing Business Logic.
+// MARK: - Payment Manager Protocol
+
+/// Defines the interface for managing in-app purchases.
 protocol PaymentManager: Actor {
-    /// A list of all products available for purchase, typically sorted for display.
+    // MARK: - Product Listings
+
+    /// All products available for purchase.
     var products: [FTProduct] { get }
 
-    /// A list of products that the user has already purchased and are currently entitled to.
+    /// Products that the user has already purchased and is entitled to.
     var purchasedProducts: [FTProduct] { get }
-    
-    /// Returns `Bool` based on if the user has used his trial period.
-    var trialUsed: Bool { get }
 
-    /// Attempts to purchase the specified ``Product``.
-    /// - Parameter product: The ``Product`` to purchase.
-    /// - Returns: A `Product.PurchaseResult?` indicating the outcome (success, pending, userCancelled).
-    /// - Throws: An error if the purchase process itself encounters a critical issue.
+    // MARK: - Purchase Actions
+
+    /// Attempts to purchase the given product.
+    ///
+    /// - Parameter product: The `FTProduct` to purchase.
+    /// - Returns: An optional `FTProduct.PurchaseResult` indicating success, pending, or cancellation.
+    /// - Throws: `PaymentError` if a critical issue occurs during the purchase.
     func purchase(_ product: FTProduct) async throws -> FTProduct.PurchaseResult?
 
-    /// Attempts to restore previously made purchases.
-    /// - Throws: An error if the restoration process encounters a critical issue.
-    /// After a successful call, the user's entitlements should be re-checked
-    /// using `hasEntitlement(:)` or `getAllActiveEntitlements()`.
+    /// Restores previously made purchases.
+    ///
+    /// - Throws: `PaymentError` if a critical issue occurs during restoration.
+    ///
+    /// After successful restoration, entitlements should be re-validated using `isPurchased(_:)`.
     func restorePurchases() async throws
-    
-    /// Checks if a specific product has been purchased by the user.
+
+    // MARK: - Entitlement Checks
+
+    /// Checks if the specified product has been purchased.
     ///
     /// - Parameter product: The `FTProduct` to check.
-    /// - Returns: `true` if the product is found in the `purchasedProducts` list, `false` otherwise.
-    /// - Throws: An error if there's an issue checking the purchase status (though typically this might just access local state).
-    func isPurchased(_ product: FTProduct) async throws -> Bool
+    /// - Returns: `true` if the product is in `purchasedProducts`, otherwise `false`.
+    func isPurchased(_ product: FTProduct) async -> Bool
+    
+    /// Determines whether the user is eligible for an introductory offer (e.g. free trial) for a specific product or
+    /// any auto-renewable product subscription in the same subscription group.
+    /// - Parameter product: The `FTProduct` to check for trial eligibility.
+    /// - Returns: `true` if the user appears to be eligible for an introductory offer; `false` otherwise.
+    /// - Throws: `PaymentError` if an error occurs while determining eligibility (e.g. missing product info).
+    func eligibleForIntro(product: FTProduct) async throws(PaymentError) -> Bool
 
-    // TODO: Implement Entitlements when wiring up business logic.
+    /// Streams updates to the purchased products list.
+    ///
+    /// - Returns: An `AsyncStream` emitting arrays of `FTProduct`.
+    func stream() -> AsyncStream<[FTProduct]>
 }
 
+// MARK: - Mock Implementation
 
-/// This instance of ``PaymentManager`` only succeeds on `getProducts()` method.
+/// A mock `PaymentManager` that simulates errors on purchase and restore operations.
 actor MockPaymentManagerWithPurchaseError: PaymentManager {
+    // MARK: - Stored Properties
     private(set) var products: [FTProduct]
+    private var trialUsed: Bool
     var purchasedProducts: [FTProduct] = []
     
-    func isPurchased(_ product: FTProduct) async throws -> Bool {
-        purchasedProducts.contains(product)
-    }
-    // This will have to be a computed property in LivePaymentManager
-    private(set) var trialUsed: Bool
-    
-    func getProducts() async throws(PaymentError) -> [FTProduct] {
-        print("getProducts invoked")
-        return products
-    }
-    
-    func purchase(_ product: FTProduct) async throws(PaymentError) -> FTProduct.PurchaseResult? {
-        print("purchase invoked")
-        print("Description: \(product)")
-        print("Formatted price: \(product.price.description)")
-        throw .unknown
-    }
-    
-    func restorePurchases() async throws(PaymentError) {
-        print("restorePurchases invoked")
-        throw .unknown
-    }
-    
+    // MARK: - Initialization
     init(trialUsed: Bool = false) {
-        // Get products
+        self.trialUsed = trialUsed
         self.products = [
             FTProduct.Mocks.monthly.product,
             FTProduct.Mocks.yearly.product,
             FTProduct.Mocks.lifetime.product
         ]
-        self.trialUsed = trialUsed
     }
-    
+
+    // MARK: - Streaming
+    func stream() -> AsyncStream<[FTProduct]> {
+        AsyncStream { continuation in
+            continuation.yield([])
+        }
+    }
+
+    // MARK: - Protocol Methods
+    func eligibleForIntro(product: FTProduct) async throws(PaymentError) -> Bool {
+        if !trialUsed {
+            if products.first(where: { $0.trialPeriod != nil }) != nil {
+                return true
+            }
+        }
+        
+        return false
+    }
+
+    func isPurchased(_ product: FTProduct) async -> Bool {
+        purchasedProducts.contains(product)
+    }
+
+    func purchase(_ product: FTProduct) async throws -> FTProduct.PurchaseResult? {
+        print("[Mock] purchase invoked for product: \(product)")
+        throw PaymentError.unknown
+    }
+
+    func restorePurchases() async throws {
+        print("[Mock] restorePurchases invoked")
+        throw PaymentError.unknown
+    }
 }

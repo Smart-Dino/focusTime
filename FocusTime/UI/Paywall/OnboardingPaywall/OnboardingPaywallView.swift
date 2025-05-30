@@ -34,10 +34,11 @@ struct OnboardingPaywallView: View {
                 VStack {
                     features
                     
-#warning("Action is empty")
+#warning("isSubscribed uses a placeholder")
                     FTSubscribeButtonView(
                         terms: viewModel.state.trialProduct?.trialPeriodDescription ?? Constants.Strings.paidOnce,
                         buttonTitle: Constants.Strings.tryButtonTitle,
+                        isSubscribed: true,
                         buttonAction: {
                             viewModel.subscribeToFreeTrial()
                         }
