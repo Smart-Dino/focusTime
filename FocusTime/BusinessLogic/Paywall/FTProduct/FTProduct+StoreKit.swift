@@ -12,20 +12,18 @@ extension FTProduct {
     /// Builds an FTProduct via LiveFTProductBuilder.
     ///
     /// - Throws: Any FTProductBuilderError if mandatory fields are missing.
-    static func fromStoreKit(_ skProduct: StoreKit.Product) -> FTProduct {
-        let unit: PeriodConverter.Unit? = switch skProduct.subscription?.subscriptionPeriod.unit {
-        case .day: .day
-        case .week: .week
-        case .month: .month
-        case .year: .year
-        case .none: nil
-        @unknown default: fatalError("Unknown subscription period unit")
-        }
+    static func fromStoreKit(_ skProduct: StoreKit.Product) throws -> FTProduct {
         
-        // This will be nil if either value or the unit is nil
-        let seconds = PeriodConverter.customByUnit(
-            value: skProduct.subscription?.subscriptionPeriod.value,
-            unit: unit
+        let subscriptionPeriod = skProduct.subscription?.subscriptionPeriod
+        let periodInSeconds = PeriodConverter.customByUnit(
+            value: subscriptionPeriod?.value,
+            unit: subscriptionPeriod?.unit.ftUnit
+        ).durationInSeconds
+        
+        let trialPeriod = skProduct.subscription?.introductoryOffer?.period
+        let trialPeriodInSeconds = PeriodConverter.customByUnit(
+            value: trialPeriod?.value,
+            unit: trialPeriod?.unit.ftUnit
         ).durationInSeconds
         
         return try! FTProductBuilder()
@@ -34,8 +32,8 @@ extension FTProduct {
             .set(description: skProduct.description)
             .set(price: skProduct.price)
             .set(currency: skProduct.priceFormatStyle)
-            .set(isTrialable: skProduct.subscription?.introductoryOffer != nil)
-            .set(subscriptionPeriod: seconds)
+            .set(subscriptionPeriod: periodInSeconds)
+            .set(trialPeriod: trialPeriodInSeconds)
             .build()
     }
 }

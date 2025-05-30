@@ -26,14 +26,17 @@ struct FTProduct: Identifiable, Equatable, Sendable {
     let priceFormatStyle: Decimal.FormatStyle.Currency
     let subscriptionPeriod: Int?
     /// Declares whether this product has a trial option on it.
-    let isTrialable: Bool
+    let trialPeriod: Int?
     /// Tells if this product is meant to be a subscription.
     
     // MARK: - UI-specific properties
     let priceString: String
+    let priceAndPeriodString: String?
     let periodString: String?
+    let trialPeriodString: String?
     let trialOfferSubtitle: String?
-    let subscriptionPeriodString: String?
+    let subscriptionPeriodDescription: String?
+    let trialPeriodDescription: String?
     
     // MARK: - Initializer
     /// Initializes a new `FTProduct` with the provided metadata and optional subscription period.
@@ -54,33 +57,51 @@ struct FTProduct: Identifiable, Equatable, Sendable {
         price: Decimal,
         priceFormatStyle: Decimal.FormatStyle.Currency,
         subscriptionPeriod: Int? = nil,
-        isTrialable: Bool = false
+        trialPeriod: Int? = nil
     ) {
-        self.id                 = id
-        self.title              = title
-        self.description        = description
-        self.price              = price
-        self.priceFormatStyle   = priceFormatStyle
+        self.id = id
+        self.title = title
+        self.description = description
+        self.price = price
+        self.priceFormatStyle = priceFormatStyle
         self.subscriptionPeriod = subscriptionPeriod
-        self.isTrialable        = isTrialable
-        
-        // Set convenience UI properties
+        self.trialPeriod = trialPeriod
         self.priceString = price.formatted(priceFormatStyle)
         
         if let subscriptionPeriod {
-            self.periodString = PeriodConverter
-                .approximateComponents(seconds: subscriptionPeriod)
-                .descriptiveLargestUnitString
-            
-            self.trialOfferSubtitle = "\(price.description) \(priceFormatStyle.currencyCode)/\(periodString!)"
-            self.subscriptionPeriodString = price.description + " " + priceFormatStyle.currencyCode + " / " + periodString!
+            let periodStr = Self.periodDescription(from: subscriptionPeriod)
+            self.periodString = periodStr
+            self.priceAndPeriodString = "\(priceString) / \(periodStr)"
+            self.subscriptionPeriodDescription = Self.subscriptionDescription(price: price, format: priceFormatStyle, period: periodStr)
+            self.trialOfferSubtitle = "\(price.description) \(priceFormatStyle.currencyCode)/\(periodStr)"
         } else {
             self.periodString = nil
+            self.priceAndPeriodString = nil
+            self.subscriptionPeriodDescription = nil
             self.trialOfferSubtitle = nil
-            self.subscriptionPeriodString = nil
         }
-        
+
+        if let trialPeriod {
+            let trialStr = Self.periodDescription(from: trialPeriod)
+            self.trialPeriodString = trialStr
+            self.trialPeriodDescription = "\(trialStr) free trial, then \(priceString), cancel anytime"
+        } else {
+            self.trialPeriodString = nil
+            self.trialPeriodDescription = nil
+        }
     }
+
+    // MARK: - Helpers
+    private static func periodDescription(from seconds: Int) -> String {
+        PeriodConverter
+            .approximateComponents(seconds: seconds)
+            .descriptiveLargestUnitString
+    }
+
+    private static func subscriptionDescription(price: Decimal, format: Decimal.FormatStyle.Currency, period: String) -> String {
+        "\(price.description) \(format.currencyCode) / \(period)"
+    }
+
 }
 
 
@@ -109,7 +130,7 @@ extension FTProduct {
                     .set(price: 2.99)
                     .set(currency: .currency(code: "USD"))
                     .set(subscriptionPeriod: PeriodConverter.monthly.durationInSeconds)
-                    .set(isTrialable: true)
+                    .set(trialPeriod: 86400 * 3)
                     .build()
             case .yearly:
                 try! FTProductBuilder()

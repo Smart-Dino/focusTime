@@ -23,7 +23,7 @@ struct OnboardingPaywallView: View {
                 .containerRelativeFrame([.horizontal])
                 .ignoresSafeArea()
             VStack(alignment: .leading) {
-                Text(Constants.Strings.navigationTitle)
+                Text(viewModel.state.navigationTitle)
                     .font(.system(
                         size: Constants.FontSize.navigationTitle,
                         weight: .bold
@@ -36,7 +36,7 @@ struct OnboardingPaywallView: View {
                     
 #warning("Action is empty")
                     FTSubscribeButtonView(
-                        terms: viewModel.state.trialTerms,
+                        terms: viewModel.state.trialProduct?.trialPeriodDescription ?? Constants.Strings.paidOnce,
                         buttonTitle: Constants.Strings.tryButtonTitle,
                         buttonAction: {
                             viewModel.subscribeToFreeTrial()

@@ -28,6 +28,9 @@ extension FreePlanUpgradeView {
             // Title of the view.
             static let title = "You're on a Free Plan"
             
+            // Product terms
+            static let paidOnce = SharedPaywallConstants.Strings.paidOnce
+            
             // Buttons
             static let tryButtonTitle = "Try For $0,00"
             static let viewPlansButton = SharedPaywallConstants.Strings.viewPlansButton

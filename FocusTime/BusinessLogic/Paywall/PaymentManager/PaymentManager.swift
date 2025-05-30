@@ -94,7 +94,6 @@ actor MockPaymentManagerWithPurchaseError: PaymentManager {
     init(trialUsed: Bool = false) {
         // Get products
         self.products = [
-//            FTProduct.mockWeekly,
             FTProduct.Mocks.monthly.product,
             FTProduct.Mocks.yearly.product,
             FTProduct.Mocks.lifetime.product

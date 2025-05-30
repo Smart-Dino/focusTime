@@ -75,7 +75,7 @@ struct FreePlanUpgradeView: View {
     private var actionButtons: some View {
         VStack {
             FTSubscribeButtonView(
-                terms: viewModel.state.trialTerms,
+                terms: viewModel.state.trialProduct?.trialPeriodDescription ?? Constants.Strings.paidOnce,
                 buttonTitle: Constants.Strings.tryButtonTitle,
                 buttonAction: {
                     viewModel.subscribeToFreeTrial()

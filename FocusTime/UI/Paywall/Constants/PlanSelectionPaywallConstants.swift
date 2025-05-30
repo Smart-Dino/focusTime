@@ -32,7 +32,7 @@ extension PlanSelectionPaywallView {
             static let noPaymentMessage = "No payment due now!"
             
             // Lifetime
-            static let paidOnce = "Paid once"
+            static let paidOnce = SharedPaywallConstants.Strings.paidOnce
             
             // Title text for the button that dismisses the view.
             static let dismissButtonTitle = SharedPaywallConstants.Strings.dismissButtonTitle

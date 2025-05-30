@@ -28,7 +28,7 @@ final class FTProductBuilder {
     private var price: Decimal?
     private var priceFormatStyle: Decimal.FormatStyle.Currency?
     private var subscriptionPeriod: Int?
-    private var isTrialable: Bool = false // Default value matches FTProduct
+    private var trialPeriod: Int?
 
     init() {
         reset()
@@ -41,7 +41,7 @@ final class FTProductBuilder {
         self.price = nil
         self.priceFormatStyle = nil
         self.subscriptionPeriod = nil
-        self.isTrialable = false
+        self.trialPeriod = nil
     }
     
     func set(id: String) -> Self {
@@ -68,14 +68,14 @@ final class FTProductBuilder {
         self.priceFormatStyle = currency
         return self
     }
-
-    func set(isTrialable: Bool) -> Self {
-        self.isTrialable = isTrialable
-        return self
-    }
     
     func set(subscriptionPeriod: Int?) -> Self {
         self.subscriptionPeriod = subscriptionPeriod
+        return self
+    }
+    
+    func set(trialPeriod: Int?) -> Self {
+        self.trialPeriod = trialPeriod
         return self
     }
 
@@ -94,7 +94,7 @@ final class FTProductBuilder {
             price:              price,
             priceFormatStyle:   priceFormatStyle,
             subscriptionPeriod: self.subscriptionPeriod,
-            isTrialable:        self.isTrialable
+            trialPeriod:        self.trialPeriod
         )
     }
 }
