@@ -50,28 +50,36 @@ final class FreePlanUpgradeViewModel {
     }
     
     func loadFirstTrialOffer() async {
-        do {
-            let products = try await paymentManager.getProducts()
-            
-            if let trialProduct = products.first(
-                where: { $0.trialPeriod != nil }
-            ) {
-                state.trialProduct = trialProduct
-                state.formattedPrice = trialProduct.priceAndPeriodString ?? trialProduct.priceString
+        let products = await paymentManager.products
+        
+        if let targetProduct = products.first(
+            where: { $0.trialPeriod != nil }
+        ) {
+            if let periodString = targetProduct.periodString {
+                state.formattedPrice = targetProduct.priceString + " / " + periodString
             } else {
-                state.error = OnboardingPaywallError.noTrialOption
+                state.formattedPrice = targetProduct.priceString
             }
-        } catch {
-            state.error = error
+            state.trialProduct = targetProduct
+            return
         }
-        Task {
-            do {
-                let _ = try await paymentManager.purchase(product)
-            } catch {
-                state.error = error
-            }
-        }
+        
+        state.error = OnboardingPaywallError.noTrialOption
     }
+    
+    func subscribeToFreeTrial() {
+            guard let product = state.trialProduct else {
+                state.error = OnboardingPaywallError.noTrialOption
+                return
+            }
+            Task {
+                do {
+                    let _ = try await paymentManager.purchase(product)
+                } catch {
+                    state.error = error
+                }
+            }
+        }
     
     func restorePurchase() {
         // I've decided to make this method sync to keep the visual harmony of

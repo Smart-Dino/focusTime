@@ -12,8 +12,8 @@ extension Array where Element == FTProduct {
     
     func sortByTrialThenPrice() -> [FTProduct] {
         self.sorted {
-            if $0.isTrialable != $1.isTrialable {
-                return $0.isTrialable && !$1.isTrialable
+            if ($0.trialPeriod != nil) != ($1.trialPeriod != nil) {
+                return ($0.trialPeriod != nil) && !($1.trialPeriod != nil)
             } else {
                 return $0.price < $1.price
             }

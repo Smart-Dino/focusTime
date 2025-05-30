@@ -50,23 +50,26 @@ final class OnboardingPaywallViewModel {
     
     // MARK: - Methods
     func loadFirstTrialOffer() async {
-        do {
-            let products = try await paymentManager.getProducts()
-            
-            if let trialProduct = products.first(
-                where: { $0.trialPeriod != nil }
-            ) {
-                state.trialProduct = trialProduct
-                state.navigationTitle = """
+        let products = await paymentManager.products
+        
+        if let trialProduct = products.first(
+            where: { $0.trialPeriod != nil }
+        ) {
+            state.trialProduct = trialProduct
+            state.navigationTitle = """
                        Get started with
                        a \(trialProduct.trialPeriodString ?? "0 days") free trial
                        """
-                state.formattedPrice = trialProduct.priceAndPeriodString ?? trialProduct.priceString
-            } else {
-                state.error = OnboardingPaywallError.noTrialOption
-            }
-        } catch {
-            state.error = error
+            state.formattedPrice = trialProduct.priceAndPeriodString ?? trialProduct.priceString
+        } else {
+            state.error = OnboardingPaywallError.noTrialOption
+        }
+    }
+    
+    func subscribeToFreeTrial() {
+        guard let product = state.trialProduct else {
+            state.error = OnboardingPaywallError.noTrialOption
+            return
         }
         Task {
             do {
