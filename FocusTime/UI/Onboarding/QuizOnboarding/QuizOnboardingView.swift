@@ -9,33 +9,26 @@
 import SwiftUI
 import FocusTimeUI
 
-// MARK: - QuizOnboardingView
-
 struct QuizOnboardingView: View {
-    // MARK: - Properties
-    @State private var viewModel = QuizOnboardingViewModel()
-    
-    // MARK: - Body
+
+    var viewModel: QuizOnboardingViewModel
+
+
     var body: some View {
-        
-        // MARK: - Header Section
-        VStack{
-            VStack(alignment: .leading){
-                
-                /// Title and subtitle
+        VStack {
+            VStack(alignment: .leading) {
                 VStack(alignment: .center, spacing: Constants.Layout.titleSpacing) {
                     Text(Constants.Strings.title)
                         .font(.title3.bold())
                         .multilineTextAlignment(.center)
-                    
+
                     Text(Constants.Strings.subtitle)
                         .font(.body)
                         .multilineTextAlignment(.center)
                 }
                 .foregroundColor(.white)
                 .padding(.bottom, Constants.Layout.bottomPadding)
-                
-                // MARK: - Scrollable Quiz Section
+
                 ScrollView {
                     VStack(alignment: .leading, spacing: Constants.Layout.quizSpacing) {
                         ForEach(Constants.QuizOption.allCases) { option in
@@ -50,21 +43,28 @@ struct QuizOnboardingView: View {
                 }
                 .scrollBounceBehavior(.basedOnSize, axes: [.vertical])
             }
+            .padding(.horizontal)
             
-            // MARK: - "Next" Button
-            /// Button to proceed after selecting options
             Button(Constants.Strings.nextButton) {
-                // TODO: - Add navigation action
+                viewModel.nextButtonTapped()
             }
             .buttonStyle(FTPrimaryButtonStyle())
             .padding()
         }
         .dynamicTypeSize(...DynamicTypeSize.large)
         .preferredColorScheme(.dark)
+        .navigationBarBackButtonHidden(true)
+        .toolbar(.hidden, for: .navigationBar)
     }
 }
 
-
 #Preview {
-    QuizOnboardingView()
+    NavigationStack {
+        QuizOnboardingView(
+            viewModel: QuizOnboardingViewModel(
+                analyticsManager: AppAnalytics.shared,
+                onNext: { print("Preview: Next button tapped") }
+            )
+        )
+    }
 }
