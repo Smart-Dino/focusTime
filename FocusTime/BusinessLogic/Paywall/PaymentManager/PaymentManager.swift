@@ -8,42 +8,32 @@
 import Foundation
 import StoreKit
 
-/// Represents errors that can occur during the payment process.
-enum PaymentError: LocalizedError {
-    case failedVerification
-    case purchaseInProgress
-    case productNotFound
-    case unknown
-
-    /// A user-friendly description for each payment error.
-    var errorDescription: String? {
+// MARK: = PaymentManagerMessage
+enum PaymentStreamMessage: CustomDebugStringConvertible {
+    case internalUpdate
+    
+    var debugDescription: String {
         switch self {
-        case .failedVerification:
-            return "The purchase could not be verified. Please try again later."
-        case .purchaseInProgress:
-            return "A purchase is already in progress. Please wait until it completes."
-        case .productNotFound:
-            return "The requested product could not be found."
-        case .unknown:
-            return "An unknown error occurred during the purchase."
+        case .internalUpdate:
+            "Manager has updates its values, make sure to reload your data based on them."
         }
     }
 }
 
 // MARK: - Payment Manager Protocol
-
 /// Defines the interface for managing in-app purchases.
 protocol PaymentManager: Actor {
     // MARK: - Product Listings
-
     /// All products available for purchase.
     var products: [FTProduct] { get }
+    
+    /// All available trial products options.
+    var trialProducts: [FTProduct] { get }
 
     /// Products that the user has already purchased and is entitled to.
     var purchasedProducts: [FTProduct] { get }
 
     // MARK: - Purchase Actions
-
     /// Attempts to purchase the given product.
     ///
     /// - Parameter product: The `FTProduct` to purchase.
@@ -59,7 +49,6 @@ protocol PaymentManager: Actor {
     func restorePurchases() async throws
 
     // MARK: - Entitlement Checks
-
     /// Checks if the specified product has been purchased.
     ///
     /// - Parameter product: The `FTProduct` to check.
@@ -76,17 +65,17 @@ protocol PaymentManager: Actor {
     /// Streams updates to the purchased products list.
     ///
     /// - Returns: An `AsyncStream` emitting arrays of `FTProduct`.
-    func stream() -> AsyncStream<[FTProduct]>
+    func updatesStream() -> AsyncStream<PaymentStreamMessage>
 }
 
 // MARK: - Mock Implementation
-
-/// A mock `PaymentManager` that simulates errors on purchase and restore operations.
 actor MockPaymentManagerWithPurchaseError: PaymentManager {
     // MARK: - Stored Properties
     private(set) var products: [FTProduct]
-    private var trialUsed: Bool
+    var trialProducts: [FTProduct]
     var purchasedProducts: [FTProduct] = []
+    
+    private var trialUsed: Bool
     
     // MARK: - Initialization
     init(trialUsed: Bool = false) {
@@ -96,16 +85,18 @@ actor MockPaymentManagerWithPurchaseError: PaymentManager {
             FTProduct.Mocks.yearly.product,
             FTProduct.Mocks.lifetime.product
         ]
+        self.trialProducts = [
+            FTProduct.Mocks.monthly.product
+        ]
     }
 
-    // MARK: - Streaming
-    func stream() -> AsyncStream<[FTProduct]> {
+    // MARK: - Methods
+    func updatesStream() -> AsyncStream<PaymentStreamMessage> {
         AsyncStream { continuation in
-            continuation.yield([])
+            continuation.yield(.internalUpdate)
         }
     }
 
-    // MARK: - Protocol Methods
     func eligibleForIntro(product: FTProduct) async throws(PaymentError) -> Bool {
         if !trialUsed {
             if products.first(where: { $0.trialPeriod != nil }) != nil {

@@ -57,9 +57,10 @@ struct FreePlanUpgradeView: View {
                 Text(viewModel.state.error?.localizedDescription ?? "")
             }
         )
-        .task {
-            await viewModel.loadFirstTrialOffer()
-            await viewModel.startListeningToSubscriptionUpdates()
+        .onAppear {
+            // Do NOT put these in the initializer
+            viewModel.setupProductInfo()
+            viewModel.startListeningToSubscriptionUpdates()
         }
     }
     
@@ -77,12 +78,12 @@ struct FreePlanUpgradeView: View {
         VStack {
             FTSubscribeButtonView(
                 terms: viewModel.state.trialPeriodDescription,
-                buttonTitle: Constants.Strings.tryButtonTitle,
-                isSubscribed: viewModel.state.isSubscribed,
+                buttonTitle: viewModel.state.purchaseButtonTitle,
                 buttonAction: {
                     viewModel.subscribeToFreeTrial()
                 }
             )
+            .disabled(viewModel.state.isButtonDisabled ? true : false)
             Button(
                 Constants.Strings.viewPlansButton,
                 action: viewModel.viewAllPlans
@@ -112,10 +113,24 @@ struct FreePlanUpgradeView: View {
     
 }
 
+// MARK: - Previews
 #Preview("MockPaymentManagerWithError") {
     NavigationStack {
         FreePlanUpgradeView(
             viewModel: .init(
+                trialableProduct: FTProduct.Mocks.monthly.product,
+                paymentManager: MockPaymentManagerWithPurchaseError()
+            )
+        )
+        .preferredColorScheme(.dark)
+    }
+}
+
+#Preview("NonTrialableProduct") {
+    NavigationStack {
+        FreePlanUpgradeView(
+            viewModel: .init(
+                trialableProduct: FTProduct.Mocks.yearly.product,
                 paymentManager: MockPaymentManagerWithPurchaseError()
             )
         )
@@ -127,6 +142,7 @@ struct FreePlanUpgradeView: View {
     NavigationStack {
         FreePlanUpgradeView(
             viewModel: .init(
+                trialableProduct: FTProduct.Mocks.monthly.product,
                 paymentManager: StoreKitPaymentManager()
             )
         )

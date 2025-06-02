@@ -12,6 +12,7 @@ struct StoreKitPaymentManagerDebugView: View {
     let paymentManager: PaymentManager
     
     @State private var products: [FTProduct] = []
+    @State private var trialProducts: [FTProduct] = []
     @State private var purchasedProducts: [FTProduct] = []
     @State private var eligibleForTrial: Bool = false
     @State private var isRefreshing: Bool = false
@@ -21,11 +22,12 @@ struct StoreKitPaymentManagerDebugView: View {
     var body: some View {
         NavigationStack {
             List {
+                let freePlanStr = String(describing: FreePlanUpgradeView.self)
                 Section("Paywall views") {
-                    NavigationLink("FreePlanUpgradeView") {
-                        let viewModel = FreePlanUpgradeViewModel(paymentManager: paymentManager)
-                        FreePlanUpgradeView(viewModel: viewModel)
-                    }
+                    NavigationLink(
+                        value: freePlanStr,
+                        label: { Text(freePlanStr) }
+                    )
                 }
                 
                 // Status Section
@@ -122,12 +124,25 @@ struct StoreKitPaymentManagerDebugView: View {
                         .background(.regularMaterial)
                 }
             }
+            .navigationDestination(for: String.self) { str in
+                switch str {
+                case String(describing: FreePlanUpgradeView.self):
+                    let viewModel = FreePlanUpgradeViewModel(
+                        trialableProduct: trialProducts.first!,
+                        paymentManager: paymentManager
+                    )
+                    FreePlanUpgradeView(viewModel: viewModel)
+                default:
+                    Text(str)
+                }
+            }
         }
         .task {
             await loadInitialData()
-            for await update in await paymentManager.stream() {
-                print("New update")
-                self.purchasedProducts = update
+            for await update in await paymentManager.updatesStream() {
+                if update == .internalUpdate {
+                    await self.refreshData()
+                }
             }
         }
     }
@@ -144,6 +159,7 @@ struct StoreKitPaymentManagerDebugView: View {
         
         // Fetch all data from the actor
         async let productsTask = paymentManager.products
+        async let trialProductsTask = paymentManager.trialProducts
         async let purchasedTask = paymentManager.purchasedProducts
         
         var fetchedEligibleForTrial: Bool?
@@ -154,9 +170,11 @@ struct StoreKitPaymentManagerDebugView: View {
         }
         
         let fetchedProducts = await productsTask
+        let fetchedTrialProducts = await trialProductsTask
         let fetchedPurchased = await purchasedTask
         
         products = fetchedProducts
+        trialProducts = fetchedTrialProducts
         purchasedProducts = fetchedPurchased
         eligibleForTrial = fetchedEligibleForTrial ?? true
         lastRefresh = Date()

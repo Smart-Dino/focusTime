@@ -61,11 +61,9 @@ struct PlanSelectionPaywallView: View {
                 VStack(spacing: .zero) {
                     features
                     
-#warning("isSubscribed uses a placeholder")
                     FTSubscribeButtonView(
                         terms: viewModel.state.subscribeButtonTerms,
                         buttonTitle: viewModel.state.primaryButtonTitle,
-                        isSubscribed: true,
                         buttonAction: {}
                     )
                     .padding()
