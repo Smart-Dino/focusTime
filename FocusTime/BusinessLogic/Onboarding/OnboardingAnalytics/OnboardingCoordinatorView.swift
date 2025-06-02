@@ -7,37 +7,36 @@
 
 import SwiftUI
 
+// Manages the navigation flow for the onboarding sequence.
+// It uses SwiftUI's NavigationStack to present different onboarding views (Quiz and Slides).
+
 enum OnboardingNavigationPath: Hashable {
-    case quiz
     case slides
 }
 
 struct OnboardingCoordinatorView: View {
     @Binding var hasCompletedOnboarding: Bool
-    // TODO: use NavigationStack for iOS 17+
-    @State private var navigationPath = NavigationPath()
+
+    @State private var path: [OnboardingNavigationPath] = []
+
 
     private let analyticsManager: AnalyticsManaging = AppAnalytics.shared
 
     var body: some View {
-        NavigationStack(path: $navigationPath) {
+
+        NavigationStack(path: $path) {
             QuizOnboardingView(
                 viewModel: QuizOnboardingViewModel(
                     analyticsManager: analyticsManager,
                     onNext: {
-                        navigationPath.append(OnboardingNavigationPath.slides)
+
+                        path.append(OnboardingNavigationPath.slides)
                     }
                 )
             )
+
             .navigationDestination(for: OnboardingNavigationPath.self) { pathValue in
                 switch pathValue {
-                case .quiz:
-                    QuizOnboardingView(
-                        viewModel: QuizOnboardingViewModel(
-                            analyticsManager: analyticsManager,
-                            onNext: { navigationPath.append(OnboardingNavigationPath.slides) }
-                        )
-                    )
                 case .slides:
                     SlideOnboardingView(
                         viewModel: SlideOnboardingViewModel(analyticsManager: analyticsManager),

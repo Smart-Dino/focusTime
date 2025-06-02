@@ -11,7 +11,11 @@ import FocusTimeUI
 
 struct QuizOnboardingView: View {
 
-    var viewModel: QuizOnboardingViewModel
+    @State private var viewModel: QuizOnboardingViewModel
+    
+    init(viewModel: QuizOnboardingViewModel) {
+            _viewModel = State(initialValue: viewModel)
+        }
 
 
     var body: some View {

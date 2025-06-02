@@ -7,6 +7,9 @@
 
 import Foundation
 
+// Provides a centralized, shared access point to the analytics service.
+// It uses a singleton-like pattern to ensure a single instance of the analytics manager is used throughout the app.
+
 struct AppAnalytics {
     static let shared: AnalyticsManaging = LoggingAnalyticsManager()
 

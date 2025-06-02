@@ -15,16 +15,15 @@ final class QuizOnboardingViewModel {
 
     struct State {
         var selectionStates: Set<QuizOption> = []
-        // Potentially add other state properties if needed
     }
 
     var state = State()
     private let analyticsManager: AnalyticsManaging
-    private var onNextCallback: () -> Void // Callback to trigger navigation
+    private var onNextCallback: () -> Void
 
     init(
-        analyticsManager: AnalyticsManaging = AppAnalytics.shared, // Default for previews/simplicity
-        onNext: @escaping () -> Void = {} // Default empty callback for previews
+        analyticsManager: AnalyticsManaging = AppAnalytics.shared,
+        onNext: @escaping () -> Void = {}
     ) {
         self.analyticsManager = analyticsManager
         self.onNextCallback = onNext
@@ -47,7 +46,6 @@ final class QuizOnboardingViewModel {
 
     func nextButtonTapped() {
         analyticsManager.log(event: .quizNextButtonTapped)
-        // Any other logic before navigating (e.g., save quiz choices)
-        onNextCallback() // Trigger navigation via the coordinator
+        onNextCallback()
     }
 }

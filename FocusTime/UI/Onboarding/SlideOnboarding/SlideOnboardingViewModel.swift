@@ -12,6 +12,7 @@ import Observation
 @MainActor
 @Observable
 final class SlideOnboardingViewModel {
+    
     struct State {
         var currentIndex: Int = 0
         var showSkipConfirmation: Bool = false

@@ -5,6 +5,8 @@
 //  Created by Keto Nioradze on 30.05.25.
 //
 
+// This enum provides a type-safe way to represent events and their associated parameters.
+
 import Foundation
 
 enum AnalyticsEvent: Sendable {

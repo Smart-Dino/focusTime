@@ -14,16 +14,17 @@ struct FocusTimeApp: App {
     var body: some Scene {
         WindowGroup {
             if hasCompletedOnboarding {
+                // TODO: - replace this with actual PaymentManager implementation
                 OnboardingPaywallView(viewModel: .init(
                     paymentManager: MockPaymentManagerWithPurchaseError()
                 ))
+                
                 // TODO: - REMOVE TEMPORARY BUTTON
                 Button("Reset Onboarding (for Preview)") {
                     hasCompletedOnboarding = false
                     
                 }
                 .padding()
-                .buttonStyle(.borderedProminent)
             } else {
                 OnboardingCoordinatorView(hasCompletedOnboarding: $hasCompletedOnboarding)
             }

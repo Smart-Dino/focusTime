@@ -10,7 +10,7 @@ import FocusTimeUI
 
 struct SlideOnboardingView: View {
 
-    @State var viewModel: SlideOnboardingViewModel
+    @State private var viewModel: SlideOnboardingViewModel
     @Binding var hasCompletedOnboarding: Bool
     private let progressItems = SlideOnboardingStep.allCases
 
@@ -80,7 +80,6 @@ struct SlideOnboardingView: View {
             } else {
                 Button(Constants.Strings.startButton) {
                     viewModel.completeOnboarding()
-                    // TODO: - Navigate to main app flow
                     hasCompletedOnboarding = true
                 }
                 .frame(height: Constants.Layout.buttonSectionHeight)
