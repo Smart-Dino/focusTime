@@ -128,7 +128,7 @@ struct StoreKitPaymentManagerDebugView: View {
                 switch str {
                 case String(describing: FreePlanUpgradeView.self):
                     let viewModel = FreePlanUpgradeViewModel(
-                        trialableProduct: trialProducts.first!,
+                        state: .init(trialProduct: products.last!),
                         paymentManager: paymentManager
                     )
                     FreePlanUpgradeView(viewModel: viewModel)

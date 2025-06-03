@@ -15,7 +15,6 @@ final class FreePlanUpgradeViewModel {
     // MARK: - Nested declarations
     struct State {
         var error: Error?
-        var subscriptionTask: Task<Void, Never>?
         
         var trialProduct: FTProduct
         var purchaseResult: FTProduct.PurchaseResult?
@@ -23,12 +22,12 @@ final class FreePlanUpgradeViewModel {
         var isButtonDisabled: Bool = true
         var purchaseButtonTitle = FreePlanUpgradeView.Constants.Strings.tryButtonTitle
         var formattedPrice: String?
-        var trialPeriodDescription: String = FreePlanUpgradeView.Constants.Strings.paidOnce
+        var trialPeriodDescription: String = FreePlanUpgradeView.Constants.Strings.loadingMessage
     }
     
     // MARK: - Properties
-    /// Property contatining values that may trigger UI redraw.
     private(set) var state: State
+    private var subscriptionTask: Task<Void, Never>?
     
     // Made this property private becase it is injected
     // through the initializer, not a property.
@@ -36,22 +35,18 @@ final class FreePlanUpgradeViewModel {
     
     // MARK: - Initializers
     init(
-        trialableProduct: FTProduct,
+        state: State,
         paymentManager: PaymentManager
     ) {
-        // ViewModel init
-        self.state = State(trialProduct: trialableProduct)
+        self.state = state
         self.paymentManager = paymentManager
-        
-        // State init
-        self.state.trialProduct = trialableProduct
     }
     
     // A deinitializer is called immediately before a class instance is deallocated
     // - so we should have access to self.state before it deinits?
     deinit {
         Task { [weak self] in
-            await self?.state.subscriptionTask?.cancel()
+            await self?.subscriptionTask?.cancel()
         }
     }
     
@@ -65,9 +60,9 @@ final class FreePlanUpgradeViewModel {
     // MARK: - Methods
     // MARK: Setup
     func startListeningToSubscriptionUpdates() {
-        state.subscriptionTask?.cancel()
+        subscriptionTask?.cancel()
         
-        state.subscriptionTask = Task { [weak self] in
+        subscriptionTask = Task { [weak self] in
             guard let self else { return }
             for await update in await self.paymentManager.updatesStream() {
                 if update == .internalUpdate {
@@ -81,7 +76,9 @@ final class FreePlanUpgradeViewModel {
         print("Setup product info")
         let trialProduct = state.trialProduct
         guard trialProduct.trialPeriod != nil else {
-            state.error = FreePlanUpgradeError.invalidProduct
+            let error = FreePlanUpgradeError.invalidProduct
+            state.error = error
+            state.trialPeriodDescription = error.localizedDescription
             // Dismiss view?
             return
         }
@@ -93,7 +90,6 @@ final class FreePlanUpgradeViewModel {
         if let description = trialProduct.trialPeriodDescription {
             state.trialPeriodDescription = description
         }
-        state.trialProduct = trialProduct
         updatePurchaseResult()
     }
     

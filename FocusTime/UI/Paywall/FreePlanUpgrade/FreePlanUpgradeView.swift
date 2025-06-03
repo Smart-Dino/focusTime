@@ -83,7 +83,7 @@ struct FreePlanUpgradeView: View {
                     viewModel.subscribeToFreeTrial()
                 }
             )
-            .disabled(viewModel.state.isButtonDisabled ? true : false)
+            .disabled(viewModel.state.isButtonDisabled)
             Button(
                 Constants.Strings.viewPlansButton,
                 action: viewModel.viewAllPlans
@@ -118,7 +118,7 @@ struct FreePlanUpgradeView: View {
     NavigationStack {
         FreePlanUpgradeView(
             viewModel: .init(
-                trialableProduct: FTProduct.Mocks.monthly.product,
+                state: .init(trialProduct: FTProduct.Mocks.monthly.product),
                 paymentManager: MockPaymentManagerWithPurchaseError()
             )
         )
@@ -130,7 +130,7 @@ struct FreePlanUpgradeView: View {
     NavigationStack {
         FreePlanUpgradeView(
             viewModel: .init(
-                trialableProduct: FTProduct.Mocks.yearly.product,
+                state: .init(trialProduct: FTProduct.Mocks.yearly.product),
                 paymentManager: MockPaymentManagerWithPurchaseError()
             )
         )
@@ -142,7 +142,7 @@ struct FreePlanUpgradeView: View {
     NavigationStack {
         FreePlanUpgradeView(
             viewModel: .init(
-                trialableProduct: FTProduct.Mocks.monthly.product,
+                state: .init(trialProduct: FTProduct.Mocks.monthly.product),
                 paymentManager: StoreKitPaymentManager()
             )
         )

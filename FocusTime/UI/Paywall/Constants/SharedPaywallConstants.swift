@@ -19,7 +19,7 @@ enum SharedPaywallConstants {
         static let paidOnce = "Paid once"
         // Button states
         static let loadingMessage = "Loading..."
-        static let pendingMessage = "Peding..."
+        static let pendingMessage = "Pending..."
         static let subscribedMessage = "Subscribed!"
     }
     
