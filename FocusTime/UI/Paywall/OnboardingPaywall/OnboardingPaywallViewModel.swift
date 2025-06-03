@@ -16,17 +16,23 @@ final class OnboardingPaywallViewModel {
     // MARK: - Nested declarations
     struct State {
         var error: Error?
-        /// Main features of the paid version,
-        let featureItems = OnboardingPaywallView.Constants.FeatureItems.allCases
-        var navigationTitle = OnboardingPaywallView.Constants.Strings.loadingMessage
         
-        var trialProduct: FTProduct?
-        var formattedPrice: String?
+        var trialProduct: FTProduct
+        var purchaseResult: FTProduct.PurchaseResult?
+        
+        // Button state
+        var isButtonDisabled = true
+        
+        // Dynamic strings
+        static let stringConstants = OnboardingPaywallView.Constants.Strings.self
+        var navigationTitle        = stringConstants.loadingMessage
+        var trialPeriodDescription = stringConstants.loadingMessage
+        var purchaseButtonTitle    = stringConstants.tryButtonTitle
     }
     
     // MARK: - Properties
-    /// Property contatining values that may trigger UI redraw.
     private(set) var state: State
+    private var subscriptionTask: Task<Void, Never>?
     
     // Made this property private becase it is injected
     // through the initializer, not a property.
@@ -34,48 +40,126 @@ final class OnboardingPaywallViewModel {
     
     // MARK: - Initializers
     init(
-        state: State = State(),
+        state: State,
         paymentManager: PaymentManager
     ) {
         self.state = state
         self.paymentManager = paymentManager
     }
     
-    // MARK: - State setter methods
+    // A deinitializer is called immediately before a class instance is deallocated
+    // - so we should have access to self.state before it deinits?
+    deinit {
+        Task { [weak self] in
+            await self?.subscriptionTask?.cancel()
+        }
+    }
+    
+    // MARK: - Methods
+    
+    // MARK: State setter methods
+    func startListeningToSubscriptionUpdates() {
+        subscriptionTask?.cancel()
+        
+        subscriptionTask = Task { [weak self] in
+            guard let self else { return }
+            for await update in await self.paymentManager.updatesStream() {
+                if update == .internalUpdate {
+                    self.updatePurchaseResult()
+                }
+            }
+        }
+    }
+    
     func updateError(showError: Bool) {
         if !showError {
             state.error = nil
         }
     }
     
-    // MARK: - Methods
-    func loadFirstTrialOffer() async {
-        let products = await paymentManager.products
-
-        guard let trialProduct = products.first(where: { $0.trialPeriod != nil }) else {
-            state.error = OnboardingPaywallError.noTrialOption
+    // MARK: Setup
+    
+    func setupProductInfo() {
+        print("Setup product info")
+        let trialProduct = state.trialProduct
+        guard trialProduct.trialPeriod != nil else {
+            let error = OnboardingPaywallError.invalidProduct
+            state.error = error
+            state.trialPeriodDescription = error.localizedDescription
+            state.navigationTitle = State.stringConstants.errorHeader
+            // Dismiss view?
             return
         }
-
-        state.trialProduct = trialProduct
-
-        let trialDuration = trialProduct.trialPeriodString ?? "0 days"
-        state.navigationTitle = """
-        Get started with
-        a \(trialDuration) free trial
-        """
-
-        state.formattedPrice = trialProduct.priceAndPeriodString ?? trialProduct.priceString
+        
+        if let description = trialProduct.trialPeriodDescription {
+            state.trialPeriodDescription = description
+        }
+        if let trialDuration = trialProduct.trialPeriodString {
+            state.navigationTitle = """
+            Get started with
+            a \(trialDuration) free trial
+            """
+        }
+        updatePurchaseResult()
     }
     
-    func subscribeToFreeTrial() {
-        guard let product = state.trialProduct else {
-            state.error = OnboardingPaywallError.noTrialOption
+    private func updatePurchaseResult() {
+        Task { [weak self] in
+            guard let self else { return }
+
+            let isPurchased = await paymentManager.isPurchased(state.trialProduct)
+            state.purchaseResult = isPurchased ? .success : nil
+            
+            self.updateUIBasedOnPurchaseResult()
+        }
+    }
+    
+    private func updateUIBasedOnPurchaseResult() {
+        guard let result = state.purchaseResult else {
+            // Reset to default if result is nil
+            state.purchaseButtonTitle = State.stringConstants.tryButtonTitle
+            state.isButtonDisabled = false
             return
         }
-        Task {
+
+        switch result {
+        case .success:
+            state.purchaseButtonTitle = State.stringConstants.subscribedMessage
+            state.isButtonDisabled = true
+            state.error = nil
+
+        case .pending:
+            state.purchaseButtonTitle = State.stringConstants.pendingMessage
+            state.isButtonDisabled = true
+            state.error = PaymentError.pending
+
+        case .userCancelled:
+            state.purchaseButtonTitle = State.stringConstants.tryButtonTitle
+            state.isButtonDisabled = false
+            state.error = PaymentError.userCancelled
+        }
+    }
+    
+    // MARK: Actions
+    func subscribeToFreeTrial() {
+        Task { [weak self] in
+            guard let self else { return }
+            
             do {
-                let _ = try await paymentManager.purchase(product)
+                let result = try await paymentManager.purchase(state.trialProduct)
+                
+                switch result {
+                case .success:
+                    state.purchaseResult = .success
+                case .userCancelled:
+                    state.purchaseResult = .userCancelled
+                case .pending:
+                    state.purchaseResult = .pending
+                case nil:
+                    state.error = PaymentError.unknown
+                }
+                
+                updateUIBasedOnPurchaseResult()
             } catch {
                 state.error = error
             }
@@ -83,9 +167,10 @@ final class OnboardingPaywallViewModel {
     }
     
     func restorePurchase() {
-        Task {
+        Task { [weak self] in
+            guard let self else { return }
             do {
-                try await paymentManager.restorePurchases()
+                try await self.paymentManager.restorePurchases()
             } catch {
                 state.error = error
             }

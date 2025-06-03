@@ -35,13 +35,14 @@ struct OnboardingPaywallView: View {
                     features
                     
                     FTSubscribeButtonView(
-                        terms: viewModel.state.trialProduct?.trialPeriodDescription ?? Constants.Strings.paidOnce,
-                        buttonTitle: Constants.Strings.tryButtonTitle,
+                        terms: viewModel.state.trialPeriodDescription,
+                        buttonTitle: viewModel.state.purchaseButtonTitle,
                         buttonAction: {
                             viewModel.subscribeToFreeTrial()
                         }
                     )
                     .padding()
+                    .disabled(viewModel.state.isButtonDisabled)
                     
                     SubscriptionUtilityLinksView(
                         onTermsTapped: viewModel.openTermsOfService,
@@ -49,9 +50,9 @@ struct OnboardingPaywallView: View {
                         onRestoreTapped: viewModel.restorePurchase
                     )
                 }
-                .containerRelativeFrame(.vertical, { amount, axis in
+                .containerRelativeFrame(.vertical) { amount, _ in
                     amount / 1.8
-                })
+                }
                 .padding()
                 .background {
                     contentCard
@@ -76,8 +77,10 @@ struct OnboardingPaywallView: View {
                 Text(viewModel.state.error?.localizedDescription ?? "")
             }
         )
-        .task {
-            await viewModel.loadFirstTrialOffer()
+        .onAppear {
+            // Do NOT put these in the initializer
+            viewModel.setupProductInfo()
+            viewModel.startListeningToSubscriptionUpdates()
         }
     }
     
@@ -97,7 +100,7 @@ struct OnboardingPaywallView: View {
     /// List of features.
     private var features: some View {
         VStack(alignment: .leading) {
-            ForEach(viewModel.state.featureItems) { item in
+            ForEach(Constants.FeatureItems.allCases) { item in
                 FTCheckmarkListItemView(item.rawValue)
                     .padding(.vertical, Constants.Padding.featureList)
             }
@@ -125,6 +128,7 @@ struct OnboardingPaywallView: View {
     NavigationStack {
         OnboardingPaywallView(
             viewModel: .init(
+                state: .init(trialProduct: FTProduct.Mocks.monthly.product),
                 paymentManager: MockPaymentManagerWithPurchaseError()
             )
         )

@@ -23,10 +23,15 @@ struct StoreKitPaymentManagerDebugView: View {
         NavigationStack {
             List {
                 let freePlanStr = String(describing: FreePlanUpgradeView.self)
+                let onboardingPaywallStr = String(describing: OnboardingPaywallView.self)
                 Section("Paywall views") {
                     NavigationLink(
                         value: freePlanStr,
                         label: { Text(freePlanStr) }
+                    )
+                    NavigationLink(
+                        value: onboardingPaywallStr,
+                        label: { Text(onboardingPaywallStr) }
                     )
                 }
                 
@@ -128,10 +133,16 @@ struct StoreKitPaymentManagerDebugView: View {
                 switch str {
                 case String(describing: FreePlanUpgradeView.self):
                     let viewModel = FreePlanUpgradeViewModel(
-                        state: .init(trialProduct: products.last!),
+                        state: .init(trialProduct: products.first!),
                         paymentManager: paymentManager
                     )
                     FreePlanUpgradeView(viewModel: viewModel)
+                case String(describing: OnboardingPaywallView.self):
+                    let viewModel = OnboardingPaywallViewModel(
+                        state: .init(trialProduct: products.first!),
+                        paymentManager: paymentManager
+                    )
+                    OnboardingPaywallView(viewModel: viewModel)
                 default:
                     Text(str)
                 }
