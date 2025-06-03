@@ -50,27 +50,29 @@ final class OnboardingPaywallViewModel {
     
     // MARK: - Methods
     func loadFirstTrialOffer() async {
-        do {
-            let products = try await paymentManager.getProducts()
-            
-            if let trialProduct = products.first(
-                where: { $0.trialPeriod != nil }
-            ) {
-                state.trialProduct = trialProduct
-                state.navigationTitle = """
-                       Get started with
-                       a \(trialProduct.trialPeriodString ?? "0 days") free trial
-                       """
-                state.formattedPrice = trialProduct.priceAndPeriodString ?? trialProduct.priceString
-            } else {
-                state.error = OnboardingPaywallError.noTrialOption
-            }
-        } catch {
-            state.error = error
+        let products = await paymentManager.products
+
+        guard let trialProduct = products.first(where: { $0.trialPeriod != nil }) else {
+            state.error = OnboardingPaywallError.noTrialOption
+            return
         }
+
+        state.trialProduct = trialProduct
+
+        let trialDuration = trialProduct.trialPeriodString ?? "0 days"
+        state.navigationTitle = """
+        Get started with
+        a \(trialDuration) free trial
+        """
+
+        state.formattedPrice = trialProduct.priceAndPeriodString ?? trialProduct.priceString
     }
     
-    func subscribe(with product: FTProduct) {
+    func subscribeToFreeTrial() {
+        guard let product = state.trialProduct else {
+            state.error = OnboardingPaywallError.noTrialOption
+            return
+        }
         Task {
             do {
                 let _ = try await paymentManager.purchase(product)
@@ -81,12 +83,6 @@ final class OnboardingPaywallViewModel {
     }
     
     func restorePurchase() {
-        // I've decided to make this method sync to keep the visual harmony of
-        // SubscriptionUtilityLinksView(
-        //      onTermsTapped: viewModel.openTermsOfService,
-        //      onPrivacyTapped: viewModel.openPrivacy,
-        //      onRestoreTapped: viewModel.restorePurchase
-        // )
         Task {
             do {
                 try await paymentManager.restorePurchases()

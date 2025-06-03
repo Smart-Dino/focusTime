@@ -30,9 +30,11 @@ public struct FTSecondaryButtonStyle: ButtonStyle {
         configuration.label
             .frame(maxWidth: .infinity)
             .padding(.vertical, 7)
-            .background(Material.ultraThinMaterial)
-            .clipShape(Capsule())
+            .background(.ultraThinMaterial)
+            .clipShape(.capsule)
             .opacity(configuration.isPressed ? 0.8 : 1)
+        // TODO: We would need to discuss a way to implement it with UI/UX team
+        #warning("ButtonStyle does not implement disable state")
     }
     
 }

@@ -14,10 +14,13 @@ enum SharedPaywallConstants {
         static let errorHeader = "An error occured"
         static let dismissButtonTitle = "Dismiss current screen."
         static let viewPlansButton = "View All Plans"
-        static let loadingMessage = "Loading..."
         static let subscribeButtonTitle = "Subscribe"
         // Lifetime
         static let paidOnce = "Paid once"
+        // Button states
+        static let loadingMessage = "Loading..."
+        static let pendingMessage = "Pending..."
+        static let subscribedMessage = "Subscribed!"
     }
     
 }
