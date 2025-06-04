@@ -21,6 +21,7 @@ import SwiftUI
 ///       .buttonStyle(FTPrimaryButtonStyle())
 ///   ```
 public struct FTPrimaryButtonStyle: ButtonStyle {
+    @Environment(\.isEnabled) private var isEnabled
     
     /// Initializes the primary button style.
     public init() { }
@@ -30,8 +31,8 @@ public struct FTPrimaryButtonStyle: ButtonStyle {
         configuration.label
             .frame(maxWidth: .infinity)
             .padding(.vertical, 7)
-            .background(Color.blue)
-            .clipShape(Capsule())
+            .background(isEnabled ? .blue : .gray)
+            .clipShape(.capsule)
             .opacity(configuration.isPressed ? 0.8 : 1)
     }
 }

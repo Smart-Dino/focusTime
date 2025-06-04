@@ -12,7 +12,7 @@ public struct FTSubscribeButtonView: View {
     private let terms: String
     private let buttonTitle: String
     private let buttonAction: () -> Void
-
+    
     public var body: some View {
         VStack {
             Text(terms)
@@ -21,7 +21,7 @@ public struct FTSubscribeButtonView: View {
                 .buttonStyle(.ftPrimary)
         }
     }
-
+    
     /// Creates a subscribe button view.
     /// - Parameters:
     ///   - terms: Text displayed above the button (e.g., trial information).

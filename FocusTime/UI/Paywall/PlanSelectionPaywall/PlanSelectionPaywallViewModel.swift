@@ -70,11 +70,11 @@ final class PlanSelectionPaywallViewModel {
     // MARK: - Methods
     func selectProduct(_ product: FTProduct) async {
         state.selectedProduct = product
-
+        
         // Suspend here until trial check completes
         // if for some reason it is empty
         if state.isTrialUsed == nil {
-            await checkTrialAvailability()
+            state.isTrialUsed = try? await paymentManager.eligibleForIntro(product: product)
         }
         
         guard let isTrialUsed = state.isTrialUsed else {
@@ -83,7 +83,7 @@ final class PlanSelectionPaywallViewModel {
         }
         
         configureBottomSectionForSelectedPtoduct(product, isTrialUsed: isTrialUsed)
-
+        
     }
     
     private func configureBottomSectionForSelectedPtoduct(
@@ -114,29 +114,21 @@ final class PlanSelectionPaywallViewModel {
         }
     }
     
-    func checkTrialAvailability() async {
-        self.state.isTrialUsed = await paymentManager.trialUsed
-    }
-    
     func getTrialTerms(for product: FTProduct) -> String {
         "Get \(product.trialPeriodString ?? "0 days") for free!"
     }
     
     func loadOffers() async {
-        do {
-            // Load products
-            let products = try await paymentManager.getProducts()
-            state.products = products
-            
-            // Set initial selected product
-            // If there are no products - we don't select anything
-            if let trialableProduct = products.first(where: { $0.trialPeriod != nil }) {
-                await selectProduct(trialableProduct)
-            } else if let product = products.first {
-                await selectProduct(product)
-            }
-        } catch {
-            state.error = error
+        // Load products
+        let products = await paymentManager.products
+        state.products = products
+        
+        // Set initial selected product
+        // If there are no products - we don't select anything
+        if let trialableProduct = products.first(where: { $0.trialPeriod != nil }) {
+            await selectProduct(trialableProduct)
+        } else if let product = products.first {
+            await selectProduct(product)
         }
     }
     
@@ -151,12 +143,6 @@ final class PlanSelectionPaywallViewModel {
     }
     
     func restorePurchase() {
-        // I've decided to make this method sync to keep the visual harmony of
-        // SubscriptionUtilityLinksView(
-        //      onTermsTapped: viewModel.openTermsOfService,
-        //      onPrivacyTapped: viewModel.openPrivacy,
-        //      onRestoreTapped: viewModel.restorePurchase
-        // )
         Task {
             do {
                 try await paymentManager.restorePurchases()

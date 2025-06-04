@@ -16,13 +16,18 @@ final class FreePlanUpgradeViewModel {
     struct State {
         var error: Error?
         
-        var trialProduct: FTProduct?
+        var trialProduct: FTProduct
+        var purchaseResult: FTProduct.PurchaseResult?
+        
+        var isButtonDisabled: Bool = true
+        var purchaseButtonTitle = FreePlanUpgradeView.Constants.Strings.tryButtonTitle
         var formattedPrice: String?
+        var trialPeriodDescription: String = FreePlanUpgradeView.Constants.Strings.loadingMessage
     }
     
     // MARK: - Properties
-    /// Property contatining values that may trigger UI redraw.
     private(set) var state: State
+    private var subscriptionTask: Task<Void, Never>?
     
     // Made this property private becase it is injected
     // through the initializer, not a property.
@@ -30,11 +35,19 @@ final class FreePlanUpgradeViewModel {
     
     // MARK: - Initializers
     init(
-        state: State = State(),
+        state: State,
         paymentManager: PaymentManager
     ) {
         self.state = state
         self.paymentManager = paymentManager
+    }
+    
+    // A deinitializer is called immediately before a class instance is deallocated
+    // - so we should have access to self.state before it deinits?
+    deinit {
+        Task { [weak self] in
+            await self?.subscriptionTask?.cancel()
+        }
     }
     
     // MARK: - State setter methods
@@ -45,31 +58,98 @@ final class FreePlanUpgradeViewModel {
     }
     
     // MARK: - Methods
-    func viewAllPlans() {
-        // Show all plans
-    }
-    
-    func loadFirstTrialOffer() async {
-        do {
-            let products = try await paymentManager.getProducts()
-            
-            if let trialProduct = products.first(
-                where: { $0.trialPeriod != nil }
-            ) {
-                state.trialProduct = trialProduct
-                state.formattedPrice = trialProduct.priceAndPeriodString ?? trialProduct.priceString
-            } else {
-                state.error = OnboardingPaywallError.noTrialOption
+    // MARK: Setup
+    func startListeningToSubscriptionUpdates() {
+        subscriptionTask?.cancel()
+        
+        subscriptionTask = Task { [weak self] in
+            guard let self else { return }
+            for await update in await self.paymentManager.updatesStream() {
+                if update == .internalUpdate {
+                    self.updatePurchaseResult()
+                }
             }
-        } catch {
-            state.error = error
         }
     }
+    
+    func setupProductInfo() {
+        print("Setup product info")
+        let trialProduct = state.trialProduct
+        guard trialProduct.trialPeriod != nil else {
+            let error = FreePlanUpgradeError.invalidProduct
+            state.error = error
+            state.trialPeriodDescription = error.localizedDescription
+            // Dismiss view?
+            return
+        }
+        
+        let price = trialProduct.priceString
+        let period = trialProduct.periodString ?? ""
+        state.formattedPrice = period.isEmpty ? price : "\(price) / \(period)"
+        
+        if let description = trialProduct.trialPeriodDescription {
+            state.trialPeriodDescription = description
+        }
+        updatePurchaseResult()
+    }
+    
+    private func updatePurchaseResult() {
+        Task { [weak self] in
+            guard let self else { return }
 
-    func subscribe(with product: FTProduct) {
-        Task {
+            let isPurchased = await paymentManager.isPurchased(state.trialProduct)
+            state.purchaseResult = isPurchased ? .success : nil
+            
+            self.updateUIBasedOnPurchaseResult()
+        }
+    }
+    
+    private func updateUIBasedOnPurchaseResult() {
+        guard let result = state.purchaseResult else {
+            // Reset to default if result is nil
+            state.purchaseButtonTitle = FreePlanUpgradeView.Constants.Strings.tryButtonTitle
+            state.isButtonDisabled = false
+            return
+        }
+
+        switch result {
+        case .success:
+            state.purchaseButtonTitle = FreePlanUpgradeView.Constants.Strings.subscribedMessage
+            state.isButtonDisabled = true
+            state.error = nil
+
+        case .pending:
+            state.purchaseButtonTitle = FreePlanUpgradeView.Constants.Strings.pendingMessage
+            state.isButtonDisabled = true
+            state.error = PaymentError.pending
+
+        case .userCancelled:
+            state.purchaseButtonTitle = FreePlanUpgradeView.Constants.Strings.tryButtonTitle
+            state.isButtonDisabled = false
+            state.error = PaymentError.userCancelled
+        }
+    }
+    
+    // MARK: Actions
+    func subscribeToFreeTrial() {
+        Task { [weak self] in
+            guard let self else { return }
+            
             do {
-                let _ = try await paymentManager.purchase(product)
+                let result = try await paymentManager.purchase(state.trialProduct)
+                
+                switch result {
+                case .success:
+                    state.purchaseResult = .success
+                case .userCancelled:
+                    state.purchaseResult = .userCancelled
+                case .pending:
+                    state.purchaseResult = .pending
+                case nil:
+                    state.error = PaymentError.unknown
+                }
+                
+                updateUIBasedOnPurchaseResult()
             } catch {
                 state.error = error
             }
@@ -77,19 +157,19 @@ final class FreePlanUpgradeViewModel {
     }
     
     func restorePurchase() {
-        // I've decided to make this method sync to keep the visual harmony of
-        // SubscriptionUtilityLinksView(
-        //      onTermsTapped: viewModel.openTermsOfService,
-        //      onPrivacyTapped: viewModel.openPrivacy,
-        //      onRestoreTapped: viewModel.restorePurchase
-        // )
-        Task {
+        Task { [weak self] in
+            guard let self else { return }
             do {
-                try await paymentManager.restorePurchases()
+                try await self.paymentManager.restorePurchases()
             } catch {
                 state.error = error
             }
         }
+    }
+    
+    // MARK: Navigation
+    func viewAllPlans() {
+        // Show all plans
     }
     
     func openTermsOfService() {
@@ -101,4 +181,3 @@ final class FreePlanUpgradeViewModel {
     }
     
 }
-

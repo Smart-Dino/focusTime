@@ -57,8 +57,10 @@ struct FreePlanUpgradeView: View {
                 Text(viewModel.state.error?.localizedDescription ?? "")
             }
         )
-        .task {
-            await viewModel.loadFirstTrialOffer()
+        .onAppear {
+            // Do NOT put these in the initializer
+            viewModel.setupProductInfo()
+            viewModel.startListeningToSubscriptionUpdates()
         }
     }
     
@@ -75,10 +77,13 @@ struct FreePlanUpgradeView: View {
     private var actionButtons: some View {
         VStack {
             FTSubscribeButtonView(
-                terms: viewModel.state.trialProduct?.trialPeriodDescription ?? Constants.Strings.paidOnce,
-                buttonTitle: Constants.Strings.tryButtonTitle,
-                buttonAction: {}
+                terms: viewModel.state.trialPeriodDescription,
+                buttonTitle: viewModel.state.purchaseButtonTitle,
+                buttonAction: {
+                    viewModel.subscribeToFreeTrial()
+                }
             )
+            .disabled(viewModel.state.isButtonDisabled)
             Button(
                 Constants.Strings.viewPlansButton,
                 action: viewModel.viewAllPlans
@@ -94,11 +99,13 @@ struct FreePlanUpgradeView: View {
         ToolbarItem(placement: .topBarTrailing) {
             // This will get adressed on the stage of incorporating
             // the business logic or navigation.
-#warning("Dismiss action is empty.")
+#warning("Dismiss action is empty")
             Button(
                 Constants.Strings.dismissButtonTitle,
                 systemImage: "xmark",
-                action: {}
+                action: {
+                    // Dismiss this view with Flow Control in mind
+                }
             )
             .buttonStyle(.plain)
         }
@@ -106,11 +113,37 @@ struct FreePlanUpgradeView: View {
     
 }
 
-#Preview {
+// MARK: - Previews
+#Preview("MockPaymentManagerWithError") {
     NavigationStack {
         FreePlanUpgradeView(
             viewModel: .init(
+                state: .init(trialProduct: FTProduct.Mocks.monthly.product),
                 paymentManager: MockPaymentManagerWithPurchaseError()
+            )
+        )
+        .preferredColorScheme(.dark)
+    }
+}
+
+#Preview("NonTrialableProduct") {
+    NavigationStack {
+        FreePlanUpgradeView(
+            viewModel: .init(
+                state: .init(trialProduct: FTProduct.Mocks.yearly.product),
+                paymentManager: MockPaymentManagerWithPurchaseError()
+            )
+        )
+        .preferredColorScheme(.dark)
+    }
+}
+
+#Preview("StoreKitPaymentManager") {
+    NavigationStack {
+        FreePlanUpgradeView(
+            viewModel: .init(
+                state: .init(trialProduct: FTProduct.Mocks.monthly.product),
+                paymentManager: StoreKitPaymentManager()
             )
         )
         .preferredColorScheme(.dark)
