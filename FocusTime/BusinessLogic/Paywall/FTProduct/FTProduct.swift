@@ -110,8 +110,6 @@ extension FTProduct {
     enum Mocks {
         case weekly
         case monthly
-        case yearly
-        case lifetime
         
         var product: FTProduct {
             switch self {
@@ -122,6 +120,7 @@ extension FTProduct {
                     .set(price: 0.37)
                     .set(currency: .currency(code: "USD"))
                     .set(subscriptionPeriod: PeriodConverter.weekly.durationInSeconds)
+                    .set(trialPeriod: 86400 * 3)
                     .build()
             case .monthly:
                 try! FTProductBuilder()
@@ -130,22 +129,6 @@ extension FTProduct {
                     .set(price: 2.99)
                     .set(currency: .currency(code: "USD"))
                     .set(subscriptionPeriod: PeriodConverter.monthly.durationInSeconds)
-                    .set(trialPeriod: 86400 * 3)
-                    .build()
-            case .yearly:
-                try! FTProductBuilder()
-                    .set(title: "Yearly")
-                    .set(description: "Unlock pro features for a year")
-                    .set(price: 29.99)
-                    .set(currency: .currency(code: "USD"))
-                    .set(subscriptionPeriod: PeriodConverter.yearly.durationInSeconds)
-                    .build()
-            case .lifetime:
-                try! FTProductBuilder()
-                    .set(title: "Lifetime")
-                    .set(description: "Unlock this app forever")
-                    .set(price: 399.99)
-                    .set(currency: .currency(code: "USD"))
                     .build()
             }
         }

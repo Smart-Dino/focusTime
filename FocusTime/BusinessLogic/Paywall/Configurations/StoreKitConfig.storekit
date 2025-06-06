@@ -14,21 +14,7 @@
 
   ],
   "products" : [
-    {
-      "displayPrice" : "399.9",
-      "familyShareable" : false,
-      "internalID" : "33F0539F",
-      "localizations" : [
-        {
-          "description" : "Unlock this app forever",
-          "displayName" : "Lifetime",
-          "locale" : "en_US"
-        }
-      ],
-      "productID" : "org.dino.smart.focustime.lifetime",
-      "referenceName" : "Lifetime",
-      "type" : "NonConsumable"
-    }
+
   ],
   "settings" : {
     "_askToBuyEnabled" : true,
@@ -103,12 +89,7 @@
           "familyShareable" : false,
           "groupNumber" : 1,
           "internalID" : "F99C34B6",
-          "introductoryOffer" : {
-            "displayPrice" : "0.99",
-            "internalID" : "909AE3F0",
-            "paymentMode" : "free",
-            "subscriptionPeriod" : "P3D"
-          },
+          "introductoryOffer" : null,
           "localizations" : [
             {
               "description" : "Unlock pro features for a month",
@@ -136,7 +117,11 @@
           "familyShareable" : false,
           "groupNumber" : 1,
           "internalID" : "8140C7CD",
-          "introductoryOffer" : null,
+          "introductoryOffer" : {
+            "internalID" : "9A6D17A9",
+            "paymentMode" : "free",
+            "subscriptionPeriod" : "P3D"
+          },
           "localizations" : [
             {
               "description" : "Unlock pro features for a week",

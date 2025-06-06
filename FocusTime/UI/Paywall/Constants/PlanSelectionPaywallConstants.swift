@@ -39,6 +39,8 @@ extension PlanSelectionPaywallView {
             
             // Error
             static let errorHeader = SharedPaywallConstants.Strings.errorHeader
+            static let defaultTrialError = "Unable to load trial information."
+            static let subscribeButtonTerms  = "Subscription automatically renews unless canceled. You can cancel anytime."
         }
         
     }

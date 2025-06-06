@@ -18,25 +18,41 @@ actor StoreKitPaymentManager: PaymentManager {
     // We do not need a property containing pending products:
     // https://developer.apple.com/forums/thread/706277
     
+    // Status
+    private(set) var isPro: Bool = false
+    
     // FTProduct
-    private(set) var products: [FTProduct]
-    private(set) var trialProducts: [FTProduct]
-    private(set) var pendingProducts: [FTProduct]
+    private(set) var _products: [FTProduct]
+    var products: [FTProduct] {
+        get async {
+            if _products.isEmpty {
+                do {
+                    try await getProducts()
+                    await updateCustomerProductStatus()
+                    return _products
+                } catch {
+                    Self.logger.critical("Could not load products: \(error.localizedDescription)")
+                    return []
+                }
+            } else {
+                return _products
+            }
+        }
+    }
     private(set) var purchasedProducts: [FTProduct]
     
     // StoreKit-related
     private var skProducts: [Product]
-    private let productIdentifiers: [String: String]
+    private let productIdentifiers: [String]
+//    private let productIdentifiers: [String: String]
     
     // Async updates
     private var updateListenerTask: Task<Void, Error>? = nil
-    private var continuation: AsyncStream<PaymentStreamMessage>.Continuation?
+    private var continuation: AsyncStream<Bool>.Continuation?
     
     init() {
         // FTProducts
-        self.products = []
-        self.trialProducts = []
-        self.pendingProducts = []
+        self._products = []
         self.purchasedProducts = []
         
         // StoreKit Products
@@ -46,13 +62,6 @@ actor StoreKitPaymentManager: PaymentManager {
         Task {
             let task = await listenForTransactions()
             await setTask(task)
-            
-            do {
-                try await getProducts()
-                await updateCustomerProductStatus()
-            } catch {
-                Self.logger.critical("Could not load products: \(error.localizedDescription)")
-            }
         }
     }
     
@@ -114,8 +123,8 @@ extension StoreKitPaymentManager {
 
 // MARK: - AsyncStream
 extension StoreKitPaymentManager {
-    func updatesStream() -> AsyncStream<PaymentStreamMessage> {
-        let stream = AsyncStream<PaymentStreamMessage> { continuation in
+    func isProUserChangesStream() -> AsyncStream<Bool> {
+        let stream = AsyncStream<Bool> { continuation in
             self.continuation = continuation
         }
         
@@ -126,15 +135,15 @@ extension StoreKitPaymentManager {
         return stream
     }
     
-    private func sendStreamUpdate() {
+    private func sendStreamUpdate(isPro: Bool) {
         guard let cont = continuation else {
             // Either: nobody’s listening yet, or they already cancelled.
             return
         }
-        cont.yield(.internalUpdate)
+        cont.yield(isPro)
     }
     
-    private func handleTermination(_ reason: AsyncStream<PaymentStreamMessage>.Continuation.Termination) {
+    private func handleTermination(_ reason: AsyncStream<Bool>.Continuation.Termination) {
         // Swift marked the stream as terminated,
         // finishing the continuation
         continuation?.finish()
@@ -189,10 +198,16 @@ extension StoreKitPaymentManager {
         }
         
         Self.logger.trace("Successfully updated customer's products with \(purchasedProducts.count) products")
+        
+        // Convert to FTProduct
         self.purchasedProducts = purchasedProducts.map {
             FTProduct.fromStoreKit($0)
         }
-        sendStreamUpdate()
+        
+        // Update status
+        let status = !purchasedProducts.isEmpty
+        isPro = status
+        sendStreamUpdate(isPro: status)
     }
 
     private func listenForTransactions() -> Task<Void, Error> {
@@ -219,48 +234,47 @@ extension StoreKitPaymentManager {
     private func getProducts() async throws {
         // Request products from the App Store using the identifiers that
         // the StoreKitProductIdentifiers.plist file defines
-        let storeProducts = try await Product.products(for: productIdentifiers.keys)
+        // let storeProducts = try await Product.products(for: productIdentifiers.keys)
         
-        // Convert products into FTProdcuts
-        var ftProducts: [FTProduct] = []
-        for product in storeProducts {
-            let ftProduct = FTProduct.fromStoreKit(product)
-            ftProducts.append(ftProduct)
-        }
-        // Find trial offers
-        var trialOffers: [FTProduct] = []
-        for ftProduct in ftProducts {
-            ftProduct.trialPeriod != nil ? trialOffers.append(ftProduct) : nil
+        let storeProducts = try await Product.products(for: productIdentifiers)
+        
+        // Convert products into FTProducts
+        let ftProducts: [FTProduct] = storeProducts.map {
+            FTProduct.fromStoreKit($0)
         }
         
         Self.logger.trace(
             "Successfully retrieved and converted \(storeProducts.count.description) StoreKit products into FTProducts"
         )
         
+        try? await Task.sleep(for: .seconds(3))
         // Set the values
-        self.products = ftProducts.sortByTrialThenPrice()
-        self.trialProducts = trialOffers
+        self._products = ftProducts.sortByTrialThenPrice()
         self.skProducts = storeProducts
     }
 }
 
 // MARK: - Static Helpers
 extension StoreKitPaymentManager {
-    private static func loadProductIdentifiers() -> [String: String] {
-        guard let path = Bundle.main.path(forResource: "StoreKitProductsIdentifiers", ofType: "plist") else {
-            logger.critical("\(#function) - Could not find resource for path.")
-            return [:]
-        }
-        guard let plist = FileManager.default.contents(atPath: path) else {
-            logger.critical("Could not read the plist at \(path.debugDescription)")
-            return [:]
-        }
-        guard let data = try? PropertyListSerialization.propertyList(from: plist, format: nil) as? [String: String] else {
-            logger.critical("Could not serialize the plist at \(path.debugDescription)")
-            return [:]
-        }
-        
-        logger.trace("Successfully retrieved data from the plist: \(data.count.description)")
-        return data
+//    private static func loadProductIdentifiers() -> [String: String] {
+//        guard let path = Bundle.main.path(forResource: "StoreKitProductsIdentifiers", ofType: "plist") else {
+//            logger.critical("\(#function) - Could not find resource for path.")
+//            return [:]
+//        }
+//        guard let plist = FileManager.default.contents(atPath: path) else {
+//            logger.critical("Could not read the plist at \(path.debugDescription)")
+//            return [:]
+//        }
+//        guard let data = try? PropertyListSerialization.propertyList(from: plist, format: nil) as? [String: String] else {
+//            logger.critical("Could not serialize the plist at \(path.debugDescription)")
+//            return [:]
+//        }
+//        
+//        logger.trace("Successfully retrieved data from the plist: \(data.count.description)")
+//        return data
+//    }
+    
+    private static func loadProductIdentifiers() -> [String] {
+        StoreKitProductIdentifiers.allCases.map { $0.id }
     }
 }

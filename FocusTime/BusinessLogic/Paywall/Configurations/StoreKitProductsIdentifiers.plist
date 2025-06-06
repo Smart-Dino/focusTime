@@ -5,8 +5,6 @@
 	<key>org.dino.smart.focustime.monthly</key>
 	<string></string>
 	<key>org.dino.smart.focustime.weekly</key>
-	<string></string>
-	<key>org.dino.smart.focustime.lifetime</key>
-	<string></string>
+	<string>Trial</string>
 </dict>
 </plist>

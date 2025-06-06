@@ -30,9 +30,7 @@ struct FreePlanUpgradeView: View {
                         .padding(.vertical)
                     
                     SubscriptionUtilityLinksView(
-                        onTermsTapped: viewModel.openTermsOfService,
-                        onPrivacyTapped: viewModel.openPrivacy,
-                        onRestoreTapped: viewModel.restorePurchase
+                        viewModel: .init(paymentManager: viewModel.getCurrentPaymentManager())
                     )
                 }
                 .padding()
@@ -50,7 +48,7 @@ struct FreePlanUpgradeView: View {
             isPresented: Binding(get: {
                 viewModel.state.error != nil
             }, set: { showError in
-                viewModel.updateError(showError: showError)
+                viewModel.keepShowingError(showError: showError)
             }), actions: {
                 // OK dismissal button by default
             }, message: {
@@ -60,7 +58,6 @@ struct FreePlanUpgradeView: View {
         .onAppear {
             // Do NOT put these in the initializer
             viewModel.setupProductInfo()
-            viewModel.startListeningToSubscriptionUpdates()
         }
     }
     
@@ -80,7 +77,9 @@ struct FreePlanUpgradeView: View {
                 terms: viewModel.state.trialPeriodDescription,
                 buttonTitle: viewModel.state.purchaseButtonTitle,
                 buttonAction: {
-                    viewModel.subscribeToFreeTrial()
+                    Task {
+                        await viewModel.initiatePurchaseWithCurrentProduct()
+                    }
                 }
             )
             .disabled(viewModel.state.isButtonDisabled)
@@ -107,7 +106,6 @@ struct FreePlanUpgradeView: View {
                     // Dismiss this view with Flow Control in mind
                 }
             )
-            .buttonStyle(.plain)
         }
     }
     
@@ -115,11 +113,13 @@ struct FreePlanUpgradeView: View {
 
 // MARK: - Previews
 #Preview("MockPaymentManagerWithError") {
+    let productID = FTProduct.Mocks.weekly.product.id
+    let paymentManager = MockPaymentManagerWithPurchaseError()
     NavigationStack {
         FreePlanUpgradeView(
             viewModel: .init(
-                state: .init(trialProduct: FTProduct.Mocks.monthly.product),
-                paymentManager: MockPaymentManagerWithPurchaseError()
+                requestedProductID: productID,
+                superPaywallVM: .init(paymentManager: paymentManager)
             )
         )
         .preferredColorScheme(.dark)
@@ -127,11 +127,13 @@ struct FreePlanUpgradeView: View {
 }
 
 #Preview("NonTrialableProduct") {
+    let productID = FTProduct.Mocks.monthly.product.id
+    let paymentManager = MockPaymentManagerWithPurchaseError()
     NavigationStack {
         FreePlanUpgradeView(
             viewModel: .init(
-                state: .init(trialProduct: FTProduct.Mocks.yearly.product),
-                paymentManager: MockPaymentManagerWithPurchaseError()
+                requestedProductID: productID,
+                superPaywallVM: .init(paymentManager: paymentManager)
             )
         )
         .preferredColorScheme(.dark)
@@ -139,11 +141,13 @@ struct FreePlanUpgradeView: View {
 }
 
 #Preview("StoreKitPaymentManager") {
+    let productID = FTProduct.Mocks.monthly.product.id
+    let paymentManager = StoreKitPaymentManager()
     NavigationStack {
         FreePlanUpgradeView(
             viewModel: .init(
-                state: .init(trialProduct: FTProduct.Mocks.monthly.product),
-                paymentManager: StoreKitPaymentManager()
+                requestedProductID: productID,
+                superPaywallVM: .init(paymentManager: paymentManager)
             )
         )
         .preferredColorScheme(.dark)

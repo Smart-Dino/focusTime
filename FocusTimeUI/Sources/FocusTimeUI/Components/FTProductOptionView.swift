@@ -82,6 +82,7 @@ public struct FTProductOptionView: View {
                     .stroke(lineWidth: 2)
             }
         }
+        .contentShape(.rect)
     }
     
     /// Initializes a view for displaying a product or subscription option.

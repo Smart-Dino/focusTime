@@ -16,6 +16,9 @@ enum PaymentError: LocalizedError {
     case failedVerification
     case purchaseInProgress
     case productNotFound
+    // Eligibility
+    case eligibilityCheckFail
+    // Unknown
     case unknown
 
     /// A user-friendly description for each payment error.
@@ -31,6 +34,8 @@ enum PaymentError: LocalizedError {
             "A purchase is already in progress. Please wait until it completes."
         case .productNotFound:
             "The requested product could not be found."
+        case .eligibilityCheckFail:
+            "Could not check whether the user is eligible for trial for the given subscription group."
         case .unknown:
             "An unknown error occurred during the purchase."
         }

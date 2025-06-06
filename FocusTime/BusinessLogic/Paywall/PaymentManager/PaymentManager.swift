@@ -8,28 +8,14 @@
 import Foundation
 import StoreKit
 
-// MARK: = PaymentManagerMessage
-enum PaymentStreamMessage: CustomDebugStringConvertible {
-    case internalUpdate
-    
-    var debugDescription: String {
-        switch self {
-        case .internalUpdate:
-            "Manager has updates its values, make sure to reload your data based on them."
-        }
-    }
-}
-
 // MARK: - Payment Manager Protocol
 /// Defines the interface for managing in-app purchases.
 protocol PaymentManager: Actor {
     // MARK: - Product Listings
+    /// Tells whether the user has access to the **pro** version of the app.
+    var isPro: Bool { get }
     /// All products available for purchase.
-    var products: [FTProduct] { get }
-    
-    /// All available trial products options.
-    var trialProducts: [FTProduct] { get }
-
+    var products: [FTProduct] { get async }
     /// Products that the user has already purchased and is entitled to.
     var purchasedProducts: [FTProduct] { get }
 
@@ -65,35 +51,34 @@ protocol PaymentManager: Actor {
     /// Streams updates to the purchased products list.
     ///
     /// - Returns: An `AsyncStream` emitting arrays of `FTProduct`.
-    func updatesStream() -> AsyncStream<PaymentStreamMessage>
+    func isProUserChangesStream() -> AsyncStream<Bool>
 }
 
 // MARK: - Mock Implementation
 actor MockPaymentManagerWithPurchaseError: PaymentManager {
     // MARK: - Stored Properties
+    private(set) var isPro: Bool
     private(set) var products: [FTProduct]
-    var trialProducts: [FTProduct]
-    var purchasedProducts: [FTProduct] = []
+    private(set) var purchasedProducts: [FTProduct] = []
     
     private var trialUsed: Bool
     
     // MARK: - Initialization
-    init(trialUsed: Bool = false) {
+    init(isPro: Bool = false,
+        trialUsed: Bool = false
+    ) {
+        self.isPro = isPro
         self.trialUsed = trialUsed
         self.products = [
-            FTProduct.Mocks.monthly.product,
-            FTProduct.Mocks.yearly.product,
-            FTProduct.Mocks.lifetime.product
-        ]
-        self.trialProducts = [
+            FTProduct.Mocks.weekly.product,
             FTProduct.Mocks.monthly.product
         ]
     }
 
     // MARK: - Methods
-    func updatesStream() -> AsyncStream<PaymentStreamMessage> {
+    func isProUserChangesStream() -> AsyncStream<Bool> {
         AsyncStream { continuation in
-            continuation.yield(.internalUpdate)
+            continuation.yield(true)
         }
     }
 

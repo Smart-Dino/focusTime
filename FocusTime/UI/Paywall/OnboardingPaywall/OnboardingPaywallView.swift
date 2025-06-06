@@ -38,16 +38,16 @@ struct OnboardingPaywallView: View {
                         terms: viewModel.state.trialPeriodDescription,
                         buttonTitle: viewModel.state.purchaseButtonTitle,
                         buttonAction: {
-                            viewModel.subscribeToFreeTrial()
+                            Task {
+                                await viewModel.initiatePurchaseWithCurrentProduct()
+                            }
                         }
                     )
                     .padding()
                     .disabled(viewModel.state.isButtonDisabled)
                     
                     SubscriptionUtilityLinksView(
-                        onTermsTapped: viewModel.openTermsOfService,
-                        onPrivacyTapped: viewModel.openPrivacy,
-                        onRestoreTapped: viewModel.restorePurchase
+                        viewModel: .init(paymentManager: viewModel.getCurrentPaymentManager())
                     )
                 }
                 .containerRelativeFrame(.vertical) { amount, _ in
@@ -70,7 +70,7 @@ struct OnboardingPaywallView: View {
             isPresented: Binding(get: {
                 viewModel.state.error != nil
             }, set: { showError in
-                viewModel.updateError(showError: showError)
+                viewModel.keepShowingError(showError: showError)
             }), actions: {
                 // OK dismissal button by default
             }, message: {
@@ -79,8 +79,7 @@ struct OnboardingPaywallView: View {
         )
         .onAppear {
             // Do NOT put these in the initializer
-            viewModel.setupProductInfo()
-            viewModel.startListeningToSubscriptionUpdates()
+            viewModel.fetchIU()
         }
     }
     
@@ -119,7 +118,6 @@ struct OnboardingPaywallView: View {
                 systemImage: "xmark",
                 action: {}
             )
-            .buttonStyle(.plain)
         }
     }
 }
@@ -128,8 +126,8 @@ struct OnboardingPaywallView: View {
     NavigationStack {
         OnboardingPaywallView(
             viewModel: .init(
-                state: .init(trialProduct: FTProduct.Mocks.monthly.product),
-                paymentManager: MockPaymentManagerWithPurchaseError()
+                requestedProductID: FTProduct.Mocks.weekly.product.id,
+                superPaywallVM: SuperPaywallViewModel(paymentManager: MockPaymentManagerWithPurchaseError())
             )
         )
         .preferredColorScheme(.dark)

@@ -26,7 +26,7 @@ struct PlanSelectionPaywallView: View {
             VStack {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: .zero) {
-                        // Cound use Array(zip(items.indices, items)
+                        // Could use Array(zip(items.indices, items)
                         // but that is harder to understand...
                         ForEach(viewModel.state.backgroudImages.indices, id: \.self) { index in
                             let imageResource = viewModel.state.backgroudImages[index]
@@ -45,42 +45,52 @@ struct PlanSelectionPaywallView: View {
                 // and pushed to the top of the view
                 Spacer()
             }
-            
-            VStack(alignment: .center) {
-                // The content card is above the images
-                // and pushed to the bottom
-                Spacer()
-                
-                FTPageControlView(
-                    viewModel.state.backgroudImages,
-                    selectedItem: selectedImageIndex
-                )
-                // Should tell the design team to make it brighter?
-                .foregroundTint(Color.ftPageControlBlue)
-                
-                VStack(spacing: .zero) {
-                    features
+            GeometryReader { proxy in
+                VStack(alignment: .center) {
+                    // The content card is above the images
+                    // and pushed to the bottom
+                    Spacer()
                     
-                    FTSubscribeButtonView(
-                        terms: viewModel.state.subscribeButtonTerms,
-                        buttonTitle: viewModel.state.primaryButtonTitle,
-                        buttonAction: {}
+                    FTPageControlView(
+                        viewModel.state.backgroudImages,
+                        selectedItem: selectedImageIndex
                     )
+                    // Should tell the design team to make it brighter?
+                    .foregroundTint(Color.ftPageControlBlue)
+                    
+                    VStack(spacing: .zero) {
+                        if viewModel.state.products.isEmpty {
+                            Spacer()
+                            ProgressView()
+                            Spacer()
+                        } else {
+                            features
+                        }
+                        
+                        FTSubscribeButtonView(
+                            terms: viewModel.state.subscribeButtonTerms,
+                            buttonTitle: viewModel.state.primaryButtonTitle,
+                            buttonAction: {
+                                Task {
+                                    await viewModel.initiatePurchaseWithCurrentProduct()
+                                }
+                            }
+                        )
+                        .padding()
+                        .disabled(viewModel.state.isButtonDisabled)
+                        
+                        SubscriptionUtilityLinksView(
+                            viewModel: .init(paymentManager: viewModel.getCurrentPaymentManager())
+                        )
+                    }
+                    .containerRelativeFrame(.vertical, { amount, axis in
+                        amount / 2.5
+                    })
                     .padding()
-                    
-                    SubscriptionUtilityLinksView(
-                        onTermsTapped: viewModel.openTermsOfService,
-                        onPrivacyTapped: viewModel.openPrivacy,
-                        onRestoreTapped: viewModel.restorePurchase
-                    )
-                }
-                .containerRelativeFrame(.vertical, { amount, axis in
-                    amount / 2
-                })
-                .padding()
-                .padding(.bottom) // Padding, so we don't hit the safe area
-                .background {
-                    contentCard
+                    .padding(.bottom) // Padding, so we don't hit the safe area
+                    .background {
+                        contentCard
+                    }
                 }
             }
         }
@@ -99,15 +109,15 @@ struct PlanSelectionPaywallView: View {
             isPresented: Binding(get: {
                 viewModel.state.error != nil
             }, set: { showError in
-                viewModel.updateError(showError: showError)
+                viewModel.keepShowingError(showError: showError)
             }), actions: {
                 // OK dismissal button by default
             }, message: {
                 Text(viewModel.state.error?.localizedDescription ?? "")
             }
         )
-        .task {
-            await viewModel.loadOffers()
+        .onAppear {
+            viewModel.fetchIU()
         }
     }
     
@@ -123,9 +133,9 @@ struct PlanSelectionPaywallView: View {
         ScrollView(.vertical) {
             VStack(spacing: Constants.Padding.featuresSpacing) {
                 ForEach(viewModel.state.products) { product in
-                    // Check if the user hasn't tried trial yet and offer him one
-                    let isTrial = (product.trialPeriod != nil) && (viewModel.state.isTrialUsed ?? true)
-                    // Precompute to flatten the call site:
+                    let isTrial = (product.trialPeriod != nil)
+                    && (viewModel.state.superState.isEligibleForIntro)
+                    
                     let subtitle: String? = isTrial
                     ? product.subscriptionPeriodDescription
                     : nil
@@ -133,18 +143,18 @@ struct PlanSelectionPaywallView: View {
                     let descriptionText: String = isTrial
                     ? viewModel.getTrialTerms(for: product)
                     : product.priceString
-                    // View
-                    FTProductOptionView(
-                        leadingTitle: product.title,
-                        leadingSubtitle: subtitle,
-                        trailingDescription: descriptionText
-                    )
-                    .selected(viewModel.state.selectedProduct == product)
-                    .onTapGesture {
-                        Task {
-                            await viewModel.selectProduct(product)
-                        }
+                    
+                    Button {
+                        viewModel.selectProduct(product)
+                    } label: {
+                        FTProductOptionView(
+                            leadingTitle: product.title,
+                            leadingSubtitle: subtitle,
+                            trailingDescription: descriptionText
+                        )
+                        .selected(viewModel.state.selectedProductID == product.id)
                     }
+                    .buttonStyle(.plain)
                 }
             }
             // Add this padding to make sure the views don't get clipped
@@ -160,7 +170,7 @@ struct PlanSelectionPaywallView: View {
     @ToolbarContentBuilder
     private var toolbarItems: some ToolbarContent {
         ToolbarItem(placement: .topBarTrailing) {
-            // This will get adressed on the stage of incorporating
+            // This will get addressed on the stage of incorporating
             // the business logic or navigation.
 #warning("Dismiss action is empty")
             Button(
@@ -168,38 +178,42 @@ struct PlanSelectionPaywallView: View {
                 systemImage: "xmark",
                 action: {}
             )
-            .buttonStyle(.plain)
         }
     }
 }
 
 #Preview("Trial unused") {
-    NavigationStack {
-        PlanSelectionPaywallView(
-            viewModel: .init(
+    PlanSelectionPaywallView(
+        viewModel: .init(
+            superPaywallVM: SuperPaywallViewModel(
                 paymentManager: MockPaymentManagerWithPurchaseError(trialUsed: false)
             )
         )
-        .preferredColorScheme(.dark)
-    }
+    )
+    .preferredColorScheme(.dark)
 }
 
 #Preview("Trial used") {
     NavigationStack {
         PlanSelectionPaywallView(
             viewModel: .init(
-                paymentManager: MockPaymentManagerWithPurchaseError(trialUsed: true)
+                superPaywallVM: SuperPaywallViewModel(
+                    paymentManager: MockPaymentManagerWithPurchaseError(trialUsed: true)
+                )
             )
         )
         .preferredColorScheme(.dark)
     }
 }
 
+
 #Preview("StoreKit Manager") {
     NavigationStack {
         PlanSelectionPaywallView(
             viewModel: .init(
-                paymentManager: StoreKitPaymentManager()
+                superPaywallVM: SuperPaywallViewModel(
+                    paymentManager: StoreKitPaymentManager()
+                )
             )
         )
         .preferredColorScheme(.dark)
