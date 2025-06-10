@@ -12,22 +12,22 @@ import Observation
 @Observable
 final class QuizOnboardingViewModel {
     typealias QuizOption = QuizOnboardingView.Constants.QuizOption
-
     struct State {
         var selectionStates: Set<QuizOption> = []
     }
 
     var state = State()
-    private let analyticsManager: AnalyticsManaging
+    private let analyticsManager: AnalyticsManager
     private var onNextCallback: () -> Void
 
     init(
-        analyticsManager: AnalyticsManaging = AppAnalytics.shared,
+        analyticsManager: AnalyticsManager,
         onNext: @escaping () -> Void = {}
     ) {
         self.analyticsManager = analyticsManager
         self.onNextCallback = onNext
         self.analyticsManager.log(event: .screenView(screenName: "QuizOnboardingView"))
+        print("QuizOnboardingViewModel initialized.")
     }
 
     func toggleSelection(for option: QuizOption) {

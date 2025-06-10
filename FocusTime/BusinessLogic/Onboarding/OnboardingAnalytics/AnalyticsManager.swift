@@ -10,6 +10,6 @@ import Foundation
 // Defines a protocol for analytics managing services.
 // This abstraction allows for different analytics implementations (e.g., Firebase)
 
-protocol AnalyticsManaging: Sendable {
-    func log(event: AnalyticsEvent) 
+protocol AnalyticsManager: Sendable {
+    func log(event: AnalyticsEvent)
 }

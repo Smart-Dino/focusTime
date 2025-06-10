@@ -13,6 +13,7 @@ extension QuizOnboardingView {
             static let titleSpacing: CGFloat = 11
             static let bottomPadding: CGFloat = 40
             static let quizSpacing: CGFloat = 42
+            static let toggleBarSpacing: CGFloat = 1
         }
         
         enum Strings {

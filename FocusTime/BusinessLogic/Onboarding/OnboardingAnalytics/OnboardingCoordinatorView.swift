@@ -7,40 +7,37 @@
 
 import SwiftUI
 
-// Manages the navigation flow for the onboarding sequence.
-// It uses SwiftUI's NavigationStack to present different onboarding views (Quiz and Slides).
-
 enum OnboardingNavigationPath: Hashable {
     case slides
 }
 
 struct OnboardingCoordinatorView: View {
-    @Binding var hasCompletedOnboarding: Bool
+    @State private var viewModel: OnboardingCoordinatorViewModel
 
-    @State private var path: [OnboardingNavigationPath] = []
-
-
-    private let analyticsManager: AnalyticsManaging = AppAnalytics.shared
+    init(onComplete: @escaping () -> Void, analyticsManager: AnalyticsManager) {
+        self._viewModel = State(wrappedValue: OnboardingCoordinatorViewModel(
+            onComplete: onComplete,
+            analyticsManager: analyticsManager
+        ))
+        print("OnboardingCoordinatorView initialized.")
+    }
 
     var body: some View {
-
-        NavigationStack(path: $path) {
+        NavigationStack(path: $viewModel.path) {
             QuizOnboardingView(
                 viewModel: QuizOnboardingViewModel(
-                    analyticsManager: analyticsManager,
-                    onNext: {
-
-                        path.append(OnboardingNavigationPath.slides)
-                    }
+                    analyticsManager: viewModel.analyticsManager,
+                    onNext: viewModel.showSlides
                 )
             )
-
             .navigationDestination(for: OnboardingNavigationPath.self) { pathValue in
                 switch pathValue {
                 case .slides:
                     SlideOnboardingView(
-                        viewModel: SlideOnboardingViewModel(analyticsManager: analyticsManager),
-                        hasCompletedOnboarding: $hasCompletedOnboarding
+                        viewModel: SlideOnboardingViewModel(
+                            analyticsManager: viewModel.analyticsManager,
+                            onOnboardingCompleted: viewModel.onboardingCompleted
+                        )
                     )
                 }
             }

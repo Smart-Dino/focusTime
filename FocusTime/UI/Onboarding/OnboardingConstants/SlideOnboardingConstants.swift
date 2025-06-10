@@ -38,7 +38,7 @@ enum SlideOnboardingStep: CaseIterable {
         switch self {
         case .step1: return "Wave Cycles"
         case .step2: return "Tide Blocker"
-        case .step3: return "Current Tracker"
+        case .step3: return "Tide Schedule"
         case .step4: return "Ocean of Achievement"
         }
     }
@@ -50,7 +50,7 @@ enum SlideOnboardingStep: CaseIterable {
         case .step2:
             return "Automatically silences notifications and blocks distracting apps during your focus sessions, keeping your mental waters clear"
         case .step3:
-            return "Visualize your productivity patterns with intuitive analytics that show your focus trends and improvements over time"
+            return "Set up automatic focus sessions that activate at predetermined times, blocking distracting apps like ocean"
         case .step4:
             return "Collect unique marine-themed awards as you develop stronger focus habits and reach new productivity depths"
         }

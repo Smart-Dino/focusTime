@@ -12,28 +12,30 @@ import Observation
 @MainActor
 @Observable
 final class SlideOnboardingViewModel {
-    
     struct State {
         var currentIndex: Int = 0
         var showSkipConfirmation: Bool = false
     }
 
     var state = State()
-    private let analyticsManager: AnalyticsManaging
+    private let analyticsManager: AnalyticsManager
+    private var onOnboardingCompleted: () -> Void
 
     var currentStep: SlideOnboardingStep {
         SlideOnboardingStep.allCases[state.currentIndex]
     }
-    
+
     var currentStepIndex: Int {
         state.currentIndex
     }
 
-    init(analyticsManager: AnalyticsManaging = AppAnalytics.shared) {
+    init(analyticsManager: AnalyticsManager, onOnboardingCompleted: @escaping () -> Void) {
         self.analyticsManager = analyticsManager
+        self.onOnboardingCompleted = onOnboardingCompleted
         logSlideViewed(step: currentStep, index: state.currentIndex)
+        print("SlideOnboardingViewModel initialized.")
     }
-    
+
     private func logSlideViewed(step: SlideOnboardingStep, index: Int) {
         analyticsManager.log(event: .onboardingSlideViewed(slideName: step.subtitle1, slideIndex: index))
     }
@@ -43,7 +45,11 @@ final class SlideOnboardingViewModel {
         let previousStepIndex = state.currentIndex
         if state.currentIndex < SlideOnboardingStep.allCases.count - 1 {
             state.currentIndex += 1
-            analyticsManager.log(event: .onboardingNextSlideTapped(fromSlideName: previousStepName, fromSlideIndex: previousStepIndex))
+            analyticsManager.log(
+                event: .onboardingNextSlideTapped(
+                    fromSlideName: previousStepName, fromSlideIndex: previousStepIndex
+                )
+            )
             logSlideViewed(step: currentStep, index: state.currentIndex)
         }
     }
@@ -55,12 +61,11 @@ final class SlideOnboardingViewModel {
 
     func skipOnboardingConfirmed() {
         analyticsManager.log(event: .onboardingSkipConfirmed(fromSlideName: currentStep.subtitle1, fromSlideIndex: state.currentIndex))
-
     }
 
     func completeOnboarding() {
-        if currentStep.isLast {
-            analyticsManager.log(event: .onboardingCompleted(lastSlideName: currentStep.subtitle1))
-        }
+        analyticsManager.log(event: .onboardingCompleted(lastSlideName: currentStep.subtitle1))
+        print("SlideOnboardingViewModel: completeOnboarding called. Triggering onOnboardingCompleted callback.")
+        self.onOnboardingCompleted()
     }
 }

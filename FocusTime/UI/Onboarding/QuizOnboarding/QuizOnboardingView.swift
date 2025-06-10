@@ -43,6 +43,7 @@ struct QuizOnboardingView: View {
                             .toggleStyle(FTCheckboxToggleStyle(color: .blue))
                             .font(.body)
                         }
+                        .padding(Constants.Layout.toggleBarSpacing)
                     }
                 }
                 .scrollBounceBehavior(.basedOnSize, axes: [.vertical])
@@ -59,16 +60,5 @@ struct QuizOnboardingView: View {
         .preferredColorScheme(.dark)
         .navigationBarBackButtonHidden(true)
         .toolbar(.hidden, for: .navigationBar)
-    }
-}
-
-#Preview {
-    NavigationStack {
-        QuizOnboardingView(
-            viewModel: QuizOnboardingViewModel(
-                analyticsManager: AppAnalytics.shared,
-                onNext: { print("Preview: Next button tapped") }
-            )
-        )
     }
 }

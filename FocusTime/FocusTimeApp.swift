@@ -9,25 +9,26 @@ import SwiftUI
 
 @main
 struct FocusTimeApp: App {
-    @AppStorage("hasCompletedOnboarding") var hasCompletedOnboarding: Bool = false
-    
+    private let analyticsManager: AnalyticsManager
+    private let onboardingStatusManager: OnboardingStatusManager
+    private let appFlowViewModel: AppFlowViewModel
+
+    init() {
+        self.analyticsManager = LoggingAnalyticsManager()
+        self.onboardingStatusManager = OnboardingStatusManager()
+        self.appFlowViewModel = AppFlowViewModel(
+            onboardingStatusProvider: onboardingStatusManager,
+            analyticsManager: analyticsManager
+        )
+        print("FocusTimeApp initialized. Initial onboarding status: \(onboardingStatusManager.hasCompletedOnboarding)")
+    }
+
     var body: some Scene {
         WindowGroup {
-            if hasCompletedOnboarding {
-                // TODO: - replace this with actual PaymentManager implementation
-                OnboardingPaywallView(viewModel: .init(
-                    paymentManager: MockPaymentManagerWithPurchaseError()
-                ))
-                
-                // TODO: - REMOVE TEMPORARY BUTTON
-                Button("Reset Onboarding (for Preview)") {
-                    hasCompletedOnboarding = false
-                    
-                }
-                .padding()
-            } else {
-                OnboardingCoordinatorView(hasCompletedOnboarding: $hasCompletedOnboarding)
-            }
+            AppFlowControlView(
+                viewModel: appFlowViewModel,
+                analyticsManager: analyticsManager 
+            )
         }
     }
 }

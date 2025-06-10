@@ -21,14 +21,14 @@ enum AnalyticsEvent: Sendable {
 
     var name: String {
         switch self {
-        case .screenView: return "screen_view"
-        case .quizOptionToggled: return "quiz_option_toggled"
-        case .quizNextButtonTapped: return "quiz_next_button_tapped"
-        case .onboardingSlideViewed: return "onboarding_slide_viewed"
-        case .onboardingNextSlideTapped: return "onboarding_next_slide_tapped"
-        case .onboardingSkipInitiated: return "onboarding_skip_initiated"
-        case .onboardingSkipConfirmed: return "onboarding_skip_confirmed"
-        case .onboardingCompleted: return "onboarding_completed"
+        case .screenView: "screen_view"
+        case .quizOptionToggled: "quiz_option_toggled"
+        case .quizNextButtonTapped: "quiz_next_button_tapped"
+        case .onboardingSlideViewed: "onboarding_slide_viewed"
+        case .onboardingNextSlideTapped: "onboarding_next_slide_tapped"
+        case .onboardingSkipInitiated: "onboarding_skip_initiated"
+        case .onboardingSkipConfirmed: "onboarding_skip_confirmed"
+        case .onboardingCompleted: "onboarding_completed"
         }
     }
 

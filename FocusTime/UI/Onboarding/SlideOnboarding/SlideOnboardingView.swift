@@ -11,14 +11,10 @@ import FocusTimeUI
 struct SlideOnboardingView: View {
 
     @State private var viewModel: SlideOnboardingViewModel
-    @Binding var hasCompletedOnboarding: Bool
-    private let progressItems = SlideOnboardingStep.allCases
 
-    init(viewModel: SlideOnboardingViewModel, hasCompletedOnboarding: Binding<Bool>) {
-
-        self.viewModel = viewModel
+    init(viewModel: SlideOnboardingViewModel) {
         _viewModel = State(initialValue: viewModel)
-        self._hasCompletedOnboarding = hasCompletedOnboarding
+        print("SlideOnboardingView initialized.")
     }
 
 
@@ -30,11 +26,8 @@ struct SlideOnboardingView: View {
                     .multilineTextAlignment(.center)
                  
                 FTProgressBarView(
-                    items: progressItems,
-                    selectedItem: Binding(
-                        get: { progressItems[viewModel.currentStepIndex] },
-                        set: { _ in }
-                    )
+                    items: SlideOnboardingStep.allCases,
+                    selectedItem: .constant(viewModel.currentStep)
                 )
                 .padding(.top, Constants.Layout.progressBarTopPadding)
             }
@@ -45,47 +38,48 @@ struct SlideOnboardingView: View {
                 .containerRelativeFrame(.vertical, { amount, axis in amount / 1.8 })
                 .clipped()
                 .padding(.top, Constants.Layout.topPadding)
-                .id(viewModel.currentStep.imageName)
                 .transition(.opacity)
                 .animation(.easeInOut, value: viewModel.currentStep.imageName)
 
             VStack {
                 Text(viewModel.currentStep.subtitle1)
                     .font(.headline)
-                    .id("subtitle1_\(viewModel.currentStep.hashValue)")
                     
                 Text(viewModel.currentStep.subtitle2)
                     .font(.subheadline)
-                    .id("subtitle2_\(viewModel.currentStep.hashValue)")
                     
             }
             .frame(height: Constants.Layout.subtitleSectionHeight)
             .multilineTextAlignment(.center)
             
 
-            if !viewModel.currentStep.isLast {
-                VStack(spacing: Constants.Layout.buttonSpacing) {
-                    Button(Constants.Strings.nextButton) {
-                        viewModel.goToNextStep()
-                    }
-                    .buttonStyle(FTPrimaryButtonStyle())
-                    
-                    Button(Constants.Strings.skipButton) {
-                        viewModel.skipOnboardingInitiated()
+            
+                VStack{
+                    if !viewModel.currentStep.isLast {
+                        VStack(spacing: Constants.Layout.buttonSpacing) {
+                            Button(Constants.Strings.nextButton) {
+                                viewModel.goToNextStep()
+                            }
+                            .buttonStyle(FTPrimaryButtonStyle())
+                            
+                            Button(Constants.Strings.skipButton) {
+                                viewModel.skipOnboardingInitiated()
+                            }
+                        }
+                        
+                    } else {
+                        Button(Constants.Strings.startButton) {
+                            viewModel.completeOnboarding()
+                        }
+                        .buttonStyle(FTPrimaryButtonStyle())
+                        
                     }
                 }
-                .frame(height: Constants.Layout.buttonSectionHeight)
-                
-                
-            } else {
-                Button(Constants.Strings.startButton) {
-                    viewModel.completeOnboarding()
-                    hasCompletedOnboarding = true
+                .containerRelativeFrame(.vertical) { fullHeight, _ in
+                    fullHeight * 0.1 
                 }
-                .frame(height: Constants.Layout.buttonSectionHeight)
-                .buttonStyle(FTPrimaryButtonStyle())
-                
-            }
+            
+            
         }
         .animation(.easeInOut, value: viewModel.currentStep)
         .preferredColorScheme(.dark)
@@ -94,29 +88,11 @@ struct SlideOnboardingView: View {
         .alert(Constants.Strings.alertTitle, isPresented: $viewModel.state.showSkipConfirmation) {
             Button(Constants.Strings.skipAnyway, role: .destructive) {
                 viewModel.skipOnboardingConfirmed()
-                hasCompletedOnboarding = true
+                viewModel.completeOnboarding()
             }
             Button(Constants.Strings.goBack, role: .cancel) {}
         } message: {
             Text(Constants.Strings.alertMessage)
         }
     }
-}
-
-#Preview {
-    struct SlideOnboardingPreviewWrapper: View {
-        @State var mockViewModel = SlideOnboardingViewModel(analyticsManager: AppAnalytics.shared)
-        @State var mockHasCompletedOnboarding = false
-
-        var body: some View {
-
-            NavigationStack {
-                SlideOnboardingView(
-                    viewModel: mockViewModel,
-                    hasCompletedOnboarding: $mockHasCompletedOnboarding
-                )
-            }
-        }
-    }
-    return SlideOnboardingPreviewWrapper()
 }
