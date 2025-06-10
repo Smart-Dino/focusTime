@@ -249,7 +249,7 @@ extension StoreKitPaymentManager {
             "Successfully retrieved and converted \(storeProducts.count.description) StoreKit products into FTProducts"
         )
         
-        try? await Task.sleep(for: .seconds(3))
+//        try? await Task.sleep(for: .seconds(3)) // Simulate loading
         // Set the values
         self.products = ftProducts.sortByTrialThenPrice()
         self.skProducts = storeProducts
