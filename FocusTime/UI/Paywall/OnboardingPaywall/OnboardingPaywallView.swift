@@ -77,9 +77,11 @@ struct OnboardingPaywallView: View {
                 Text(viewModel.superState.error?.localizedDescription ?? "")
             }
         )
-        .onAppear {
+        .task {
             // Do NOT put these in the initializer
-            viewModel.fetchIU()
+            await viewModel.fetchIU()
+            viewModel.selectRequestedProduct()
+            viewModel.setupProductInfo()
         }
     }
     
@@ -126,7 +128,7 @@ struct OnboardingPaywallView: View {
     NavigationStack {
         OnboardingPaywallView(
             viewModel: .init(
-                requestedProductID: FTProduct.Mocks.weekly.product.id,
+                state: .init(requestedProductID: FTProduct.Mocks.weekly.product.id),
                 superPaywallVM: SuperPaywallViewModel(
                     paymentManager: MockPaymentManagerWithPurchaseError()
                 )

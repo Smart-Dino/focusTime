@@ -27,7 +27,10 @@ class PaywallBusinessLogicFactory {
     }
     
     func makeOnboardingPaywallViewModel(requestedProductID: String) -> OnboardingPaywallViewModel {
-        OnboardingPaywallViewModel(requestedProductID: requestedProductID, superPaywallVM: superPaywallVM)
+        OnboardingPaywallViewModel(
+            state: .init(requestedProductID: requestedProductID),
+            superPaywallVM: superPaywallVM
+        )
     }
     
     func makePlanSelectionViewModel() -> PlanSelectionPaywallViewModel {

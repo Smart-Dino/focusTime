@@ -15,6 +15,8 @@ import StoreKit
 final class OnboardingPaywallViewModel {
     // MARK: - Nested declarations
     struct State {
+        var requestedProductID: String
+        
         // Button state
         var isButtonDisabled = true
         
@@ -32,9 +34,8 @@ final class OnboardingPaywallViewModel {
     
     // MARK: - Initializers
     init(
-        state: State = State(),
+        state: State,
         superState: SuperPaywallViewModel.State = .init(),
-        requestedProductID: String,
         superPaywallVM: SuperPaywallViewModel,
     ) {
         // Init
@@ -43,24 +44,12 @@ final class OnboardingPaywallViewModel {
         
         // Additional setup
         self.superState = superState
-        
-        superPaywallVM.selectProductWithID(requestedProductID, state: superState)
+
         superPaywallVM.delegate = self
     }
     
     // MARK: - Methods
-    
     // MARK: State setter methods
-    
-    func fetchIU() {
-        Task {
-            await superPaywallVM.fetchProducts(state: superState)
-            print("FETCHED PRODUCTS")
-            setupProductInfo()
-            state.isButtonDisabled = false
-        }
-    }
-    
     func keepShowingError(showError: Bool) {
         if !showError {
             superState.error = nil
@@ -68,10 +57,19 @@ final class OnboardingPaywallViewModel {
     }
     
     // MARK: Setup
+    func fetchIU() async {
+        await superPaywallVM.fetchProducts(state: superState)
+        state.isButtonDisabled = false
+    }
+    
     func getCurrentPaymentManager() -> PaymentManager {
         superPaywallVM.getCurrentPaymentManager()
     }
     
+    func selectRequestedProduct() {
+        superPaywallVM.selectProductWithID(state.requestedProductID, state: superState)
+    }
+
     func setupProductInfo() {
         guard let product = superState.selectedProduct else {
             let error = PaymentError.productNotFound
