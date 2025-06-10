@@ -17,9 +17,9 @@ enum PaywallScreens: Identifiable, Hashable {
 
 @MainActor
 @Observable
-final class PaywallFlowViewModel {
+final class PaywallFlowCoordinatorViewModel {
     struct State {
-        var currentFlow: PaywallScreens = .onboarding
+        var currentFlow: PaywallScreens = .freePlan
     }
     
     private(set) var flowState: State

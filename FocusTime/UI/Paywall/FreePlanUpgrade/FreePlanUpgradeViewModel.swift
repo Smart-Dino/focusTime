@@ -14,8 +14,7 @@ import Foundation
 final class FreePlanUpgradeViewModel {
     // MARK: - Nested declarations
     struct State {
-        // Button state
-        var isButtonDisabled = true
+        var requestedProductID: String
         
         // Dynamic strings
         static let stringConstants = FreePlanUpgradeView.Constants.Strings.self
@@ -30,9 +29,8 @@ final class FreePlanUpgradeViewModel {
     
     // MARK: - Initializers
     init(
-        state: State = State(),
+        state: State,
         superState: SuperPaywallViewModel.State = .init(),
-        requestedProductID: String,
         superPaywallVM: SuperPaywallViewModel,
     ) {
         // Init
@@ -41,8 +39,7 @@ final class FreePlanUpgradeViewModel {
         
         // Additional setup
         self.superState = superState
-        
-        superPaywallVM.selectProductWithID(requestedProductID, state: superState)
+
         superPaywallVM.delegate = self
     }
     
@@ -53,7 +50,17 @@ final class FreePlanUpgradeViewModel {
             superState.error = nil
         }
     }
+    
     // MARK: Setup
+    func fetchProducts() async {
+        await superPaywallVM.fetchProducts(state: superState)
+        superState.isButtonDisabled = false
+    }
+    
+    func selectRequestedProduct() {
+        superPaywallVM.selectProductWithID(state.requestedProductID, state: superState)
+    }
+    
     func getCurrentPaymentManager() -> PaymentManager {
         superPaywallVM.getCurrentPaymentManager()
     }
@@ -80,21 +87,23 @@ final class FreePlanUpgradeViewModel {
         }
     }
     
-    private func updateUIBasedOnPurchaseResult(_ purchaseResult: FTProduct.PurchaseResult) {
+    private func updateUIBasedOnPurchaseResult() {
+        guard let purchaseResult = superState.purchaseResult else { return }
+        
         switch purchaseResult {
         case .success:
-            state.purchaseButtonTitle = State.stringConstants.loadingTitle
-            state.isButtonDisabled = true
+            state.purchaseButtonTitle = State.stringConstants.subscribedTitle
+            superState.isButtonDisabled = true
             superState.error = nil
 
         case .pending:
             state.purchaseButtonTitle = State.stringConstants.loadingTitle
-            state.isButtonDisabled = true
+            superState.isButtonDisabled = true
             superState.error = PaymentError.pending
 
         case .userCancelled:
             state.purchaseButtonTitle = State.stringConstants.tryButtonTitle
-            state.isButtonDisabled = false
+            superState.isButtonDisabled = false
             superState.error = PaymentError.userCancelled
         }
     }
@@ -106,6 +115,7 @@ final class FreePlanUpgradeViewModel {
 
 extension FreePlanUpgradeViewModel: SuperPaywallViewModelDelegate {
     func didChangeUserEntitlementStatus(isPro: Bool) {
-        #warning("Method is not implemented")
+        superPaywallVM.updatePurchaseResultForSelectedProduct(state: superState)
+        updateUIBasedOnPurchaseResult()
     }
 }

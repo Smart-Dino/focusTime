@@ -75,7 +75,7 @@ struct PlanSelectionPaywallView: View {
                             }
                         }
                     )
-                    .disabled(viewModel.state.isButtonDisabled)
+                    .disabled(viewModel.superState.isButtonDisabled)
                     .padding()
                     
                     SubscriptionUtilityLinksView(

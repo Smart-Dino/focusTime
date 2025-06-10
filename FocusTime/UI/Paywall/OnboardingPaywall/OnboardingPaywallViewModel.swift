@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import StoreKit
 
 /// ViewModel, responsible for managing the logic on ``OnboardingPaywallView``.
 /// - Note: Use it in the ``OnboadingPaywallView``.
@@ -16,9 +15,6 @@ final class OnboardingPaywallViewModel {
     // MARK: - Nested declarations
     struct State {
         var requestedProductID: String
-        
-        // Button state
-        var isButtonDisabled = true
         
         // Dynamic strings
         static let stringConstants = OnboardingPaywallView.Constants.Strings.self
@@ -57,9 +53,9 @@ final class OnboardingPaywallViewModel {
     }
     
     // MARK: Setup
-    func fetchIU() async {
+    func fetchProducts() async {
         await superPaywallVM.fetchProducts(state: superState)
-        state.isButtonDisabled = false
+        superState.isButtonDisabled = false
     }
     
     func getCurrentPaymentManager() -> PaymentManager {
@@ -97,17 +93,17 @@ final class OnboardingPaywallViewModel {
         switch purchaseResult {
         case .success:
             state.purchaseButtonTitle = State.stringConstants.subscribedTitle
-            state.isButtonDisabled = true
+            superState.isButtonDisabled = true
             superState.error = nil
             
         case .pending:
             state.purchaseButtonTitle = State.stringConstants.pendingTitle
-            state.isButtonDisabled = true
+            superState.isButtonDisabled = true
             superState.error = PaymentError.pending
             
         case .userCancelled:
             state.purchaseButtonTitle = State.stringConstants.tryButtonTitle
-            state.isButtonDisabled = false
+            superState.isButtonDisabled = false
             superState.error = PaymentError.userCancelled
         }
     }

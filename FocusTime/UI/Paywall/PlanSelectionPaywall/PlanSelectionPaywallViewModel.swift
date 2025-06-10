@@ -5,7 +5,6 @@
 //  Created by Maksym Horobets on 19.05.2025.
 //
 import SwiftUI
-import StoreKit
 
 /// ViewModel, responsible for managing the logic on ``PlanSelectionPaywallView``.
 /// - Note: Use it in the ``PlanSelectionPaywallView``.
@@ -22,10 +21,8 @@ final class PlanSelectionPaywallViewModel {
         var selectedImageIndex: Int? = .zero
         
         // MARK: Other
-        static let loadingMessage = PlanSelectionPaywallView.Constants.Strings.loadingTitle
-        // Button state
-        var isButtonDisabled = true
-        var primaryButtonTitle: String = loadingMessage
+        static let stringConstants = PlanSelectionPaywallView.Constants.Strings.self
+        var primaryButtonTitle: String = stringConstants.loadingTitle
         var subscribeButtonTerms: String = ""
     }
     
@@ -87,39 +84,37 @@ final class PlanSelectionPaywallViewModel {
     
     private func configurePurchaseButtonAvailabilityBasedOnSelectedProduct() {
         guard let product = superState.selectedProduct else { return }
-        let shortcut = PlanSelectionPaywallView.Constants.Strings.self
-        state.isButtonDisabled = true
+        superState.isButtonDisabled = true
         
         Task { [weak self] in
             guard let self else { return }
             
             if await superPaywallVM.isProductPurchased(product) {
-                state.isButtonDisabled = true
+                superState.isButtonDisabled = true
                 
                 state.primaryButtonTitle =
                 (product.subscriptionPeriod != nil)
-                ? shortcut.subscribedTitle
-                : shortcut.purchasedTitle
+                ? State.stringConstants.subscribedTitle
+                : State.stringConstants.purchasedTitle
                 
                 
             } else {
-                state.isButtonDisabled = false
+                superState.isButtonDisabled = false
             }
         }
     }
     
     private func configureBottomSectionForSelectedProduct() {
         guard let product = superState.selectedProduct else { return }
-        let shortcut = PlanSelectionPaywallView.Constants.Strings.self
         
         if product.trialPeriod != nil && superState.isEligibleForIntro {
             // Product is trialable and the user is eligible for trial
-            state.primaryButtonTitle = shortcut.startFreeTrial
-            state.subscribeButtonTerms = shortcut.noPaymentMessage
+            state.primaryButtonTitle = State.stringConstants.startFreeTrial
+            state.subscribeButtonTerms = State.stringConstants.noPaymentMessage
         } else if product.trialPeriod == nil || !superState.isEligibleForIntro {
             // No trial on product or it is already used
-            let periodDesc = product.subscriptionPeriodDescription ?? shortcut.paidOnce
-            state.primaryButtonTitle = shortcut.subscribeButtonTitle
+            let periodDesc = product.subscriptionPeriodDescription ?? State.stringConstants.paidOnce
+            state.primaryButtonTitle = State.stringConstants.subscribeButtonTitle
             state.subscribeButtonTerms = periodDesc
         }
         
@@ -143,12 +138,8 @@ final class PlanSelectionPaywallViewModel {
 
 extension PlanSelectionPaywallViewModel: SuperPaywallViewModelDelegate {
     func didChangeUserEntitlementStatus(isPro: Bool) {
-        print(#function)
-        #warning("Maybe remove this and use as a parameter to this method instead?")
         superPaywallVM.updatePurchaseResultForSelectedProduct(state: superState)
         configurePurchaseButtonAvailabilityBasedOnSelectedProduct()
-        print(state.primaryButtonTitle)
-        print("PlanSelectionPaywallViewModel instance:", ObjectIdentifier(self))
         #warning("Dissmis?")
     }
 }

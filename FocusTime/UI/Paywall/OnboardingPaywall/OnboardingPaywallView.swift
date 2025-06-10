@@ -44,7 +44,7 @@ struct OnboardingPaywallView: View {
                         }
                     )
                     .padding()
-                    .disabled(viewModel.state.isButtonDisabled)
+                    .disabled(viewModel.superState.isButtonDisabled)
                     
                     SubscriptionUtilityLinksView(
                         viewModel: .init(paymentManager: viewModel.getCurrentPaymentManager())
@@ -79,7 +79,7 @@ struct OnboardingPaywallView: View {
         )
         .task {
             // Do NOT put these in the initializer
-            await viewModel.fetchIU()
+            await viewModel.fetchProducts()
             viewModel.selectRequestedProduct()
             viewModel.setupProductInfo()
         }

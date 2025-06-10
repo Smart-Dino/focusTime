@@ -26,7 +26,7 @@ extension SubscriptionUtilityLinksView {
             static let restorePurchases = "Restore purchases"
             
             // Alert
-            static let errorHeader = "An error occured"
+            static let errorHeader = "An error occurred"
             
             // Other UI
             static let separatorDot = "•"

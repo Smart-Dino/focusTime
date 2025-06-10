@@ -23,7 +23,10 @@ class PaywallBusinessLogicFactory {
     
     // MARK: - Factory Methods
     func makeFreePlanUpgradeViewModel(requestedProductID: String) -> FreePlanUpgradeViewModel {
-        FreePlanUpgradeViewModel(requestedProductID: requestedProductID, superPaywallVM: superPaywallVM)
+        FreePlanUpgradeViewModel(
+            state: .init(requestedProductID: requestedProductID),
+            superPaywallVM: superPaywallVM
+        )
     }
     
     func makeOnboardingPaywallViewModel(requestedProductID: String) -> OnboardingPaywallViewModel {

@@ -55,8 +55,10 @@ struct FreePlanUpgradeView: View {
                 Text(viewModel.superState.error?.localizedDescription ?? "")
             }
         )
-        .onAppear {
+        .task {
             // Do NOT put these in the initializer
+            await viewModel.fetchProducts()
+            viewModel.selectRequestedProduct()
             viewModel.setupProductInfo()
         }
     }
@@ -82,7 +84,7 @@ struct FreePlanUpgradeView: View {
                     }
                 }
             )
-            .disabled(viewModel.state.isButtonDisabled)
+            .disabled(viewModel.superState.isButtonDisabled)
             Button(
                 Constants.Strings.viewPlansButton,
                 action: viewModel.viewAllPlans
@@ -118,7 +120,7 @@ struct FreePlanUpgradeView: View {
     NavigationStack {
         FreePlanUpgradeView(
             viewModel: .init(
-                requestedProductID: productID,
+                state: .init(requestedProductID: productID),
                 superPaywallVM: .init(paymentManager: paymentManager)
             )
         )
@@ -132,7 +134,7 @@ struct FreePlanUpgradeView: View {
     NavigationStack {
         FreePlanUpgradeView(
             viewModel: .init(
-                requestedProductID: productID,
+                state: .init(requestedProductID: productID),
                 superPaywallVM: .init(paymentManager: paymentManager)
             )
         )
@@ -146,7 +148,7 @@ struct FreePlanUpgradeView: View {
     NavigationStack {
         FreePlanUpgradeView(
             viewModel: .init(
-                requestedProductID: productID,
+                state: .init(requestedProductID: productID),
                 superPaywallVM: .init(paymentManager: paymentManager)
             )
         )

@@ -7,8 +7,8 @@
 
 import SwiftUI
 
-struct PaywallFlowView: View {
-    @State var viewModel: PaywallFlowViewModel
+struct PaywallFlowCoordinatorView: View {
+    @State var viewModel: PaywallFlowCoordinatorViewModel
     
     var body: some View {
         let _ = Self._printChanges()
@@ -35,5 +35,5 @@ struct PaywallFlowView: View {
 }
 
 #Preview {
-    PaywallFlowView(viewModel: .init(paymentManager: MockPaymentManagerWithPurchaseError()))
+    PaywallFlowCoordinatorView(viewModel: .init(paymentManager: MockPaymentManagerWithPurchaseError()))
 }

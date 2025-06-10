@@ -11,7 +11,7 @@ enum SharedPaywallConstants {
     
     // MARK: - Strings
     enum Strings {
-        static let errorHeader = "An error occured"
+        static let errorHeader = "An error occurred"
         static let dismissButtonTitle = "Dismiss current screen."
         static let viewPlansButton = "View All Plans"
         static let subscribeButtonTitle = "Subscribe"

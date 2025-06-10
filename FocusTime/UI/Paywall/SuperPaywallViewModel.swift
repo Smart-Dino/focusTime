@@ -33,19 +33,22 @@ final class SuperPaywallViewModel {
         
         // Purchase
         var selectedProduct: FTProduct?
+        var isButtonDisabled: Bool
         
         init(
             error: Error? = nil,
             purchaseResult: FTProduct.PurchaseResult? = nil,
             isEligibleForIntro: Bool = false,
             allProducts: [FTProduct] = [],
-            selectedProduct: FTProduct? = nil
+            selectedProduct: FTProduct? = nil,
+            isButtonDisabled: Bool = true
         ) {
             self.error = error
             self.purchaseResult = purchaseResult
             self.isEligibleForIntro = isEligibleForIntro
             self.allProducts = allProducts
             self.selectedProduct = selectedProduct
+            self.isButtonDisabled = isButtonDisabled
         }
     }
     

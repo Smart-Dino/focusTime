@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import StoreKit
 
 /// An abstracted structure for a purchase product used as an intermediate level between the app
 /// and the payment processing system.
