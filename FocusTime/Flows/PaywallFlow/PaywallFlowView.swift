@@ -11,23 +11,26 @@ struct PaywallFlowView: View {
     @State var viewModel: PaywallFlowViewModel
     
     var body: some View {
-        Group {
-            switch viewModel.state.currentPaywall {
-            case .freePlan:
-                FreePlanUpgradeView(
-                    viewModel: viewModel.makeFreePlanUpgradeViewModel()
-                )
-            case .onboarding:
-                OnboardingPaywallView(
-                    viewModel: viewModel.makeOnboardingPaywallViewModel()
-                )
-            case .planSelection:
-                PlanSelectionPaywallView(
-                    viewModel: viewModel.makePlanSelectionPaywallViewModel()
-                )
+        let _ = Self._printChanges()
+        NavigationStack {
+            Group {
+                switch viewModel.flowState.currentFlow {
+                case .freePlan:
+                    FreePlanUpgradeView(
+                        viewModel: viewModel.makeFreePlanUpgradeViewModel()
+                    )
+                case .onboarding:
+                    OnboardingPaywallView(
+                        viewModel: viewModel.makeOnboardingPaywallViewModel()
+                    )
+                case .planSelection:
+                    PlanSelectionPaywallView(
+                        viewModel: viewModel.makePlanSelectionPaywallViewModel()
+                    )
+                }
             }
+            .preferredColorScheme(.dark)
         }
-        .preferredColorScheme(.dark)
     }
 }
 

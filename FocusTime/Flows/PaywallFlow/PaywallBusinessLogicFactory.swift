@@ -31,7 +31,9 @@ class PaywallBusinessLogicFactory {
     }
     
     func makePlanSelectionViewModel() -> PlanSelectionPaywallViewModel {
-        PlanSelectionPaywallViewModel(superPaywallVM: superPaywallVM)
+        let obj = PlanSelectionPaywallViewModel(superPaywallVM: superPaywallVM)
+        print("PlanSelectionPaywallViewModel initial instance:", ObjectIdentifier(obj))
+        return obj
     }
     
 }

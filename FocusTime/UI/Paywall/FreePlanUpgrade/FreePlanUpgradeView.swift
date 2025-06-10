@@ -46,13 +46,13 @@ struct FreePlanUpgradeView: View {
         .alert(
             Constants.Strings.errorHeader,
             isPresented: Binding(get: {
-                viewModel.state.error != nil
+                viewModel.superState.error != nil
             }, set: { showError in
                 viewModel.keepShowingError(showError: showError)
             }), actions: {
                 // OK dismissal button by default
             }, message: {
-                Text(viewModel.state.error?.localizedDescription ?? "")
+                Text(viewModel.superState.error?.localizedDescription ?? "")
             }
         )
         .onAppear {

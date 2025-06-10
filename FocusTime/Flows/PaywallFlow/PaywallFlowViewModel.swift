@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum PaywallSreens: Identifiable, Hashable {
+enum PaywallScreens: Identifiable, Hashable {
     case freePlan
     case onboarding
     case planSelection
@@ -19,17 +19,17 @@ enum PaywallSreens: Identifiable, Hashable {
 @Observable
 final class PaywallFlowViewModel {
     struct State {
-        var currentPaywall: PaywallSreens = .planSelection
+        var currentFlow: PaywallScreens = .planSelection
     }
     
-    private(set) var state: State
+    private(set) var flowState: State
     private var factory: PaywallBusinessLogicFactory
     
     init(
-        state: State = State(),
+        flowState: State = State(),
         paymentManager: PaymentManager
     ) {
-        self.state = state
+        self.flowState = flowState
         self.factory = PaywallBusinessLogicFactory(paymentManager: paymentManager)
     }
     

@@ -41,11 +41,11 @@ extension OnboardingPaywallView {
         enum Strings {
             // Purchase button states
             static let tryButtonTitle = "Try free and subscribe."
-            static let pendingMessage = SharedPaywallConstants.Strings.pendingMessage
-            static let subscribedMessage = SharedPaywallConstants.Strings.subscribedMessage
+            static let pendingTitle = SharedPaywallConstants.Strings.pendingTitle
+            static let subscribedTitle = SharedPaywallConstants.Strings.subscribedTitle
             
             // UI
-            static let loadingMessage = SharedPaywallConstants.Strings.loadingMessage
+            static let loadingTitle = SharedPaywallConstants.Strings.loadingTitle
             static let dismissButtonTitle = SharedPaywallConstants.Strings.dismissButtonTitle
             
             // Error

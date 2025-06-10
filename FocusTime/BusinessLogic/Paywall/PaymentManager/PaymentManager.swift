@@ -19,6 +19,33 @@ protocol PaymentManager: Actor {
     /// Products that the user has already purchased and is entitled to.
     var purchasedProducts: [FTProduct] { get }
 
+    // MARK: - Service
+    /// Used to load/reload data into payment manager's public and private properties.
+    /// - Important: Recommended to use on every paywall screen launch. Access the needed data after awaiting this method.
+    func reloadData() async
+    
+    // MARK: - Convenience
+    /// Returns the `FTProduct` associated with the given product identifier.
+    ///
+    /// - Parameter id: The product identifier as a `String`.
+    /// - Returns: The `FTProduct` corresponding to the given identifier.
+    /// - Throws: `PaymentError` if the product cannot be found or retrieved.
+    func productForID(_ id: String) throws(PaymentError) -> FTProduct
+
+    /// Checks if the specified product has been purchased.
+    ///
+    /// - Parameter product: The `FTProduct` to check.
+    /// - Returns: `true` if the product is in `purchasedProducts`, otherwise `false`.
+    func isPurchased(_ product: FTProduct) async -> Bool
+    
+    
+    /// Determines whether the user is eligible for an introductory offer (e.g. free trial) for a specific product or
+    /// any auto-renewable product subscription in the same subscription group.
+    /// - Parameter product: The `FTProduct` to check for trial eligibility.
+    /// - Returns: `true` if the user appears to be eligible for an introductory offer; `false` otherwise.
+    /// - Throws: `PaymentError` if an error occurs while determining eligibility (e.g. missing product info).
+    func eligibleForIntro(product: FTProduct) async throws(PaymentError) -> Bool
+    
     // MARK: - Purchase Actions
     /// Attempts to purchase the given product.
     ///
@@ -34,20 +61,7 @@ protocol PaymentManager: Actor {
     /// After successful restoration, entitlements should be re-validated using `isPurchased(_:)`.
     func restorePurchases() async throws
 
-    // MARK: - Entitlement Checks
-    /// Checks if the specified product has been purchased.
-    ///
-    /// - Parameter product: The `FTProduct` to check.
-    /// - Returns: `true` if the product is in `purchasedProducts`, otherwise `false`.
-    func isPurchased(_ product: FTProduct) async -> Bool
-    
-    /// Determines whether the user is eligible for an introductory offer (e.g. free trial) for a specific product or
-    /// any auto-renewable product subscription in the same subscription group.
-    /// - Parameter product: The `FTProduct` to check for trial eligibility.
-    /// - Returns: `true` if the user appears to be eligible for an introductory offer; `false` otherwise.
-    /// - Throws: `PaymentError` if an error occurs while determining eligibility (e.g. missing product info).
-    func eligibleForIntro(product: FTProduct) async throws(PaymentError) -> Bool
-
+    // MARK: - Stream
     /// Streams updates to the purchased products list.
     ///
     /// - Returns: An `AsyncStream` emitting arrays of `FTProduct`.
@@ -94,6 +108,12 @@ actor MockPaymentManagerWithPurchaseError: PaymentManager {
 
     func isPurchased(_ product: FTProduct) async -> Bool {
         purchasedProducts.contains(product)
+    }
+    
+    func reloadData() async { return }
+    
+    func productForID(_ id: String) throws(PaymentError) -> FTProduct {
+        throw .productNotFound
     }
 
     func purchase(_ product: FTProduct) async throws -> FTProduct.PurchaseResult? {

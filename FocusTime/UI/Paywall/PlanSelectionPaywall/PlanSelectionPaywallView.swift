@@ -45,52 +45,50 @@ struct PlanSelectionPaywallView: View {
                 // and pushed to the top of the view
                 Spacer()
             }
-            GeometryReader { proxy in
-                VStack(alignment: .center) {
-                    // The content card is above the images
-                    // and pushed to the bottom
-                    Spacer()
+            VStack(alignment: .center) {
+                // The content card is above the images
+                // and pushed to the bottom
+                Spacer()
+                
+                FTPageControlView(
+                    viewModel.state.backgroudImages,
+                    selectedItem: selectedImageIndex
+                )
+                // Should tell the design team to make it brighter?
+                .foregroundTint(Color.ftPageControlBlue)
+                
+                VStack(spacing: .zero) {
+                    if viewModel.superState.allProducts.isEmpty {
+                        Spacer()
+                        ProgressView()
+                        Spacer()
+                    } else {
+                        features
+                    }
                     
-                    FTPageControlView(
-                        viewModel.state.backgroudImages,
-                        selectedItem: selectedImageIndex
-                    )
-                    // Should tell the design team to make it brighter?
-                    .foregroundTint(Color.ftPageControlBlue)
-                    
-                    VStack(spacing: .zero) {
-                        if viewModel.state.products.isEmpty {
-                            Spacer()
-                            ProgressView()
-                            Spacer()
-                        } else {
-                            features
-                        }
-                        
-                        FTSubscribeButtonView(
-                            terms: viewModel.state.subscribeButtonTerms,
-                            buttonTitle: viewModel.state.primaryButtonTitle,
-                            buttonAction: {
-                                Task {
-                                    await viewModel.initiatePurchaseWithCurrentProduct()
-                                }
+                    FTSubscribeButtonView(
+                        terms: viewModel.state.subscribeButtonTerms,
+                        buttonTitle: viewModel.state.primaryButtonTitle,
+                        buttonAction: {
+                            Task {
+                                await viewModel.initiatePurchaseWithCurrentProduct()
                             }
-                        )
-                        .padding()
-                        .disabled(viewModel.state.isButtonDisabled)
-                        
-                        SubscriptionUtilityLinksView(
-                            viewModel: .init(paymentManager: viewModel.getCurrentPaymentManager())
-                        )
-                    }
-                    .containerRelativeFrame(.vertical, { amount, axis in
-                        amount / 2.5
-                    })
+                        }
+                    )
+                    .disabled(viewModel.state.isButtonDisabled)
                     .padding()
-                    .padding(.bottom) // Padding, so we don't hit the safe area
-                    .background {
-                        contentCard
-                    }
+                    
+                    SubscriptionUtilityLinksView(
+                        viewModel: .init(paymentManager: viewModel.getCurrentPaymentManager())
+                    )
+                }
+                .containerRelativeFrame(.vertical, { amount, axis in
+                    amount / 2.5
+                })
+                .padding()
+                .padding(.bottom) // Padding, so we don't hit the safe area
+                .background {
+                    contentCard
                 }
             }
         }
@@ -107,13 +105,13 @@ struct PlanSelectionPaywallView: View {
         .alert(
             Constants.Strings.errorHeader,
             isPresented: Binding(get: {
-                viewModel.state.error != nil
+                viewModel.superState.error != nil
             }, set: { showError in
                 viewModel.keepShowingError(showError: showError)
             }), actions: {
                 // OK dismissal button by default
             }, message: {
-                Text(viewModel.state.error?.localizedDescription ?? "")
+                Text(viewModel.superState.error?.localizedDescription ?? "")
             }
         )
         .onAppear {
@@ -132,9 +130,9 @@ struct PlanSelectionPaywallView: View {
     private var features: some View {
         ScrollView(.vertical) {
             VStack(spacing: Constants.Padding.featuresSpacing) {
-                ForEach(viewModel.state.products) { product in
+                ForEach(viewModel.superState.allProducts) { product in
                     let isTrial = (product.trialPeriod != nil)
-                    && (viewModel.state.superState.isEligibleForIntro)
+                    && (viewModel.superState.isEligibleForIntro)
                     
                     let subtitle: String? = isTrial
                     ? product.subscriptionPeriodDescription
@@ -152,7 +150,7 @@ struct PlanSelectionPaywallView: View {
                             leadingSubtitle: subtitle,
                             trailingDescription: descriptionText
                         )
-                        .selected(viewModel.state.selectedProductID == product.id)
+                        .selected(viewModel.superState.selectedProduct == product)
                     }
                     .buttonStyle(.plain)
                 }

@@ -22,23 +22,7 @@ actor StoreKitPaymentManager: PaymentManager {
     private(set) var isPro: Bool = false
     
     // FTProduct
-    private(set) var _products: [FTProduct]
-    var products: [FTProduct] {
-        get async {
-            if _products.isEmpty {
-                do {
-                    try await getProducts()
-                    await updateCustomerProductStatus()
-                    return _products
-                } catch {
-                    Self.logger.critical("Could not load products: \(error.localizedDescription)")
-                    return []
-                }
-            } else {
-                return _products
-            }
-        }
-    }
+    private(set) var products: [FTProduct]
     private(set) var purchasedProducts: [FTProduct]
     
     // StoreKit-related
@@ -52,7 +36,7 @@ actor StoreKitPaymentManager: PaymentManager {
     
     init() {
         // FTProducts
-        self._products = []
+        self.products = []
         self.purchasedProducts = []
         
         // StoreKit Products
@@ -60,6 +44,7 @@ actor StoreKitPaymentManager: PaymentManager {
         self.productIdentifiers = Self.loadProductIdentifiers()
         
         Task {
+            await reloadData()
             let task = await listenForTransactions()
             await setTask(task)
         }
@@ -79,6 +64,23 @@ extension StoreKitPaymentManager {
     
     func isPurchased(_ product: FTProduct) async -> Bool {
         purchasedProducts.contains(product)
+    }
+    
+    func productForID(_ id: String) throws(PaymentError) -> FTProduct {
+        if let product = products.first(where: { $0.id == id }) {
+            return product
+        } else {
+            throw .productNotFound
+        }
+    }
+    
+    func reloadData() async {
+        do {
+            try await getProducts()
+            await updateCustomerProductStatus()
+        } catch {
+            Self.logger.critical("Could not load products: \(error.localizedDescription)")
+        }
     }
     
     func eligibleForIntro(product: FTProduct) async throws(PaymentError) -> Bool {
@@ -214,7 +216,7 @@ extension StoreKitPaymentManager {
         return Task.detached {
             //Iterate through any transactions that don't come from a direct call to `purchase()`.
             for await result in Transaction.updates {
-                Self.logger.trace("New incoming transaction update: \(result.debugDescription)")
+                Self.logger.trace("New incoming transaction update: \(result.jwsRepresentation)")
                 do {
                     let transaction = try await self.checkVerified(result)
                     
@@ -249,7 +251,7 @@ extension StoreKitPaymentManager {
         
         try? await Task.sleep(for: .seconds(3))
         // Set the values
-        self._products = ftProducts.sortByTrialThenPrice()
+        self.products = ftProducts.sortByTrialThenPrice()
         self.skProducts = storeProducts
     }
 }

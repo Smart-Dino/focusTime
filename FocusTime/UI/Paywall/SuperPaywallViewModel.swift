@@ -9,18 +9,21 @@ import Foundation
 
 @MainActor
 protocol SuperPaywallViewModelDelegate: AnyObject {
-    func didFinishCurrentPurchaseWithResult(_ purchaseResult: FTProduct.PurchaseResult)
+    func didChangeUserEntitlementStatus(isPro: Bool)
 }
 
 @MainActor
-@Observable
+//@Observable
 final class SuperPaywallViewModel {
     // MARK: - Nested Declarations
-    struct State {
+    // This State was made a reference type so it can be passed and mutated
+    // in a non-sendable way
+    @Observable
+    final class State {
         // Variables
         var error: Error?
         var purchaseResult: FTProduct.PurchaseResult?
-        var isEligibleForIntro = false
+        var isEligibleForIntro: Bool
         
         // Product
         var allProducts: [FTProduct] = []
@@ -29,14 +32,27 @@ final class SuperPaywallViewModel {
         //        }
         
         // Purchase
-        var requestedProductID: String? = nil
-        var product: FTProduct? {
-            allProducts.first(where: {$0.id == requestedProductID})
+        var selectedProduct: FTProduct?
+        
+        init(
+            error: Error? = nil,
+            purchaseResult: FTProduct.PurchaseResult? = nil,
+            isEligibleForIntro: Bool = false,
+            allProducts: [FTProduct] = [],
+            selectedProduct: FTProduct? = nil
+        ) {
+            self.error = error
+            self.purchaseResult = purchaseResult
+            self.isEligibleForIntro = isEligibleForIntro
+            self.allProducts = allProducts
+            self.selectedProduct = selectedProduct
         }
     }
     
     // MARK: - Properties
-    private(set) var state: State
+    // Made this private because there is no reason for anybody
+    // to access it
+    private var state: State
     
     private let paymentManager: PaymentManager
     private var subscriptionTask: Task<Void, Never>?
@@ -51,6 +67,8 @@ final class SuperPaywallViewModel {
     ) {
         self.state = state
         self.paymentManager = paymentManager
+        
+        startListeningToSubscriptionUpdates()
     }
     
     // A deinitializer is called immediately before a class instance is deallocated
@@ -64,33 +82,54 @@ final class SuperPaywallViewModel {
     // MARK: - Private Methods
     
     private func startListeningToSubscriptionUpdates() {
+        print(#function)
         subscriptionTask?.cancel()
         
         subscriptionTask = Task { [weak self] in
             guard let self else { return }
-            for await _ in await self.paymentManager.isProUserChangesStream() {
-                self.updatePurchaseResult()
+            for await isPro in await self.paymentManager.isProUserChangesStream() {
+                self.delegate?.didChangeUserEntitlementStatus(isPro: isPro)
             }
         }
     }
     
-    private func updatePurchaseResult() {
+    // MARK: Product selection
+    
+    func selectProductWithID(_ id: String, state: State) {
+        // We can replace this line with PaymentManager.productForID(_ id: ) instead.
+        state.selectedProduct = state.allProducts.first(where: { $0.id == id })
+    }
+    
+    func selectFirstProductIfNeeded(state: State) {
+        // If nothing selected yet, pick the first trialable, or the first overall:
+        if state.selectedProduct == nil {
+            if let trialable = state.allProducts.first(where: { $0.trialPeriod != nil }) {
+                selectProduct(trialable, state: state)
+            } else if let first = state.allProducts.first {
+                selectProduct(first, state: state)
+            }
+        }
+    }
+    
+    func selectProduct(_ product: FTProduct, state: State) {
+        // Immediately store the selected product ID so `superState.product` is correct:
+        state.selectedProduct = product
+    }
+    
+    func updatePurchaseResultForSelectedProduct(state: State) {
         Task { [weak self] in
-            guard let self, let product = state.product else { return }
+            guard let self, let product = state.selectedProduct else { return }
             
             let isPurchased = await paymentManager.isPurchased(product)
             
             let result: FTProduct.PurchaseResult? = isPurchased ? .success : nil
             state.purchaseResult = result
-            
-            if let result {
-                delegate?.didFinishCurrentPurchaseWithResult(result)
-            }
         }
     }
     
     // MARK: - Public Methods
-    func fetchProducts(state: inout State) async {
+    func fetchProducts(state: State) async {
+        await paymentManager.reloadData()
         let products = await paymentManager.products
         state.allProducts = products
     }
@@ -99,15 +138,15 @@ final class SuperPaywallViewModel {
         paymentManager
     }
     
-    func isProductPurchased(_ productID: String) async -> Bool {
-        await paymentManager.purchasedProducts.contains(where: { $0.id == productID })
+    func isProductPurchased(_ product: FTProduct) async -> Bool {
+        await paymentManager.isPurchased(product)
     }
     
     // So far we only have one subscriptions group in our app,
     // so checking one product would automatically check if the user
     // is eligible for any type of introductory offer
-    func isUserEligibleForTrial(state: inout State) async {
-        guard let product = state.product else {
+    func isUserEligibleForTrial(state: State) async {
+        guard let product = state.selectedProduct else {
             state.error = PaymentError.productNotFound
             return
         }
@@ -119,11 +158,13 @@ final class SuperPaywallViewModel {
     }
     
     
-    func subscribeToCurrentRequestedProduct(state: inout State) async {
-        guard let product = state.product else {
+    func subscribeToCurrentRequestedProduct(state: State) async {
+        guard let product = state.selectedProduct else {
             state.error = PaymentError.productNotFound
             return
         }
+        
+        let wasEligibleForIntro = try? await paymentManager.eligibleForIntro(product: product)
         
         do {
             guard let result = try await paymentManager.purchase(product) else {
@@ -137,15 +178,21 @@ final class SuperPaywallViewModel {
             case .userCancelled:
                 state.purchaseResult = .userCancelled
             case .pending:
+                guard product.trialPeriod == nil && !(wasEligibleForIntro ?? false) else {
+                    // Then pretty sure it was a trial purchase so it is successful
+                    state.purchaseResult = .success
+                    delegate?.didChangeUserEntitlementStatus(isPro: true)
+                    break
+                }
                 state.purchaseResult = .pending
+                state.error = PaymentError.pending
+                delegate?.didChangeUserEntitlementStatus(isPro: false)
             }
             
-            delegate?.didFinishCurrentPurchaseWithResult(result)
+//            delegate?.didFinishCurrentPurchaseWithResult(result)
         } catch {
             state.error = error
         }
     }
-    
-    
     
 }
