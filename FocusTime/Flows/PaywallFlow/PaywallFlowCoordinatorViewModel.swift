@@ -23,14 +23,14 @@ final class PaywallFlowCoordinatorViewModel {
     }
     
     private(set) var flowState: State
-    private var factory: PaywallBusinessLogicFactory
+    private var factory: PaywallBusinessLogicFactory!
     
     init(
         flowState: State = State(),
-        paymentManager: PaymentManager
+        factory: PaywallBusinessLogicFactory
     ) {
         self.flowState = flowState
-        self.factory = PaywallBusinessLogicFactory(paymentManager: paymentManager)
+        self.factory = factory
     }
     
     private func getTrialProductID() -> String {
@@ -39,16 +39,37 @@ final class PaywallFlowCoordinatorViewModel {
     
     func makeFreePlanUpgradeViewModel() -> FreePlanUpgradeViewModel {
         let trialProductID = getTrialProductID()
-        return factory.makeFreePlanUpgradeViewModel(requestedProductID: trialProductID)
+        return factory.makeFreePlanUpgradeViewModel(requestedProductID: trialProductID, flowDelegate: self)
     }
     
     func makeOnboardingPaywallViewModel() -> OnboardingPaywallViewModel {
         let trialProductID = getTrialProductID()
-        return factory.makeOnboardingPaywallViewModel(requestedProductID: trialProductID)
+        return factory.makeOnboardingPaywallViewModel(requestedProductID: trialProductID, flowDelegate: self)
     }
     
     func makePlanSelectionPaywallViewModel() -> PlanSelectionPaywallViewModel {
-        return factory.makePlanSelectionViewModel()
+        return factory.makePlanSelectionViewModel(flowDelegate: self)
     }
     
+}
+
+extension PaywallFlowCoordinatorViewModel: PaywallNavigationDelegate {
+    func paywallDidRequestTermsOfService() {
+        #warning("No implementation")
+        print("ToS requested")
+    }
+    
+    func paywallDidRequestPrivacyPolicy() {
+        #warning("No implementation")
+        print("Privacy requested")
+    }
+    
+    func paywallDidRequestPlanSelection() {
+        flowState.currentFlow = .planSelection
+    }
+    
+    func paywallDidRequestDismissal() {
+        #warning("No implementation")
+        print("Dismissal requested")
+    }
 }

@@ -79,7 +79,10 @@ struct PlanSelectionPaywallView: View {
                     .padding()
                     
                     SubscriptionUtilityLinksView(
-                        viewModel: .init(paymentManager: viewModel.getCurrentPaymentManager())
+                        viewModel: .init(
+                            paymentManager: viewModel.getCurrentPaymentManager(),
+                            flowDelegate: viewModel.getCurrentFlowDelegate()
+                        )
                     )
                 }
                 .containerRelativeFrame(.vertical, { amount, axis in
@@ -170,34 +173,35 @@ struct PlanSelectionPaywallView: View {
         ToolbarItem(placement: .topBarTrailing) {
             // This will get addressed on the stage of incorporating
             // the business logic or navigation.
-#warning("Dismiss action is empty")
             Button(
                 Constants.Strings.dismissButtonTitle,
                 systemImage: "xmark",
-                action: {}
+                action: viewModel.dismissView
             )
         }
     }
 }
 
 #Preview("Trial unused") {
-    PlanSelectionPaywallView(
-        viewModel: .init(
-            superPaywallVM: SuperPaywallViewModel(
-                paymentManager: MockPaymentManagerWithPurchaseError(trialUsed: false)
-            )
-        )
-    )
-    .preferredColorScheme(.dark)
-}
-
-#Preview("Trial used") {
+    let paymentManager = MockPaymentManagerWithPurchaseError(trialUsed: false)
     NavigationStack {
         PlanSelectionPaywallView(
             viewModel: .init(
-                superPaywallVM: SuperPaywallViewModel(
-                    paymentManager: MockPaymentManagerWithPurchaseError(trialUsed: true)
-                )
+                superPaywallVM: .init(paymentManager: paymentManager),
+                flowDelegate: nil
+            )
+        )
+        .preferredColorScheme(.dark)
+    }
+}
+
+#Preview("Trial used") {
+    let paymentManager = MockPaymentManagerWithPurchaseError(trialUsed: true)
+    NavigationStack {
+        PlanSelectionPaywallView(
+            viewModel: .init(
+                superPaywallVM: .init(paymentManager: paymentManager),
+                flowDelegate: nil
             )
         )
         .preferredColorScheme(.dark)
@@ -206,12 +210,12 @@ struct PlanSelectionPaywallView: View {
 
 
 #Preview("StoreKit Manager") {
+    let paymentManager = StoreKitPaymentManager()
     NavigationStack {
         PlanSelectionPaywallView(
             viewModel: .init(
-                superPaywallVM: SuperPaywallViewModel(
-                    paymentManager: StoreKitPaymentManager()
-                )
+                superPaywallVM: .init(paymentManager: paymentManager),
+                flowDelegate: nil
             )
         )
         .preferredColorScheme(.dark)

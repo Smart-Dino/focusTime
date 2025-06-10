@@ -15,29 +15,37 @@ class PaywallBusinessLogicFactory {
     
     // MARK: - Initializer
     init(
-        paymentManager: PaymentManager
+        paymentManager: PaymentManager,
+        superPaywallVM: SuperPaywallViewModel,
     ) {
         self.paymentManager = paymentManager
-        self.superPaywallVM = SuperPaywallViewModel(paymentManager: paymentManager)
+        self.superPaywallVM = superPaywallVM
     }
     
     // MARK: - Factory Methods
-    func makeFreePlanUpgradeViewModel(requestedProductID: String) -> FreePlanUpgradeViewModel {
+    func makeFreePlanUpgradeViewModel(requestedProductID: String,
+                                      flowDelegate: PaywallNavigationDelegate) -> FreePlanUpgradeViewModel {
         FreePlanUpgradeViewModel(
             state: .init(requestedProductID: requestedProductID),
-            superPaywallVM: superPaywallVM
+            superPaywallVM: superPaywallVM,
+            flowDelegate: flowDelegate
         )
     }
     
-    func makeOnboardingPaywallViewModel(requestedProductID: String) -> OnboardingPaywallViewModel {
+    func makeOnboardingPaywallViewModel(requestedProductID: String,
+                                        flowDelegate: PaywallNavigationDelegate) -> OnboardingPaywallViewModel {
         OnboardingPaywallViewModel(
             state: .init(requestedProductID: requestedProductID),
-            superPaywallVM: superPaywallVM
+            superPaywallVM: superPaywallVM,
+            flowDelegate: flowDelegate
         )
     }
     
-    func makePlanSelectionViewModel() -> PlanSelectionPaywallViewModel {
-        let obj = PlanSelectionPaywallViewModel(superPaywallVM: superPaywallVM)
+    func makePlanSelectionViewModel(flowDelegate: PaywallNavigationDelegate) -> PlanSelectionPaywallViewModel {
+        let obj = PlanSelectionPaywallViewModel(
+            superPaywallVM: superPaywallVM,
+            flowDelegate: flowDelegate
+        )
         print("PlanSelectionPaywallViewModel initial instance:", ObjectIdentifier(obj))
         return obj
     }

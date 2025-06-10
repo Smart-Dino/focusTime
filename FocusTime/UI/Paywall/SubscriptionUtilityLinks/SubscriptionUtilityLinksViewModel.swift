@@ -16,13 +16,16 @@ final class SubscriptionUtilityLinksViewModel {
     
     private(set) var state: State
     private var paymentManager: PaymentManager
+    private var flowDelegate: PaywallNavigationDelegate?
     
     init(
         state: State = State(),
-        paymentManager: PaymentManager
+        paymentManager: PaymentManager,
+        flowDelegate: PaywallNavigationDelegate?
     ) {
         self.state = state
         self.paymentManager = paymentManager
+        self.flowDelegate = flowDelegate
     }
     
     func keepShowingError(showError: Bool) {
@@ -42,11 +45,11 @@ final class SubscriptionUtilityLinksViewModel {
     }
     
     func openTermsOfService() {
-        // Open ToS
+        flowDelegate?.paywallDidRequestTermsOfService()
     }
     
     func openPrivacy() {
-        // Open Privacy
+        flowDelegate?.paywallDidRequestPrivacyPolicy()
     }
     
 }

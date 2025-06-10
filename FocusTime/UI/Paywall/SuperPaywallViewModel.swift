@@ -82,8 +82,7 @@ final class SuperPaywallViewModel {
         }
     }
     
-    // MARK: - Private Methods
-    
+    // MARK: - Stream
     private func startListeningToSubscriptionUpdates() {
         print(#function)
         subscriptionTask?.cancel()
@@ -96,8 +95,16 @@ final class SuperPaywallViewModel {
         }
     }
     
-    // MARK: Product selection
+    // MARK: - Return
+    func getCurrentPaymentManager() -> PaymentManager {
+        paymentManager
+    }
     
+    func isProductPurchased(_ product: FTProduct) async -> Bool {
+        await paymentManager.isPurchased(product)
+    }
+    
+    // MARK: - Product selection
     func selectProductWithID(_ id: String, state: State) {
         // We can replace this line with PaymentManager.productForID(_ id: ) instead.
         state.selectedProduct = state.allProducts.first(where: { $0.id == id })
@@ -119,6 +126,13 @@ final class SuperPaywallViewModel {
         state.selectedProduct = product
     }
     
+    // MARK: - Update state
+    func fetchProducts(state: State) async {
+        await paymentManager.reloadData()
+        let products = await paymentManager.products
+        state.allProducts = products
+    }
+    
     func updatePurchaseResultForSelectedProduct(state: State) {
         Task { [weak self] in
             guard let self, let product = state.selectedProduct else { return }
@@ -128,21 +142,6 @@ final class SuperPaywallViewModel {
             let result: FTProduct.PurchaseResult? = isPurchased ? .success : nil
             state.purchaseResult = result
         }
-    }
-    
-    // MARK: - Public Methods
-    func fetchProducts(state: State) async {
-        await paymentManager.reloadData()
-        let products = await paymentManager.products
-        state.allProducts = products
-    }
-    
-    func getCurrentPaymentManager() -> PaymentManager {
-        paymentManager
-    }
-    
-    func isProductPurchased(_ product: FTProduct) async -> Bool {
-        await paymentManager.isPurchased(product)
     }
     
     // So far we only have one subscriptions group in our app,
@@ -191,8 +190,6 @@ final class SuperPaywallViewModel {
                 state.error = PaymentError.pending
                 delegate?.didChangeUserEntitlementStatus(isPro: false)
             }
-            
-//            delegate?.didFinishCurrentPurchaseWithResult(result)
         } catch {
             state.error = error
         }

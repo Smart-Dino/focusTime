@@ -49,7 +49,8 @@ struct SubscriptionUtilityLinksView: View {
 #Preview {
     SubscriptionUtilityLinksView(
         viewModel: .init(
-            paymentManager: MockPaymentManagerWithPurchaseError()
+            paymentManager: MockPaymentManagerWithPurchaseError(),
+            flowDelegate: nil
         )
     )
 }

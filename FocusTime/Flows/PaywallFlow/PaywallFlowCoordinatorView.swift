@@ -31,9 +31,16 @@ struct PaywallFlowCoordinatorView: View {
             }
             .preferredColorScheme(.dark)
         }
+        .animation(.default, value: viewModel.flowState.currentFlow)
     }
 }
 
 #Preview {
-    PaywallFlowCoordinatorView(viewModel: .init(paymentManager: MockPaymentManagerWithPurchaseError()))
+    let paymentManager = MockPaymentManagerWithPurchaseError()
+    let superVM = SuperPaywallViewModel(paymentManager: paymentManager)
+    let factory = PaywallBusinessLogicFactory(paymentManager: paymentManager,
+                                              superPaywallVM: superVM)
+    PaywallFlowCoordinatorView(
+        viewModel: .init(factory: factory)
+    )
 }

@@ -30,7 +30,10 @@ struct FreePlanUpgradeView: View {
                         .padding(.vertical)
                     
                     SubscriptionUtilityLinksView(
-                        viewModel: .init(paymentManager: viewModel.getCurrentPaymentManager())
+                        viewModel: .init(
+                            paymentManager: viewModel.getCurrentPaymentManager(),
+                            flowDelegate: viewModel.flowDelegate
+                        )
                     )
                 }
                 .padding()
@@ -100,13 +103,10 @@ struct FreePlanUpgradeView: View {
         ToolbarItem(placement: .topBarTrailing) {
             // This will get adressed on the stage of incorporating
             // the business logic or navigation.
-#warning("Dismiss action is empty")
             Button(
                 Constants.Strings.dismissButtonTitle,
                 systemImage: "xmark",
-                action: {
-                    // Dismiss this view with Flow Control in mind
-                }
+                action: viewModel.dismissView
             )
         }
     }
@@ -121,7 +121,8 @@ struct FreePlanUpgradeView: View {
         FreePlanUpgradeView(
             viewModel: .init(
                 state: .init(requestedProductID: productID),
-                superPaywallVM: .init(paymentManager: paymentManager)
+                superPaywallVM: .init(paymentManager: paymentManager),
+                flowDelegate: nil
             )
         )
         .preferredColorScheme(.dark)
@@ -135,7 +136,8 @@ struct FreePlanUpgradeView: View {
         FreePlanUpgradeView(
             viewModel: .init(
                 state: .init(requestedProductID: productID),
-                superPaywallVM: .init(paymentManager: paymentManager)
+                superPaywallVM: .init(paymentManager: paymentManager),
+                flowDelegate: nil
             )
         )
         .preferredColorScheme(.dark)
@@ -149,7 +151,8 @@ struct FreePlanUpgradeView: View {
         FreePlanUpgradeView(
             viewModel: .init(
                 state: .init(requestedProductID: productID),
-                superPaywallVM: .init(paymentManager: paymentManager)
+                superPaywallVM: .init(paymentManager: paymentManager),
+                flowDelegate: nil
             )
         )
         .preferredColorScheme(.dark)

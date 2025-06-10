@@ -27,21 +27,23 @@ final class FreePlanUpgradeViewModel {
     private(set) var superState: SuperPaywallViewModel.State!
     private var superPaywallVM: SuperPaywallViewModel
     
+    // The flow delegate property is accessed by SubscriptionUtilityLinksView in the view
+    let flowDelegate: PaywallNavigationDelegate?
+    
     // MARK: - Initializers
     init(
         state: State,
         superState: SuperPaywallViewModel.State = .init(),
         superPaywallVM: SuperPaywallViewModel,
+        flowDelegate: PaywallNavigationDelegate?
     ) {
-        // Init
         self.state = state
         self.superPaywallVM = superPaywallVM
-        
-        // Additional setup
         self.superState = superState
-
+        self.flowDelegate = flowDelegate
         superPaywallVM.delegate = self
     }
+    
     
     // MARK: - Methods
     // MARK: State setter methods
@@ -108,8 +110,12 @@ final class FreePlanUpgradeViewModel {
         }
     }
     
+    func dismissView() {
+        flowDelegate?.paywallDidRequestDismissal()
+    }
+    
     func viewAllPlans() {
-        // Tell the flow that the all plans view was requested
+        flowDelegate?.paywallDidRequestPlanSelection()
     }
 }
 

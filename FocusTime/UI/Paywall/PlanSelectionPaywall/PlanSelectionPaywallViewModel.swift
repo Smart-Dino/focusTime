@@ -30,23 +30,30 @@ final class PlanSelectionPaywallViewModel {
     // MARK: - Properties
     private(set) var state: State
     private(set) var superState: SuperPaywallViewModel.State!
-    private var superPaywallVM: SuperPaywallViewModel
+    private let superPaywallVM: SuperPaywallViewModel
+    private let flowDelegate: PaywallNavigationDelegate?
     
     // MARK: - Initializers
     init(
         state: State = State(),
         superState: SuperPaywallViewModel.State = .init(),
-        superPaywallVM: SuperPaywallViewModel
+        superPaywallVM: SuperPaywallViewModel,
+        flowDelegate: PaywallNavigationDelegate?
     ) {
         self.state = state
         self.superPaywallVM = superPaywallVM
         self.superState = superState
+        self.flowDelegate = flowDelegate
         superPaywallVM.delegate = self
     }
     
-    // MARK: - State setter methods
+    // MARK: - Get/Set methods
     func getCurrentPaymentManager() -> PaymentManager {
         superPaywallVM.getCurrentPaymentManager()
+    }
+    
+    func getCurrentFlowDelegate() -> PaywallNavigationDelegate? {
+        flowDelegate
     }
     
     func updateSelectedImageIndex(index: Int?) {
@@ -132,6 +139,10 @@ final class PlanSelectionPaywallViewModel {
             await superPaywallVM.subscribeToCurrentRequestedProduct(state: superState)
             configureBottomSectionForSelectedProduct()
         }
+    }
+    
+    func dismissView() {
+        flowDelegate?.paywallDidRequestDismissal()
     }
 }
 

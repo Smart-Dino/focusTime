@@ -47,7 +47,10 @@ struct OnboardingPaywallView: View {
                     .disabled(viewModel.superState.isButtonDisabled)
                     
                     SubscriptionUtilityLinksView(
-                        viewModel: .init(paymentManager: viewModel.getCurrentPaymentManager())
+                        viewModel: .init(
+                            paymentManager: viewModel.getCurrentPaymentManager(),
+                            flowDelegate: viewModel.getCurrentFlowDelegate()
+                        )
                     )
                 }
                 .containerRelativeFrame(.vertical) { amount, _ in
@@ -114,24 +117,23 @@ struct OnboardingPaywallView: View {
         ToolbarItem(placement: .topBarTrailing) {
             // This will get adressed on the stage of incorporating
             // the business logic or navigation.
-#warning("Dismiss action is empty")
             Button(
                 Constants.Strings.dismissButtonTitle,
                 systemImage: "xmark",
-                action: {}
+                action: viewModel.dismissView
             )
         }
     }
 }
 
 #Preview {
+    let paymentManager = MockPaymentManagerWithPurchaseError()
     NavigationStack {
         OnboardingPaywallView(
             viewModel: .init(
                 state: .init(requestedProductID: FTProduct.Mocks.weekly.product.id),
-                superPaywallVM: SuperPaywallViewModel(
-                    paymentManager: MockPaymentManagerWithPurchaseError()
-                )
+                superPaywallVM: .init(paymentManager: paymentManager),
+                flowDelegate: nil
             )
         )
         .preferredColorScheme(.dark)

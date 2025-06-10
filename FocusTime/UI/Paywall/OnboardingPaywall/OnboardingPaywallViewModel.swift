@@ -26,23 +26,23 @@ final class OnboardingPaywallViewModel {
     // MARK: - Properties
     private(set) var state: State
     private(set) var superState: SuperPaywallViewModel.State!
-    private var superPaywallVM: SuperPaywallViewModel
+    private let superPaywallVM: SuperPaywallViewModel
+    private let flowDelegate: PaywallNavigationDelegate?
     
     // MARK: - Initializers
     init(
         state: State,
         superState: SuperPaywallViewModel.State = .init(),
         superPaywallVM: SuperPaywallViewModel,
+        flowDelegate: PaywallNavigationDelegate?
     ) {
-        // Init
         self.state = state
         self.superPaywallVM = superPaywallVM
-        
-        // Additional setup
         self.superState = superState
-
+        self.flowDelegate = flowDelegate
         superPaywallVM.delegate = self
     }
+    
     
     // MARK: - Methods
     // MARK: State setter methods
@@ -60,6 +60,10 @@ final class OnboardingPaywallViewModel {
     
     func getCurrentPaymentManager() -> PaymentManager {
         superPaywallVM.getCurrentPaymentManager()
+    }
+    
+    func getCurrentFlowDelegate() -> PaywallNavigationDelegate? {
+        flowDelegate
     }
     
     func selectRequestedProduct() {
@@ -115,6 +119,10 @@ final class OnboardingPaywallViewModel {
             
             await superPaywallVM.subscribeToCurrentRequestedProduct(state: superState)
         }
+    }
+    
+    func dismissView() {
+        flowDelegate?.paywallDidRequestDismissal()
     }
 }
 
