@@ -15,9 +15,9 @@ struct PaywallFlowCoordinatorView: View {
         NavigationStack {
             Group {
                 switch viewModel.flowState.currentFlow {
-                case .freePlan:
+                case .freePlan(let freePlanModel):
                     FreePlanUpgradeView(
-                        viewModel: viewModel.makeFreePlanUpgradeViewModel()
+                        viewModel: freePlanModel
                     )
                 case .onboarding:
                     OnboardingPaywallView(
@@ -31,7 +31,7 @@ struct PaywallFlowCoordinatorView: View {
             }
             .preferredColorScheme(.dark)
         }
-        .animation(.default, value: viewModel.flowState.currentFlow)
+//        .animation(.default, value: viewModel.flowState.currentFlow)
     }
 }
 

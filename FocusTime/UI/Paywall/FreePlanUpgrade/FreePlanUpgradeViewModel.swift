@@ -19,6 +19,7 @@ final class FreePlanUpgradeViewModel {
         // Dynamic strings
         static let stringConstants = FreePlanUpgradeView.Constants.Strings.self
         var purchaseButtonTitle    = stringConstants.tryButtonTitle
+        @SafeSharedValue(factory: { .init() }) var superState: SuperPaywallViewModel.State
         var trialPeriodDescription = stringConstants.loadingTitle
     }
     

@@ -29,6 +29,7 @@ final class PlanSelectionPaywallViewModel {
     
     // MARK: - Properties
     private(set) var state: State
+    #warning("Move this back to State")
     private(set) var superState: SuperPaywallViewModel.State!
     private let superPaywallVM: SuperPaywallViewModel
     private let flowDelegate: PaywallNavigationDelegate?

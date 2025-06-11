@@ -7,8 +7,8 @@
 
 import Foundation
 
-enum PaywallScreens: Identifiable, Hashable {
-    case freePlan
+enum PaywallScreens {
+    case freePlan(_ viewModel: FreePlanUpgradeViewModel)
     case onboarding
     case planSelection
     
@@ -19,18 +19,22 @@ enum PaywallScreens: Identifiable, Hashable {
 @Observable
 final class PaywallFlowCoordinatorViewModel {
     struct State {
-        var currentFlow: PaywallScreens = .freePlan
+        var currentFlow: PaywallScreens
+        
+        init(currentFlow: PaywallScreens) {
+            self.currentFlow = currentFlow
+        }
     }
     
-    private(set) var flowState: State
-    private var factory: PaywallBusinessLogicFactory!
+    private(set) var flowState: State!
+    private var factory: PaywallBusinessLogicFactory
     
     init(
-        flowState: State = State(),
+//        flowState: State = State(),
         factory: PaywallBusinessLogicFactory
     ) {
-        self.flowState = flowState
         self.factory = factory
+        self.flowState = State(currentFlow: .freePlan(self.makeFreePlanUpgradeViewModel()))
     }
     
     private func getTrialProductID() -> String {
