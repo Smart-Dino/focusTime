@@ -7,12 +7,21 @@
 
 import Foundation
 
-enum PaywallScreens {
+enum PaywallScreens: Equatable {
     case freePlan(_ viewModel: FreePlanUpgradeViewModel)
     case onboarding
     case planSelection
     
     var id: Self { self }
+    
+    static func == (lhs: PaywallScreens, rhs: PaywallScreens) -> Bool {
+        switch (lhs, rhs) {
+        case (.freePlan, .freePlan): true
+        case (.onboarding, .onboarding): true
+        case (.planSelection, .planSelection): true
+        default: false
+        }
+    }
 }
 
 @MainActor
