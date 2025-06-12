@@ -20,6 +20,20 @@ extension OnboardingPaywallView {
             case priorityFeatures  = "Priority updates and new features"
             
             var id: String { rawValue }
+            var systemImage: String {
+                switch self {
+                case .unlimitedSessions:
+                    "arrow.trianglehead.2.clockwise.rotate.90"
+                case .unlimitedApps:
+                    "lock.circle"
+                case .deepFocus:
+                    "clock"
+                case .whiteNoise:
+                    "speaker.wave.2"
+                case .priorityFeatures:
+                    "icloud.and.arrow.up"
+                }
+            }
         }
         // MARK: - Typography
         enum FontSize {
@@ -29,12 +43,12 @@ extension OnboardingPaywallView {
         // MARK: - Layout
         enum Padding {
             /// Padding around each feature in the list.
-            static let featureList: CGFloat = 10
+            static let featureList: CGFloat = 12
         }
         
         enum CornerRadius {
             /// Corner radius for primary container.
-            static let card: CGFloat = 40
+            static let card: CGFloat = 35
         }
         
         // MARK: - Strings

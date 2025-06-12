@@ -55,7 +55,7 @@ struct PlanSelectionPaywallView: View {
                     selectedItem: selectedImageIndex
                 )
                 // Should tell the design team to make it brighter?
-                .foregroundTint(Color.ftPageControlBlue)
+                .foregroundTint(Color.ftMainBlue)
                 
                 VStack(spacing: .zero) {
                     if viewModel.state.superState.allProducts.isEmpty {
@@ -178,6 +178,8 @@ struct PlanSelectionPaywallView: View {
                 systemImage: "xmark",
                 action: viewModel.dismissView
             )
+            .buttonStyle(.plain)
+            .foregroundStyle(.ftDarkBlue)
         }
     }
 }

@@ -15,6 +15,7 @@ struct OnboardingPaywallView: View {
     
     // MARK: - Body
     var body: some View {
+#warning("Alert disabled")
         ZStack(alignment: .leading) {
             Image(.debugNightMountain)
                 .resizable()
@@ -32,6 +33,11 @@ struct OnboardingPaywallView: View {
                     .padding()
                 Spacer()
                 VStack {
+                    Text("Unlock All Features")
+                        .font(.title3)
+                        .bold()
+                        .padding(.top)
+                    
                     features
                     
                     FTSubscribeButtonView(
@@ -53,10 +59,8 @@ struct OnboardingPaywallView: View {
                         )
                     )
                 }
-                .containerRelativeFrame(.vertical) { amount, _ in
-                    amount / 1.8
-                }
                 .padding()
+                .padding(.bottom) // Padding, so we don't hit the safe area
                 .background {
                     contentCard
                 }
@@ -68,18 +72,18 @@ struct OnboardingPaywallView: View {
         .toolbar {
             toolbarItems
         }
-        .alert(
-            Constants.Strings.errorHeader,
-            isPresented: Binding(get: {
-                viewModel.state.superState.error != nil
-            }, set: { showError in
-                viewModel.keepShowingError(showError: showError)
-            }), actions: {
-                // OK dismissal button by default
-            }, message: {
-                Text(viewModel.state.superState.error?.localizedDescription ?? "")
-            }
-        )
+//        .alert(
+//            Constants.Strings.errorHeader,
+//            isPresented: Binding(get: {
+//                viewModel.state.superState.error != nil
+//            }, set: { showError in
+//                viewModel.keepShowingError(showError: showError)
+//            }), actions: {
+//                // OK dismissal button by default
+//            }, message: {
+//                Text(viewModel.state.superState.error?.localizedDescription ?? "")
+//            }
+//        )
         .task {
             // Do NOT put these in the initializer
             await viewModel.fetchProducts()
@@ -93,6 +97,7 @@ struct OnboardingPaywallView: View {
     private var contentCard: some View {
         Rectangle()
             .foregroundStyle(Color.ftBackground)
+            .opacity(0.6)
             .clipShape(
                 .rect(
                     topLeadingRadius: Constants.CornerRadius.card,
@@ -105,10 +110,11 @@ struct OnboardingPaywallView: View {
     private var features: some View {
         VStack(alignment: .leading) {
             ForEach(Constants.FeatureItems.allCases) { item in
-                FTCheckmarkListItemView(item.rawValue)
+                FTListItemView(item.rawValue, systemImage: item.systemImage)
                     .padding(.vertical, Constants.Padding.featureList)
             }
         }
+        .foregroundStyle(.ftGray3)
     }
     
     /// Toolbar items.
