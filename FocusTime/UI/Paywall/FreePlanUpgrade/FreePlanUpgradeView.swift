@@ -16,10 +16,14 @@ struct FreePlanUpgradeView: View {
     // MARK: - Body
     var body: some View {
         ZStack {
-            Image(.debugNightMountain)
+            Image(.freePlanPaywallBackgound)
                 .resizable()
                 .scaledToFill()
                 .containerRelativeFrame([.horizontal])
+                .scaleEffect(1.05, anchor: .bottom) // Scale it to the top a bit
+                .overlay {
+                    Color.ftMainBlue.opacity(0.1)
+                }
             // VStack to push the elements down with a spacer.
             VStack {
                 Spacer()
@@ -46,18 +50,18 @@ struct FreePlanUpgradeView: View {
         .toolbar {
             toolbarItems
         }
-//        .alert(
-//            Constants.Strings.errorHeader,
-//            isPresented: Binding(get: {
-//                viewModel.state.superState.error != nil
-//            }, set: { showError in
-//                viewModel.keepShowingError(showError: showError)
-//            }), actions: {
-//                // OK dismissal button by default
-//            }, message: {
-//                Text(viewModel.state.superState.error?.localizedDescription ?? "")
-//            }
-//        )
+        .alert(
+            Constants.Strings.errorHeader,
+            isPresented: Binding(get: {
+                viewModel.state.superState.error != nil
+            }, set: { showError in
+                viewModel.keepShowingError(showError: showError)
+            }), actions: {
+                // OK dismissal button by default
+            }, message: {
+                Text(viewModel.state.superState.error?.localizedDescription ?? "")
+            }
+        )
         .task {
             // Do NOT put these in the initializer
             await viewModel.fetchProducts()

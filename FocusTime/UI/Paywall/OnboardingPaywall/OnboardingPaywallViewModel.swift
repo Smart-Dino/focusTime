@@ -19,7 +19,6 @@ final class OnboardingPaywallViewModel {
         
         // Dynamic strings
         static let stringConstants = OnboardingPaywallView.Constants.Strings.self
-        var navigationTitle        = stringConstants.loadingTitle
         var trialPeriodDescription = stringConstants.loadingTitle
         var purchaseButtonTitle    = stringConstants.tryButtonTitle
         
@@ -81,19 +80,12 @@ final class OnboardingPaywallViewModel {
             let error = PaymentError.productNotFound
             state.superState.error = error
             state.trialPeriodDescription = error.localizedDescription
-            state.navigationTitle = State.stringConstants.errorHeader
             // Dismiss view?
             return
         }
         
         if let description = product.trialPeriodDescription {
             state.trialPeriodDescription = description
-        }
-        if let trialDuration = product.trialPeriodString {
-            state.navigationTitle = """
-            Get started with
-            a \(trialDuration) free trial
-            """
         }
     }
     

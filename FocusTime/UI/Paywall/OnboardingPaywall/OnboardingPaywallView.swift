@@ -16,26 +16,47 @@ struct OnboardingPaywallView: View {
     // MARK: - Body
     var body: some View {
         ZStack(alignment: .leading) {
-            Image(.debugNightMountain)
+            RadialGradient(
+                colors: [
+                    Constants.Gradient.glowColor,
+                    Constants.Gradient.secondColor
+                ],
+                center: .top,
+                startRadius: Constants.Gradient.startRadius,
+                endRadius: Constants.Gradient.endRadius
+            )
+            .ignoresSafeArea()
+            
+            Image(.onboardingPaywallBackground)
                 .resizable()
                 .scaledToFill()
-            // Used to prevent image from shifting off the screen
-                .containerRelativeFrame([.horizontal])
-                .ignoresSafeArea()
+                .containerRelativeFrame([.vertical]) { amount, _ in
+                    amount / 1.5
+                }
+                .scaleEffect(1.55, anchor: .leading)
+            
             VStack(alignment: .leading) {
-                Text(viewModel.state.navigationTitle)
-                    .font(.system(
-                        size: Constants.FontSize.navigationTitle,
-                        weight: .bold
-                    ))
-                    .foregroundColor(Color.white)
-                    .padding()
+                
+                VStack(alignment: .leading) {
+                    Text(Constants.Strings.appName)
+                        .font(.system(
+                            size: Constants.FontSize.navigationTitle,
+                            weight: .bold
+                        ))
+                        .foregroundColor(Color.white)
+                    Text(Constants.Strings.appSlogan)
+                        .font(.subheadline)
+                        .foregroundStyle(.ftGray3)
+                }
+                .padding()
+                
                 Spacer()
+                
                 VStack {
-                    Text("Unlock All Features")
-                        .font(.title3)
+                    Text(Constants.Strings.featuresTitle)
+                        .font(.title2)
                         .bold()
-                        .padding(.top)
+                        .padding()
                     
                     features
                     
@@ -95,7 +116,7 @@ struct OnboardingPaywallView: View {
     /// Computes the shape underneath the feature list.
     private var contentCard: some View {
         Rectangle()
-            .foregroundStyle(Color.ftBackground)
+            .foregroundStyle(Color.onboardingPaywallContentPad)
             .opacity(0.6)
             .clipShape(
                 .rect(

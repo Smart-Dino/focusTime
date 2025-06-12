@@ -85,7 +85,7 @@ struct PlanSelectionPaywallView: View {
                         )
                     )
                 }
-                .containerRelativeFrame(.vertical, { amount, axis in
+                .containerRelativeFrame(.vertical, { amount, _ in
                     amount / 2.5
                 })
                 .padding()

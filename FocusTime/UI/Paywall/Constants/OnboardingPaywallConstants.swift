@@ -5,7 +5,8 @@
 //  Created by Maksym Horobets on 15.05.2025.
 //
 
-import Foundation
+import SwiftUI
+import FocusTimeUI
 
 extension OnboardingPaywallView {
     /// Organized and sorted ``OnboardingPaywallView`` constants.
@@ -35,6 +36,15 @@ extension OnboardingPaywallView {
                 }
             }
         }
+        // MARK: - Gradient
+        enum Gradient {
+            // Colors
+            static let glowColor: Color = .ftDarkBlue.opacity(0.5)
+            static let secondColor: Color = .black
+            // Radius
+            static let startRadius: CGFloat = 1
+            static let endRadius: CGFloat = 1500
+        }
         // MARK: - Typography
         enum FontSize {
             static let navigationTitle: CGFloat = 34
@@ -54,13 +64,16 @@ extension OnboardingPaywallView {
         // MARK: - Strings
         enum Strings {
             // Purchase button states
-            static let tryButtonTitle = "Try free and subscribe."
+            static let tryButtonTitle = "Try free and subscribe"
             static let pendingTitle = SharedPaywallConstants.Strings.pendingTitle
             static let subscribedTitle = SharedPaywallConstants.Strings.subscribedTitle
             
+            static let featuresTitle = "Unlock All Features"
+            
             // UI
+            static let appName = SharedPaywallConstants.Strings.appName
+            static let appSlogan = SharedPaywallConstants.Strings.appSlogan
             static let loadingTitle = SharedPaywallConstants.Strings.loadingTitle
-            static let dismissButtonTitle = SharedPaywallConstants.Strings.dismissButtonTitle
             
             // Error
             static let errorHeader = SharedPaywallConstants.Strings.errorHeader
