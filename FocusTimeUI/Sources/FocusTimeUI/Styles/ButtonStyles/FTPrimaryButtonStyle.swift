@@ -31,8 +31,9 @@ public struct FTPrimaryButtonStyle: ButtonStyle {
         configuration.label
             .frame(maxWidth: .infinity)
             .padding(.vertical, 13)
-            .background(isEnabled ? .ftMainBlue : .gray)
+            .background(.ftMainBlue)
             .clipShape(.capsule)
             .opacity(configuration.isPressed ? 0.8 : 1)
+            .opacity(isEnabled ? 1 : 0.3)
     }
 }
