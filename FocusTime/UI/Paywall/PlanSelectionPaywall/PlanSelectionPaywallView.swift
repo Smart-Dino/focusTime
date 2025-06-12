@@ -171,15 +171,7 @@ struct PlanSelectionPaywallView: View {
     @ToolbarContentBuilder
     private var toolbarItems: some ToolbarContent {
         ToolbarItem(placement: .topBarTrailing) {
-            // This will get addressed on the stage of incorporating
-            // the business logic or navigation.
-            Button(
-                Constants.Strings.dismissButtonTitle,
-                systemImage: "xmark",
-                action: viewModel.dismissView
-            )
-            .buttonStyle(.plain)
-            .foregroundStyle(.ftDarkBlue)
+            FTDismissToolbarButtonView(dismissAction: viewModel.dismissView)
         }
     }
 }

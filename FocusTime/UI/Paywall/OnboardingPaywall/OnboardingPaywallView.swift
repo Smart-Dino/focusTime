@@ -120,13 +120,7 @@ struct OnboardingPaywallView: View {
     @ToolbarContentBuilder
     private var toolbarItems: some ToolbarContent {
         ToolbarItem(placement: .topBarTrailing) {
-            // This will get adressed on the stage of incorporating
-            // the business logic or navigation.
-            Button(
-                Constants.Strings.dismissButtonTitle,
-                systemImage: "xmark",
-                action: viewModel.dismissView
-            )
+            FTDismissToolbarButtonView(dismissAction: viewModel.dismissView)
         }
     }
 }

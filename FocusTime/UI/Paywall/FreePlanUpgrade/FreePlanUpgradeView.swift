@@ -46,18 +46,18 @@ struct FreePlanUpgradeView: View {
         .toolbar {
             toolbarItems
         }
-        .alert(
-            Constants.Strings.errorHeader,
-            isPresented: Binding(get: {
-                viewModel.state.superState.error != nil
-            }, set: { showError in
-                viewModel.keepShowingError(showError: showError)
-            }), actions: {
-                // OK dismissal button by default
-            }, message: {
-                Text(viewModel.state.superState.error?.localizedDescription ?? "")
-            }
-        )
+//        .alert(
+//            Constants.Strings.errorHeader,
+//            isPresented: Binding(get: {
+//                viewModel.state.superState.error != nil
+//            }, set: { showError in
+//                viewModel.keepShowingError(showError: showError)
+//            }), actions: {
+//                // OK dismissal button by default
+//            }, message: {
+//                Text(viewModel.state.superState.error?.localizedDescription ?? "")
+//            }
+//        )
         .task {
             // Do NOT put these in the initializer
             await viewModel.fetchProducts()
@@ -70,8 +70,10 @@ struct FreePlanUpgradeView: View {
     private var upgradePromptSection: some View {
         Group {
             Text(Constants.Strings.title)
-                .font(.title.bold())
+                .font(.title3.bold())
             Text(Constants.Strings.upgradeMessage)
+                .multilineTextAlignment(.center)
+                .foregroundStyle(.ftGray3)
         }
     }
     
@@ -101,13 +103,7 @@ struct FreePlanUpgradeView: View {
     @ToolbarContentBuilder
     private var toolbarItems: some ToolbarContent {
         ToolbarItem(placement: .topBarTrailing) {
-            // This will get adressed on the stage of incorporating
-            // the business logic or navigation.
-            Button(
-                Constants.Strings.dismissButtonTitle,
-                systemImage: "xmark",
-                action: viewModel.dismissView
-            )
+            FTDismissToolbarButtonView(dismissAction: viewModel.dismissView)
         }
     }
     
