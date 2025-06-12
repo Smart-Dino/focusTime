@@ -15,7 +15,6 @@ struct OnboardingPaywallView: View {
     
     // MARK: - Body
     var body: some View {
-#warning("Alert disabled")
         ZStack(alignment: .leading) {
             Image(.debugNightMountain)
                 .resizable()
@@ -72,18 +71,18 @@ struct OnboardingPaywallView: View {
         .toolbar {
             toolbarItems
         }
-//        .alert(
-//            Constants.Strings.errorHeader,
-//            isPresented: Binding(get: {
-//                viewModel.state.superState.error != nil
-//            }, set: { showError in
-//                viewModel.keepShowingError(showError: showError)
-//            }), actions: {
-//                // OK dismissal button by default
-//            }, message: {
-//                Text(viewModel.state.superState.error?.localizedDescription ?? "")
-//            }
-//        )
+        .alert(
+            Constants.Strings.errorHeader,
+            isPresented: Binding(get: {
+                viewModel.state.superState.error != nil
+            }, set: { showError in
+                viewModel.keepShowingError(showError: showError)
+            }), actions: {
+                // OK dismissal button by default
+            }, message: {
+                Text(viewModel.state.superState.error?.localizedDescription ?? "")
+            }
+        )
         .task {
             // Do NOT put these in the initializer
             await viewModel.fetchProducts()
