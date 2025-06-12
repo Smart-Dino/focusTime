@@ -64,7 +64,7 @@ extension OnboardingPaywallView {
         // MARK: - Strings
         enum Strings {
             // Purchase button states
-            static let tryButtonTitle = "Try free and subscribe"
+            static let tryButtonTitle = "Try Free And Subscribe"
             static let pendingTitle = SharedPaywallConstants.Strings.pendingTitle
             static let subscribedTitle = SharedPaywallConstants.Strings.subscribedTitle
             
