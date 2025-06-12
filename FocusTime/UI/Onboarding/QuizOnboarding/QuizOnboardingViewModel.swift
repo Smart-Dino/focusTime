@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Observation
 
 @MainActor
 @Observable
@@ -18,14 +17,15 @@ final class QuizOnboardingViewModel {
 
     var state = State()
     private let analyticsManager: AnalyticsManager
-    private var onNextCallback: () -> Void
-
+    private weak var delegate: QuizOnboardingViewModelDelegate?
+    
     init(
         analyticsManager: AnalyticsManager,
-        onNext: @escaping () -> Void = {}
+        delegate: QuizOnboardingViewModelDelegate?,
+        
     ) {
         self.analyticsManager = analyticsManager
-        self.onNextCallback = onNext
+        self.delegate = delegate
         self.analyticsManager.log(event: .screenView(screenName: "QuizOnboardingView"))
         print("QuizOnboardingViewModel initialized.")
     }
@@ -46,6 +46,6 @@ final class QuizOnboardingViewModel {
 
     func nextButtonTapped() {
         analyticsManager.log(event: .quizNextButtonTapped)
-        onNextCallback()
+        delegate?.didTapNext()
     }
 }

@@ -16,8 +16,13 @@ enum AppFlow: Hashable {
 
 @MainActor
 @Observable
-class AppFlowViewModel {
-    var currentFlow: AppFlow = .launch
+class AppFlowCoordinatorViewModel {
+    
+    struct State {
+        var currentFlow: AppFlow = .launch
+    }
+    
+    private(set) var state = State()
 
     let onboardingStatusProvider: OnboardingStatusManager
     private let analyticsManager: AnalyticsManager
@@ -26,42 +31,53 @@ class AppFlowViewModel {
         self.onboardingStatusProvider = onboardingStatusProvider
         self.analyticsManager = analyticsManager
         
-        self.onboardingStatusProvider.onStatusDidChange = { [weak self] in
-            self?.determineCurrentFlow()
-        }
+        self.onboardingStatusProvider.delegate = self
         determineCurrentFlow()
     }
 
     func determineCurrentFlow() {
         let isOnboardingCompleted = self.onboardingStatusProvider.hasCompletedOnboarding
-        let previousFlow = self.currentFlow
+        let previousFlow = self.state.currentFlow
 
-        if self.currentFlow == .launch {
-            if isOnboardingCompleted {
-                self.currentFlow = .main
-            } else {
-                self.currentFlow = .onboarding
-            }
-        } else if self.currentFlow == .onboarding && isOnboardingCompleted {
-            self.currentFlow = .main
-        } else if self.currentFlow == .main && !isOnboardingCompleted {
-            self.currentFlow = .onboarding
+        switch previousFlow {
+        case .launch:
+            self.state.currentFlow = isOnboardingCompleted ? .main : .onboarding
+            
+        case .onboarding where isOnboardingCompleted:
+            self.state.currentFlow = .main
+            
+        case .main where !isOnboardingCompleted:
+            self.state.currentFlow = .onboarding
+            
+        default:
+            break
         }
         
-        if previousFlow != self.currentFlow {
-             print("AppFlow changed from \(previousFlow) to: \(self.currentFlow) (Onboarding completed: \(isOnboardingCompleted))")
+        if previousFlow != self.state.currentFlow {
+            print("AppFlow changed from \(previousFlow) to: \(self.state.currentFlow) (Onboarding completed: \(isOnboardingCompleted))")
         } else {
-             print("AppFlow re-evaluated, remains: \(self.currentFlow) (Onboarding completed: \(isOnboardingCompleted))")
+            print("AppFlow re-evaluated, remains: \(self.state.currentFlow) (Onboarding completed: \(isOnboardingCompleted))")
         }
     }
 
-    func completeOnboarding() {
-        print("AppFlowViewModel: Onboarding completed, setting status to true.")
-        onboardingStatusProvider.hasCompletedOnboarding = true
-    }
     
     func resetOnboarding() {
-        print("AppFlowViewModel: Resetting onboarding status to false.")
+        print("AppFlowCoordinatorViewModel: Resetting onboarding status to false.")
         onboardingStatusProvider.hasCompletedOnboarding = false
+    }
+}
+
+
+// Extensions
+extension AppFlowCoordinatorViewModel: OnboardingCoordinatorDelegate {
+    func onboardingDidComplete() {
+        onboardingStatusProvider.hasCompletedOnboarding = true
+        print("AppFlowCoordinatorViewModel: Onboarding completed, setting status to true.")
+    }
+}
+
+extension AppFlowCoordinatorViewModel: OnboardingStatusManagerDelegate {
+    func onboardingStatusDidChange() {
+        self.determineCurrentFlow()
     }
 }

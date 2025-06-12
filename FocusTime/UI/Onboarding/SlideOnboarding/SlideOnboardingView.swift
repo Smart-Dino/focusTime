@@ -27,25 +27,25 @@ struct SlideOnboardingView: View {
                  
                 FTProgressBarView(
                     items: SlideOnboardingStep.allCases,
-                    selectedItem: .constant(viewModel.currentStep)
+                    selectedItem: .constant(viewModel.state.currentStep)
                 )
                 .padding(.top, Constants.Layout.progressBarTopPadding)
             }
             
-            Image(viewModel.currentStep.imageName)
+            Image(viewModel.state.currentStep.imageName)
                 .resizable()
                 .scaledToFill()
                 .containerRelativeFrame(.vertical, { amount, axis in amount / 1.8 })
                 .clipped()
                 .padding(.top, Constants.Layout.topPadding)
                 .transition(.opacity)
-                .animation(.easeInOut, value: viewModel.currentStep.imageName)
+                .animation(.easeInOut, value: viewModel.state.currentStep.imageName)
 
             VStack {
-                Text(viewModel.currentStep.subtitle1)
+                Text(viewModel.state.currentStep.subtitle1)
                     .font(.headline)
                     
-                Text(viewModel.currentStep.subtitle2)
+                Text(viewModel.state.currentStep.subtitle2)
                     .font(.subheadline)
                     
             }
@@ -55,7 +55,7 @@ struct SlideOnboardingView: View {
 
             
                 VStack{
-                    if !viewModel.currentStep.isLast {
+                    if !viewModel.state.currentStep.isLast {
                         VStack(spacing: Constants.Layout.buttonSpacing) {
                             Button(Constants.Strings.nextButton) {
                                 viewModel.goToNextStep()
@@ -81,17 +81,28 @@ struct SlideOnboardingView: View {
             
             
         }
-        .animation(.easeInOut, value: viewModel.currentStep)
+        .animation(.easeInOut, value: viewModel.state.currentStep)
         .preferredColorScheme(.dark)
         .navigationBarBackButtonHidden(true)
         
-        .alert(Constants.Strings.alertTitle, isPresented: $viewModel.state.showSkipConfirmation) {
-            Button(Constants.Strings.skipAnyway, role: .destructive) {
-                viewModel.skipOnboardingConfirmed()
-                viewModel.completeOnboarding()
+        .alert(
+            Constants.Strings.alertTitle,
+            isPresented: .constant(viewModel.state.alertType != nil),
+            presenting: viewModel.state.alertType
+        ) { alertType in
+            // The buttons now call ViewModel methods to handle logic AND dismiss the alert.
+            switch alertType {
+            case .skipConfirmation:
+                Button(Constants.Strings.skipAnyway, role: .destructive) {
+                    viewModel.skipOnboardingConfirmed()
+                    viewModel.completeOnboarding() // This also dismisses the alert implicitly.
+                }
+                Button(Constants.Strings.goBack, role: .cancel) {
+                    // Explicitly call the dismiss method.
+                    viewModel.dismissAlert()
+                }
             }
-            Button(Constants.Strings.goBack, role: .cancel) {}
-        } message: {
+        } message: { _ in
             Text(Constants.Strings.alertMessage)
         }
     }

@@ -12,27 +12,32 @@ import Observation
 @MainActor
 @Observable
 final class SlideOnboardingViewModel {
+    
+    enum OnboardingAlertType: Identifiable {
+        case skipConfirmation
+        var id: Self { self }
+    }
+    
     struct State {
         var currentIndex: Int = 0
-        var showSkipConfirmation: Bool = false
+
+        var alertType: OnboardingAlertType? = nil
+        
+        var currentStep: SlideOnboardingStep {
+            SlideOnboardingStep.allCases[currentIndex]
+        }
+        
+        
     }
 
-    var state = State()
+    private(set) var state = State()
     private let analyticsManager: AnalyticsManager
-    private var onOnboardingCompleted: () -> Void
+    private weak var delegate: SlideOnboardingViewModelDelegate?
 
-    var currentStep: SlideOnboardingStep {
-        SlideOnboardingStep.allCases[state.currentIndex]
-    }
-
-    var currentStepIndex: Int {
-        state.currentIndex
-    }
-
-    init(analyticsManager: AnalyticsManager, onOnboardingCompleted: @escaping () -> Void) {
+    init(analyticsManager: AnalyticsManager, delegate: SlideOnboardingViewModelDelegate?) {
         self.analyticsManager = analyticsManager
-        self.onOnboardingCompleted = onOnboardingCompleted
-        logSlideViewed(step: currentStep, index: state.currentIndex)
+        self.delegate = delegate
+        logSlideViewed(step: state.currentStep, index: state.currentIndex)
         print("SlideOnboardingViewModel initialized.")
     }
 
@@ -41,7 +46,7 @@ final class SlideOnboardingViewModel {
     }
 
     func goToNextStep() {
-        let previousStepName = currentStep.subtitle1
+        let previousStepName = state.currentStep.subtitle1
         let previousStepIndex = state.currentIndex
         if state.currentIndex < SlideOnboardingStep.allCases.count - 1 {
             state.currentIndex += 1
@@ -50,22 +55,26 @@ final class SlideOnboardingViewModel {
                     fromSlideName: previousStepName, fromSlideIndex: previousStepIndex
                 )
             )
-            logSlideViewed(step: currentStep, index: state.currentIndex)
+            logSlideViewed(step: state.currentStep, index: state.currentIndex)
         }
     }
 
     func skipOnboardingInitiated() {
-        analyticsManager.log(event: .onboardingSkipInitiated(fromSlideName: currentStep.subtitle1, fromSlideIndex: state.currentIndex))
-        state.showSkipConfirmation = true
+        analyticsManager.log(event: .onboardingSkipInitiated(fromSlideName: state.currentStep.subtitle1, fromSlideIndex: state.currentIndex))
+        state.alertType = .skipConfirmation
     }
 
     func skipOnboardingConfirmed() {
-        analyticsManager.log(event: .onboardingSkipConfirmed(fromSlideName: currentStep.subtitle1, fromSlideIndex: state.currentIndex))
+        analyticsManager.log(event: .onboardingSkipConfirmed(fromSlideName: state.currentStep.subtitle1, fromSlideIndex: state.currentIndex))
     }
 
+    func dismissAlert() {
+        state.alertType = nil
+    }
+    
     func completeOnboarding() {
-        analyticsManager.log(event: .onboardingCompleted(lastSlideName: currentStep.subtitle1))
+        analyticsManager.log(event: .onboardingCompleted(lastSlideName: state.currentStep.subtitle1))
         print("SlideOnboardingViewModel: completeOnboarding called. Triggering onOnboardingCompleted callback.")
-        self.onOnboardingCompleted()
+        self.delegate?.didCompleteOnboarding()
     }
 }

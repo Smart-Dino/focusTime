@@ -11,12 +11,12 @@ import SwiftUI
 struct FocusTimeApp: App {
     private let analyticsManager: AnalyticsManager
     private let onboardingStatusManager: OnboardingStatusManager
-    private let appFlowViewModel: AppFlowViewModel
+    private let appFlowCoordinatorViewModel: AppFlowCoordinatorViewModel
 
     init() {
-        self.analyticsManager = LoggingAnalyticsManager()
+        self.analyticsManager = MockLoggingAnalyticsManager()
         self.onboardingStatusManager = OnboardingStatusManager()
-        self.appFlowViewModel = AppFlowViewModel(
+        self.appFlowCoordinatorViewModel = AppFlowCoordinatorViewModel(
             onboardingStatusProvider: onboardingStatusManager,
             analyticsManager: analyticsManager
         )
@@ -25,9 +25,9 @@ struct FocusTimeApp: App {
 
     var body: some Scene {
         WindowGroup {
-            AppFlowControlView(
-                viewModel: appFlowViewModel,
-                analyticsManager: analyticsManager 
+            AppFlowCoordinatorView(
+                viewModel: appFlowCoordinatorViewModel,
+                analyticsManager: analyticsManager
             )
         }
     }

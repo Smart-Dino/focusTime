@@ -14,9 +14,9 @@ enum OnboardingNavigationPath: Hashable {
 struct OnboardingCoordinatorView: View {
     @State private var viewModel: OnboardingCoordinatorViewModel
 
-    init(onComplete: @escaping () -> Void, analyticsManager: AnalyticsManager) {
+    init(delegate: OnboardingCoordinatorDelegate?, analyticsManager: AnalyticsManager) {
         self._viewModel = State(wrappedValue: OnboardingCoordinatorViewModel(
-            onComplete: onComplete,
+            delegate: delegate,
             analyticsManager: analyticsManager
         ))
         print("OnboardingCoordinatorView initialized.")
@@ -27,7 +27,7 @@ struct OnboardingCoordinatorView: View {
             QuizOnboardingView(
                 viewModel: QuizOnboardingViewModel(
                     analyticsManager: viewModel.analyticsManager,
-                    onNext: viewModel.showSlides
+                    delegate: viewModel
                 )
             )
             .navigationDestination(for: OnboardingNavigationPath.self) { pathValue in
@@ -36,7 +36,7 @@ struct OnboardingCoordinatorView: View {
                     SlideOnboardingView(
                         viewModel: SlideOnboardingViewModel(
                             analyticsManager: viewModel.analyticsManager,
-                            onOnboardingCompleted: viewModel.onboardingCompleted
+                            delegate: viewModel
                         )
                     )
                 }

@@ -1,5 +1,5 @@
 //
-//  AppFlowControlView.swift
+//  AppFlowCoordinatorView.swift
 //  FocusTime
 //
 //  Created by Keto Nioradze on 05.06.25.
@@ -7,18 +7,18 @@
 
 import SwiftUI
 
-struct AppFlowControlView: View {
-    @State var viewModel: AppFlowViewModel
+struct AppFlowCoordinatorView: View {
+    @State var viewModel: AppFlowCoordinatorViewModel
     private let analyticsManager: AnalyticsManager
 
-    init(viewModel: AppFlowViewModel, analyticsManager: AnalyticsManager) {
+    init(viewModel: AppFlowCoordinatorViewModel, analyticsManager: AnalyticsManager) {
         _viewModel = State(wrappedValue: viewModel)
         self.analyticsManager = analyticsManager
     }
 
     var body: some View {
         Group {
-            switch viewModel.currentFlow {
+            switch viewModel.state.currentFlow {
             case .launch:
                 ProgressView("Loading...")
                     .onAppear {
@@ -26,13 +26,12 @@ struct AppFlowControlView: View {
                     }
             case .onboarding:
                 OnboardingCoordinatorView(
-                    onComplete: {
-                        viewModel.completeOnboarding()
-                    },
+                    delegate: viewModel,
                     analyticsManager: analyticsManager
                 )
             case .main:
                 VStack {
+                    #warning("Replace with actual view")
                     ContentView()
                     Button("Reset Onboarding (for Preview)") {
                         viewModel.resetOnboarding()
@@ -43,6 +42,6 @@ struct AppFlowControlView: View {
                 }
             }
         }
-        .animation(.easeInOut, value: viewModel.currentFlow)
+        .animation(.easeInOut, value: viewModel.state.currentFlow)
     }
 }

@@ -5,24 +5,18 @@
 //  Created by Keto Nioradze on 04.06.25.
 //
 
-import Foundation
 import SwiftUI
-import Observation
-
-protocol OnboardingStatusProviding: Sendable {
-    @MainActor var hasCompletedOnboarding: Bool { get set }
-}
 
 @MainActor
 @Observable
 class OnboardingStatusManager: OnboardingStatusProviding {
-    var onStatusDidChange: (() -> Void)?
+    weak var delegate: OnboardingStatusManagerDelegate?
 
     @AppStorage("hasCompletedOnboarding")
     @ObservationIgnored
     var hasCompletedOnboarding: Bool = false {
         didSet {
-            onStatusDidChange?()
+            delegate?.onboardingStatusDidChange()
         }
     }
 
