@@ -258,24 +258,6 @@ extension StoreKitPaymentManager {
 
 // MARK: - Static Helpers
 extension StoreKitPaymentManager {
-//    private static func loadProductIdentifiers() -> [String: String] {
-//        guard let path = Bundle.main.path(forResource: "StoreKitProductsIdentifiers", ofType: "plist") else {
-//            logger.critical("\(#function) - Could not find resource for path.")
-//            return [:]
-//        }
-//        guard let plist = FileManager.default.contents(atPath: path) else {
-//            logger.critical("Could not read the plist at \(path.debugDescription)")
-//            return [:]
-//        }
-//        guard let data = try? PropertyListSerialization.propertyList(from: plist, format: nil) as? [String: String] else {
-//            logger.critical("Could not serialize the plist at \(path.debugDescription)")
-//            return [:]
-//        }
-//        
-//        logger.trace("Successfully retrieved data from the plist: \(data.count.description)")
-//        return data
-//    }
-    
     private static func loadProductIdentifiers() -> [String] {
         StoreKitProductIdentifiers.allCases.map { $0.id }
     }
