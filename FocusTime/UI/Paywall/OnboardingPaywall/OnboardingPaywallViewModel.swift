@@ -8,37 +8,43 @@
 import Foundation
 
 /// ViewModel, responsible for managing the logic on ``OnboardingPaywallView``.
-/// - Note: Use it in the ``OnboadingPaywallView``.
+/// - Note: Use it in the ``OnboardingPaywallView``.
 @MainActor
 @Observable
 final class OnboardingPaywallViewModel {
     // MARK: - Nested declarations
     struct State {
-        var requestedProductID: String
+        let requestedProductID: String
+        var superState: SuperPaywallViewModel.State
         
         // Dynamic strings
         static let stringConstants = OnboardingPaywallView.Constants.Strings.self
         var navigationTitle        = stringConstants.loadingTitle
         var trialPeriodDescription = stringConstants.loadingTitle
         var purchaseButtonTitle    = stringConstants.tryButtonTitle
+        
+        init(
+            requestedProductID: String,
+            superState: SuperPaywallViewModel.State = .init()
+        ) {
+            self.requestedProductID = requestedProductID
+            self.superState = superState
+        }
     }
     
     // MARK: - Properties
     private(set) var state: State
-    private(set) var superState: SuperPaywallViewModel.State!
     private let superPaywallVM: SuperPaywallViewModel
     private let flowDelegate: PaywallNavigationDelegate?
     
     // MARK: - Initializers
     init(
         state: State,
-        superState: SuperPaywallViewModel.State = .init(),
         superPaywallVM: SuperPaywallViewModel,
         flowDelegate: PaywallNavigationDelegate?
     ) {
         self.state = state
         self.superPaywallVM = superPaywallVM
-        self.superState = superState
         self.flowDelegate = flowDelegate
         superPaywallVM.delegate = self
     }
@@ -48,14 +54,14 @@ final class OnboardingPaywallViewModel {
     // MARK: State setter methods
     func keepShowingError(showError: Bool) {
         if !showError {
-            superState.error = nil
+            state.superState.error = nil
         }
     }
     
     // MARK: Setup
     func fetchProducts() async {
-        await superPaywallVM.fetchProducts(state: superState)
-        superState.isButtonDisabled = false
+        await superPaywallVM.fetchProducts(state: state.superState)
+        state.superState.isButtonDisabled = false
     }
     
     func getCurrentPaymentManager() -> PaymentManager {
@@ -67,13 +73,13 @@ final class OnboardingPaywallViewModel {
     }
     
     func selectRequestedProduct() {
-        superPaywallVM.selectProductWithID(state.requestedProductID, state: superState)
+        superPaywallVM.selectProductWithID(state.requestedProductID, state: state.superState)
     }
 
     func setupProductInfo() {
-        guard let product = superState.selectedProduct else {
+        guard let product = state.superState.selectedProduct else {
             let error = PaymentError.productNotFound
-            superState.error = error
+            state.superState.error = error
             state.trialPeriodDescription = error.localizedDescription
             state.navigationTitle = State.stringConstants.errorHeader
             // Dismiss view?
@@ -92,23 +98,22 @@ final class OnboardingPaywallViewModel {
     }
     
     private func updateUIBasedOnPurchaseResult() {
-        guard let purchaseResult = superState.purchaseResult else { return }
+        guard let purchaseResult = state.superState.purchaseResult else { return }
         
         switch purchaseResult {
         case .success:
             state.purchaseButtonTitle = State.stringConstants.subscribedTitle
-            superState.isButtonDisabled = true
-            superState.error = nil
+            state.superState.isButtonDisabled = true
+            state.superState.error = nil
             
         case .pending:
             state.purchaseButtonTitle = State.stringConstants.pendingTitle
-            superState.isButtonDisabled = true
-            superState.error = PaymentError.pending
+            state.superState.isButtonDisabled = true
+            state.superState.error = PaymentError.pending
             
         case .userCancelled:
             state.purchaseButtonTitle = State.stringConstants.tryButtonTitle
-            superState.isButtonDisabled = false
-            superState.error = PaymentError.userCancelled
+            state.superState.isButtonDisabled = false
         }
     }
     
@@ -117,7 +122,8 @@ final class OnboardingPaywallViewModel {
         Task { [weak self] in
             guard let self else { return }
             
-            await superPaywallVM.subscribeToCurrentRequestedProduct(state: superState)
+            await superPaywallVM.subscribeToCurrentRequestedProduct(state: state.superState)
+            updateUIBasedOnPurchaseResult()
         }
     }
     
@@ -128,7 +134,15 @@ final class OnboardingPaywallViewModel {
 
 extension OnboardingPaywallViewModel: SuperPaywallViewModelDelegate {
     func didChangeUserEntitlementStatus(isPro: Bool) {
-        superPaywallVM.updatePurchaseResultForSelectedProduct(state: superState)
-        updateUIBasedOnPurchaseResult()
+        Task { [weak self] in
+            guard let self else { return }
+            
+            await self.superPaywallVM.updatePurchaseResultForSelectedProduct(
+                state: self.state.superState
+            )
+            updateUIBasedOnPurchaseResult()
+            
+            if isPro { flowDelegate?.paywallDidRequestDismissal() }
+        }
     }
 }

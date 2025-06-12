@@ -9,8 +9,8 @@ import Foundation
 
 enum PaywallScreens: Equatable {
     case freePlan(_ viewModel: FreePlanUpgradeViewModel)
-    case onboarding
-    case planSelection
+    case onboarding(_ viewModel: OnboardingPaywallViewModel)
+    case planSelection(_ viewModel: PlanSelectionPaywallViewModel)
     
     var id: Self { self }
     
@@ -29,39 +29,46 @@ enum PaywallScreens: Equatable {
 final class PaywallFlowCoordinatorViewModel {
     struct State {
         var currentFlow: PaywallScreens
-        
-        init(currentFlow: PaywallScreens) {
-            self.currentFlow = currentFlow
-        }
     }
-    
     private(set) var flowState: State!
-    private var factory: PaywallBusinessLogicFactory
+    
+    let tiralProductID: String
+    let superPaywallVM: SuperPaywallViewModel
     
     init(
-//        flowState: State = State(),
-        factory: PaywallBusinessLogicFactory
+        trialProductID: StoreKitProductIdentifiers = .trialableWeekly,
+        superPaywallVM: SuperPaywallViewModel
     ) {
-        self.factory = factory
-        self.flowState = State(currentFlow: .freePlan(self.makeFreePlanUpgradeViewModel()))
+        self.tiralProductID = trialProductID.id
+        self.superPaywallVM = superPaywallVM
+        self.flowState = State(
+//            currentFlow: .freePlan(self.makeFreePlanUpgradeViewModel(requestedProductID: self.tiralProductID))
+//            currentFlow: .onboarding(self.makeOnboardingPaywallViewModel(requestedProductID: self.tiralProductID))
+            currentFlow: .planSelection(self.makePlanSelectionPaywallViewModel())
+        )
     }
     
-    private func getTrialProductID() -> String {
-        StoreKitProductIdentifiers.trialableWeekly.id
+    func makeFreePlanUpgradeViewModel(requestedProductID: String) -> FreePlanUpgradeViewModel {
+        FreePlanUpgradeViewModel(
+            state: .init(requestedProductID: requestedProductID),
+            superPaywallVM: superPaywallVM,
+            flowDelegate: self
+        )
     }
     
-    func makeFreePlanUpgradeViewModel() -> FreePlanUpgradeViewModel {
-        let trialProductID = getTrialProductID()
-        return factory.makeFreePlanUpgradeViewModel(requestedProductID: trialProductID, flowDelegate: self)
-    }
-    
-    func makeOnboardingPaywallViewModel() -> OnboardingPaywallViewModel {
-        let trialProductID = getTrialProductID()
-        return factory.makeOnboardingPaywallViewModel(requestedProductID: trialProductID, flowDelegate: self)
+    func makeOnboardingPaywallViewModel(requestedProductID: String) -> OnboardingPaywallViewModel {
+        OnboardingPaywallViewModel(
+            state: .init(requestedProductID: requestedProductID),
+            superPaywallVM: superPaywallVM,
+            flowDelegate: self
+        )
     }
     
     func makePlanSelectionPaywallViewModel() -> PlanSelectionPaywallViewModel {
-        return factory.makePlanSelectionViewModel(flowDelegate: self)
+        PlanSelectionPaywallViewModel(
+            superPaywallVM: superPaywallVM,
+            flowDelegate: self
+        )
     }
     
 }
@@ -78,7 +85,7 @@ extension PaywallFlowCoordinatorViewModel: PaywallNavigationDelegate {
     }
     
     func paywallDidRequestPlanSelection() {
-        flowState.currentFlow = .planSelection
+        flowState.currentFlow = .planSelection(self.makePlanSelectionPaywallViewModel())
     }
     
     func paywallDidRequestDismissal() {

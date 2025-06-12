@@ -58,7 +58,7 @@ struct PlanSelectionPaywallView: View {
                 .foregroundTint(Color.ftPageControlBlue)
                 
                 VStack(spacing: .zero) {
-                    if viewModel.superState.allProducts.isEmpty {
+                    if viewModel.state.superState.allProducts.isEmpty {
                         Spacer()
                         ProgressView()
                         Spacer()
@@ -75,7 +75,7 @@ struct PlanSelectionPaywallView: View {
                             }
                         }
                     )
-                    .disabled(viewModel.superState.isButtonDisabled)
+                    .disabled(viewModel.state.superState.isButtonDisabled)
                     .padding()
                     
                     SubscriptionUtilityLinksView(
@@ -108,13 +108,13 @@ struct PlanSelectionPaywallView: View {
         .alert(
             Constants.Strings.errorHeader,
             isPresented: Binding(get: {
-                viewModel.superState.error != nil
+                viewModel.state.superState.error != nil
             }, set: { showError in
                 viewModel.keepShowingError(showError: showError)
             }), actions: {
                 // OK dismissal button by default
             }, message: {
-                Text(viewModel.superState.error?.localizedDescription ?? "")
+                Text(viewModel.state.superState.error?.localizedDescription ?? "")
             }
         )
         .onAppear {
@@ -133,9 +133,9 @@ struct PlanSelectionPaywallView: View {
     private var features: some View {
         ScrollView(.vertical) {
             VStack(spacing: Constants.Padding.featuresSpacing) {
-                ForEach(viewModel.superState.allProducts) { product in
+                ForEach(viewModel.state.superState.allProducts) { product in
                     let isTrial = (product.trialPeriod != nil)
-                    && (viewModel.superState.isEligibleForIntro)
+                    && (viewModel.state.superState.isEligibleForIntro)
                     
                     let subtitle: String? = isTrial
                     ? product.subscriptionPeriodDescription
@@ -153,7 +153,7 @@ struct PlanSelectionPaywallView: View {
                             leadingSubtitle: subtitle,
                             trailingDescription: descriptionText
                         )
-                        .selected(viewModel.superState.selectedProduct == product)
+                        .selected(viewModel.state.superState.selectedProduct == product)
                     }
                     .buttonStyle(.plain)
                 }

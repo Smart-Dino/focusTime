@@ -49,13 +49,13 @@ struct FreePlanUpgradeView: View {
         .alert(
             Constants.Strings.errorHeader,
             isPresented: Binding(get: {
-                viewModel.superState.error != nil
+                viewModel.state.superState.error != nil
             }, set: { showError in
                 viewModel.keepShowingError(showError: showError)
             }), actions: {
                 // OK dismissal button by default
             }, message: {
-                Text(viewModel.superState.error?.localizedDescription ?? "")
+                Text(viewModel.state.superState.error?.localizedDescription ?? "")
             }
         )
         .task {
@@ -87,7 +87,7 @@ struct FreePlanUpgradeView: View {
                     }
                 }
             )
-            .disabled(viewModel.superState.isButtonDisabled)
+            .disabled(viewModel.state.superState.isButtonDisabled)
             Button(
                 Constants.Strings.viewPlansButton,
                 action: viewModel.viewAllPlans

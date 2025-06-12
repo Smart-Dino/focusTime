@@ -53,10 +53,6 @@ final class SuperPaywallViewModel {
     }
     
     // MARK: - Properties
-    // Made this private because there is no reason for anybody
-    // to access it
-    private var state: State
-    
     private let paymentManager: PaymentManager
     private var subscriptionTask: Task<Void, Never>?
     
@@ -65,10 +61,8 @@ final class SuperPaywallViewModel {
     
     // MARK: - Init, Deinit
     init(
-        state: State = State(),
         paymentManager: PaymentManager
     ) {
-        self.state = state
         self.paymentManager = paymentManager
         
         startListeningToSubscriptionUpdates()
@@ -133,15 +127,13 @@ final class SuperPaywallViewModel {
         state.allProducts = products
     }
     
-    func updatePurchaseResultForSelectedProduct(state: State) {
-        Task { [weak self] in
-            guard let self, let product = state.selectedProduct else { return }
-            
-            let isPurchased = await paymentManager.isPurchased(product)
-            
-            let result: FTProduct.PurchaseResult? = isPurchased ? .success : nil
-            state.purchaseResult = result
-        }
+    func updatePurchaseResultForSelectedProduct(state: State) async {
+        guard let product = state.selectedProduct else { return }
+        
+        let isPurchased = await paymentManager.isPurchased(product)
+        
+        let result: FTProduct.PurchaseResult? = isPurchased ? .success : nil
+        state.purchaseResult = result
     }
     
     // So far we only have one subscriptions group in our app,
@@ -166,8 +158,6 @@ final class SuperPaywallViewModel {
             return
         }
         
-        let wasEligibleForIntro = try? await paymentManager.eligibleForIntro(product: product)
-        
         do {
             guard let result = try await paymentManager.purchase(product) else {
                 state.error = PaymentError.unknown
@@ -180,15 +170,8 @@ final class SuperPaywallViewModel {
             case .userCancelled:
                 state.purchaseResult = .userCancelled
             case .pending:
-                guard product.trialPeriod == nil && !(wasEligibleForIntro ?? false) else {
-                    // Then pretty sure it was a trial purchase so it is successful
-                    state.purchaseResult = .success
-                    delegate?.didChangeUserEntitlementStatus(isPro: true)
-                    break
-                }
                 state.purchaseResult = .pending
                 state.error = PaymentError.pending
-                delegate?.didChangeUserEntitlementStatus(isPro: false)
             }
         } catch {
             state.error = error

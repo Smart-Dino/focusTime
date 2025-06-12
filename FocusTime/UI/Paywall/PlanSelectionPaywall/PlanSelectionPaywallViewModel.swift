@@ -13,6 +13,8 @@ import SwiftUI
 final class PlanSelectionPaywallViewModel {
     // MARK: - Nested declarations
     struct State {
+        var superState: SuperPaywallViewModel.State
+        
         // MARK: Background Images
         let backgroudImages: [ImageResource] = [
             .debugNightMountain,
@@ -24,13 +26,15 @@ final class PlanSelectionPaywallViewModel {
         static let stringConstants = PlanSelectionPaywallView.Constants.Strings.self
         var primaryButtonTitle: String = stringConstants.loadingTitle
         var subscribeButtonTerms: String = ""
+        
+        init(superState: SuperPaywallViewModel.State = .init()) {
+            self.superState = superState
+        }
     }
     
     
     // MARK: - Properties
     private(set) var state: State
-    #warning("Move this back to State")
-    private(set) var superState: SuperPaywallViewModel.State!
     private let superPaywallVM: SuperPaywallViewModel
     private let flowDelegate: PaywallNavigationDelegate?
     
@@ -43,7 +47,6 @@ final class PlanSelectionPaywallViewModel {
     ) {
         self.state = state
         self.superPaywallVM = superPaywallVM
-        self.superState = superState
         self.flowDelegate = flowDelegate
         superPaywallVM.delegate = self
     }
@@ -63,7 +66,7 @@ final class PlanSelectionPaywallViewModel {
     
     func keepShowingError(showError: Bool) {
         if !showError {
-            superState.error = nil
+            state.superState.error = nil
         }
     }
     
@@ -72,11 +75,11 @@ final class PlanSelectionPaywallViewModel {
         Task { [weak self] in
             guard let self else { return }
             // Fetch products and select first
-            await superPaywallVM.fetchProducts(state: superState)
-            superPaywallVM.selectFirstProductIfNeeded(state: superState)
+            await superPaywallVM.fetchProducts(state: state.superState)
+            superPaywallVM.selectFirstProductIfNeeded(state: state.superState)
             
             // Check user's eligibility for free trial
-            await superPaywallVM.isUserEligibleForTrial(state: superState)
+            await superPaywallVM.isUserEligibleForTrial(state: state.superState)
             
             configureBottomSectionForSelectedProduct()
             
@@ -85,20 +88,19 @@ final class PlanSelectionPaywallViewModel {
     }
     
     func selectProduct(_ product: FTProduct) {
-        print("PlanSelectionPaywallViewModel instance:", ObjectIdentifier(self))
-        superPaywallVM.selectProduct(product, state: superState)
+        superPaywallVM.selectProduct(product, state: state.superState)
         configureBottomSectionForSelectedProduct()
     }
     
     private func configurePurchaseButtonAvailabilityBasedOnSelectedProduct() {
-        guard let product = superState.selectedProduct else { return }
-        superState.isButtonDisabled = true
+        guard let product = state.superState.selectedProduct else { return }
+        state.superState.isButtonDisabled = true
         
         Task { [weak self] in
             guard let self else { return }
             
             if await superPaywallVM.isProductPurchased(product) {
-                superState.isButtonDisabled = true
+                state.superState.isButtonDisabled = true
                 
                 state.primaryButtonTitle =
                 (product.subscriptionPeriod != nil)
@@ -107,19 +109,19 @@ final class PlanSelectionPaywallViewModel {
                 
                 
             } else {
-                superState.isButtonDisabled = false
+                state.superState.isButtonDisabled = false
             }
         }
     }
     
     private func configureBottomSectionForSelectedProduct() {
-        guard let product = superState.selectedProduct else { return }
+        guard let product = state.superState.selectedProduct else { return }
         
-        if product.trialPeriod != nil && superState.isEligibleForIntro {
+        if product.trialPeriod != nil && state.superState.isEligibleForIntro {
             // Product is trialable and the user is eligible for trial
             state.primaryButtonTitle = State.stringConstants.startFreeTrial
             state.subscribeButtonTerms = State.stringConstants.noPaymentMessage
-        } else if product.trialPeriod == nil || !superState.isEligibleForIntro {
+        } else if product.trialPeriod == nil || !state.superState.isEligibleForIntro {
             // No trial on product or it is already used
             let periodDesc = product.subscriptionPeriodDescription ?? State.stringConstants.paidOnce
             state.primaryButtonTitle = State.stringConstants.subscribeButtonTitle
@@ -137,7 +139,7 @@ final class PlanSelectionPaywallViewModel {
     func initiatePurchaseWithCurrentProduct() async {
         Task { [weak self] in
             guard let self else { return }
-            await superPaywallVM.subscribeToCurrentRequestedProduct(state: superState)
+            await superPaywallVM.subscribeToCurrentRequestedProduct(state: state.superState)
             configureBottomSectionForSelectedProduct()
         }
     }
@@ -150,8 +152,15 @@ final class PlanSelectionPaywallViewModel {
 
 extension PlanSelectionPaywallViewModel: SuperPaywallViewModelDelegate {
     func didChangeUserEntitlementStatus(isPro: Bool) {
-        superPaywallVM.updatePurchaseResultForSelectedProduct(state: superState)
-        configurePurchaseButtonAvailabilityBasedOnSelectedProduct()
-        #warning("Dissmis?")
+        Task { [weak self] in
+            guard let self else { return }
+            
+            await self.superPaywallVM.updatePurchaseResultForSelectedProduct(
+                state: self.state.superState
+            )
+            configurePurchaseButtonAvailabilityBasedOnSelectedProduct()
+            
+            if isPro { flowDelegate?.paywallDidRequestDismissal() }
+        }
     }
 }

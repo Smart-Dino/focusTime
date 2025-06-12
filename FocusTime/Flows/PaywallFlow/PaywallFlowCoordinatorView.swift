@@ -15,32 +15,30 @@ struct PaywallFlowCoordinatorView: View {
         NavigationStack {
             Group {
                 switch viewModel.flowState.currentFlow {
-                case .freePlan(let freePlanModel):
+                case .freePlan(let freePlanViewModel):
                     FreePlanUpgradeView(
-                        viewModel: freePlanModel
+                        viewModel: freePlanViewModel
                     )
-                case .onboarding:
+                case .onboarding(let onboardingViewModel):
                     OnboardingPaywallView(
-                        viewModel: viewModel.makeOnboardingPaywallViewModel()
+                        viewModel: onboardingViewModel
                     )
-                case .planSelection:
+                case .planSelection(let planSelectionViewModel):
                     PlanSelectionPaywallView(
-                        viewModel: viewModel.makePlanSelectionPaywallViewModel()
+                        viewModel: planSelectionViewModel
                     )
                 }
             }
             .preferredColorScheme(.dark)
         }
-//        .animation(.default, value: viewModel.flowState.currentFlow)
+        .animation(.default, value: viewModel.flowState.currentFlow)
     }
 }
 
 #Preview {
     let paymentManager = MockPaymentManagerWithPurchaseError()
     let superVM = SuperPaywallViewModel(paymentManager: paymentManager)
-    let factory = PaywallBusinessLogicFactory(paymentManager: paymentManager,
-                                              superPaywallVM: superVM)
     PaywallFlowCoordinatorView(
-        viewModel: .init(factory: factory)
+        viewModel: .init(superPaywallVM: superVM)
     )
 }
