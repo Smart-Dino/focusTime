@@ -1,7 +1,10 @@
 ## User settings
-xcuserdata/
 *.xcuserstate
+*.xcuserdatad
+*.xcuserdata
+xcuserdata/
 project.xcworkspace/
+
 
 ## compatibility with Xcode 8 and earlier (ignoring not required starting Xcode 9)
 *.xcscmblueprint
