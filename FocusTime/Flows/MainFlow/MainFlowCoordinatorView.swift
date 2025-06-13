@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FocusTimeUI
 
 struct MainFlowCoordinatorView: View {
     @State var viewModel: MainFlowCoordinatorViewModel
@@ -14,55 +15,52 @@ struct MainFlowCoordinatorView: View {
         NavigationStack {
             TabView {
                 Group {
-                    if let ipGeoLocationViewModel = viewModel.setupIPGeolocationViewModel() {
+                    Group {
                         Text("Home view")
-                    } else {
-                        Text("No geo view model")
                     }
-                }
-                .tabItem {
-                    Label("Home", image: .wavelogo)
-                }
-                Group {
-                    Text("Empty for now")
-                }
-                .tabItem {
-                    Label("Greeting", systemImage: "person.circle")
-                }
-                
-                Group {
-                    Text("Empty for now")
-                }
                     .tabItem {
-                        Label("Useless", systemImage: "xmark.circle")
+                        LabeledContent("Home") {
+                            Image(.wavelogo)
+                                .renderingMode(.template)
+                        }
                     }
+                    Group {
+                        Text("Empty for now")
+                    }
+                    .tabItem {
+                        Label("Blocks", systemImage: "hand.raised")
+                    }
+                    
+                    Group {
+                        Text("Empty for now")
+                    }
+                    .tabItem {
+                        Label("Profile", systemImage: "person")
+                    }
+                }
+                .toolbarBackground(Color.ftBackground, for: .tabBar)
+                .toolbarBackground(.visible, for: .tabBar)
+                .toolbarColorScheme(.dark, for: .tabBar)
             }
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Settings", systemImage: "gear") {
-                        viewModel.showSettings()
-                    }
-                }
+                toolBarItems
             }
         }
-        .sheet(isPresented: Binding(get: {
-            viewModel.state.selectedSheet != nil
-        }, set: { isPresented in
-            viewModel.onUpdateSelectedSheet(isPresented: isPresented)
-        })) {
-            viewModel.onDismissSheet()
+        .preferredColorScheme(.dark)
+        .sheet(isPresented: .constant(false)) {
+            // On dismiss sheet
         } content: {
-            switch viewModel.state.selectedSheet {
-            case .settings:
-                if let settingViewModel = viewModel.setupSettingsViewModel() {
-                    SettingsView(viewModel: settingViewModel)
-                } else {
-                    Text("No settings view model")
-                }
-            case .paywall:
-                Text("Paywall")
-            case .none:
-                Text("How you did open it?")
+            switch viewModel.flowState.currentFlow {
+            default: Text("Empty for now")
+            }
+        }
+    }
+    
+    @ToolbarContentBuilder
+    var toolBarItems: some ToolbarContent {
+        ToolbarItem(placement: .topBarTrailing) {
+            Button("Settings", systemImage: "gear") {
+                // Open settings
             }
         }
     }

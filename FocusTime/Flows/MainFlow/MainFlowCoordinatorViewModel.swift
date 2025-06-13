@@ -8,11 +8,11 @@
 import Foundation
 
 enum MainTabScreens: Equatable {
-    case home(_ viewModel: FreePlanUpgradeViewModel)
+    case home(_ viewModel: HomeViewModel)
     
     var id: Self { self }
     
-    static func == (lhs: PaywallScreens, rhs: PaywallScreens) -> Bool {
+    static func == (lhs: MainTabScreens, rhs: MainTabScreens) -> Bool {
         switch (lhs, rhs) {
         case (.home, .home): true
         default: false
@@ -22,7 +22,7 @@ enum MainTabScreens: Equatable {
 
 @MainActor
 @Observable
-final class PaywallFlowCoordinatorViewModel {
+final class MainFlowCoordinatorViewModel {
     struct State {
         var currentFlow: MainTabScreens
     }
@@ -36,7 +36,7 @@ final class PaywallFlowCoordinatorViewModel {
         )
     }
     
-    func makeHomeViewModel() -> FreePlanUpgradeViewModel {
+    func makeHomeViewModel() -> HomeViewModel {
         HomeViewModel()
     }
     
