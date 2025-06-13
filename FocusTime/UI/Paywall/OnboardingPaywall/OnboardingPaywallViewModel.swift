@@ -119,12 +119,8 @@ final class OnboardingPaywallViewModel {
     
     // MARK: Actions
     func initiatePurchaseWithCurrentProduct() async {
-        Task { [weak self] in
-            guard let self else { return }
-            
-            await superPaywallVM.subscribeToCurrentRequestedProduct(state: state.superState)
-            updateUIBasedOnPurchaseResult()
-        }
+        await superPaywallVM.subscribeToCurrentRequestedProduct(state: state.superState)
+        updateUIBasedOnPurchaseResult()
     }
     
     func dismissView() {

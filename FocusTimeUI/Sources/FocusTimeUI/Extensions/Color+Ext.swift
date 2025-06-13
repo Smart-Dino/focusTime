@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public extension Color {
-    static let ftBackground = Color("CustomBackground", bundle: .module)
-    static let ftPageControlBlue = Color("PageControlBlue", bundle: .module)
+public extension ShapeStyle where Self == Color {
+    static var ftBackground: Color { Color("CustomBackground", bundle: .module) }
+    static var ftPageControlBlue: Color { Color("PageControlBlue", bundle: .module) }
 }

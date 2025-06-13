@@ -55,7 +55,7 @@ struct PlanSelectionPaywallView: View {
                     selectedItem: selectedImageIndex
                 )
                 // Should tell the design team to make it brighter?
-                .foregroundTint(Color.ftPageControlBlue)
+                .foregroundTint(.ftPageControlBlue)
                 
                 VStack(spacing: .zero) {
                     if viewModel.state.superState.allProducts.isEmpty {
@@ -117,8 +117,12 @@ struct PlanSelectionPaywallView: View {
                 Text(viewModel.state.superState.error?.localizedDescription ?? "")
             }
         )
-        .onAppear {
-            viewModel.fetchIU()
+        .task {
+            // Do NOT put these in the initializer
+            await viewModel.fetchProducts()
+            await viewModel.checkIfUserIsEligibleForFreeTrial()
+            viewModel.selectFirstProductIfNeeded()
+            viewModel.configureBottomSectionForSelectedProduct()
         }
     }
     

@@ -71,25 +71,38 @@ final class PlanSelectionPaywallViewModel {
     }
     
     // MARK: - Methods
-    func fetchIU() {
-        Task { [weak self] in
-            guard let self else { return }
-            // Fetch products and select first
-            await superPaywallVM.fetchProducts(state: state.superState)
-            superPaywallVM.selectFirstProductIfNeeded(state: state.superState)
-            
-            // Check user's eligibility for free trial
-            await superPaywallVM.isUserEligibleForTrial(state: state.superState)
-            
-            configureBottomSectionForSelectedProduct()
-            
-            print("FETCHED PRODUCTS")
-        }
+    func fetchProducts() async {
+        await superPaywallVM.fetchProducts(state: state.superState)
+    }
+    
+    func checkIfUserIsEligibleForFreeTrial() async {
+        await superPaywallVM.isUserEligibleForTrial(state: state.superState)
+    }
+    
+    func selectFirstProductIfNeeded() {
+        superPaywallVM.selectFirstProductIfNeeded(state: state.superState)
     }
     
     func selectProduct(_ product: FTProduct) {
         superPaywallVM.selectProduct(product, state: state.superState)
         configureBottomSectionForSelectedProduct()
+    }
+    
+    func configureBottomSectionForSelectedProduct() {
+        guard let product = state.superState.selectedProduct else { return }
+        
+        if product.trialPeriod != nil && state.superState.isEligibleForIntro {
+            // Product is trialable and the user is eligible for trial
+            state.primaryButtonTitle = State.stringConstants.startFreeTrial
+            state.subscribeButtonTerms = State.stringConstants.noPaymentMessage
+        } else if product.trialPeriod == nil || !state.superState.isEligibleForIntro {
+            // No trial on product or it is already used
+            let periodDesc = product.subscriptionPeriodDescription ?? State.stringConstants.paidOnce
+            state.primaryButtonTitle = State.stringConstants.subscribeButtonTitle
+            state.subscribeButtonTerms = periodDesc
+        }
+        
+        configurePurchaseButtonAvailabilityBasedOnSelectedProduct()
     }
     
     private func configurePurchaseButtonAvailabilityBasedOnSelectedProduct() {
@@ -114,34 +127,14 @@ final class PlanSelectionPaywallViewModel {
         }
     }
     
-    private func configureBottomSectionForSelectedProduct() {
-        guard let product = state.superState.selectedProduct else { return }
-        
-        if product.trialPeriod != nil && state.superState.isEligibleForIntro {
-            // Product is trialable and the user is eligible for trial
-            state.primaryButtonTitle = State.stringConstants.startFreeTrial
-            state.subscribeButtonTerms = State.stringConstants.noPaymentMessage
-        } else if product.trialPeriod == nil || !state.superState.isEligibleForIntro {
-            // No trial on product or it is already used
-            let periodDesc = product.subscriptionPeriodDescription ?? State.stringConstants.paidOnce
-            state.primaryButtonTitle = State.stringConstants.subscribeButtonTitle
-            state.subscribeButtonTerms = periodDesc
-        }
-        
-        configurePurchaseButtonAvailabilityBasedOnSelectedProduct()
-    }
-    
     func getTrialTerms(for product: FTProduct) -> String {
         "Get \(product.trialPeriodString ?? "0 days") for free!"
     }
     
     // MARK: Actions
     func initiatePurchaseWithCurrentProduct() async {
-        Task { [weak self] in
-            guard let self else { return }
-            await superPaywallVM.subscribeToCurrentRequestedProduct(state: state.superState)
-            configureBottomSectionForSelectedProduct()
-        }
+        await superPaywallVM.subscribeToCurrentRequestedProduct(state: state.superState)
+        configureBottomSectionForSelectedProduct()
     }
     
     func dismissView() {
