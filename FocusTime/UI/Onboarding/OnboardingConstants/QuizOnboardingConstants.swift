@@ -9,6 +9,9 @@ import Foundation
 
 extension QuizOnboardingView {
     enum Constants {
+        
+        static let screenName = "QuizOnboardingView"
+        
         enum Layout {
             static let titleSpacing: CGFloat = 11
             static let bottomPadding: CGFloat = 40

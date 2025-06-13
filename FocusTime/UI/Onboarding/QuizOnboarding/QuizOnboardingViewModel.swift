@@ -26,7 +26,7 @@ final class QuizOnboardingViewModel {
     ) {
         self.analyticsManager = analyticsManager
         self.delegate = delegate
-        self.analyticsManager.log(event: .screenView(screenName: "QuizOnboardingView"))
+        self.analyticsManager.log(event: .screenView(screenName: QuizOnboardingView.Constants.screenName))
         print("QuizOnboardingViewModel initialized.")
     }
 

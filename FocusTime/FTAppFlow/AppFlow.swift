@@ -9,7 +9,8 @@ import Foundation
 import Observation
 
 enum AppFlow: Hashable {
-    case launch // Initial state, perhaps for loading resources
+    /// Initial state, perhaps for loading resources
+    case launch
     case onboarding
     case main
 }

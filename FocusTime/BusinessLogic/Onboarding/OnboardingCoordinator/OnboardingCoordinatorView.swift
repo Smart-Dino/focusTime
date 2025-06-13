@@ -8,7 +8,7 @@
 import SwiftUI
 
 enum OnboardingNavigationPath: Hashable {
-    case slides
+    case onboardingSlidesPath
 }
 
 struct OnboardingCoordinatorView: View {
@@ -32,7 +32,7 @@ struct OnboardingCoordinatorView: View {
             )
             .navigationDestination(for: OnboardingNavigationPath.self) { pathValue in
                 switch pathValue {
-                case .slides:
+                case .onboardingSlidesPath:
                     SlideOnboardingView(
                         viewModel: SlideOnboardingViewModel(
                             analyticsManager: viewModel.analyticsManager,

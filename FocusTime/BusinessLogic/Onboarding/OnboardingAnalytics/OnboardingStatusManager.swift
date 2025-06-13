@@ -12,15 +12,18 @@ import SwiftUI
 class OnboardingStatusManager: OnboardingStatusProviding {
     weak var delegate: OnboardingStatusManagerDelegate?
 
-    @AppStorage("hasCompletedOnboarding")
-    @ObservationIgnored
-    var hasCompletedOnboarding: Bool = false {
+    private var persistenceManager: PersistenceManager
+    
+    var hasCompletedOnboarding: Bool {
         didSet {
+            persistenceManager.hasCompletedOnboarding = hasCompletedOnboarding
             delegate?.onboardingStatusDidChange()
         }
     }
 
-    init() {
+    init(persistenceManager: PersistenceManager) {
+        self.persistenceManager = persistenceManager
+        self.hasCompletedOnboarding = persistenceManager.hasCompletedOnboarding
         print("OnboardingStatusManager initialized on MainActor. Initial status: \(hasCompletedOnboarding)")
     }
 }

@@ -7,10 +7,9 @@
 
 import Foundation
 
-// Implementation of the `AnalyticsManager` protocol that logs events to the console.
-// For development and debugging analytics events
-
-final class MockLoggingAnalyticsManager: AnalyticsManager, Sendable {
+/// Implementation of the `AnalyticsManager` protocol that logs events to the console.
+/// For development and debugging analytics events
+struct MockLoggingAnalyticsManager: AnalyticsManager, Sendable {
     func log(event: AnalyticsEvent) {
         if let params = event.parameters, !params.isEmpty {
             print("Analytics Event: \(event.name), Parameters: \(params)")

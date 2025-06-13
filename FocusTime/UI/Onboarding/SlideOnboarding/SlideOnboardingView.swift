@@ -90,15 +90,13 @@ struct SlideOnboardingView: View {
             isPresented: .constant(viewModel.state.alertType != nil),
             presenting: viewModel.state.alertType
         ) { alertType in
-            // The buttons now call ViewModel methods to handle logic AND dismiss the alert.
             switch alertType {
             case .skipConfirmation:
                 Button(Constants.Strings.skipAnyway, role: .destructive) {
                     viewModel.skipOnboardingConfirmed()
-                    viewModel.completeOnboarding() // This also dismisses the alert implicitly.
+                    viewModel.completeOnboarding() 
                 }
                 Button(Constants.Strings.goBack, role: .cancel) {
-                    // Explicitly call the dismiss method.
                     viewModel.dismissAlert()
                 }
             }

@@ -5,10 +5,9 @@
 //  Created by Keto Nioradze on 30.05.25.
 //
 
-// This enum provides a type-safe way to represent events and their associated parameters.
-
 import Foundation
 
+/// This enum provides a type-safe way to represent events and their associated parameters.
 enum AnalyticsEvent: Sendable {
     case screenView(screenName: String)
     case quizOptionToggled(option: String, isSelected: Bool)

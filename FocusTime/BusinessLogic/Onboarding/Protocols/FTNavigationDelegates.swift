@@ -38,3 +38,8 @@ protocol QuizOnboardingViewModelDelegate: AnyObject {
 protocol SlideOnboardingViewModelDelegate: AnyObject {
     func didCompleteOnboarding()
 }
+
+@MainActor
+protocol PersistenceManager {
+    var hasCompletedOnboarding: Bool { get set }
+}

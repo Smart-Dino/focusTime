@@ -20,8 +20,8 @@ final class OnboardingCoordinatorViewModel {
         self.analyticsManager = analyticsManager
     }
 
-    func showSlides() {
-        path.append(.slides)
+    func showOnboardingSlides() {
+        path.append(.onboardingSlidesPath)
     }
 }
 
@@ -36,6 +36,6 @@ extension OnboardingCoordinatorViewModel: SlideOnboardingViewModelDelegate {
 
 extension OnboardingCoordinatorViewModel : QuizOnboardingViewModelDelegate {
     func didTapNext() {
-        showSlides()
+        showOnboardingSlides()
     }
 }
