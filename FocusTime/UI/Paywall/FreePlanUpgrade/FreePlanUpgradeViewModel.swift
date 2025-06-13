@@ -87,15 +87,6 @@ final class FreePlanUpgradeViewModel {
         }
     }
     
-    func initiatePurchaseWithCurrentProduct() async {
-        Task { [weak self] in
-            guard let self else { return }
-            
-            await superPaywallVM.subscribeToCurrentRequestedProduct(state: state.superState)
-            updateUIBasedOnPurchaseResult()
-        }
-    }
-    
     private func updateUIBasedOnPurchaseResult() {
         guard let purchaseResult = state.superState.purchaseResult else { return }
         
@@ -115,6 +106,11 @@ final class FreePlanUpgradeViewModel {
             state.superState.isButtonDisabled = false
             state.superState.error = PaymentError.userCancelled
         }
+    }
+    
+    func initiatePurchaseWithCurrentProduct() async {
+        await superPaywallVM.subscribeToCurrentRequestedProduct(state: state.superState)
+        updateUIBasedOnPurchaseResult()
     }
     
     func dismissView() {
