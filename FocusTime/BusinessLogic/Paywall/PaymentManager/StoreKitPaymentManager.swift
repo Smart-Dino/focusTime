@@ -28,7 +28,6 @@ actor StoreKitPaymentManager: PaymentManager {
     // StoreKit-related
     private var skProducts: [Product]
     private let productIdentifiers: [String]
-//    private let productIdentifiers: [String: String]
     
     // Async updates
     private var updateListenerTask: Task<Void, Error>? = nil
@@ -104,8 +103,8 @@ extension StoreKitPaymentManager {
         
         switch result {
         case .success(let verificationResult):
-            //Check whether the transaction is verified
-            // If it isn't - this function rethrows the verification error
+            // Check whether the transaction is verified.
+            // If it isn't - this function rethrows the verification error.
             let transaction = try checkVerified(verificationResult)
             
             await updateCustomerProductStatus()
@@ -147,7 +146,7 @@ extension StoreKitPaymentManager {
     
     private func handleTermination(_ reason: AsyncStream<Bool>.Continuation.Termination) {
         // Swift marked the stream as terminated,
-        // finishing the continuation
+        // finishing the continuation.
         continuation?.finish()
         continuation = nil
         
@@ -201,12 +200,12 @@ extension StoreKitPaymentManager {
         
         Self.logger.trace("Successfully updated customer's products with \(purchasedProducts.count) products")
         
-        // Convert to FTProduct
+        // Convert to FTProduct.
         self.purchasedProducts = purchasedProducts.map {
             FTProduct.fromStoreKit($0)
         }
         
-        // Update status
+        // Update status.
         let status = !purchasedProducts.isEmpty
         isPro = status
         sendStreamUpdate(isPro: status)
@@ -234,13 +233,10 @@ extension StoreKitPaymentManager {
     }
 
     private func getProducts() async throws {
-        // Request products from the App Store using the identifiers that
-        // the StoreKitProductIdentifiers.plist file defines
-        // let storeProducts = try await Product.products(for: productIdentifiers.keys)
-        
+        // Request products from the App Store.
         let storeProducts = try await Product.products(for: productIdentifiers)
         
-        // Convert products into FTProducts
+        // Convert products into FTProducts.
         let ftProducts: [FTProduct] = storeProducts.map {
             FTProduct.fromStoreKit($0)
         }
@@ -249,8 +245,8 @@ extension StoreKitPaymentManager {
             "Successfully retrieved and converted \(storeProducts.count.description) StoreKit products into FTProducts"
         )
         
-//        try? await Task.sleep(for: .seconds(3)) // Simulate loading
-        // Set the values
+//        try? await Task.sleep(for: .seconds(3)) // Simulate loading.
+        // Set the values.
         self.products = ftProducts.sortByTrialThenPrice()
         self.skProducts = storeProducts
     }
