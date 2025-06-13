@@ -115,15 +115,13 @@ struct OnboardingPaywallView: View {
     // MARK: - Computed properties
     /// Computes the shape underneath the feature list.
     private var contentCard: some View {
-        Rectangle()
-            .foregroundStyle(Color.onboardingPaywallContentPad)
-            .opacity(0.6)
-            .clipShape(
-                .rect(
-                    topLeadingRadius: Constants.CornerRadius.card,
-                    topTrailingRadius: Constants.CornerRadius.card
-                )
-            )
+        let cornerRadius = Constants.CornerRadius.card
+        return UnevenRoundedRectangle(
+            cornerRadii: .init(topLeading: cornerRadius,
+                               topTrailing: cornerRadius)
+        )
+        .foregroundStyle(.onboardingPaywallContentPad)
+        .opacity(0.6)
     }
     
     /// List of features.

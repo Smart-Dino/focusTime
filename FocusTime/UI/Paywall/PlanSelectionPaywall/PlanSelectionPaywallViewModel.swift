@@ -5,8 +5,7 @@
 //  Created by Maksym Horobets on 19.05.2025.
 //
 
-import Foundation
-import DeveloperToolsSupport
+import SwiftUI
 
 /// ViewModel, responsible for managing the logic on ``PlanSelectionPaywallView``.
 /// - Note: Use it in the ``PlanSelectionPaywallView``.
