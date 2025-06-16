@@ -11,19 +11,25 @@ import SwiftUI
 @Observable
 class OnboardingStatusManager: OnboardingStatusProviding {
     weak var delegate: OnboardingStatusManagerDelegate?
-
-    private var persistenceManager: PersistenceManager
+    private var persistenceManager: OnboardingPersistenceManaging
+    
+    var onboardingProgress: OnboardingProgress {
+            didSet {
+                persistenceManager.onboardingProgress = onboardingProgress
+                delegate?.onboardingStatusDidChange()
+            }
+        }
     
     var hasCompletedOnboarding: Bool {
-        didSet {
-            persistenceManager.hasCompletedOnboarding = hasCompletedOnboarding
-            delegate?.onboardingStatusDidChange()
+        get { onboardingProgress == .completed }
+        set {
+            onboardingProgress = newValue ? .completed : .quiz
         }
     }
-
-    init(persistenceManager: PersistenceManager) {
+    
+    init(persistenceManager: OnboardingPersistenceManaging) {
         self.persistenceManager = persistenceManager
-        self.hasCompletedOnboarding = persistenceManager.hasCompletedOnboarding
-        print("OnboardingStatusManager initialized on MainActor. Initial status: \(hasCompletedOnboarding)")
+        self.onboardingProgress = persistenceManager.onboardingProgress
+        print("OnboardingStatusManager initialized on MainActor. Initial progress: \(onboardingProgress)")
     }
 }

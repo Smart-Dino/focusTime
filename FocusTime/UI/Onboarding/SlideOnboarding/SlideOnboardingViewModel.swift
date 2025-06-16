@@ -26,18 +26,22 @@ final class SlideOnboardingViewModel {
         var currentStep: SlideOnboardingStep {
             SlideOnboardingStep.allCases[currentIndex]
         }
-        
-        
     }
 
-    private(set) var state = State()
+    private(set) var state: State
     private let analyticsManager: AnalyticsManager
     private weak var delegate: SlideOnboardingViewModelDelegate?
 
-    init(analyticsManager: AnalyticsManager, delegate: SlideOnboardingViewModelDelegate?) {
+    init(
+        state: State = State(),
+        analyticsManager: AnalyticsManager,
+        delegate: SlideOnboardingViewModelDelegate?
+    ) {
+        self.state = state
         self.analyticsManager = analyticsManager
         self.delegate = delegate
-        logSlideViewed(step: state.currentStep, index: state.currentIndex)
+        
+        logSlideViewed(step: self.state.currentStep, index: self.state.currentIndex)
         print("SlideOnboardingViewModel initialized.")
     }
 
@@ -75,6 +79,6 @@ final class SlideOnboardingViewModel {
     func completeOnboarding() {
         analyticsManager.log(event: .onboardingCompleted(lastSlideName: state.currentStep.subtitle1))
         print("SlideOnboardingViewModel: completeOnboarding called. Triggering onOnboardingCompleted callback.")
-        self.delegate?.didCompleteOnboarding()
+        self.delegate?.didFinishSlideSequence()
     }
 }

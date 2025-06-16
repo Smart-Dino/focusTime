@@ -11,13 +11,20 @@ import Observation
 @Observable
 final class OnboardingCoordinatorViewModel {
     var path: [OnboardingNavigationPath] = []
-
     weak var delegate: OnboardingCoordinatorDelegate?
     let analyticsManager: AnalyticsManager
 
-    init(delegate: OnboardingCoordinatorDelegate?, analyticsManager: AnalyticsManager) {
+    init(
+        startingProgress: OnboardingProgress,
+        delegate: OnboardingCoordinatorDelegate?,
+        analyticsManager: AnalyticsManager
+    ) {
         self.delegate = delegate
         self.analyticsManager = analyticsManager
+
+        if startingProgress == .slides {
+            self.path = [.onboardingSlidesPath]
+        }
     }
 
     func showOnboardingSlides() {
@@ -27,15 +34,16 @@ final class OnboardingCoordinatorViewModel {
 
 
 // Extensions
-extension OnboardingCoordinatorViewModel: SlideOnboardingViewModelDelegate {
-    func didCompleteOnboarding() {
-        print("SlideOnboardingView signaled completion.")
-        delegate?.onboardingDidComplete()
+extension OnboardingCoordinatorViewModel : QuizOnboardingViewModelDelegate {
+    func didFinishQuiz() {
+        delegate?.quizFlowDidFinish()
+        showOnboardingSlides()
     }
 }
 
-extension OnboardingCoordinatorViewModel : QuizOnboardingViewModelDelegate {
-    func didTapNext() {
-        showOnboardingSlides()
+extension OnboardingCoordinatorViewModel: SlideOnboardingViewModelDelegate {
+    func didFinishSlideSequence() {
+        print("SlideOnboardingView signaled completion.")
+        delegate?.onboardingDidComplete()
     }
 }

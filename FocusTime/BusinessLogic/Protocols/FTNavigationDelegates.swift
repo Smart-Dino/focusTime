@@ -7,20 +7,9 @@
 
 import Foundation
 
-
-@MainActor
-protocol AnalyticsManager: Sendable {
-    func log(event: AnalyticsEvent)
-}
-
-@MainActor
-protocol OnboardingStatusProviding: Sendable {
-    @MainActor var hasCompletedOnboarding: Bool { get set }
-}
-
-
 @MainActor
 protocol OnboardingCoordinatorDelegate: AnyObject {
+    func quizFlowDidFinish()
     func onboardingDidComplete()
 }
 
@@ -31,15 +20,10 @@ protocol OnboardingStatusManagerDelegate: AnyObject {
 
 @MainActor
 protocol QuizOnboardingViewModelDelegate: AnyObject {
-    func didTapNext()
+    func didFinishQuiz()
 }
 
 @MainActor
 protocol SlideOnboardingViewModelDelegate: AnyObject {
-    func didCompleteOnboarding()
-}
-
-@MainActor
-protocol PersistenceManager {
-    var hasCompletedOnboarding: Bool { get set }
+    func didFinishSlideSequence()
 }

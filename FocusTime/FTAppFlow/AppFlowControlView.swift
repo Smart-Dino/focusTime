@@ -9,11 +9,9 @@ import SwiftUI
 
 struct AppFlowCoordinatorView: View {
     @State var viewModel: AppFlowCoordinatorViewModel
-    private let analyticsManager: AnalyticsManager
 
-    init(viewModel: AppFlowCoordinatorViewModel, analyticsManager: AnalyticsManager) {
+    init(viewModel: AppFlowCoordinatorViewModel) {
         _viewModel = State(wrappedValue: viewModel)
-        self.analyticsManager = analyticsManager
     }
 
     var body: some View {
@@ -24,11 +22,8 @@ struct AppFlowCoordinatorView: View {
                     .onAppear {
                         // it transitions very quickly to either onboarding or the main app based on the saved onboarding status. We've kept it as a placeholder in case we need to add any pre-loading tasks or a splash screen in the future
                     }
-            case .onboarding:
-                OnboardingCoordinatorView(
-                    delegate: viewModel,
-                    analyticsManager: analyticsManager
-                )
+            case .onboarding(let onboardingViewModel):
+                OnboardingCoordinatorView(viewModel: onboardingViewModel)
             case .main:
                 VStack {
                     #warning("Replace with actual view")

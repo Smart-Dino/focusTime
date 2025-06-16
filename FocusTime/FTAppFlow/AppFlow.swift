@@ -6,13 +6,37 @@
 //
 
 import Foundation
-import Observation
 
 enum AppFlow: Hashable {
     /// Initial state, perhaps for loading resources
     case launch
-    case onboarding
+    case onboarding(OnboardingCoordinatorViewModel)
     case main
+    
+    
+    static func == (lhs: AppFlow, rhs: AppFlow) -> Bool {
+        switch (lhs, rhs) {
+        case (.launch, .launch):
+            return true
+        case (.onboarding, .onboarding):
+            return true
+        case (.main, .main):
+            return true
+        default:
+            return false
+        }
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        switch self {
+        case .launch:
+            hasher.combine(0)
+        case .onboarding:
+            hasher.combine(1)
+        case .main:
+            hasher.combine(2)
+        }
+    }
 }
 
 @MainActor
@@ -31,49 +55,55 @@ class AppFlowCoordinatorViewModel {
     init(onboardingStatusProvider: OnboardingStatusManager, analyticsManager: AnalyticsManager) {
         self.onboardingStatusProvider = onboardingStatusProvider
         self.analyticsManager = analyticsManager
-        
         self.onboardingStatusProvider.delegate = self
         determineCurrentFlow()
     }
 
     func determineCurrentFlow() {
-        let isOnboardingCompleted = self.onboardingStatusProvider.hasCompletedOnboarding
-        let previousFlow = self.state.currentFlow
+            let progress = self.onboardingStatusProvider.onboardingProgress
+            let previousFlow = self.state.currentFlow
+            let newFlow: AppFlow
+            
+            switch progress {
+            case .completed:
+                newFlow = .main
+            case .quiz, .slides:
+                let onboardingViewModel = OnboardingCoordinatorViewModel(
+                    startingProgress: progress,
+                    delegate: self,
+                    analyticsManager: self.analyticsManager
+                )
+                newFlow = .onboarding(onboardingViewModel)
+            }
 
-        switch previousFlow {
-        case .launch:
-            self.state.currentFlow = isOnboardingCompleted ? .main : .onboarding
-            
-        case .onboarding where isOnboardingCompleted:
-            self.state.currentFlow = .main
-            
-        case .main where !isOnboardingCompleted:
-            self.state.currentFlow = .onboarding
-            
-        default:
-            break
-        }
-        
-        if previousFlow != self.state.currentFlow {
-            print("AppFlow changed from \(previousFlow) to: \(self.state.currentFlow) (Onboarding completed: \(isOnboardingCompleted))")
-        } else {
-            print("AppFlow re-evaluated, remains: \(self.state.currentFlow) (Onboarding completed: \(isOnboardingCompleted))")
-        }
-    }
-
+        switch (newFlow, previousFlow) {
+         case (.main, .main),
+              (.onboarding, .onboarding),
+              (.launch, .launch):
+             print("AppFlow re-evaluated, remains: \(self.state.currentFlow) (Onboarding progress: \(progress))")
+         default:
+             self.state.currentFlow = newFlow
+             print("AppFlow changed to: \(self.state.currentFlow) (Onboarding progress: \(progress))")
+         }
+     }
     
     func resetOnboarding() {
-        print("AppFlowCoordinatorViewModel: Resetting onboarding status to false.")
-        onboardingStatusProvider.hasCompletedOnboarding = false
-    }
-}
+         print("AppFlowCoordinatorViewModel: Resetting onboarding status to false.")
+         onboardingStatusProvider.onboardingProgress = .quiz
+     }
+ }
 
 
 // Extensions
 extension AppFlowCoordinatorViewModel: OnboardingCoordinatorDelegate {
+    func quizFlowDidFinish() {
+        onboardingStatusProvider.onboardingProgress = .slides
+        print("AppFlowCoordinatorViewModel: Quiz finished, saving progress as .slides")
+    }
+
     func onboardingDidComplete() {
-        onboardingStatusProvider.hasCompletedOnboarding = true
-        print("AppFlowCoordinatorViewModel: Onboarding completed, setting status to true.")
+        onboardingStatusProvider.onboardingProgress = .completed
+        print("AppFlowCoordinatorViewModel: Onboarding completed, saving progress as .completed.")
     }
 }
 

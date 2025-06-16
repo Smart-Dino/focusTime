@@ -10,13 +10,13 @@ import SwiftUI
 @main
 struct FocusTimeApp: App {
     private let analyticsManager: AnalyticsManager
-    private let persistenceManager: UserDefaultsPersistenceManager
+    private let persistenceManager: OnboardingPersistenceManager
     private let onboardingStatusManager: OnboardingStatusManager
     private let appFlowCoordinatorViewModel: AppFlowCoordinatorViewModel
 
     init() {
         self.analyticsManager = MockLoggingAnalyticsManager()
-        self.persistenceManager = UserDefaultsPersistenceManager()
+        self.persistenceManager = OnboardingPersistenceManager()
         self.onboardingStatusManager = OnboardingStatusManager(persistenceManager: self.persistenceManager)
         self.appFlowCoordinatorViewModel = AppFlowCoordinatorViewModel(
             onboardingStatusProvider: onboardingStatusManager,
@@ -29,7 +29,6 @@ struct FocusTimeApp: App {
         WindowGroup {
             AppFlowCoordinatorView(
                 viewModel: appFlowCoordinatorViewModel,
-                analyticsManager: analyticsManager
             )
         }
     }

@@ -11,14 +11,9 @@ import FocusTimeUI
 
 struct QuizOnboardingView: View {
 
-    @State private var viewModel: QuizOnboardingViewModel
-    
-    init(viewModel: QuizOnboardingViewModel) {
-            _viewModel = State(initialValue: viewModel)
-        }
+    @State var viewModel: QuizOnboardingViewModel
 
-
-    var body: some View {
+    var body: some View { 
         VStack {
             VStack(alignment: .leading) {
                 VStack(alignment: .center, spacing: Constants.Layout.titleSpacing) {
@@ -55,6 +50,7 @@ struct QuizOnboardingView: View {
             }
             .buttonStyle(FTPrimaryButtonStyle())
             .padding()
+            .disabled(!viewModel.isNextButtonEnabled)
         }
         .dynamicTypeSize(...DynamicTypeSize.large)
         .preferredColorScheme(.dark)

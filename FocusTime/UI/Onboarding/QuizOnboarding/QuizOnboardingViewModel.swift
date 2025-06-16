@@ -15,21 +15,26 @@ final class QuizOnboardingViewModel {
         var selectionStates: Set<QuizOption> = []
     }
 
-    var state = State()
+    var state: State
     private let analyticsManager: AnalyticsManager
     private weak var delegate: QuizOnboardingViewModelDelegate?
     
+    var isNextButtonEnabled: Bool {
+            !state.selectionStates.isEmpty
+    }
+    
     init(
+        state: State = State(),
         analyticsManager: AnalyticsManager,
-        delegate: QuizOnboardingViewModelDelegate?,
-        
+        delegate: QuizOnboardingViewModelDelegate?
     ) {
+        self.state = state
         self.analyticsManager = analyticsManager
         self.delegate = delegate
-        self.analyticsManager.log(event: .screenView(screenName: QuizOnboardingView.Constants.screenName))
+        self.analyticsManager.log(event: .screenView(screenName: String(describing: QuizOnboardingView.self)))
         print("QuizOnboardingViewModel initialized.")
     }
-
+    
     func toggleSelection(for option: QuizOption) {
         let isCurrentlySelected = state.selectionStates.contains(option)
         if isCurrentlySelected {
@@ -46,6 +51,6 @@ final class QuizOnboardingViewModel {
 
     func nextButtonTapped() {
         analyticsManager.log(event: .quizNextButtonTapped)
-        delegate?.didTapNext()
+        delegate?.didFinishQuiz()
     }
 }

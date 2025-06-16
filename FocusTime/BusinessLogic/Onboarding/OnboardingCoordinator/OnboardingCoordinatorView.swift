@@ -12,24 +12,22 @@ enum OnboardingNavigationPath: Hashable {
 }
 
 struct OnboardingCoordinatorView: View {
-    @State private var viewModel: OnboardingCoordinatorViewModel
-
-    init(delegate: OnboardingCoordinatorDelegate?, analyticsManager: AnalyticsManager) {
-        self._viewModel = State(wrappedValue: OnboardingCoordinatorViewModel(
-            delegate: delegate,
-            analyticsManager: analyticsManager
-        ))
-        print("OnboardingCoordinatorView initialized.")
-    }
+    let viewModel: OnboardingCoordinatorViewModel
 
     var body: some View {
-        NavigationStack(path: $viewModel.path) {
-            QuizOnboardingView(
-                viewModel: QuizOnboardingViewModel(
-                    analyticsManager: viewModel.analyticsManager,
-                    delegate: viewModel
-                )
-            )
+        
+        let pathBinding = Binding(
+            get: { viewModel.path },
+            set: { viewModel.path = $0 }
+        )
+        
+        NavigationStack(path: pathBinding) {
+                    QuizOnboardingView(
+                        viewModel: QuizOnboardingViewModel(
+                            analyticsManager: viewModel.analyticsManager,
+                            delegate: viewModel
+                        )
+                    )
             .navigationDestination(for: OnboardingNavigationPath.self) { pathValue in
                 switch pathValue {
                 case .onboardingSlidesPath:

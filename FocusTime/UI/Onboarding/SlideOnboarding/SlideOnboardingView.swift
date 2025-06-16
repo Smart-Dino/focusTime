@@ -10,13 +10,7 @@ import FocusTimeUI
 
 struct SlideOnboardingView: View {
 
-    @State private var viewModel: SlideOnboardingViewModel
-
-    init(viewModel: SlideOnboardingViewModel) {
-        _viewModel = State(initialValue: viewModel)
-        print("SlideOnboardingView initialized.")
-    }
-
+    @State var viewModel: SlideOnboardingViewModel
 
     var body: some View {
         VStack {
@@ -52,7 +46,6 @@ struct SlideOnboardingView: View {
             .frame(height: Constants.Layout.subtitleSectionHeight)
             .multilineTextAlignment(.center)
             
-
             
                 VStack{
                     if !viewModel.state.currentStep.isLast {
@@ -72,14 +65,11 @@ struct SlideOnboardingView: View {
                             viewModel.completeOnboarding()
                         }
                         .buttonStyle(FTPrimaryButtonStyle())
-                        
                     }
                 }
                 .containerRelativeFrame(.vertical) { fullHeight, _ in
                     fullHeight * 0.1 
                 }
-            
-            
         }
         .animation(.easeInOut, value: viewModel.state.currentStep)
         .preferredColorScheme(.dark)
