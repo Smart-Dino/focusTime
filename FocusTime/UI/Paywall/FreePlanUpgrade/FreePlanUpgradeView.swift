@@ -16,10 +16,14 @@ struct FreePlanUpgradeView: View {
     // MARK: - Body
     var body: some View {
         ZStack {
-            Image(.debugNightMountain)
+            Image(.freePlanPaywallBackgound)
                 .resizable()
                 .scaledToFill()
                 .containerRelativeFrame([.horizontal])
+                .scaleEffect(1.05, anchor: .bottom) // Scale it to the top a bit
+                .overlay {
+                    Color.ftMainBlue.opacity(0.1)
+                }
             // VStack to push the elements down with a spacer.
             VStack {
                 Spacer()
@@ -70,8 +74,10 @@ struct FreePlanUpgradeView: View {
     private var upgradePromptSection: some View {
         Group {
             Text(Constants.Strings.title)
-                .font(.title.bold())
+                .font(.title3.bold())
             Text(Constants.Strings.upgradeMessage)
+                .multilineTextAlignment(.center)
+                .foregroundStyle(.ftGray3)
         }
     }
     
@@ -101,13 +107,7 @@ struct FreePlanUpgradeView: View {
     @ToolbarContentBuilder
     private var toolbarItems: some ToolbarContent {
         ToolbarItem(placement: .topBarTrailing) {
-            // This will get adressed on the stage of incorporating
-            // the business logic or navigation.
-            Button(
-                Constants.Strings.dismissButtonTitle,
-                systemImage: "xmark",
-                action: viewModel.dismissView
-            )
+            FTDismissToolbarButtonView(dismissAction: viewModel.dismissView)
         }
     }
     

@@ -55,7 +55,7 @@ struct PlanSelectionPaywallView: View {
                     selectedItem: selectedImageIndex
                 )
                 // Should tell the design team to make it brighter?
-                .foregroundTint(.ftPageControlBlue)
+                .foregroundTint(.ftMainBlue)
                 
                 VStack(spacing: .zero) {
                     if viewModel.state.superState.allProducts.isEmpty {
@@ -85,7 +85,7 @@ struct PlanSelectionPaywallView: View {
                         )
                     )
                 }
-                .containerRelativeFrame(.vertical, { amount, axis in
+                .containerRelativeFrame(.vertical, { amount, _ in
                     amount / 2.5
                 })
                 .padding()
@@ -175,13 +175,7 @@ struct PlanSelectionPaywallView: View {
     @ToolbarContentBuilder
     private var toolbarItems: some ToolbarContent {
         ToolbarItem(placement: .topBarTrailing) {
-            // This will get addressed on the stage of incorporating
-            // the business logic or navigation.
-            Button(
-                Constants.Strings.dismissButtonTitle,
-                systemImage: "xmark",
-                action: viewModel.dismissView
-            )
+            FTDismissToolbarButtonView(dismissAction: viewModel.dismissView)
         }
     }
 }

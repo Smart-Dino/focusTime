@@ -18,7 +18,7 @@ extension FreePlanUpgradeView {
         enum Strings {
             /// Body message of the upgrade view.
             static var upgradeMessage: AttributedString {
-                var string = AttributedString("Upgrade to have unlimited scheduled\nsessions with Pro version")
+                var string = AttributedString("Upgrade to have unlimited scheduled sessions with Pro version")
                 if let range = string.range(of: "Pro version") {
                     string[range].font = .body.bold()
                 }

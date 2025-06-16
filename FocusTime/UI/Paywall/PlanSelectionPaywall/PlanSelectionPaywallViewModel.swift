@@ -4,6 +4,7 @@
 //
 //  Created by Maksym Horobets on 19.05.2025.
 //
+
 import SwiftUI
 
 /// ViewModel, responsible for managing the logic on ``PlanSelectionPaywallView``.

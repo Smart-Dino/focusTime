@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FocusTimeUI
 
 /// A view displaying standard subscription utility links: "Terms", "Privacy", and "Restore Purchase".
 struct SubscriptionUtilityLinksView: View {
@@ -31,6 +32,7 @@ struct SubscriptionUtilityLinksView: View {
         }
         .buttonStyle(.plain)
         .font(.callout)
+        .foregroundStyle(.ftGray3)
         .alert(
             Constants.Strings.errorHeader,
             isPresented: Binding(get: {
