@@ -16,43 +16,71 @@ struct OnboardingPaywallView: View {
     // MARK: - Body
     var body: some View {
         ZStack(alignment: .leading) {
-            Image(.debugNightMountain)
+            RadialGradient(
+                colors: [
+                    Constants.Gradient.glowColor,
+                    Constants.Gradient.secondColor
+                ],
+                center: .top,
+                startRadius: Constants.Gradient.startRadius,
+                endRadius: Constants.Gradient.endRadius
+            )
+            .ignoresSafeArea()
+            
+            Image(.onboardingPaywallBackground)
                 .resizable()
                 .scaledToFill()
-            // Used to prevent image from shifting off the screen
-                .containerRelativeFrame([.horizontal])
-                .ignoresSafeArea()
+                .containerRelativeFrame([.vertical]) { amount, _ in
+                    amount / 1.5
+                }
+                .scaleEffect(1.55, anchor: .leading)
+            
             VStack(alignment: .leading) {
-                Text(viewModel.state.navigationTitle)
-                    .font(.system(
-                        size: Constants.FontSize.navigationTitle,
-                        weight: .bold
-                    ))
-                    .foregroundColor(Color.white)
-                    .padding()
+                
+                VStack(alignment: .leading) {
+                    Text(Constants.Strings.appName)
+                        .font(.system(
+                            size: Constants.FontSize.navigationTitle,
+                            weight: .bold
+                        ))
+                        .foregroundColor(Color.white)
+                    Text(Constants.Strings.appSlogan)
+                        .font(.subheadline)
+                        .foregroundStyle(.ftGray3)
+                }
+                .padding()
+                
                 Spacer()
+                
                 VStack {
+                    Text(Constants.Strings.featuresTitle)
+                        .font(.title2)
+                        .bold()
+                        .padding()
+                    
                     features
                     
                     FTSubscribeButtonView(
-                        terms: viewModel.state.trialProduct?.trialPeriodDescription ?? Constants.Strings.paidOnce,
-                        buttonTitle: Constants.Strings.tryButtonTitle,
+                        terms: viewModel.state.trialPeriodDescription,
+                        buttonTitle: viewModel.state.purchaseButtonTitle,
                         buttonAction: {
-                            viewModel.subscribeToFreeTrial()
+                            Task {
+                                await viewModel.initiatePurchaseWithCurrentProduct()
+                            }
                         }
                     )
                     .padding()
+                    .disabled(viewModel.state.superState.isButtonDisabled)
                     
                     SubscriptionUtilityLinksView(
-                        onTermsTapped: viewModel.openTermsOfService,
-                        onPrivacyTapped: viewModel.openPrivacy,
-                        onRestoreTapped: viewModel.restorePurchase
+                        viewModel: .init(
+                            paymentManager: viewModel.getCurrentPaymentManager(),
+                            flowDelegate: viewModel.getCurrentFlowDelegate()
+                        )
                     )
                 }
-                .containerRelativeFrame(.vertical, { amount, axis in
-                    amount / 1.8
-                })
                 .padding()
+                .padding(.bottom) // Padding, so we don't hit the safe area
                 .background {
                     contentCard
                 }
@@ -67,65 +95,63 @@ struct OnboardingPaywallView: View {
         .alert(
             Constants.Strings.errorHeader,
             isPresented: Binding(get: {
-                viewModel.state.error != nil
+                viewModel.state.superState.error != nil
             }, set: { showError in
-                viewModel.updateError(showError: showError)
+                viewModel.keepShowingError(showError: showError)
             }), actions: {
                 // OK dismissal button by default
             }, message: {
-                Text(viewModel.state.error?.localizedDescription ?? "")
+                Text(viewModel.state.superState.error?.localizedDescription ?? "")
             }
         )
         .task {
-            await viewModel.loadFirstTrialOffer()
+            // Do NOT put these in the initializer
+            await viewModel.fetchProducts()
+            viewModel.selectRequestedProduct()
+            viewModel.setupProductInfo()
         }
     }
     
     // MARK: - Computed properties
     /// Computes the shape underneath the feature list.
     private var contentCard: some View {
-        Rectangle()
-            .foregroundStyle(Color.ftBackground)
-            .clipShape(
-                .rect(
-                    topLeadingRadius: Constants.CornerRadius.card,
-                    topTrailingRadius: Constants.CornerRadius.card
-                )
-            )
+        let cornerRadius = Constants.CornerRadius.card
+        return UnevenRoundedRectangle(
+            cornerRadii: .init(topLeading: cornerRadius,
+                               topTrailing: cornerRadius)
+        )
+        .foregroundStyle(.onboardingPaywallContentPad)
+        .opacity(0.6)
     }
     
     /// List of features.
     private var features: some View {
         VStack(alignment: .leading) {
-            ForEach(viewModel.state.featureItems) { item in
-                FTCheckmarkListItemView(item.rawValue)
+            ForEach(Constants.FeatureItems.allCases) { item in
+                FTListItemView(item.rawValue, systemImage: item.systemImage)
                     .padding(.vertical, Constants.Padding.featureList)
             }
         }
+        .foregroundStyle(.ftGray3)
     }
     
     /// Toolbar items.
     @ToolbarContentBuilder
     private var toolbarItems: some ToolbarContent {
         ToolbarItem(placement: .topBarTrailing) {
-            // This will get adressed on the stage of incorporating
-            // the business logic or navigation.
-#warning("Dismiss action is empty")
-            Button(
-                Constants.Strings.dismissButtonTitle,
-                systemImage: "xmark",
-                action: {}
-            )
-            .buttonStyle(.plain)
+            FTDismissToolbarButtonView(dismissAction: viewModel.dismissView)
         }
     }
 }
 
 #Preview {
+    let paymentManager = MockPaymentManagerWithPurchaseError()
     NavigationStack {
         OnboardingPaywallView(
             viewModel: .init(
-                paymentManager: MockPaymentManagerWithPurchaseError()
+                state: .init(requestedProductID: FTProduct.Mocks.weekly.product.id),
+                superPaywallVM: .init(paymentManager: paymentManager),
+                flowDelegate: nil
             )
         )
         .preferredColorScheme(.dark)

@@ -6,98 +6,131 @@
 //
 
 import Foundation
-import StoreKit
 
 /// ViewModel, responsible for managing the logic on ``OnboardingPaywallView``.
-/// - Note: Use it in the ``OnboadingPaywallView``.
+/// - Note: Use it in the ``OnboardingPaywallView``.
 @MainActor
 @Observable
 final class OnboardingPaywallViewModel {
     // MARK: - Nested declarations
     struct State {
-        var error: Error?
-        /// Main features of the paid version,
-        let featureItems = OnboardingPaywallView.Constants.FeatureItems.allCases
-        var navigationTitle = OnboardingPaywallView.Constants.Strings.loadingMessage
+        let requestedProductID: String
+        var superState: SuperPaywallViewModel.State
         
-        var trialProduct: FTProduct?
-        var formattedPrice: String?
+        // Dynamic strings
+        static let stringConstants = OnboardingPaywallView.Constants.Strings.self
+        var trialPeriodDescription = stringConstants.loadingTitle
+        var purchaseButtonTitle    = stringConstants.tryButtonTitle
+        
+        init(
+            requestedProductID: String,
+            superState: SuperPaywallViewModel.State = .init()
+        ) {
+            self.requestedProductID = requestedProductID
+            self.superState = superState
+        }
     }
     
     // MARK: - Properties
-    /// Property contatining values that may trigger UI redraw.
     private(set) var state: State
-    
-    // Made this property private becase it is injected
-    // through the initializer, not a property.
-    private let paymentManager: PaymentManager
+    private let superPaywallVM: SuperPaywallViewModel
+    private let flowDelegate: PaywallNavigationDelegate?
     
     // MARK: - Initializers
     init(
-        state: State = State(),
-        paymentManager: PaymentManager
+        state: State,
+        superPaywallVM: SuperPaywallViewModel,
+        flowDelegate: PaywallNavigationDelegate?
     ) {
         self.state = state
-        self.paymentManager = paymentManager
+        self.superPaywallVM = superPaywallVM
+        self.flowDelegate = flowDelegate
+        superPaywallVM.delegate = self
     }
     
-    // MARK: - State setter methods
-    func updateError(showError: Bool) {
-        if !showError {
-            state.error = nil
-        }
-    }
     
     // MARK: - Methods
-    func loadFirstTrialOffer() async {
-        let products = await paymentManager.products
+    // MARK: State setter methods
+    func keepShowingError(showError: Bool) {
+        if !showError {
+            state.superState.error = nil
+        }
+    }
+    
+    // MARK: Setup
+    func fetchProducts() async {
+        await superPaywallVM.fetchProducts(state: state.superState)
+        state.superState.isButtonDisabled = false
+    }
+    
+    func getCurrentPaymentManager() -> PaymentManager {
+        superPaywallVM.getCurrentPaymentManager()
+    }
+    
+    func getCurrentFlowDelegate() -> PaywallNavigationDelegate? {
+        flowDelegate
+    }
+    
+    func selectRequestedProduct() {
+        superPaywallVM.selectProductWithID(state.requestedProductID, state: state.superState)
+    }
 
-        guard let trialProduct = products.first(where: { $0.trialPeriod != nil }) else {
-            state.error = OnboardingPaywallError.noTrialOption
+    func setupProductInfo() {
+        guard let product = state.superState.selectedProduct else {
+            let error = PaymentError.productNotFound
+            state.superState.error = error
+            state.trialPeriodDescription = error.localizedDescription
+            // Dismiss view?
             return
         }
-
-        state.trialProduct = trialProduct
-
-        let trialDuration = trialProduct.trialPeriodString ?? "0 days"
-        state.navigationTitle = """
-        Get started with
-        a \(trialDuration) free trial
-        """
-
-        state.formattedPrice = trialProduct.priceAndPeriodString ?? trialProduct.priceString
-    }
-    
-    func subscribeToFreeTrial() {
-        guard let product = state.trialProduct else {
-            state.error = OnboardingPaywallError.noTrialOption
-            return
-        }
-        Task {
-            do {
-                let _ = try await paymentManager.purchase(product)
-            } catch {
-                state.error = error
-            }
+        
+        if let description = product.trialPeriodDescription {
+            state.trialPeriodDescription = description
         }
     }
     
-    func restorePurchase() {
-        Task {
-            do {
-                try await paymentManager.restorePurchases()
-            } catch {
-                state.error = error
-            }
+    private func updateUIBasedOnPurchaseResult() {
+        guard let purchaseResult = state.superState.purchaseResult else { return }
+        
+        switch purchaseResult {
+        case .success:
+            state.purchaseButtonTitle = State.stringConstants.subscribedTitle
+            state.superState.isButtonDisabled = true
+            state.superState.error = nil
+            
+        case .pending:
+            state.purchaseButtonTitle = State.stringConstants.pendingTitle
+            state.superState.isButtonDisabled = true
+            state.superState.error = PaymentError.pending
+            
+        case .userCancelled:
+            state.purchaseButtonTitle = State.stringConstants.tryButtonTitle
+            state.superState.isButtonDisabled = false
         }
     }
     
-    func openTermsOfService() {
-        // Open ToS
+    // MARK: Actions
+    func initiatePurchaseWithCurrentProduct() async {
+        await superPaywallVM.subscribeToCurrentRequestedProduct(state: state.superState)
+        updateUIBasedOnPurchaseResult()
     }
     
-    func openPrivacy() {
-        // Open Privacy
+    func dismissView() {
+        flowDelegate?.paywallDidRequestDismissal()
     }
-    
+}
+
+extension OnboardingPaywallViewModel: SuperPaywallViewModelDelegate {
+    func didChangeUserEntitlementStatus(isPro: Bool) {
+        Task { [weak self] in
+            guard let self else { return }
+            
+            await self.superPaywallVM.updatePurchaseResultForSelectedProduct(
+                state: self.state.superState
+            )
+            updateUIBasedOnPurchaseResult()
+            
+            if isPro { flowDelegate?.paywallDidRequestDismissal() }
+        }
+    }
 }

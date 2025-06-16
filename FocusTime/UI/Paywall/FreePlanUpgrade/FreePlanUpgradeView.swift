@@ -16,10 +16,14 @@ struct FreePlanUpgradeView: View {
     // MARK: - Body
     var body: some View {
         ZStack {
-            Image(.debugNightMountain)
+            Image(.freePlanPaywallBackgound)
                 .resizable()
                 .scaledToFill()
                 .containerRelativeFrame([.horizontal])
+                .scaleEffect(1.05, anchor: .bottom) // Scale it to the top a bit
+                .overlay {
+                    Color.ftMainBlue.opacity(0.1)
+                }
             // VStack to push the elements down with a spacer.
             VStack {
                 Spacer()
@@ -30,9 +34,10 @@ struct FreePlanUpgradeView: View {
                         .padding(.vertical)
                     
                     SubscriptionUtilityLinksView(
-                        onTermsTapped: viewModel.openTermsOfService,
-                        onPrivacyTapped: viewModel.openPrivacy,
-                        onRestoreTapped: viewModel.restorePurchase
+                        viewModel: .init(
+                            paymentManager: viewModel.getCurrentPaymentManager(),
+                            flowDelegate: viewModel.flowDelegate
+                        )
                     )
                 }
                 .padding()
@@ -48,19 +53,20 @@ struct FreePlanUpgradeView: View {
         .alert(
             Constants.Strings.errorHeader,
             isPresented: Binding(get: {
-                viewModel.state.error != nil
+                viewModel.state.superState.error != nil
             }, set: { showError in
-                viewModel.updateError(showError: showError)
+                viewModel.keepShowingError(showError: showError)
             }), actions: {
                 // OK dismissal button by default
             }, message: {
-                Text(viewModel.state.error?.localizedDescription ?? "")
+                Text(viewModel.state.superState.error?.localizedDescription ?? "")
             }
         )
-        .onAppear {
+        .task {
             // Do NOT put these in the initializer
+            await viewModel.fetchProducts()
+            viewModel.selectRequestedProduct()
             viewModel.setupProductInfo()
-            viewModel.startListeningToSubscriptionUpdates()
         }
     }
     
@@ -68,8 +74,10 @@ struct FreePlanUpgradeView: View {
     private var upgradePromptSection: some View {
         Group {
             Text(Constants.Strings.title)
-                .font(.title.bold())
+                .font(.title3.bold())
             Text(Constants.Strings.upgradeMessage)
+                .multilineTextAlignment(.center)
+                .foregroundStyle(.ftGray3)
         }
     }
     
@@ -80,10 +88,12 @@ struct FreePlanUpgradeView: View {
                 terms: viewModel.state.trialPeriodDescription,
                 buttonTitle: viewModel.state.purchaseButtonTitle,
                 buttonAction: {
-                    viewModel.subscribeToFreeTrial()
+                    Task {
+                        await viewModel.initiatePurchaseWithCurrentProduct()
+                    }
                 }
             )
-            .disabled(viewModel.state.isButtonDisabled)
+            .disabled(viewModel.state.superState.isButtonDisabled)
             Button(
                 Constants.Strings.viewPlansButton,
                 action: viewModel.viewAllPlans
@@ -97,17 +107,7 @@ struct FreePlanUpgradeView: View {
     @ToolbarContentBuilder
     private var toolbarItems: some ToolbarContent {
         ToolbarItem(placement: .topBarTrailing) {
-            // This will get adressed on the stage of incorporating
-            // the business logic or navigation.
-#warning("Dismiss action is empty")
-            Button(
-                Constants.Strings.dismissButtonTitle,
-                systemImage: "xmark",
-                action: {
-                    // Dismiss this view with Flow Control in mind
-                }
-            )
-            .buttonStyle(.plain)
+            FTDismissToolbarButtonView(dismissAction: viewModel.dismissView)
         }
     }
     
@@ -115,11 +115,14 @@ struct FreePlanUpgradeView: View {
 
 // MARK: - Previews
 #Preview("MockPaymentManagerWithError") {
+    let productID = FTProduct.Mocks.weekly.product.id
+    let paymentManager = MockPaymentManagerWithPurchaseError()
     NavigationStack {
         FreePlanUpgradeView(
             viewModel: .init(
-                state: .init(trialProduct: FTProduct.Mocks.monthly.product),
-                paymentManager: MockPaymentManagerWithPurchaseError()
+                state: .init(requestedProductID: productID),
+                superPaywallVM: .init(paymentManager: paymentManager),
+                flowDelegate: nil
             )
         )
         .preferredColorScheme(.dark)
@@ -127,11 +130,14 @@ struct FreePlanUpgradeView: View {
 }
 
 #Preview("NonTrialableProduct") {
+    let productID = FTProduct.Mocks.monthly.product.id
+    let paymentManager = MockPaymentManagerWithPurchaseError()
     NavigationStack {
         FreePlanUpgradeView(
             viewModel: .init(
-                state: .init(trialProduct: FTProduct.Mocks.yearly.product),
-                paymentManager: MockPaymentManagerWithPurchaseError()
+                state: .init(requestedProductID: productID),
+                superPaywallVM: .init(paymentManager: paymentManager),
+                flowDelegate: nil
             )
         )
         .preferredColorScheme(.dark)
@@ -139,11 +145,14 @@ struct FreePlanUpgradeView: View {
 }
 
 #Preview("StoreKitPaymentManager") {
+    let productID = FTProduct.Mocks.monthly.product.id
+    let paymentManager = StoreKitPaymentManager()
     NavigationStack {
         FreePlanUpgradeView(
             viewModel: .init(
-                state: .init(trialProduct: FTProduct.Mocks.monthly.product),
-                paymentManager: StoreKitPaymentManager()
+                state: .init(requestedProductID: productID),
+                superPaywallVM: .init(paymentManager: paymentManager),
+                flowDelegate: nil
             )
         )
         .preferredColorScheme(.dark)

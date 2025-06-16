@@ -22,10 +22,12 @@ extension PlanSelectionPaywallView {
         // MARK: - Strings
         enum Strings {
             static let navigationTitle = "Get DeepWave Pro"
-            static let loadingMessage = SharedPaywallConstants.Strings.loadingMessage
+            static let loadingTitle = SharedPaywallConstants.Strings.loadingTitle
             // Title text for the subscription trial button.
             static let startFreeTrial = "Start Free Trial"
             static let subscribeButtonTitle = SharedPaywallConstants.Strings.subscribeButtonTitle
+            static let subscribedTitle = SharedPaywallConstants.Strings.subscribedTitle
+            static let purchasedTitle = SharedPaywallConstants.Strings.purchasedTitle
             
             // Trial-related
             static let trialDescription = "Try Free For 3 days"
@@ -39,6 +41,8 @@ extension PlanSelectionPaywallView {
             
             // Error
             static let errorHeader = SharedPaywallConstants.Strings.errorHeader
+            static let defaultTrialError = "Unable to load trial information."
+            static let subscribeButtonTerms  = "Subscription automatically renews unless canceled. You can cancel anytime."
         }
         
     }

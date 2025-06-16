@@ -4,8 +4,8 @@
 //
 //  Created by Maksym Horobets on 19.05.2025.
 //
+
 import SwiftUI
-import StoreKit
 
 /// ViewModel, responsible for managing the logic on ``PlanSelectionPaywallView``.
 /// - Note: Use it in the ``PlanSelectionPaywallView``.
@@ -14,8 +14,7 @@ import StoreKit
 final class PlanSelectionPaywallViewModel {
     // MARK: - Nested declarations
     struct State {
-        static let loadingMessage = PlanSelectionPaywallView.Constants.Strings.loadingMessage
-        var error: Error? // Alerts are not implemented yet
+        var superState: SuperPaywallViewModel.State
         
         // MARK: Background Images
         let backgroudImages: [ImageResource] = [
@@ -24,93 +23,108 @@ final class PlanSelectionPaywallViewModel {
         ]
         var selectedImageIndex: Int? = .zero
         
-        // MARK: Product-related
-        var products: [FTProduct] = []
-        /// - Important:
-        /// Set this property through the `PlanSelectionPaywallViewModel.selectProduct(_:)`.
-        fileprivate(set) var selectedProduct: FTProduct?
-        
-        // MARK: Trial view
-        var isTrialUsed: Bool?
-        var trialOfferSubtitle: String = loadingMessage
-        
         // MARK: Other
-        var primaryButtonTitle: String = loadingMessage
-        var subscribeButtonTerms: String = loadingMessage
+        static let stringConstants = PlanSelectionPaywallView.Constants.Strings.self
+        var primaryButtonTitle: String = stringConstants.loadingTitle
+        var subscribeButtonTerms: String = ""
+        
+        init(superState: SuperPaywallViewModel.State = .init()) {
+            self.superState = superState
+        }
     }
     
-    // MARK: - Properties
-    /// Property contatining values that may trigger UI redraw.
-    private(set) var state: State
     
-    // Made this property private becase it is injected
-    // through the initializer, not a property.
-    private let paymentManager: PaymentManager
+    // MARK: - Properties
+    private(set) var state: State
+    private let superPaywallVM: SuperPaywallViewModel
+    private let flowDelegate: PaywallNavigationDelegate?
     
     // MARK: - Initializers
     init(
         state: State = State(),
-        paymentManager: PaymentManager
+        superState: SuperPaywallViewModel.State = .init(),
+        superPaywallVM: SuperPaywallViewModel,
+        flowDelegate: PaywallNavigationDelegate?
     ) {
         self.state = state
-        self.paymentManager = paymentManager
+        self.superPaywallVM = superPaywallVM
+        self.flowDelegate = flowDelegate
+        superPaywallVM.delegate = self
     }
     
-    // MARK: - State setter methods
+    // MARK: - Get/Set methods
+    func getCurrentPaymentManager() -> PaymentManager {
+        superPaywallVM.getCurrentPaymentManager()
+    }
+    
+    func getCurrentFlowDelegate() -> PaywallNavigationDelegate? {
+        flowDelegate
+    }
+    
     func updateSelectedImageIndex(index: Int?) {
         state.selectedImageIndex = index
     }
     
-    func updateError(showError: Bool) {
+    func keepShowingError(showError: Bool) {
         if !showError {
-            state.error = nil
+            state.superState.error = nil
         }
     }
     
     // MARK: - Methods
-    func selectProduct(_ product: FTProduct) async {
-        state.selectedProduct = product
-        
-        // Suspend here until trial check completes
-        // if for some reason it is empty
-        if state.isTrialUsed == nil {
-            state.isTrialUsed = try? await paymentManager.eligibleForIntro(product: product)
-        }
-        
-        guard let isTrialUsed = state.isTrialUsed else {
-            state.error = PlanSelectionPaywallError.missingTrialInfo
-            return
-        }
-        
-        configureBottomSectionForSelectedPtoduct(product, isTrialUsed: isTrialUsed)
-        
+    func fetchProducts() async {
+        await superPaywallVM.fetchProducts(state: state.superState)
     }
     
-    private func configureBottomSectionForSelectedPtoduct(
-        _ product: FTProduct,
-        isTrialUsed: Bool
-    ) {
-        // Just a shortcut to constants
-        let shortcut = PlanSelectionPaywallView.Constants.Strings.self
+    func checkIfUserIsEligibleForFreeTrial() async {
+        await superPaywallVM.isUserEligibleForTrial(state: state.superState)
+    }
+    
+    func selectFirstProductIfNeeded() {
+        superPaywallVM.selectFirstProductIfNeeded(state: state.superState)
+    }
+    
+    func selectProduct(_ product: FTProduct) {
+        superPaywallVM.selectProduct(product, state: state.superState)
+        configureBottomSectionForSelectedProduct()
+    }
+    
+    func configureBottomSectionForSelectedProduct() {
+        guard let product = state.superState.selectedProduct else { return }
         
-        // If this product is trialable and the user hasn't used
-        // their trial yet - we say it is available
-        let useTrial: Bool = product.trialPeriod != nil && !isTrialUsed
+        if product.trialPeriod != nil && state.superState.isEligibleForIntro {
+            // Product is trialable and the user is eligible for trial
+            state.primaryButtonTitle = State.stringConstants.startFreeTrial
+            state.subscribeButtonTerms = State.stringConstants.noPaymentMessage
+        } else if product.trialPeriod == nil || !state.superState.isEligibleForIntro {
+            // No trial on product or it is already used
+            let periodDesc = product.subscriptionPeriodDescription ?? State.stringConstants.paidOnce
+            state.primaryButtonTitle = State.stringConstants.subscribeButtonTitle
+            state.subscribeButtonTerms = periodDesc
+        }
         
-        if useTrial {
-            state.primaryButtonTitle = shortcut.startFreeTrial
-            state.subscribeButtonTerms = shortcut.noPaymentMessage
-        } else {
-            var terms: String
+        configurePurchaseButtonAvailabilityBasedOnSelectedProduct()
+    }
+    
+    private func configurePurchaseButtonAvailabilityBasedOnSelectedProduct() {
+        guard let product = state.superState.selectedProduct else { return }
+        state.superState.isButtonDisabled = true
+        
+        Task { [weak self] in
+            guard let self else { return }
             
-            if let periodDescription = product.subscriptionPeriodDescription {
-                terms = periodDescription
+            if await superPaywallVM.isProductPurchased(product) {
+                state.superState.isButtonDisabled = true
+                
+                state.primaryButtonTitle =
+                (product.subscriptionPeriod != nil)
+                ? State.stringConstants.subscribedTitle
+                : State.stringConstants.purchasedTitle
+                
+                
             } else {
-                terms = shortcut.paidOnce
+                state.superState.isButtonDisabled = false
             }
-            
-            state.primaryButtonTitle = shortcut.subscribeButtonTitle
-            state.subscribeButtonTerms = terms
         }
     }
     
@@ -118,46 +132,29 @@ final class PlanSelectionPaywallViewModel {
         "Get \(product.trialPeriodString ?? "0 days") for free!"
     }
     
-    func loadOffers() async {
-        // Load products
-        let products = await paymentManager.products
-        state.products = products
-        
-        // Set initial selected product
-        // If there are no products - we don't select anything
-        if let trialableProduct = products.first(where: { $0.trialPeriod != nil }) {
-            await selectProduct(trialableProduct)
-        } else if let product = products.first {
-            await selectProduct(product)
+    // MARK: Actions
+    func initiatePurchaseWithCurrentProduct() async {
+        await superPaywallVM.subscribeToCurrentRequestedProduct(state: state.superState)
+        configureBottomSectionForSelectedProduct()
+    }
+    
+    func dismissView() {
+        flowDelegate?.paywallDidRequestDismissal()
+    }
+}
+
+
+extension PlanSelectionPaywallViewModel: SuperPaywallViewModelDelegate {
+    func didChangeUserEntitlementStatus(isPro: Bool) {
+        Task { [weak self] in
+            guard let self else { return }
+            
+            await self.superPaywallVM.updatePurchaseResultForSelectedProduct(
+                state: self.state.superState
+            )
+            configurePurchaseButtonAvailabilityBasedOnSelectedProduct()
+            
+            if isPro { flowDelegate?.paywallDidRequestDismissal() }
         }
     }
-    
-    func subscribe(with product: FTProduct) {
-        Task {
-            do {
-                let _ = try await paymentManager.purchase(product)
-            } catch {
-                state.error = error
-            }
-        }
-    }
-    
-    func restorePurchase() {
-        Task {
-            do {
-                try await paymentManager.restorePurchases()
-            } catch {
-                state.error = error
-            }
-        }
-    }
-    
-    func openTermsOfService() {
-        // Open ToS
-    }
-    
-    func openPrivacy() {
-        // Open Privacy
-    }
-    
 }

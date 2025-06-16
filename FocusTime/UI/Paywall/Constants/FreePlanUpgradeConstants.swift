@@ -18,7 +18,7 @@ extension FreePlanUpgradeView {
         enum Strings {
             /// Body message of the upgrade view.
             static var upgradeMessage: AttributedString {
-                var string = AttributedString("Upgrade to have unlimited scheduled\nsessions with Pro version")
+                var string = AttributedString("Upgrade to have unlimited scheduled sessions with Pro version")
                 if let range = string.range(of: "Pro version") {
                     string[range].font = .body.bold()
                 }
@@ -29,12 +29,12 @@ extension FreePlanUpgradeView {
             static let title = "You're on a Free Plan"
             
             // Loading state
-            static let loadingMessage = SharedPaywallConstants.Strings.loadingMessage
+            static let loadingTitle = SharedPaywallConstants.Strings.loadingTitle
             
             // Purchase button states
             static let tryButtonTitle = "Try For $0,00"
-            static let pendingMessage = SharedPaywallConstants.Strings.pendingMessage
-            static let subscribedMessage = SharedPaywallConstants.Strings.subscribedMessage
+            static let pendingTitle = SharedPaywallConstants.Strings.pendingTitle
+            static let subscribedTitle = SharedPaywallConstants.Strings.subscribedTitle
             
             // Other buttons
             static let viewPlansButton = SharedPaywallConstants.Strings.viewPlansButton

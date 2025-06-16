@@ -11,16 +11,21 @@ enum SharedPaywallConstants {
     
     // MARK: - Strings
     enum Strings {
-        static let errorHeader = "An error occured"
+        static let appName = "DeepWave"
+        static let appSlogan = "Focus within minutes"
+        
+        static let errorHeader = "An error occurred"
         static let dismissButtonTitle = "Dismiss current screen."
         static let viewPlansButton = "View All Plans"
         static let subscribeButtonTitle = "Subscribe"
         // Lifetime
         static let paidOnce = "Paid once"
         // Button states
-        static let loadingMessage = "Loading..."
-        static let pendingMessage = "Pending..."
-        static let subscribedMessage = "Subscribed!"
+        static let loadingTitle = "Loading..."
+        static let pendingTitle = "Pending..."
+        static let subscribeTitle = "Subscribe"
+        static let subscribedTitle = "Subscribed!"
+        static let purchasedTitle = "Purchased!"
     }
     
 }
