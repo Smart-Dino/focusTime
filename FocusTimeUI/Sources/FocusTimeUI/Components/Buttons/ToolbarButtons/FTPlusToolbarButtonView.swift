@@ -1,8 +1,8 @@
 //
-//  FTDismissToolbarButtonView.swift
+//  File.swift
 //  FocusTimeUI
 //
-//  Created by Maksym Horobets on 12.06.2025.
+//  Created by Maksym Horobets on 16.06.2025.
 //
 
 import SwiftUI

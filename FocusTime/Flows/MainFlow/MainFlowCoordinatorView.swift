@@ -13,55 +13,63 @@ struct MainFlowCoordinatorView: View {
     
     var body: some View {
         NavigationStack {
-            TabView {
+            TabView(selection: Binding(get: {
+                viewModel.flowState.currentScreen
+            }, set: { screen in
+                viewModel.setScreen(screen)
+            })) {
                 Group {
-                    Group {
-                        Text("Home view")
-                    }
-                    .tabItem {
-                        LabeledContent("Home") {
-                            Image(.wavelogo)
-                                .renderingMode(.template)
+                    HomeView()
+                        .tabItem {
+                            LabeledContent("Home") {
+                                Image(.wavelogo)
+                                    .renderingMode(.template)
+                            }
                         }
-                    }
-                    Group {
-                        Text("Empty for now")
-                    }
-                    .tabItem {
-                        Label("Blocks", systemImage: "hand.raised")
-                    }
-                    
-                    Group {
-                        Text("Empty for now")
-                    }
-                    .tabItem {
-                        Label("Profile", systemImage: "person")
-                    }
+                        .tag(MainTabScreens.home)
+                    Text("Empty for now")
+                        .tabItem {
+                            Label("Blocks", systemImage: "hand.raised")
+                        }
+                        .tag(MainTabScreens.blocks)
+                    Text("Empty for now")
+                        .tabItem {
+                            Label("Profile", systemImage: "person")
+                        }
+                        .tag(MainTabScreens.profile)
                 }
-                .toolbarBackground(Color.ftBackground, for: .tabBar)
-                .toolbarBackground(.visible, for: .tabBar)
+//                .toolbarBackground(Color.ftBackground, for: .tabBar)
+//                .toolbarBackground(.visible, for: .tabBar)
+                .toolbarBackground(.hidden, for: .tabBar)
                 .toolbarColorScheme(.dark, for: .tabBar)
             }
+            .toolbar(.visible)
             .toolbar {
-                toolBarItems
+                if viewModel.flowState.currentScreen == .home {
+                    ToolbarItem {
+                        FTProUpgradeButtonView {
+#warning("Action is empty")
+                        }
+                    }
+                }
+                // In future SDKs of iOS we would have to put a spacer here.
+                ToolbarItemGroup {
+                    switch viewModel.flowState.currentScreen {
+                    case .home:
+                        homeScreenToolbarItems
+                    case .blocks: EmptyView()
+                    case .profile: EmptyView()
+                    }
+                }
             }
         }
         .preferredColorScheme(.dark)
-        .sheet(isPresented: .constant(false)) {
-            // On dismiss sheet
-        } content: {
-            switch viewModel.flowState.currentFlow {
-            default: Text("Empty for now")
-            }
-        }
     }
     
-    @ToolbarContentBuilder
-    var toolBarItems: some ToolbarContent {
-        ToolbarItem(placement: .topBarTrailing) {
-            Button("Settings", systemImage: "gear") {
-                // Open settings
-            }
+    @ViewBuilder
+    var homeScreenToolbarItems: some View {
+        FTPlusToolbarButtonView {
+#warning("Action is empty")
         }
     }
 }

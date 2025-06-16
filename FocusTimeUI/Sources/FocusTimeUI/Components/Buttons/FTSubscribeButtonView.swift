@@ -32,11 +32,11 @@ public struct FTSubscribeButtonView: View {
     public init(
         terms: String,
         buttonTitle: String,
-        buttonAction: @escaping () -> Void
+        action: @escaping () -> Void
     ) {
         self.terms = terms
         self.buttonTitle = buttonTitle
-        self.buttonAction = buttonAction
+        self.buttonAction = action
     }
 }
 

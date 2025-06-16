@@ -46,8 +46,8 @@ extension OnboardingPaywallView {
             static let endRadius: CGFloat = 1500
         }
         // MARK: - Typography
-        enum FontSize {
-            static let navigationTitle: CGFloat = 34
+        enum Fonts {
+            static let navigationTitle = SharedConstants.Fonts.navigationTitle
         }
         
         // MARK: - Layout
@@ -65,18 +65,18 @@ extension OnboardingPaywallView {
         enum Strings {
             // Purchase button states
             static let tryButtonTitle = "Try Free And Subscribe"
-            static let pendingTitle = SharedPaywallConstants.Strings.pendingTitle
-            static let subscribedTitle = SharedPaywallConstants.Strings.subscribedTitle
+            static let pendingTitle = SharedConstants.Strings.pendingTitle
+            static let subscribedTitle = SharedConstants.Strings.subscribedTitle
             
             static let featuresTitle = "Unlock All Features"
             
             // UI
-            static let appName = SharedPaywallConstants.Strings.appName
-            static let appSlogan = SharedPaywallConstants.Strings.appSlogan
-            static let loadingTitle = SharedPaywallConstants.Strings.loadingTitle
+            static let appName = SharedConstants.Strings.appName
+            static let appSlogan = SharedConstants.Strings.appSlogan
+            static let loadingTitle = SharedConstants.Strings.loadingTitle
             
             // Error
-            static let errorHeader = SharedPaywallConstants.Strings.errorHeader
+            static let errorHeader = SharedConstants.Strings.errorHeader
         }
         
     }

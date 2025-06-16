@@ -12,7 +12,7 @@ import SwiftUI
 public extension ShapeStyle where Self == Color {
     // MARK: - Backgrounds
     static var ftBackground: Color { Color("BackgroundColor", bundle: .module) }
-    static var ftBackgroundBlueColor: Color { Color("BackgroundBlueColor", bundle: .module) }
+    static var ftBackgroundBlue: Color { Color("BackgroundBlueColor", bundle: .module) }
     // MARK: - Blue
     static var ftDarkBlue: Color { Color("DarkBlueColor", bundle: .module) }
     static var ftMainBlue: Color { Color("MainBlueColor", bundle: .module) }

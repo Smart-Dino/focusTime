@@ -27,28 +27,29 @@ struct OnboardingPaywallView: View {
             )
             .ignoresSafeArea()
             
-            Image(.onboardingPaywallBackground)
-                .resizable()
-                .scaledToFill()
-                .containerRelativeFrame([.vertical]) { amount, _ in
-                    amount / 1.5
-                }
-                .scaleEffect(1.55, anchor: .leading)
+            Image(
+                ImageResource
+                    .PaywallImages
+                    .onboardingBackground
+            )
+            .resizable()
+            .scaledToFill()
+            .containerRelativeFrame([.vertical]) { amount, _ in
+                amount / 1.5
+            }
+            .scaleEffect(1.55, anchor: .leading)
             
             VStack(alignment: .leading) {
                 
                 VStack(alignment: .leading) {
                     Text(Constants.Strings.appName)
-                        .font(.system(
-                            size: Constants.FontSize.navigationTitle,
-                            weight: .bold
-                        ))
-                        .foregroundColor(Color.white)
+                        .font(Constants.Fonts.navigationTitle)
                     Text(Constants.Strings.appSlogan)
                         .font(.subheadline)
                         .foregroundStyle(.ftGray3)
                 }
-                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal)
                 
                 Spacer()
                 
@@ -63,7 +64,7 @@ struct OnboardingPaywallView: View {
                     FTSubscribeButtonView(
                         terms: viewModel.state.trialPeriodDescription,
                         buttonTitle: viewModel.state.purchaseButtonTitle,
-                        buttonAction: {
+                        action: {
                             Task {
                                 await viewModel.initiatePurchaseWithCurrentProduct()
                             }

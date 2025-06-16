@@ -7,24 +7,19 @@
 
 import Foundation
 
-enum MainTabScreens: Equatable {
-    case home(_ viewModel: HomeViewModel)
+enum MainTabScreens: Equatable, Hashable {
+    case home
+    case blocks
+    case profile
     
     var id: Self { self }
-    
-    static func == (lhs: MainTabScreens, rhs: MainTabScreens) -> Bool {
-        switch (lhs, rhs) {
-        case (.home, .home): true
-        default: false
-        }
-    }
 }
 
 @MainActor
 @Observable
 final class MainFlowCoordinatorViewModel {
     struct State {
-        var currentFlow: MainTabScreens
+        var currentScreen: MainTabScreens
     }
     private(set) var flowState: State!
     
@@ -32,8 +27,12 @@ final class MainFlowCoordinatorViewModel {
     
     init() {
         self.flowState = State(
-            currentFlow: .home(self.makeHomeViewModel())
+            currentScreen: .home
         )
+    }
+    
+    func setScreen(_ screen: MainTabScreens) {
+        flowState.currentScreen = screen
     }
     
     func makeHomeViewModel() -> HomeViewModel {
