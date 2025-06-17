@@ -9,9 +9,11 @@ import SwiftUI
 import FocusTimeUI
 
 struct HomeView: View {
+    @State var viewModel: HomeViewModel
+    
     var body: some View {
         ZStack {
-            backgroundGradient
+            MainBackgroundGradientView()
 
             // Nav title and an image below it.
             VStack {
@@ -89,27 +91,10 @@ struct HomeView: View {
         }
         .preferredColorScheme(.dark)
     }
-
-    var backgroundGradient: some View {
-        ZStack {
-            Color.ftBackground
-                .ignoresSafeArea()
-            VStack {
-                Group {
-                    Circle()
-                        .fill(.ftBackgroundBlue.opacity(0.5))
-                    Spacer()
-                    Circle()
-                        .fill(.ftDarkBlue)
-                }
-            }
-        }
-        .blur(radius: Constants.Layout.backgroundBlurRadius)
-    }
 }
 
 #Preview {
     NavigationStack {
-        HomeView()
+        HomeView(viewModel: .init())
     }
 }

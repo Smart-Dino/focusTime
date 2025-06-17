@@ -19,7 +19,7 @@ struct MainFlowCoordinatorView: View {
                 viewModel.setScreen(screen)
             })) {
                 Group {
-                    HomeView()
+                    HomeView(viewModel: viewModel.makeHomeViewModel())
                         .tabItem {
                             LabeledContent("Home") {
                                 Image(.wavelogo)
@@ -27,7 +27,7 @@ struct MainFlowCoordinatorView: View {
                             }
                         }
                         .tag(MainTabScreens.home)
-                    Text("Empty for now")
+                    AppBlockingListView(viewModel: viewModel.makeAppBlockListViewModel())
                         .tabItem {
                             Label("Blocks", systemImage: "hand.raised")
                             // Prevent system from filling our icons.

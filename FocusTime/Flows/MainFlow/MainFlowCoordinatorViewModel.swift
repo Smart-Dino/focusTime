@@ -39,4 +39,8 @@ final class MainFlowCoordinatorViewModel {
         HomeViewModel()
     }
     
+    func makeAppBlockListViewModel() -> AppBlockingListViewModel {
+        AppBlockingListViewModel()
+    }
+    
 }

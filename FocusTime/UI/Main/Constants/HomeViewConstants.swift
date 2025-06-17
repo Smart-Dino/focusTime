@@ -33,7 +33,6 @@ extension HomeView {
         // MARK: - Layout
         enum Layout {
             static let mainSpacing: CGFloat = 70
-            static let backgroundBlurRadius: CGFloat = 160
         }
     }
 }
