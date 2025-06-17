@@ -30,17 +30,24 @@ struct MainFlowCoordinatorView: View {
                     Text("Empty for now")
                         .tabItem {
                             Label("Blocks", systemImage: "hand.raised")
+                            // Prevent system from filling our icons.
+                                .environment(\.symbolVariants, .none)
+
                         }
                         .tag(MainTabScreens.blocks)
                     Text("Empty for now")
                         .tabItem {
                             Label("Profile", systemImage: "person")
+                            // Prevent system from filling our icons.
+                                .environment(\.symbolVariants, .none)
                         }
                         .tag(MainTabScreens.profile)
                 }
-//                .toolbarBackground(Color.ftBackground, for: .tabBar)
-//                .toolbarBackground(.visible, for: .tabBar)
-                .toolbarBackground(.hidden, for: .tabBar)
+//                .toolbarBackground(Color.ftBackground, for: .tabBar) // Set a specific color
+                // as a background, but we don't do it because the tabbar is transparent
+                // in a non-scrolling content so we underlay our own behind it.
+//                .toolbarBackground(.hidden, for: .tabBar) // Removes background and sets
+                // selected item to be white-tinted.
                 .toolbarColorScheme(.dark, for: .tabBar)
             }
             .toolbar(.visible)
@@ -56,7 +63,9 @@ struct MainFlowCoordinatorView: View {
                 ToolbarItemGroup {
                     switch viewModel.flowState.currentScreen {
                     case .home:
-                        homeScreenToolbarItems
+                        FTPlusToolbarButtonView {
+                #warning("Action is empty")
+                        }
                     case .blocks: EmptyView()
                     case .profile: EmptyView()
                     }
@@ -64,13 +73,6 @@ struct MainFlowCoordinatorView: View {
             }
         }
         .preferredColorScheme(.dark)
-    }
-    
-    @ViewBuilder
-    var homeScreenToolbarItems: some View {
-        FTPlusToolbarButtonView {
-#warning("Action is empty")
-        }
     }
 }
 
