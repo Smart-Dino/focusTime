@@ -102,9 +102,6 @@ struct HomeView: View {
                     Circle()
                         .fill(.ftDarkBlue)
                 }
-                .containerRelativeFrame(.horizontal) { amount, _ in
-                    amount / 1.5
-                }
             }
         }
         .blur(radius: Constants.Layout.backgroundBlurRadius)
