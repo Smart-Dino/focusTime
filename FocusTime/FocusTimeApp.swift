@@ -13,6 +13,7 @@ struct FocusTimeApp: App {
     
     var body: some Scene {
         WindowGroup {
+
             Group {
                 if let paymentManager {
                     PlanSelectionPaywallView(
@@ -27,6 +28,9 @@ struct FocusTimeApp: App {
                 }
             }
             .preferredColorScheme(.dark)
+
+         //   FocusSessionView()
+
         }
     }
 }

@@ -20,7 +20,8 @@
             "value" : "📋 Lack of structure"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "quiz_onboarding_option_mental_fatigue" : {
       "extractionState" : "stale",
@@ -31,7 +32,8 @@
             "value" : "🧘 Mental fatigue"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "quiz_onboarding_option_notifications" : {
       "extractionState" : "stale",
@@ -42,7 +44,8 @@
             "value" : "📩 Notifications and messages"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "quiz_onboarding_option_social_media" : {
       "extractionState" : "stale",
@@ -53,7 +56,8 @@
             "value" : "📱 Social media"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "quiz_onboarding_option_work_distractions" : {
       "extractionState" : "stale",
@@ -64,7 +68,8 @@
             "value" : "💻 Work distractions"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "quiz_onboarding_subtitle" : {
       "localizations" : {
