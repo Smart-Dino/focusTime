@@ -10,7 +10,7 @@ import FamilyControls
 
 extension BlockItem {
     enum CodingKeys: CodingKey {
-        case id, name, icon, schedule, blockedContent, isScheduled, isEnabled
+        case id, name, icon, schedules, blockedContent, isEnabled
     }
 }
 
@@ -20,9 +20,8 @@ extension BlockItem: SwiftDataItem {
         try container.encode(id, forKey: .id)
         try container.encode(name, forKey: .name)
         try container.encode(icon, forKey: .icon)
-        try container.encode(schedule, forKey: .schedule)
+        try container.encode(schedules, forKey: .schedules)
         try container.encode(blockedContent, forKey: .blockedContent)
-        try container.encode(isScheduled, forKey: .isScheduled)
         try container.encode(isEnabled, forKey: .isEnabled)
     }
     convenience init(from decoder: any Decoder) throws {
@@ -31,18 +30,16 @@ extension BlockItem: SwiftDataItem {
         let id = try container.decode(UUID.self, forKey: .id)
         let name = try container.decode(String.self, forKey: .name)
         let icon = try container.decode(String.self, forKey: .icon)
-        let schedule = try container.decode(Schedule.self, forKey: .schedule)
+        let schedules = try container.decode([Schedule].self, forKey: .schedules)
         let blockedContent = try container.decode(FamilyActivitySelection.self, forKey: .blockedContent)
-        let isScheduled = try container.decode(Bool.self, forKey: .isScheduled)
         let isEnabled = try container.decode(Bool.self, forKey: .isEnabled)
         
         self.init(
             id: id,
             name: name,
             icon: icon,
-            schedule: schedule,
+            schedules: schedules,
             blockedContent: blockedContent,
-            isScheduled: isScheduled,
             isEnabled: isEnabled
         )
     }

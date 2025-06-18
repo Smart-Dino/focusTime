@@ -7,23 +7,17 @@
 
 import SwiftData
 import Foundation
+import FamilyControls
 
-@MainActor
-final class BlockItemStore: DataSource {
-    private let modelContainer: ModelContainer
-    private let modelContext: ModelContext
+@globalActor
+actor GlobalSourceActor {
+    static let shared = GlobalSourceActor()
+}
 
-    init() {
-        let container = try! ModelContainer(
-            for: BlockItem.self,
-            configurations: ModelConfiguration(isStoredInMemoryOnly: ProcessInfo.isOnPreview() ? true : false)
-        )
-        let context = container.mainContext
-        self.modelContainer = container
-        self.modelContext = context
-    }
-    
+@ModelActor
+actor BlockItemStore1: DataSource1 {
     func insert(_ item: BlockItem) throws {
+        print(Thread.current)
         modelContext.insert(item)
         try modelContext.save()
     }
@@ -38,7 +32,54 @@ final class BlockItemStore: DataSource {
     }
     
     func updateFields(of item: inout BlockItem, using updates: (BlockItem) -> Void) throws {
-        guard var fetchedItem = modelContext.model(for: item.id) as? BlockItem else {
+        guard let fetchedItem = modelContext.model(for: item.id) as? BlockItem else {
+            throw DataSourceError.notFound
+        }
+        
+        updates(fetchedItem)
+        
+        try modelContext.save()
+        item = fetchedItem
+    }
+}
+
+@MainActor
+final class BlockItemStore: DataSource {
+    private let modelContainer: ModelContainer
+    private let modelContext: ModelContext
+
+    init() {
+        let container = try! ModelContainer(
+            for: BlockItem.self,
+            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+        )
+        let context = container.mainContext
+        self.modelContainer = container
+        self.modelContext = context
+    }
+    
+    @GlobalSourceActor func insert(_ item: BlockItem) /*async*/ throws {
+        let container = modelContainer
+        let context = ModelContext(container)
+        context.insert(item)
+        if Thread.isMainThread {
+            fatalError()
+        }
+        try context.save()
+    }
+    
+    func delete(_ item: BlockItem) throws {
+//        try! context.fetch(FetchDescriptor<BlockItem>(predicate: #Predicate { $0.id == itemID }))
+        modelContext.delete(item)
+        try modelContext.save()
+    }
+    
+    func fetchAll() throws -> [BlockItem] {
+        try modelContext.fetch(FetchDescriptor<BlockItem>())
+    }
+    
+    func updateFields(of item: inout BlockItem, using updates: (BlockItem) -> Void) throws {
+        guard let fetchedItem = modelContext.model(for: item.id) as? BlockItem else {
             throw DataSourceError.notFound
         }
         

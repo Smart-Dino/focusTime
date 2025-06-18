@@ -23,11 +23,21 @@ enum DataSourceError: LocalizedError {
     }
 }
 
+protocol DataSource1: ModelActor {
+    associatedtype Model: SwiftDataItem
+    
+    func insert(_ item: Model) async throws
+    func delete(_ item: Model) async throws
+    func fetchAll() async throws -> [Model]
+    
+    func updateFields(of item: inout Model, using updates: (Model) -> Void) async throws
+}
+
 @MainActor
 protocol DataSource {
     associatedtype Model: SwiftDataItem
     
-    func insert(_ item: Model) throws
+    @GlobalSourceActor func insert(_ item: Model) async throws
     func delete(_ item: Model) throws
     func fetchAll() throws -> [Model]
     

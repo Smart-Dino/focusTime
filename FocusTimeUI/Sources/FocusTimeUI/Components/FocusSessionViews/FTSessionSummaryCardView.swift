@@ -1,0 +1,67 @@
+//
+//  FTSessionSummaryCardView.swift
+//  FocusTimeUI
+//
+//  Created by Maksym Horobets on 18.06.2025.
+//
+
+import SwiftUI
+
+fileprivate extension ShapeStyle where Self == Color {
+    // MARK: AppBlocking Colors
+    static var leadingSummaryCard: Color {
+        Color("LeadingSummaryCardColor", bundle: .module)
+    }
+    static var trailingSummaryCard: Color {
+        Color("TrailingSummaryCardColor", bundle: .module)
+    }
+}
+
+public struct FTSessionSummaryCardView: View {
+    private let emoji: String
+    private let title: String
+    private let description: String
+    
+    public var body: some View {
+        HStack(spacing: 15) {
+            Text(emoji)
+                .font(.title2)
+            VStack(alignment: .leading) {
+                Text(title)
+                Text(description)
+                    .foregroundStyle(.ftGray3)
+            }
+            Spacer()
+        }
+        .padding()
+        .background {
+            FocusSessionBackgroundShape()
+                .stroke(gradient, lineWidth: 1.2)
+        }
+    }
+    
+    var gradient: LinearGradient {
+        LinearGradient(
+            colors: [.leadingSummaryCard, .trailingSummaryCard],
+            startPoint: .leading,
+            endPoint: .trailing
+        )
+    }
+    
+    public init(
+        emoji: String,
+        title: String,
+        description: String
+    ) {
+        self.emoji = emoji
+        self.title = title
+        self.description = description
+    }
+    
+}
+
+#Preview(traits: .sizeThatFitsLayout) {
+    FTSessionSummaryCardView(emoji: "😎", title: "Cool", description: "This is a cool view huh.")
+        .padding()
+        .preferredColorScheme(.dark)
+}

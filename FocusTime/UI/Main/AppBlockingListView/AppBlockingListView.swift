@@ -40,7 +40,7 @@ struct AppBlockingListView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 
                 // List
-                if [1].isEmpty {
+                if viewModel.state.items.isEmpty {
                     noBlockListView
                 } else {
                     blockListView
@@ -50,7 +50,10 @@ struct AppBlockingListView: View {
         }
         .safeAreaInset(edge: .bottom) {
             Button("New Blocklist", systemImage: "plus.circle") {
-                #warning("Action is empty")
+#warning("Action is empty")
+                Task {
+                    await viewModel.insertANewItemIntoDatabase()
+                }
             }
             .buttonStyle(.ftPrimary)
             .padding()
@@ -64,14 +67,13 @@ struct AppBlockingListView: View {
     }
     
     var blockListView: some View {
-        VStack {
-            ScrollView(.vertical) {
-                ForEach([BlockItem.mocks.first!]) { block in
-                    FTScheduleItemView(
+        ScrollView(.vertical) {
+            LazyVStack {
+                ForEach(viewModel.state.items) { block in
+                    FTSessionSummaryCardView(
                         emoji: block.icon,
                         title: block.name,
-                        description: block.schedule?.endTime.description ?? "None",
-                        style: .appBlocking
+                        description: "None",
                     )
                     .padding(1)
                 }
