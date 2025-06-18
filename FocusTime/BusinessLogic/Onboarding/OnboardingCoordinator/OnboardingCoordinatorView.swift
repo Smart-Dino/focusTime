@@ -17,8 +17,8 @@ struct OnboardingCoordinatorView: View {
     var body: some View {
         
         let pathBinding = Binding(
-            get: { viewModel.path },
-            set: { viewModel.path = $0 }
+            get: { viewModel.state.path },
+            set: { viewModel.state.path = $0 }
         )
         
         NavigationStack(path: pathBinding) {

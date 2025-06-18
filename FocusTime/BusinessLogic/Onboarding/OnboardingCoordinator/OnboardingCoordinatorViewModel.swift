@@ -10,7 +10,13 @@ import Observation
 @MainActor
 @Observable
 final class OnboardingCoordinatorViewModel {
-    var path: [OnboardingNavigationPath] = []
+    
+    struct State {
+        var path: [OnboardingNavigationPath] = []
+    }
+    
+    var state = State()
+    
     weak var delegate: OnboardingCoordinatorDelegate?
     let analyticsManager: AnalyticsManager
 
@@ -23,12 +29,12 @@ final class OnboardingCoordinatorViewModel {
         self.analyticsManager = analyticsManager
 
         if startingProgress == .slides {
-            self.path = [.onboardingSlidesPath]
+            self.state.path = [.onboardingSlidesPath]
         }
     }
 
     func showOnboardingSlides() {
-        path.append(.onboardingSlidesPath)
+        state.path.append(.onboardingSlidesPath)
     }
 }
 
