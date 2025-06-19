@@ -7,16 +7,6 @@
 
 import SwiftUI
 
-fileprivate extension ShapeStyle where Self == Color {
-    // MARK: AppBlocking Colors
-    static var leadingSummaryCard: Color {
-        Color("LeadingSummaryCardColor", bundle: .module)
-    }
-    static var trailingSummaryCard: Color {
-        Color("TrailingSummaryCardColor", bundle: .module)
-    }
-}
-
 public struct FTSessionSummaryCardView: View {
     private let emoji: String
     private let title: String

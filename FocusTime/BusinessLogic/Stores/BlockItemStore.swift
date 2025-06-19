@@ -49,6 +49,7 @@ final class BlockItemStore: DataSource {
     private let modelContext: ModelContext
 
     init() {
+        #warning("Memory only container")
         let container = try! ModelContainer(
             for: BlockItem.self,
             configurations: ModelConfiguration(isStoredInMemoryOnly: true)

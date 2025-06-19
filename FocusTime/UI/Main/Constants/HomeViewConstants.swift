@@ -5,7 +5,7 @@
 //  Created by Maksym Horobets on 16.06.2025.
 //
 
-import Foundation
+import SwiftUI
 
 extension HomeView {
     enum Constants {
@@ -13,7 +13,7 @@ extension HomeView {
         enum Strings {
             static let navigationTitle = "Let's make your\nconcentration better"
             static let timerValue = "1h 36m 50s"
-            static let timerSubtitle = "Save time today"
+            static let timerSubtitle = "Screen time today"
             static let scheduledFocusTitle = "Scheduled Focus"
             static let scheduledFocusSubtitle = "Take control with a scheduled session"
             static let bottomButtonTitle = "Start Focusing"
@@ -21,6 +21,7 @@ extension HomeView {
 
         // MARK: - Icons
         enum Icons {
+            static let waveImage = ImageResource.MainImages.homeViewWave
             static let chevronRight = "chevron.right"
             static let hourglass = "hourglass"
         }

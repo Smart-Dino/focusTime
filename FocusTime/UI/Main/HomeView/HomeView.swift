@@ -14,7 +14,7 @@ struct HomeView: View {
     var body: some View {
         ZStack {
             MainBackgroundGradientView()
-
+            
             // Nav title and an image below it.
             VStack {
                 VStack(alignment: .leading) {
@@ -23,22 +23,18 @@ struct HomeView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal)
-
-                Image(
-                    ImageResource
-                        .MainImages
-                        .homeViewWave
-                )
-                .resizable()
-                .scaledToFit()
-
+                
+                Image(Constants.Icons.waveImage)
+                    .resizable()
+                    .scaledToFit()
+                
                 Spacer()
             }
-
+            
             // Main content on this view.
-            VStack(spacing: Constants.Layout.mainSpacing) {
+            VStack(spacing: 20) {
                 Spacer()
-
+                
                 // Timer
                 VStack {
                     Text(Constants.Strings.timerValue)
@@ -54,32 +50,44 @@ struct HomeView: View {
                         .font(.callout)
                         .foregroundStyle(.ftGray3)
                 }
-
-                // Scheduled focus button
-                Button {
-                    #warning("Empty button action")
-                } label: {
-                    HStack {
-                        VStack(alignment: .leading) {
-                            Text(Constants.Strings.scheduledFocusTitle)
-                                .font(.title3)
-                                .bold()
-                            Text(Constants.Strings.scheduledFocusSubtitle)
-                                .font(.subheadline)
-                                .foregroundStyle(.ftGray3)
+                VStack(spacing: .zero) {
+                    // Scheduled focus button
+                    NavigationLink(
+                        value: MainScreens.scheduledFocusList(viewModel.makeScheduledFocusViewModel())
+                    ) {
+                        HStack {
+                            VStack(alignment: .leading) {
+                                Text(Constants.Strings.scheduledFocusTitle)
+                                    .font(.title3)
+                                    .bold()
+                                Text(Constants.Strings.scheduledFocusSubtitle)
+                                    .font(.subheadline)
+                                    .foregroundStyle(.ftGray3)
+                            }
+                            Spacer()
+                            Image(systemName: Constants.Icons.chevronRight)
                         }
-                        Spacer()
-                        Image(systemName: Constants.Icons.chevronRight)
+                        .foregroundStyle(.ftMainBlue)
                     }
-                    .foregroundStyle(.ftMainBlue)
+                    .buttonStyle(.plain)
+                    .padding(.horizontal)
+                    // Schedule
+                    #warning("Placeholder")
+                    if true {
+                        FTHomeSessionCardView(
+                            title: "Work time",
+                            mode: .scheduled(timeRange: "6 AM - 7:30 PM")
+                        )
+                        .padding(.horizontal)
+                        .padding(.vertical, 5)
+                    }
                 }
-                .buttonStyle(.plain)
-                .padding(.horizontal)
+                .frame(minHeight: 130) // Used so that the screen time value stays in the same place
             }
         }
         .safeAreaInset(edge: .bottom) {
             Button(Constants.Strings.bottomButtonTitle, systemImage: Constants.Icons.hourglass) {
-                #warning("Action is empty")
+#warning("Action is empty")
             }
             .buttonStyle(.ftPrimary)
             .padding()

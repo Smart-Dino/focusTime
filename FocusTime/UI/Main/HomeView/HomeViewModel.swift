@@ -19,4 +19,8 @@ final class HomeViewModel {
     init(state: State = State()) {
         self.state = state
     }
+    
+    func makeScheduledFocusViewModel() -> ScheduledFocusListViewModel {
+        ScheduledFocusListViewModel()
+    }
 }

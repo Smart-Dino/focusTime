@@ -12,11 +12,15 @@ struct MainFlowCoordinatorView: View {
     @State var viewModel: MainFlowCoordinatorViewModel
     
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: Binding(get: {
+            viewModel.flowState.currentPath
+        }, set: { screens in
+            viewModel.setScreens(screens)
+        })) {
             TabView(selection: Binding(get: {
-                viewModel.flowState.currentScreen
+                viewModel.flowState.currentTabScreen
             }, set: { screen in
-                viewModel.setScreen(screen)
+                viewModel.setTabScreen(screen)
             })) {
                 Group {
                     HomeView(viewModel: viewModel.makeHomeViewModel())
@@ -30,7 +34,7 @@ struct MainFlowCoordinatorView: View {
                     AppBlockingListView(viewModel: viewModel.makeAppBlockListViewModel())
                         .tabItem {
                             Label("Blocks", systemImage: "hand.raised")
-                            // Prevent system from filling our icons.
+                            // Prevent system from filling system icons.
                                 .environment(\.symbolVariants, .none)
 
                         }
@@ -38,7 +42,7 @@ struct MainFlowCoordinatorView: View {
                     Text("Empty for now")
                         .tabItem {
                             Label("Profile", systemImage: "person")
-                            // Prevent system from filling our icons.
+                            // Prevent system from filling system icons.
                                 .environment(\.symbolVariants, .none)
                         }
                         .tag(MainTabScreens.profile)
@@ -46,29 +50,35 @@ struct MainFlowCoordinatorView: View {
 //                .toolbarBackground(Color.ftBackground, for: .tabBar) // Set a specific color
                 // as a background, but we don't do it because the tabbar is transparent
                 // in a non-scrolling content so we underlay our own behind it.
-//                .toolbarBackground(.hidden, for: .tabBar) // Removes background and sets
+                .toolbarBackground(.hidden, for: .tabBar) // Removes background and sets
                 // selected item to be white-tinted.
                 .toolbarColorScheme(.dark, for: .tabBar)
             }
             .toolbar(.visible)
             .toolbar {
-                if viewModel.flowState.currentScreen == .home {
+                if viewModel.flowState.currentTabScreen == .home {
                     ToolbarItem {
                         FTProUpgradeButtonView {
-#warning("Action is empty")
+                            #warning("Action is empty")
                         }
                     }
                 }
                 // In future SDKs of iOS we would have to put a spacer here.
                 ToolbarItemGroup {
-                    switch viewModel.flowState.currentScreen {
+                    switch viewModel.flowState.currentTabScreen {
                     case .home:
                         FTPlusToolbarButtonView {
-                #warning("Action is empty")
+                            #warning("Action is empty")
                         }
                     case .blocks: EmptyView()
                     case .profile: EmptyView()
                     }
+                }
+            }
+            .navigationDestination(for: MainScreens.self) { screen in
+                switch screen {
+                case .scheduledFocusList(let scheduledFocusViewModel):
+                    ScheduledFocusListView(viewModel: scheduledFocusViewModel)
                 }
             }
         }

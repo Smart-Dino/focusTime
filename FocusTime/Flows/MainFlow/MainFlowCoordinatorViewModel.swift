@@ -15,11 +15,32 @@ enum MainTabScreens: Equatable, Hashable {
     var id: Self { self }
 }
 
+enum MainScreens: Equatable, Hashable {
+    case scheduledFocusList(_ viewModel: ScheduledFocusListViewModel)
+    
+    var id: Self { self }
+    
+    static func == (lhs: MainScreens, rhs: MainScreens) -> Bool {
+        switch (lhs, rhs) {
+        case (.scheduledFocusList, .scheduledFocusList): true
+        default: false
+        }
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        switch self {
+        case .scheduledFocusList:
+            hasher.combine("scheduledFocusList")
+        }
+    }
+}
+
 @MainActor
 @Observable
 final class MainFlowCoordinatorViewModel {
     struct State {
-        var currentScreen: MainTabScreens
+        var currentTabScreen: MainTabScreens
+        var currentPath: [MainScreens] = []
     }
     private(set) var flowState: State!
     
@@ -27,12 +48,16 @@ final class MainFlowCoordinatorViewModel {
     
     init() {
         self.flowState = State(
-            currentScreen: .home
+            currentTabScreen: .home
         )
     }
     
-    func setScreen(_ screen: MainTabScreens) {
-        flowState.currentScreen = screen
+    func setScreens(_ screens: [MainScreens]) {
+        flowState.currentPath = screens
+    }
+    
+    func setTabScreen(_ screen: MainTabScreens) {
+        flowState.currentTabScreen = screen
     }
     
     func makeHomeViewModel() -> HomeViewModel {

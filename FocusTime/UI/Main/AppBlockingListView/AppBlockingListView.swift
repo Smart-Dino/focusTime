@@ -17,13 +17,9 @@ struct AppBlockingListView: View {
             MainBackgroundGradientView()
             // Wave image
             VStack {
-                Image(
-                    ImageResource
-                        .MainImages
-                        .appBlockingListWave
-                )
-                .resizable()
-                .scaledToFit()
+                Image(Constants.Icons.waveImage)
+                    .resizable()
+                    .scaledToFit()
                 Spacer()
             }
             .ignoresSafeArea()
@@ -31,9 +27,9 @@ struct AppBlockingListView: View {
             VStack {
                 // Nav title
                 VStack(alignment: .leading) {
-                    Text("App Blocking")
+                    Text(Constants.Strings.navTitle)
                         .font(Constants.Fonts.navigationTitle)
-                    Text("Block distracting apps and create custom schedules to stay in flow")
+                    Text(Constants.Strings.navSubtitle)
                         .font(.subheadline)
                         .foregroundStyle(.ftGray3)
                 }
@@ -49,10 +45,10 @@ struct AppBlockingListView: View {
             .padding(.horizontal)
         }
         .safeAreaInset(edge: .bottom) {
-            Button("New Blocklist", systemImage: "plus.circle") {
+            Button(Constants.Strings.newBlocklistButtonTitle, systemImage: "plus.circle") {
 #warning("Action is empty")
                 Task {
-                    await viewModel.insertANewItemIntoDatabase()
+                    await viewModel.insertTestItemsIntoDatabase()
                 }
             }
             .buttonStyle(.ftPrimary)
@@ -71,9 +67,9 @@ struct AppBlockingListView: View {
             LazyVStack {
                 ForEach(viewModel.state.items) { block in
                     FTSessionSummaryCardView(
-                        emoji: block.icon,
+                        emoji: block.emoji,
                         title: block.name,
-                        description: "None",
+                        description: block.schedulesDescription,
                     )
                     .padding(1)
                 }
@@ -85,9 +81,9 @@ struct AppBlockingListView: View {
     var noBlockListView: some View {
         VStack(spacing: 15) {
             Spacer()
-            Text("🛑 No Blocklists Yet!")
+            Text(Constants.Strings.noBlocklistsTitle)
                 .bold()
-            Text("Looks like you haven’t made any blocklists yet. Create one to keep distracting apps out of sight during focus time. Staying on track has never been easier!")
+            Text(Constants.Strings.noBlocklistsMessage)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.ftGray3)
             Spacer()

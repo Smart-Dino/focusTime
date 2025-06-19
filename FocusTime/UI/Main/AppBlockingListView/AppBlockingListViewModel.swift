@@ -17,30 +17,20 @@ final class AppBlockingListViewModel {
     }
     
     private(set) var state: State
-    private var modelContainer: ModelContainer
-    let modelActor: BlockItemStore
+    let blockItemStore: BlockItemStore
     
-    init(state: State = State()) {
+    init(state: State = State(), blockItemStore: BlockItemStore = BlockItemStore()) {
         self.state = state
-        let container = try! ModelContainer(
-            for: BlockItem.self,
-            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
-        )
-        self.modelContainer = container
-        self.modelActor = BlockItemStore()
+        self.blockItemStore = blockItemStore
     }
     
-    func insertANewItemIntoDatabase() async {
-//        Task.detached(priority: .background) { [weak self] in
-//            guard let self else { return }
-            
-            for _ in 0..<100 {
-                let item = BlockItem(name: "Block", icon: "😜", blockedContent: FamilyActivitySelection())
-                try? await modelActor.insert(item)
-            }
-//        }
+    func insertTestItemsIntoDatabase() async {
+        for _ in 0..<100 {
+            let item = BlockItem(name: "Block", emoji: "😜", blockedContent: FamilyActivitySelection())
+            try? await blockItemStore.insert(item)
+        }
         await MainActor.run {
-            state.items = try! modelActor.fetchAll()
+            state.items = try! blockItemStore.fetchAll()
         }
     }
 }
