@@ -17,7 +17,7 @@ final class AppBlockingListViewModel {
     }
     
     private(set) var state: State
-    let blockItemStore: BlockItemStore
+    private let blockItemStore: BlockItemStore
     
     init(state: State = State(), blockItemStore: BlockItemStore = BlockItemStore()) {
         self.state = state

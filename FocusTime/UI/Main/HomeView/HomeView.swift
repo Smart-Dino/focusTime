@@ -87,7 +87,7 @@ struct HomeView: View {
         }
         .safeAreaInset(edge: .bottom) {
             Button(Constants.Strings.bottomButtonTitle, systemImage: Constants.Icons.hourglass) {
-#warning("Action is empty")
+                #warning("Action is empty")
             }
             .buttonStyle(.ftPrimary)
             .padding()

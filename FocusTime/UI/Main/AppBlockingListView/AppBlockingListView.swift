@@ -46,7 +46,7 @@ struct AppBlockingListView: View {
         }
         .safeAreaInset(edge: .bottom) {
             Button(Constants.Strings.newBlocklistButtonTitle, systemImage: "plus.circle") {
-#warning("Action is empty")
+                #warning("Placeholder code")
                 Task {
                     await viewModel.insertTestItemsIntoDatabase()
                 }
