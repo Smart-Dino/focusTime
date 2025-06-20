@@ -13,8 +13,6 @@ public struct FTHomeSessionCardView: View {
         case countdown(timeLeft: Int, isPaused: Binding<Bool>)
     }
     
-    static let formatter = DateComponentsFormatter()
-    
     private let title: String
     private let mode: CardMode
     
@@ -48,8 +46,8 @@ public struct FTHomeSessionCardView: View {
         .padding(.horizontal)
         .padding(.vertical, 10)
         .background {
+            let shape = FocusSessionBackgroundShape()
             ZStack {
-                let shape = FocusSessionBackgroundShape()
                 shape
                     .fill(.backgroundScheduledFocus)
                 shape
@@ -75,12 +73,12 @@ public struct FTHomeSessionCardView: View {
     }
     
     func formatTime(seconds: Int) -> String {
-        let formatter = Self.formatter
-        formatter.unitsStyle = .positional
-        formatter.allowedUnits = [.hour, .minute, .second]
-        formatter.zeroFormattingBehavior = [.pad]
-        return formatter.string(from: TimeInterval(seconds)) ?? "00:00:00"
+        let hrs = seconds / 3600
+        let mins = (seconds % 3600) / 60
+        let secs = seconds % 60
+        return String(format: "%02d:%02d:%02d", hrs, mins, secs)
     }
+
     
 }
 

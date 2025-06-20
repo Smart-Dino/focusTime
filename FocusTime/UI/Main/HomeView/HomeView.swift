@@ -98,6 +98,7 @@ struct HomeView: View {
             }
         }
         .preferredColorScheme(.dark)
+        .dynamicTypeSize(...DynamicTypeSize.accessibility2)
     }
 }
 

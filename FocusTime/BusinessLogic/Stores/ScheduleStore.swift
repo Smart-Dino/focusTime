@@ -26,16 +26,15 @@ final class ScheduleStore: DataSource {
     
     @GlobalSourceActor func insert(_ item: Schedule) /*async*/ throws {
         let container = modelContainer
-        let context = ModelContext(container)
+        let context = ModelContext(container) // Create a separate, non-main context to write to
         context.insert(item)
-        if Thread.isMainThread {
-            fatalError()
-        }
-        try context.save()
+        try context.save() // Apply the context to the DB
     }
     
     func delete(_ item: Schedule) throws {
-//        try! context.fetch(FetchDescriptor<BlockItem>(predicate: #Predicate { $0.id == itemID }))
+        // If there are ever any Sendable errors we can just take the item's ID as a parameter
+        // and remove that item by fetching the related item.
+        // try! context.fetch(FetchDescriptor<Schedule>(predicate: #Predicate { $0.id == itemID }))
         modelContext.delete(item)
         try modelContext.save()
     }

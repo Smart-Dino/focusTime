@@ -58,7 +58,7 @@ public struct FTSessionSelectionRowView: View {
     FTSessionSelectionRowView(
         emoji: "😎",
         title: "Cool",
-        description: "This is a cool view huh.",
+        description: "This is a cool view huh?",
         isToggled: $isToggled
     )
     .padding()

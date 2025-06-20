@@ -50,6 +50,7 @@ struct ScheduledFocusListView: View {
         .navigationTitle(Constants.Strings.navTitle)
         .navigationBarTitleDisplayMode(.inline)
         .preferredColorScheme(.dark)
+        .dynamicTypeSize(...DynamicTypeSize.accessibility2)
     }
     
     var schedulesView: some View {
@@ -82,5 +83,7 @@ struct ScheduledFocusListView: View {
 }
 
 #Preview {
-    ScheduledFocusListView(viewModel: .init())
+    NavigationStack {
+        ScheduledFocusListView(viewModel: .init())
+    }
 }

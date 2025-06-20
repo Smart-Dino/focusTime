@@ -28,8 +28,8 @@ public struct FTScheduledFocusRowView: View {
         }
         .padding()
         .background {
+            let shape = FocusSessionBackgroundShape()
             ZStack {
-                let shape = FocusSessionBackgroundShape()
                 shape
                     .fill(.backgroundScheduledFocus)
                 shape
@@ -59,7 +59,11 @@ public struct FTScheduledFocusRowView: View {
 }
 
 #Preview(traits: .sizeThatFitsLayout) {
-    FTScheduledFocusRowView(emoji: "😎", title: "Cool", description: "This is a cool view huh.")
-        .padding()
-        .preferredColorScheme(.dark)
+    FTScheduledFocusRowView(
+        emoji: "😎",
+        title: "Cool",
+        description: "This is a cool view huh?"
+    )
+    .padding()
+    .preferredColorScheme(.dark)
 }

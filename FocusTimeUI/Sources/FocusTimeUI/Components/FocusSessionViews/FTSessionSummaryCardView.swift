@@ -51,7 +51,11 @@ public struct FTSessionSummaryCardView: View {
 }
 
 #Preview(traits: .sizeThatFitsLayout) {
-    FTSessionSummaryCardView(emoji: "😎", title: "Cool", description: "This is a cool view huh.")
-        .padding()
-        .preferredColorScheme(.dark)
+    FTSessionSummaryCardView(
+        emoji: "😎",
+        title: "Cool",
+        description: "This is a cool view huh?"
+    )
+    .padding()
+    .preferredColorScheme(.dark)
 }

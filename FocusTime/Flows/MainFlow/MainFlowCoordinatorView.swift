@@ -75,6 +75,9 @@ struct MainFlowCoordinatorView: View {
                     }
                 }
             }
+            // Navigation has to be managed here
+            // since declaring navDest in the views nested in the tabbar
+            // makes them load lazily which will cause navigation bugs.
             .navigationDestination(for: MainScreens.self) { screen in
                 switch screen {
                 case .scheduledFocusList(let scheduledFocusViewModel):
@@ -83,6 +86,7 @@ struct MainFlowCoordinatorView: View {
             }
         }
         .preferredColorScheme(.dark)
+        .dynamicTypeSize(...DynamicTypeSize.accessibility2)
     }
 }
 

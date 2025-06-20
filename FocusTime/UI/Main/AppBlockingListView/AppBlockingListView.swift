@@ -60,6 +60,7 @@ struct AppBlockingListView: View {
             }
         }
         .preferredColorScheme(.dark)
+        .dynamicTypeSize(...DynamicTypeSize.accessibility2)
     }
     
     var blockListView: some View {

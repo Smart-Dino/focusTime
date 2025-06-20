@@ -12,25 +12,12 @@ import Foundation
 // it will be treated as a redundant conformance to PersistentModel.
 protocol SwiftDataItem: Codable, Identifiable, PersistentModel { }
 
-enum DataSourceError: LocalizedError {
-    case notFound
-    
-    var errorDescription: String? {
-        switch self {
-        case .notFound:
-            "The requested model was not found in the modelContext."
-        }
-    }
-}
-
-protocol DataSource1: ModelActor {
-    associatedtype Model: SwiftDataItem
-    
-    func insert(_ item: Model) async throws
-    func delete(_ item: Model) async throws
-    func fetchAll() async throws -> [Model]
-    
-    func updateFields(of item: inout Model, using updates: (Model) -> Void) async throws
+// Serialize writes to the database on a custom, global actor.
+// This is a custom-defined actor, much like MainActor is
+// so this actor will never cross MainActor and run DB writes off the main thread.
+@globalActor
+actor GlobalSourceActor {
+    static let shared = GlobalSourceActor()
 }
 
 @MainActor
