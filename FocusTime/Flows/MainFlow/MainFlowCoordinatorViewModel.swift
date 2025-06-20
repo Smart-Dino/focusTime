@@ -23,14 +23,13 @@ enum MainScreens: Equatable, Hashable {
     static func == (lhs: MainScreens, rhs: MainScreens) -> Bool {
         switch (lhs, rhs) {
         case (.scheduledFocusList, .scheduledFocusList): true
-        default: false
         }
     }
     
     func hash(into hasher: inout Hasher) {
         switch self {
         case .scheduledFocusList:
-            hasher.combine("scheduledFocusList")
+            hasher.combine(0)
         }
     }
 }
