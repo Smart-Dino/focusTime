@@ -82,7 +82,7 @@ public struct FTHomeSessionCardView: View {
     
 }
 
-#Preview {
+#Preview(traits: .sizeThatFitsLayout) {
     @Previewable let timer = Timer.publish(every: 1, on: .current, in: .default).autoconnect()
     
     @Previewable @State var isPaused = false
