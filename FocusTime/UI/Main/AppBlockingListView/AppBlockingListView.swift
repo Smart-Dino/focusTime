@@ -13,9 +13,9 @@ struct AppBlockingListView: View {
     
     var body: some View {
         ZStack {
-            // Gradient
+            // MARK: - Gradient
             MainBackgroundGradientView()
-            // Wave image
+            // MARK: - Wave image
             VStack {
                 Image(Constants.Icons.waveImage)
                     .resizable()
@@ -25,7 +25,7 @@ struct AppBlockingListView: View {
             .ignoresSafeArea()
             
             VStack {
-                // Nav title
+                // MARK: - Nav title
                 VStack(alignment: .leading) {
                     Text(Constants.Strings.navTitle)
                         .font(Constants.Fonts.navigationTitle)
@@ -35,7 +35,7 @@ struct AppBlockingListView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 
-                // List
+                // MARK: - List
                 if viewModel.state.items.isEmpty {
                     noBlockListView
                 } else {
@@ -44,6 +44,7 @@ struct AppBlockingListView: View {
             }
             .padding(.horizontal)
         }
+        // MARK: - Bottom floating button
         .safeAreaInset(edge: .bottom) {
             Button(Constants.Strings.newBlocklistButtonTitle, systemImage: "plus.circle") {
                 #warning("Placeholder code")

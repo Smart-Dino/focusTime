@@ -15,7 +15,7 @@ struct HomeView: View {
         ZStack {
             MainBackgroundGradientView()
             
-            // Nav title and an image below it.
+            // MARK: - Nav title and an image below it.
             VStack {
                 VStack(alignment: .leading) {
                     Text(Constants.Strings.navigationTitle)
@@ -31,7 +31,7 @@ struct HomeView: View {
                 Spacer()
             }
             
-            // Main content on this view.
+            // MARK: - Main content on this view.
             VStack(spacing: 20) {
                 Spacer()
                 
@@ -51,7 +51,7 @@ struct HomeView: View {
                         .foregroundStyle(.ftGray3)
                 }
                 VStack(spacing: .zero) {
-                    // Scheduled focus button
+                    // MARK: - Scheduled focus button
                     NavigationLink(
                         value: MainScreens.scheduledFocusList(viewModel.makeScheduledFocusViewModel())
                     ) {
@@ -71,7 +71,7 @@ struct HomeView: View {
                     }
                     .buttonStyle(.plain)
                     .padding(.horizontal)
-                    // Schedule
+                    // MARK: - Schedule
                     #warning("Placeholder")
                     if true {
                         FTHomeSessionCardView(
@@ -85,6 +85,7 @@ struct HomeView: View {
                 .frame(minHeight: 130) // Used so that the screen time value stays in the same place
             }
         }
+        // MARK: - Bottom floating button
         .safeAreaInset(edge: .bottom) {
             Button(Constants.Strings.bottomButtonTitle, systemImage: Constants.Icons.hourglass) {
                 #warning("Action is empty")

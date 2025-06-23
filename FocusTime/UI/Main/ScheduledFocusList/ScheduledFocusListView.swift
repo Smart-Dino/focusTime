@@ -13,9 +13,9 @@ struct ScheduledFocusListView: View {
     
     var body: some View {
         ZStack {
-            // Gradient
+            // MARK: - Gradient
             MainBackgroundGradientView()
-            // Wave image
+            // MARK: - Wave image
             VStack {
                 Image(Constants.Icons.waveImage)
                     .resizable()
@@ -25,7 +25,7 @@ struct ScheduledFocusListView: View {
             .ignoresSafeArea()
             
             VStack(spacing: .zero) {
-                // List
+                // MARK: - List
                 if viewModel.state.items.isEmpty {
                     noSchedulesView
                 } else {
@@ -34,6 +34,7 @@ struct ScheduledFocusListView: View {
             }
             .padding(.horizontal)
         }
+        // MARK: - Bottom floating button
         .safeAreaInset(edge: .bottom) {
             Button(
                 Constants.Strings.newSessionButtonTitle,
