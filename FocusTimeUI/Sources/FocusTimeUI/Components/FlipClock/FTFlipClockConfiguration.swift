@@ -16,7 +16,7 @@ public struct FTFlipClockConfiguration {
     public let animationDuration: CGFloat
     
     public init(
-        size: CGSize = .init(width: 90, height: 80),
+        size: CGSize = .init(width: 100, height: 85),
         fontSize: CGFloat = 64,
         cornerRadius: CGFloat = 15,
         foreground: Color = .white,

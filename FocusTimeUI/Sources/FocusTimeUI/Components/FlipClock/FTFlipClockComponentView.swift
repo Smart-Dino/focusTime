@@ -19,7 +19,9 @@ public struct FTFlipClockComponentView: View {
         let halfHeightWithSpacing = configuration.size.height * 0.5 - 1
         
         ZStack {
+            // MARK: - Static parts
             VStack(spacing: .zero) {
+                // MARK: Top
                 UnevenRoundedRectangle(
                     topLeadingRadius: configuration.cornerRadius,
                     topTrailingRadius: configuration.cornerRadius
@@ -40,6 +42,7 @@ public struct FTFlipClockComponentView: View {
                 .clipped()
                 .frame(maxHeight: .infinity, alignment: .top)
                 
+                // MARK: Bottom
                 UnevenRoundedRectangle(
                     bottomLeadingRadius: configuration.cornerRadius,
                     bottomTrailingRadius: configuration.cornerRadius,
@@ -62,6 +65,7 @@ public struct FTFlipClockComponentView: View {
             }
             .frame(maxHeight: configuration.size.height)
             
+            // MARK: - Flipping part
             UnevenRoundedRectangle(
                 topLeadingRadius: configuration.cornerRadius,
                 topTrailingRadius: configuration.cornerRadius
@@ -84,30 +88,7 @@ public struct FTFlipClockComponentView: View {
         }
         .frame(width: configuration.size.width, height: configuration.size.height)
         .onChange(of: value, initial: true) { oldValue, newValue in
-            currentValue = oldValue
-            nextValue = newValue
-            
-            // Make sure previous animations have ended.
-            guard rotation == 0 else {
-                // Otherwise just set the value mid-animation.
-                currentValue = value
-                return
-            }
-            
-            // Make sure the new value is different from the previous.
-            guard oldValue != newValue else { return }
-            
-            withAnimation(
-                .easeInOut(duration: configuration.animationDuration),
-                completionCriteria: .logicallyComplete
-            ) {
-                // Flip.
-                rotation = -180
-            } completion: {
-                // Reset.
-                rotation = 0
-                currentValue = value
-            }
+            updateViewBasedOnValueChange(oldValue, newValue)
         }
         .drawingGroup() // Fixes number tearing.
     }
@@ -118,6 +99,35 @@ public struct FTFlipClockComponentView: View {
     ) {
         self._value = value
         self.configuration = configuration
+    }
+    
+    private func updateViewBasedOnValueChange(_ oldValue: Int, _ newValue: Int) {
+        currentValue = oldValue
+        nextValue = newValue
+        
+        // Make sure previous animations have ended.
+        guard rotation == 0 else {
+            // Otherwise just set the value mid-animation.
+            currentValue = value
+            return
+        }
+        
+        // Make sure the new value is different from the previous.
+        guard oldValue != newValue else { return }
+        
+        withAnimation(
+            .easeInOut(duration: configuration.animationDuration),
+            completionCriteria: .logicallyComplete
+        ) {
+            // Flip.
+            rotation = -180
+        } completion: {
+            // Reset.
+            rotation = 0
+            // Take the actual value so we don't have
+            // a stale number fire back at us when this closure runs.
+            currentValue = value
+        }
     }
     
 }

@@ -13,8 +13,8 @@ internal struct FlipClockBoldTextView: View {
     private let foreground: Color
     
     internal var body: some View {
-        Text(String(displayValue))
-            .font(.system(size: fontSize)).bold()
+        Text(String(format: "%02d", displayValue))
+            .font(.system(size: fontSize, weight: .heavy))
             .foregroundStyle(foreground)
             .lineLimit(1)
     }

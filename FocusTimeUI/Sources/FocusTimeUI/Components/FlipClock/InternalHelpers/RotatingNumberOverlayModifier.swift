@@ -41,13 +41,18 @@ internal struct RotatingNumberOverlayModifier: ViewModifier, @MainActor Animatab
         content
             .overlay(alignment: .top) {
                 Group {
+                    // Rotation is negative when animating,
+                    // so we make it positive and if it is
+                    // more than half way through the animation
+                    // - we change the value to the next one
+                    // and flip it.
                     if -rotation > 90 {
                         FlipClockBoldTextView(
                             nextValue,
                             fontSize: configuration.fontSize,
                             foreground: configuration.foreground
                         )
-                        .scaleEffect(x: 1, y: -1) // Flip the view
+                        .scaleEffect(x: 1, y: -1) // Flip the view.
                         .transition(.identity)
                     } else {
                         FlipClockBoldTextView(
