@@ -17,7 +17,7 @@ public struct FTSubscribeButtonView: View {
         VStack {
             Text(terms)
                 .font(.caption)
-                .foregroundStyle(.ftGray3)
+                .foregroundStyle(.ftGray3Light)
                 .multilineTextAlignment(.center)
             Button(buttonTitle, action: buttonAction)
                 .buttonStyle(.ftPrimary)

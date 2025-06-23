@@ -77,7 +77,7 @@ struct FreePlanUpgradeView: View {
                 .font(.title3.bold())
             Text(Constants.Strings.upgradeMessage)
                 .multilineTextAlignment(.center)
-                .foregroundStyle(.ftGray3)
+                .foregroundStyle(.ftGray3Light)
         }
     }
     

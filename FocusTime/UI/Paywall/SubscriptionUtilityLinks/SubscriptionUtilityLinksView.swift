@@ -32,7 +32,7 @@ struct SubscriptionUtilityLinksView: View {
         }
         .buttonStyle(.plain)
         .font(.callout)
-        .foregroundStyle(.ftGray3)
+        .foregroundStyle(.ftGray3Light)
         .alert(
             Constants.Strings.errorHeader,
             isPresented: Binding(get: {
