@@ -7,14 +7,14 @@
 
 import SwiftUI
 
-struct FTFlipClockView: View {
+public struct FTFlipClockView: View {
     let configuration: FTFlipClockConfiguration
     
     @Binding private var seconds: Int
     @State private var hours: Int = 0
     @State private var minutes: Int = 0
     
-    var body: some View {
+    public var body: some View {
         HStack {
             FTFlipClockComponentView(value: $hours, configuration: configuration)
             FTFlipClockComponentView(value: $minutes, configuration: configuration)
@@ -23,7 +23,7 @@ struct FTFlipClockView: View {
         .onAppear(perform: formatTime)
     }
     
-    init(
+    public init(
         configuration: FTFlipClockConfiguration,
         timeLeft: Binding<Int>
     ) {
@@ -31,7 +31,7 @@ struct FTFlipClockView: View {
         self._seconds = timeLeft
     }
     
-    func formatTime() {
+    private func formatTime() {
         hours = seconds / 3600
         minutes = (seconds % 3600) / 60
     }
