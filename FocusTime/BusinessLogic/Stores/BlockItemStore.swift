@@ -15,10 +15,10 @@ final class BlockItemStore: DataSource {
     private let modelContext: ModelContext
 
     init() {
-        #warning("Memory only container")
+        let config = ModelConfiguration(groupContainer: .identifier(appGroupIdentifier))
         let container = try! ModelContainer(
             for: BlockItem.self,
-            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+            configurations: config
         )
         let context = container.mainContext
         self.modelContainer = container
@@ -40,8 +40,12 @@ final class BlockItemStore: DataSource {
         try modelContext.save()
     }
     
-    func fetchAll() throws -> [BlockItem] {
+    func fetch() throws -> [BlockItem] {
         try modelContext.fetch(FetchDescriptor<BlockItem>())
+    }
+    
+    func fetch(descriptor: FetchDescriptor<BlockItem>) throws -> [BlockItem] {
+        try modelContext.fetch(descriptor)
     }
     
     func updateFields(of item: inout BlockItem, using updates: (BlockItem) -> Void) throws {

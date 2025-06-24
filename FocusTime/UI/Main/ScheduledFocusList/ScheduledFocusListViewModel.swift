@@ -35,7 +35,7 @@ final class ScheduledFocusListViewModel {
             try? await scheduleStore.insert(schedule)
         }
         await MainActor.run {
-            state.items = try! scheduleStore.fetchAll()
+            state.items = try! scheduleStore.fetch()
         }
     }
 }

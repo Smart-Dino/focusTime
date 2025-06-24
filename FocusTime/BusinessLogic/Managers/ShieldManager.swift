@@ -17,7 +17,7 @@ protocol ShieldManager {
     // MARK: - Block
     func block() async throws
     func block(specific selection: FamilyActivitySelection) async throws
-    func block(specific selection: FamilyActivitySelection, start: Date, finish: Date, repeats: Bool) async throws
+    func block(specific selection: FamilyActivitySelection, schedule: Schedule) async throws
     // MARK: - Unblock
     func unblock() async throws
     // MARK: - Auth
@@ -69,11 +69,37 @@ final class LiveShieldManager: ShieldManager {
         }
     }
     
-//    func block(specific selection: FamilyActivitySelection, start: Date, finish: Date, repeats: Bool) async throws {
-//        let deviceActivitySchedule = DeviceActivitySchedule(intervalStart: <#T##DateComponents#>,
-//                                                            intervalEnd: <#T##DateComponents#>,
-//                                                            repeats: <#T##Bool#>)
-//    }
+    // The reason why we schedule two schedules instead of one
+    // is because if the user wants an interval to be less than 15 minutes
+    // - the system will not allow us to do so and throw an error.
+    // We can solve this by having two separate schedules that are both 15+
+    // mins in length but have less than 15 minutes in-between them!
+    func block(specific selection: FamilyActivitySelection, schedule: Schedule) async throws {
+        // Start of interval + 15 mins
+        let intervalStart = schedule.startTime.dateComponents
+        let startAddingFifteen = intervalStart.adding(minutes: 15)
+        
+        // End of interval + 15 mins
+        let intervalEnd = schedule.endTime.dateComponents
+        let endAddingFifteen = intervalEnd.adding(minutes: 15)
+        
+        // Generate ids for querying DB
+        let deviceActivityStartName = DeviceActivityName(schedule.id.uuidString + " " + "start")
+        let deviceActivityEndName = DeviceActivityName(schedule.id.uuidString + " " + "end")
+        
+        // Schedule both events
+        let deviceActivityScheduleStart = DeviceActivitySchedule(intervalStart: intervalStart,
+                                                            intervalEnd: startAddingFifteen,
+                                                            repeats: true)
+        
+        let deviceActivityScheduleEnd = DeviceActivitySchedule(intervalStart: intervalEnd,
+                                                            intervalEnd: endAddingFifteen,
+                                                            repeats: true)
+        
+        // Start monitoring events
+        try center.startMonitoring(deviceActivityStartName, during: deviceActivityScheduleStart)
+        try center.startMonitoring(deviceActivityEndName, during: deviceActivityScheduleEnd)
+    }
     
     func unblock() async throws {
         try await checkAuthorization()

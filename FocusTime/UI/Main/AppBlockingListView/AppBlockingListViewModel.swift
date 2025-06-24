@@ -30,7 +30,7 @@ final class AppBlockingListViewModel {
             try? await blockItemStore.insert(item)
         }
         await MainActor.run {
-            state.items = try! blockItemStore.fetchAll()
+            state.items = try! blockItemStore.fetch()
         }
     }
 }

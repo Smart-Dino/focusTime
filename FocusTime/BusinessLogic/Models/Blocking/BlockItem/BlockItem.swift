@@ -10,7 +10,7 @@ import SwiftData
 import FamilyControls
 
 @Model
-final class BlockItem {
+final class BlockItem: SwiftDataItem {
     // MARK: - Saved properties
     @Attribute(.unique) var id: UUID
     var name: String

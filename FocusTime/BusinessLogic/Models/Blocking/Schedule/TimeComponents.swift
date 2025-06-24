@@ -25,12 +25,17 @@ struct TimeComponents: Codable {
     var description: String {
         String(format: "%02d:%02d", hour, minute)
     }
-
-    /// Optionally returns time in user's locale using DateFormatter
-    func localizedDescription(using calendar: Calendar = .current, locale: Locale = .current) -> String {
+    
+    var dateComponents: DateComponents {
         var components = DateComponents()
         components.hour = hour
         components.minute = minute
+        return components
+    }
+
+    /// Optionally returns time in user's locale using DateFormatter
+    func localizedDescription(using calendar: Calendar = .current, locale: Locale = .current) -> String {
+        let components = self.dateComponents
 
         let formatter = DateFormatter()
         formatter.calendar = calendar

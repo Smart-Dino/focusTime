@@ -14,10 +14,10 @@ final class ScheduleStore: DataSource {
     private let modelContext: ModelContext
 
     init() {
-        #warning("Memory only container")
+        let config = ModelConfiguration(groupContainer: .identifier(appGroupIdentifier))
         let container = try! ModelContainer(
             for: BlockItem.self,
-            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+            configurations: config
         )
         let context = container.mainContext
         self.modelContainer = container
@@ -39,8 +39,12 @@ final class ScheduleStore: DataSource {
         try modelContext.save()
     }
     
-    func fetchAll() throws -> [Schedule] {
+    func fetch() throws -> [Schedule] {
         try modelContext.fetch(FetchDescriptor<Schedule>())
+    }
+    
+    func fetch(descriptor: FetchDescriptor<Schedule>) throws -> [Schedule] {
+        try modelContext.fetch(descriptor)
     }
     
     func updateFields(of item: inout Schedule, using updates: (Schedule) -> Void) throws {
