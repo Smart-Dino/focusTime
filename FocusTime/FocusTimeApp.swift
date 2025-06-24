@@ -13,6 +13,7 @@ struct FocusTimeApp: App {
     
     var body: some Scene {
         WindowGroup {
+<<<<<<< HEAD
 
             Group {
                 if let paymentManager {
@@ -31,6 +32,9 @@ struct FocusTimeApp: App {
 
          //   FocusSessionView()
 
+=======
+            ContentView()
+>>>>>>> d1e90e4 (feat: Created and refactored base focus session views)
         }
     }
 }
