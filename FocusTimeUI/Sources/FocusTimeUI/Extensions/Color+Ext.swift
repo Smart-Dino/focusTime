@@ -7,12 +7,13 @@
 
 import SwiftUI
 
+// MARK: - Public colors
 // https://www.hackingwithswift.com/forums/100-days-of-swiftui/extending-shapestyle-for-adding-colors-instead-of-extending-color/12324
 // Important: Static stored properties not supported in protocol extensions
 public extension ShapeStyle where Self == Color {
     // MARK: - Backgrounds
     static var ftBackground: Color { Color("BackgroundColor", bundle: .module) }
-    static var ftBackgroundBlueColor: Color { Color("BackgroundBlueColor", bundle: .module) }
+    static var ftBackgroundBlue: Color { Color("BackgroundBlueColor", bundle: .module) }
     // MARK: - Blue
     static var ftDarkBlue: Color { Color("DarkBlueColor", bundle: .module) }
     static var ftMainBlue: Color { Color("MainBlueColor", bundle: .module) }
@@ -25,3 +26,25 @@ public extension ShapeStyle where Self == Color {
         )
     }
 }
+
+// MARK: Private colors
+internal extension ShapeStyle where Self == Color {
+    // MARK: AppBlocking Colors
+    static var leadingSummaryCard: Color {
+        Color("LeadingSummaryCardColor", bundle: .module)
+    }
+    static var trailingSummaryCard: Color {
+        Color("TrailingSummaryCardColor", bundle: .module)
+    }
+    // MARK: ScheduledFocus Colors
+    static var leadingScheduledFocus: Color {
+        Color("LeadingScheduledFocusColor", bundle: .module)
+    }
+    static var trailingScheduledFocus: Color {
+        Color("TrailingScheduledFocusColor", bundle: .module)
+    }
+    static var backgroundScheduledFocus: Color {
+        Color("BackgroundScheduledFocusColor", bundle: .module)
+    }
+}
+

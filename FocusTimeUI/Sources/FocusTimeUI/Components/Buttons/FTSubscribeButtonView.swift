@@ -28,15 +28,15 @@ public struct FTSubscribeButtonView: View {
     /// - Parameters:
     ///   - terms: Text displayed above the button (e.g., trial information).
     ///   - buttonTitle: The title of the action button.
-    ///   - buttonAction: The action to perform when the button is tapped.
+    ///   - action: The action to perform when the button is tapped.
     public init(
         terms: String,
         buttonTitle: String,
-        buttonAction: @escaping () -> Void
+        action: @escaping () -> Void
     ) {
         self.terms = terms
         self.buttonTitle = buttonTitle
-        self.buttonAction = buttonAction
+        self.buttonAction = action
     }
 }
 

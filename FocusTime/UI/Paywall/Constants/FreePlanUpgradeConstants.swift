@@ -29,19 +29,19 @@ extension FreePlanUpgradeView {
             static let title = "You're on a Free Plan"
             
             // Loading state
-            static let loadingTitle = SharedPaywallConstants.Strings.loadingTitle
+            static let loadingTitle = SharedConstants.Strings.loadingTitle
             
             // Purchase button states
             static let tryButtonTitle = "Try For $0,00"
-            static let pendingTitle = SharedPaywallConstants.Strings.pendingTitle
-            static let subscribedTitle = SharedPaywallConstants.Strings.subscribedTitle
+            static let pendingTitle = SharedConstants.Strings.pendingTitle
+            static let subscribedTitle = SharedConstants.Strings.subscribedTitle
             
             // Other buttons
-            static let viewPlansButton = SharedPaywallConstants.Strings.viewPlansButton
-            static let dismissButtonTitle = SharedPaywallConstants.Strings.dismissButtonTitle
+            static let viewPlansButton = SharedConstants.Strings.viewPlansButton
+            static let dismissButtonTitle = SharedConstants.Strings.dismissButtonTitle
             
             // Error
-            static let errorHeader = SharedPaywallConstants.Strings.errorHeader
+            static let errorHeader = SharedConstants.Strings.errorHeader
         }
     }
 }

@@ -5,9 +5,9 @@
 //  Created by Maksym Horobets on 26.05.2025.
 //
 
-import Foundation
+import SwiftUI
 
-enum SharedPaywallConstants {
+enum SharedConstants {
     
     // MARK: - Strings
     enum Strings {
@@ -26,6 +26,12 @@ enum SharedPaywallConstants {
         static let subscribeTitle = "Subscribe"
         static let subscribedTitle = "Subscribed!"
         static let purchasedTitle = "Purchased!"
+    }
+    
+    // MARK: - Typography
+    enum Fonts {
+        static let navigationTitle = Font.system(size: 34,
+                                                 weight: .bold)
     }
     
 }
