@@ -7,82 +7,201 @@
 
 import Foundation
 
-/// The ViewModel for the FocusSetupView.
-@MainActor
 @Observable
 class FocusSessionViewModel {
     
-    // MARK: - Published State
+    // MARK: - State
+    struct State {
+        var listName: String = FocusSessionView.Constants.DefaultValues.listName
+        var isDurationPickerPresented: Bool = false
+        var selectedHours: Int = FocusSessionView.Constants.DefaultValues.durationHours
+        var selectedMinutes: Int = FocusSessionView.Constants.DefaultValues.durationMinutes
+        var scheduleForLater: Bool = false
+        var selectedPresetID: UUID?
+        var scheduledDays: Set<Weekday> = []
+        var startTime: Date = FocusSessionView.Constants.DefaultValues.startTime
+        var endTime: Date = FocusSessionView.Constants.DefaultValues.endTime
+        var isStartTimePickerPresented: Bool = false
+        var isEndTimePickerPresented: Bool = false
+        var isAppBlockerSheetPresented: Bool = false
+    }
     
-    var listName: String = "Focus Session"
-    var isDurationPickerPresented: Bool = false
-    var selectedHours: Int = 0
-    var selectedMinutes: Int = 30
-    var scheduleForLater: Bool = false
-    var selectedPresetID: UUID?
-
-    let presets: [FocusPreset] = [
-        .init(name: "Morning\nRoutine", iconName: "sun.max.fill"),
-        .init(name: "Social\nDetox", iconName: "message.fill"),
-        .init(name: "Work\nSprint", iconName: "stopwatch.fill"),
-        .init(name: "Zero\nDistraction", iconName: "nosign"),
-        .init(name: "Study", iconName: "books.vertical.fill"),
-        .init(name: "Creative", iconName: "paintpalette.fill"),
-        .init(name: "Mindfulness", iconName: "brain.head.profile"),
-        .init(name: "Reading", iconName: "book.fill")
-    ]
+    var state = State()
+    
+    // MARK: - Static Data
+    let presets: [FocusPreset] = FocusSessionView.Constants.Data.presets
     
     // MARK: - Computed Properties
+    var selectedPresetIconName: String? {
+        guard let selectedID = state.selectedPresetID else { return nil }
+        return presets.first { $0.id == selectedID }?.iconName
+    }
     
     var isStartButtonEnabled: Bool {
-        !listName.trimmingCharacters(in: .whitespaces).isEmpty
+        !state.listName.trimmingCharacters(in: .whitespaces).isEmpty
     }
     
     var formattedDuration: String {
-           if selectedHours > 0 {
-               return "\(selectedHours)h \(selectedMinutes)m"
-           } else {
-               return "\(selectedMinutes)m"
-           }
-       }
-    
-    
-    
-    // MARK: - User Intent Methods
-    
-    func clearFocusName() {
-           listName = ""
-       }
-    
-    func presentDurationPicker() {
-            isDurationPickerPresented = true
-        }
-    
-    
-    
-    
-    
-    
-    
-    
-    /// Logic to handle tapping on a preset icon.
-    func selectPreset(_ preset: FocusPreset) {
-        if selectedPresetID == preset.id {
-            selectedPresetID = nil 
+        let h = FocusSessionView.Constants.Time.hourSuffix
+        let m = FocusSessionView.Constants.Time.minuteSuffix
+        if state.selectedHours > 0 {
+            return "\(state.selectedHours)\(h) \(state.selectedMinutes)\(m)"
         } else {
-            selectedPresetID = preset.id
+            return "\(state.selectedMinutes)\(m)"
         }
     }
     
-    /// Logic for when the main start button is tapped.
+    var formattedScheduledDays: String {
+        if state.scheduledDays.isEmpty {
+            return "Never"
+        }
+        if state.scheduledDays.count == Weekday.allCases.count {
+            return "Every Day"
+        }
+        if state.scheduledDays == [.saturday, .sunday] {
+            return "Weekends"
+        }
+        if state.scheduledDays == [.monday, .tuesday, .wednesday, .thursday, .friday] {
+            return "Weekdays"
+        }
+        
+        let sortedDays = state.scheduledDays.sorted()
+        return sortedDays.map { $0.shortName }.joined(separator: ", ")
+    }
+    
+    var formattedStartTime: String {
+        state.startTime.formatted(
+            Date.FormatStyle()
+                .hour(.twoDigits(amPM: .omitted))
+                .minute(.twoDigits)
+        )
+    }
+    
+    var formattedEndTime: String {
+        state.endTime.formatted(
+            Date.FormatStyle()
+                .hour(.twoDigits(amPM: .omitted))
+                .minute(.twoDigits)
+        )
+    }
+    
+    // MARK: - User Intent Methods
+    func updateListName(to newName: String) {
+        state.listName = newName
+    }
+    
+    func updateScheduleToggle(to newValue: Bool) {
+        state.scheduleForLater = newValue
+    }
+    
+    func updateDuration(hours: Int, minutes: Int) {
+        state.selectedHours = hours
+        state.selectedMinutes = minutes
+    }
+    
+    func presentDurationPicker() {
+        state.isDurationPickerPresented = true
+    }
+    
+    func toggleScheduledDay(_ day: Weekday) {
+        if state.scheduledDays.contains(day) {
+            state.scheduledDays.remove(day)
+        } else {
+            state.scheduledDays.insert(day)
+        }
+    }
+    
+    func presentStartTimePicker() {
+        state.isStartTimePickerPresented = true
+    }
+    
+    func presentEndTimePicker() {
+        state.isEndTimePickerPresented = true
+    }
+    
+    func updateStartTime(to date: Date) {
+        state.startTime = date
+    }
+    
+    func updateEndTime(to date: Date) {
+        state.endTime = date
+    }
+    
+    func presentAppBlockerSheet() {
+        state.isAppBlockerSheetPresented = true
+    }
+    
+    private func selectPreset(_ preset: FocusPreset) {
+        if state.selectedPresetID == preset.id {
+            state.selectedPresetID = nil
+        } else {
+            state.selectedPresetID = preset.id
+        }
+    }
+    
     func startTapped() {
         print("Start button tapped!")
-        print("Current List Name: \(listName)")
-        print("Schedule for Later is: \(scheduleForLater)")
-        if let selectedPresetID, let preset = presets.first(where: { $0.id == selectedPresetID }) {
+        print("Current List Name: \(state.listName)")
+        print("Schedule for Later is: \(state.scheduleForLater)")
+        if let selectedPresetID = state.selectedPresetID, let preset = presets.first(where: { $0.id == selectedPresetID }) {
             print("Selected Preset: \(preset.name)")
         } else {
             print("No preset selected.")
+        }
+    }
+}
+
+
+// MARK: - Extensions
+extension FocusSessionViewModel: SessionConfigurationViewDelegate {
+    func sessionConfigurationDidUpdateListName(to newName: String) {
+        updateListName(to: newName)
+    }
+    
+    func sessionConfigurationDidUpdateScheduleToggle(to newValue: Bool) {
+        updateScheduleToggle(to: newValue)
+    }
+    
+    func sessionConfigurationDidTapDuration() {
+        presentDurationPicker()
+    }
+    
+    func sessionConfigurationDidToggleDay(_ day: Weekday) {
+        toggleScheduledDay(day)
+    }
+    
+    func sessionConfigurationDidTapStartTime() {
+        presentStartTimePicker()
+    }
+    
+    func sessionConfigurationDidTapEndTime() {
+        presentEndTimePicker()
+    }
+    
+    func sessionConfigurationDidTapAppsBlocked() {
+        presentAppBlockerSheet()
+    }
+}
+
+extension FocusSessionViewModel: FocusPresetGridViewDelegate {
+    func focusPresetGridDidSelectPreset(_ preset: FocusPreset) {
+        selectPreset(preset)
+    }
+}
+
+extension FocusSessionViewModel: DurationPickerSheetViewDelegate {
+    func durationPickerDidSave(hours: Int, minutes: Int){
+        updateDuration(hours: hours, minutes: minutes)
+    }
+}
+
+extension FocusSessionViewModel: TimePickerSheetViewDelegate {
+    func timePickerDidSave(date: Date, type: TimePickerType) {
+        switch type {
+        case .start:
+            updateStartTime(to: date)
+        case .end:
+            updateEndTime(to: date)
         }
     }
 }

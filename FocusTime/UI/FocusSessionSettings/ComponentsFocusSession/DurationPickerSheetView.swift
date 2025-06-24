@@ -10,64 +10,78 @@ import FocusTimeUI
 
 struct DurationPickerSheetView: View {
     
-
-    @Binding var hours: Int
-    @Binding var minutes: Int
+    @State private var hours: Int
+    @State private var minutes: Int
     
-
+    weak var delegate: DurationPickerSheetViewDelegate?
+    
+    init(initialHours: Int, initialMinutes: Int, delegate: DurationPickerSheetViewDelegate?) {
+        self._hours = State(initialValue: initialHours)
+        self._minutes = State(initialValue: initialMinutes)
+        self.delegate = delegate
+    }
+    
+    private typealias Strings = FocusSessionView.Constants.DurationPicker.Strings
+    private typealias Layout = FocusSessionView.Constants.DurationPicker.Layout
+    private typealias Colors = FocusSessionView.Constants.DurationPicker.Colors
     
     var body: some View {
-        VStack(spacing: 16) {
-
-            Capsule()
-                .fill(Color.gray.opacity(0.5))
-                .frame(width: 40, height: 5)
-                .padding(.top, 8)
+        ZStack {
+            FocusSessionView.Constants.Colors.sheetBackground
+                .ignoresSafeArea()
             
-
-            Text("Session Length")
-                .font(.headline)
-                .foregroundStyle(Color.blue)
-            
-            Text("Choose how long you want to stay focused")
-                .font(.subheadline)
-                .foregroundColor(.gray)
-                .padding(.bottom)
-            
-
-            
-            durationPicker
-                .padding(.bottom)
-            
-
-            
-            
+            VStack(spacing: Layout.mainSpacing) {
+                Capsule()
+                    .fill(Color.gray)
+                    .frame(width: Layout.dragIndicatorWidth, height: Layout.dragIndicatorHeight)
+                
+                Text(Strings.title)
+                    .font(.headline)
+                    .foregroundStyle(Color.blue)
+                
+                Text(Strings.subtitle)
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
+                    .padding(.bottom)
+                
+                ZStack {
+                    Colors.pickerBackground
+                    
+                    durationPicker
+                        .padding(.bottom)
+                }
+                .frame(width: Layout.containerWidth, height: Layout.containerHeight)
+                .cornerRadius(Layout.containerCornerRadius)
+            }
+            .foregroundColor(.white)
         }
-        .frame(maxWidth: .infinity)
-        .background(Color(red: 0.1, green: 0.1, blue: 0.12))
-        
-        .foregroundColor(.white)
+        .onDisappear {
+            delegate?.durationPickerDidSave(hours: hours, minutes: minutes)
+        }
     }
     
     private var durationPicker: some View {
         HStack(spacing: 0) {
-            Picker("Hours", selection: $hours) {
-                ForEach(0..<24) { hour in
+            Picker(Strings.hoursPickerTitle, selection: $hours) {
+                ForEach(0..<FocusSessionView.Constants.Time.hoursInDay, id: \.self) { hour in
                     Text("\(hour)").tag(hour)
                 }
             }
             .pickerStyle(.wheel)
-            .frame(width: 70)
+            .frame(width: Layout.pickerWidth)
             .clipped()
             
-            Picker("Minutes", selection: $minutes) {
-                ForEach(0..<60) { minute in
+            Picker(Strings.minutesPickerTitle, selection: $minutes) {
+                ForEach(0..<FocusSessionView.Constants.Time.minutesInHour, id: \.self) { minute in
                     Text("\(minute)").tag(minute)
                 }
             }
             .pickerStyle(.wheel)
-            .frame(width: 70)
+            .frame(width: Layout.pickerWidth)
             .clipped()
         }
     }
 }
+
+
+
