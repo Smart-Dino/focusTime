@@ -11,7 +11,8 @@ import SwiftUI
 struct FocusTimeApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+//            ContentView()
+            ShieldDebugView()
         }
     }
 }
