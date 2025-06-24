@@ -13,9 +13,9 @@ import FamilyControls
 
 // Optionally override any of the functions below.
 // Make sure that your class name matches the NSExtensionPrincipalClass in your Info.plist.
-class DeviceActivityMonitorExtension: @MainActor DeviceActivityMonitor {
-    let store = ManagedSettingsStore()
-    @MainActor let scheduleStore = ScheduleStore()
+final class DeviceActivityMonitorExtension: DeviceActivityMonitor {
+    private let store = ManagedSettingsStore()
+    @MainActor private let scheduleStore = ScheduleStore()
     
     override func intervalDidStart(for activity: DeviceActivityName) {
         super.intervalDidStart(for: activity)
