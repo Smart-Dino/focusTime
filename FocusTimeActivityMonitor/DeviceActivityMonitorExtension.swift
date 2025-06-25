@@ -15,20 +15,24 @@ import FamilyControls
 // Make sure that your class name matches the NSExtensionPrincipalClass in your Info.plist.
 final class DeviceActivityMonitorExtension: DeviceActivityMonitor {
     private let store = ManagedSettingsStore()
-//    @MainActor private let scheduleStore = ScheduleStore()
+    private let container = try! ModelContainer(
+        for: BlockItem.self,
+        configurations: ModelConfiguration(groupContainer: .identifier(appGroupIdentifier))
+    )
     
     override func intervalDidStart(for activity: DeviceActivityName) {
         super.intervalDidStart(for: activity)
+//        let context = ModelContext(container)
+        
+        // Separate id and the start-end identifier.
+        let idComponents = activity.rawValue.components(separatedBy: .whitespaces)
+        // Schedule id.
+        let identifier = idComponents[0]
+        // Determine if it is a start or the end of the schedule.
+        let blockingPhase = idComponents[1]
+        
+        #warning("Determine the day of the week and decide to kick in with blocking or not.")
         store.shield.applicationCategories = .all()
-//
-//        // Separate id and the start-end identifier.
-//        let idComponents = activity.rawValue.components(separatedBy: .whitespaces)
-//        // Schedule id.
-//        let identifier = idComponents[0]
-//        // Determine if it is a start or the end of the schedule.
-//        let blockingPhase = idComponents[1]
-//        
-//        #warning("Determine the day of the week and decide to kick in with blocking or not.")
 //        Task { @MainActor in
 //            if blockingPhase == "start" {
 //                // Fetch the schedule.
