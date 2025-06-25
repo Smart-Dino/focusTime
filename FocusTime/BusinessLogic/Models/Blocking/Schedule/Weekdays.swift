@@ -10,9 +10,11 @@ import Foundation
 import Foundation
 
 /// Days of the week, starting with Sunday = 1 to match Calendar.
-enum Weekday: Int, Codable, CaseIterable, Comparable {
+enum Weekday: Int, Codable, CaseIterable, Comparable, Identifiable {
     case sunday = 1, monday, tuesday, wednesday, thursday, friday, saturday
 
+    var id: Int { rawValue }
+    
     /// Human-readable name of the weekday.
     var description: String {
         switch self {

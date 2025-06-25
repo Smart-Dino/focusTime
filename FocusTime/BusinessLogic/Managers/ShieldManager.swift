@@ -75,19 +75,19 @@ final class LiveShieldManager: ShieldManager {
     // We can solve this by having two separate schedules that are both 15+
     // mins in length but have less than 15 minutes in-between them!
     func block(specific selection: FamilyActivitySelection, schedule: Schedule) async throws {
-        // Start of interval + 15 mins
+        // Start of interval + 15 mins.
         let intervalStart = schedule.startTime.dateComponents
         let startAddingFifteen = intervalStart.adding(minutes: 15)
         
-        // End of interval + 15 mins
+        // End of interval + 15 mins.
         let intervalEnd = schedule.endTime.dateComponents
         let endAddingFifteen = intervalEnd.adding(minutes: 15)
         
-        // Generate ids for querying DB
+        // Generate ids for querying DB.
         let deviceActivityStartName = DeviceActivityName(schedule.id.uuidString + " " + "start")
         let deviceActivityEndName = DeviceActivityName(schedule.id.uuidString + " " + "end")
         
-        // Schedule both events
+        // Schedule both events.
         let deviceActivityScheduleStart = DeviceActivitySchedule(intervalStart: intervalStart,
                                                             intervalEnd: startAddingFifteen,
                                                             repeats: true)
@@ -96,7 +96,7 @@ final class LiveShieldManager: ShieldManager {
                                                             intervalEnd: endAddingFifteen,
                                                             repeats: true)
         
-        // Start monitoring events
+        // Start monitoring events.
         try center.startMonitoring(deviceActivityStartName, during: deviceActivityScheduleStart)
         try center.startMonitoring(deviceActivityEndName, during: deviceActivityScheduleEnd)
     }

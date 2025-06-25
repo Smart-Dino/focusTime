@@ -13,14 +13,116 @@ struct ShieldDebugView: View {
     
     var body: some View {
         VStack {
+            // MARK: - Schedule list
+            VStack {
+                ScrollView(.vertical) {
+                    ForEach(viewModel.state.schedules) { schedule in
+                        HStack {
+                            Text(schedule.emoji)
+                            VStack {
+                                Text(schedule.name)
+                                Text("Id: " + schedule.id.uuidString)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // MARK: - BlockItem list
+            VStack {
+                ScrollView(.vertical) {
+                    ForEach(viewModel.state.blockItems) { blockItem in
+                        HStack {
+                            Text(blockItem.emoji)
+                            VStack {
+                                Text(blockItem.name)
+                                Text("Id: " + blockItem.id.uuidString)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                }
+            }
+            
             // MARK: - Status
+            sectionSeparator(sectionName: "Status")
             VStack(alignment: .leading) {
-                Text("Is blocked: \(viewModel.shieldManager.isShieldActive)")
+                Text("Is blocked: \(viewModel.shieldManager.isShieldActive.description)")
                 Text("Apps chosen: \(viewModel.state.selection.applicationTokens.count)")
                 Text("Categories chosen: \(viewModel.state.selection.categoryTokens.count)")
             }
             
+            // MARK: - Selection
+            sectionSeparator(sectionName: "Selection")
+            Menu("Select days") {
+                ForEach(Weekday.allCases) { weekday in
+                    Button {
+                        viewModel.toggleSelectionFor(weekday: weekday)
+                    } label: {
+                        if viewModel.state.daySelection.contains(weekday) {
+                            Label(weekday.description, systemImage: "checkmark")
+                        } else {
+                            Text(weekday.description)
+                        }
+                    }
+                }
+            }
+            .menuActionDismissBehavior(.disabled)
+
+            HStack {
+                DatePicker(
+                    "Select start time",
+                    selection:
+                        Binding(get: {
+                            viewModel.state.startTime
+                        }, set: { date in
+                            viewModel.setStartTime(date)
+                        }),
+                    displayedComponents: [.hourAndMinute]
+                )
+                .datePickerStyle(.compact)
+                DatePicker(
+                    "Select end time",
+                    selection:
+                        Binding(get: {
+                            viewModel.state.endTime
+                        }, set: { date in
+                            viewModel.setEndTime(date)
+                        }),
+                    displayedComponents: [.hourAndMinute]
+                )
+            }
+            
+            Button("Toggle selection sheet") {
+                Task {
+                    await viewModel.toggleSelectionSheet()
+                }
+            }
+            
+            Button("Create schedule") {
+                Task {
+                    do {
+                        try await viewModel.addScheduleToDB()
+                    } catch {
+                        print(error)
+                    }
+                }
+            }
+            
+            Button("Start schedule") {
+                Task {
+                    do {
+                        try viewModel.appendBlockItemToSchedule()
+                        await viewModel.blockSelectionDuringSchedule()
+                    } catch {
+                        print(error)
+                    }
+                }
+            }
+            
             // MARK: - Controls
+            sectionSeparator(sectionName: "Controls")
             VStack {
                 Button("Start block") {
                     Task {
@@ -34,12 +136,6 @@ struct ShieldDebugView: View {
                     }
                 }
                 .buttonStyle(.borderedProminent)
-                Button("Toggle selection sheet") {
-                    Task {
-                        await viewModel.toggleSelectionSheet()
-                    }
-                }
-                .buttonStyle(.bordered)
             }
             .frame(maxWidth: .infinity)
             .buttonBorderShape(.capsule)
@@ -61,6 +157,15 @@ struct ShieldDebugView: View {
     
     init(viewModel: ShieldDebugViewModel = ShieldDebugViewModel()) {
         self.viewModel = viewModel
+    }
+    
+    
+    func sectionSeparator(sectionName: String) -> some View {
+        Group {
+            Divider()
+            Text(sectionName).bold()
+            Divider()
+        }
     }
 }
 
