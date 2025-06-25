@@ -75,6 +75,7 @@ final class ShieldDebugViewModel {
         }
     }
     
+    #warning("Code methods to reset app state instead of reinstalling it each time")
     // MARK: - Methods
     func addScheduleToDB() async throws {
         let blockItem = BlockItem(id: UUID(uuidString: "F0883B46-08B4-4FA7-9D84-560C32E2FF7C")!,

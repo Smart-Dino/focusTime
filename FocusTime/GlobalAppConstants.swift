@@ -7,4 +7,5 @@
 
 import Foundation
 
-let appGroupIdentifier = "group." + Bundle.main.bundleIdentifier!
+//let appGroupIdentifier = "group." + Bundle.main.bundleIdentifier!
+let appGroupIdentifier = "group.org.dino.smart.FocusTime"

@@ -16,63 +16,68 @@ import FamilyControls
 final class DeviceActivityMonitorExtension: DeviceActivityMonitor {
     private let store = ManagedSettingsStore()
     private let container = try! ModelContainer(
-        for: BlockItem.self,
-        configurations: ModelConfiguration(groupContainer: .identifier(appGroupIdentifier))
+        for: Schedule.self,
+        configurations: ModelConfiguration(allowsSave: false, groupContainer: .identifier(appGroupIdentifier))
     )
     
     override func intervalDidStart(for activity: DeviceActivityName) {
         super.intervalDidStart(for: activity)
-//        let context = ModelContext(container)
+        
+        // Create context from scratch because using mainContext in a
+        // non-isolated to MainActor environment is not allowed.
+        let context = ModelContext(container)
         
         // Separate id and the start-end identifier.
         let idComponents = activity.rawValue.components(separatedBy: .whitespaces)
-        // Schedule id.
-        let identifier = idComponents[0]
+        
+        // Convert the string-based schedule identifier back into a UUID because SwiftData's #Predicate closures
+        // are compiled down to NSPredicate under the hood. NSPredicate cannot understand or evaluate Swift-specific
+        // expressions like `id.uuidString`.
+        // As a result, using `id.uuidString == identifier` silently fails and returns no matches.
+        guard let identifier = UUID(uuidString: idComponents[0]) else { return }
+        
         // Determine if it is a start or the end of the schedule.
         let blockingPhase = idComponents[1]
         
-        #warning("Determine the day of the week and decide to kick in with blocking or not.")
-        store.shield.applicationCategories = .all()
-//        Task { @MainActor in
-//            if blockingPhase == "start" {
-//                // Fetch the schedule.
-//                let fetchDescriptor = FetchDescriptor<Schedule>(
-//                    predicate: #Predicate { $0.id.uuidString == identifier }
-//                )
-//                let schedule = try! scheduleStore.fetch(descriptor: fetchDescriptor).first
-//                
-//                // Make sure we have our schedule.
-//                guard let schedule else { return }
-//                
-//                // Add all the items to discourage.
-//                var applicationsToDiscourage = Set<ApplicationToken>()
-//                var applicationCategoriesToDiscourage = Set<ActivityCategoryToken>()
-//                
-//                for blockItem in schedule.blockItems {
-//                    let blockedContent = blockItem.blockedContent
-//                    applicationsToDiscourage.formUnion(blockedContent.applicationTokens)
-//                    applicationCategoriesToDiscourage.formUnion(blockedContent.categoryTokens)
-//                }
-//                
-//                // Block selected applications.
-//                if applicationsToDiscourage.isEmpty {
-//                    store.shield.applications = nil
-//                } else {
-//                    store.shield.applications = applicationsToDiscourage
-//                }
-//                
-//                // Block selected categories.
-//                if applicationCategoriesToDiscourage.isEmpty {
-//                    store.shield.applicationCategories = nil
-//                } else {
-//                    store.shield.applicationCategories = .specific(applicationCategoriesToDiscourage)
-//                }
-//                
-//            } else {
-//                store.shield.applications = nil
-//                store.shield.applicationCategories = nil
-//            }
-//        }
+#warning("Determine the day of the week and decide to kick in with blocking or not.")
+        if blockingPhase == "start" {
+            // Fetch the schedule.
+            let fetchDescriptor = FetchDescriptor<Schedule>(
+                predicate: #Predicate<Schedule> { $0.id == identifier }
+            )
+            let schedule = try? context.fetch(fetchDescriptor).first
+            
+            // Make sure we have our schedule.
+            guard let schedule else { return }
+            
+            // Add all the items to discourage.
+            var applicationsToDiscourage = Set<ApplicationToken>()
+            var applicationCategoriesToDiscourage = Set<ActivityCategoryToken>()
+            
+            for blockItem in schedule.blockItems {
+                let blockedContent = blockItem.blockedContent
+                applicationsToDiscourage.formUnion(blockedContent.applicationTokens)
+                applicationCategoriesToDiscourage.formUnion(blockedContent.categoryTokens)
+            }
+            
+            // Block selected applications.
+            if applicationsToDiscourage.isEmpty {
+                store.shield.applications = nil
+            } else {
+                store.shield.applications = applicationsToDiscourage
+            }
+            
+            // Block selected categories.
+            if applicationCategoriesToDiscourage.isEmpty {
+                store.shield.applicationCategories = nil
+            } else {
+                store.shield.applicationCategories = .specific(applicationCategoriesToDiscourage)
+            }
+            
+        } else {
+            store.shield.applications = nil
+            store.shield.applicationCategories = nil
+        }
     }
     
     override func intervalDidEnd(for activity: DeviceActivityName) {
