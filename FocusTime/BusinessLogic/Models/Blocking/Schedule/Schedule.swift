@@ -19,8 +19,8 @@ final class Schedule: SwiftDataItem {
     var endTime: TimeComponents
     var isActive: Bool
     
-    @Relationship(inverse: \BlockItem.schedules)
-    var blockItems: [BlockItem]
+    @Relationship(deleteRule: .nullify, inverse: \BlockItem.schedules)
+    var blockItems: [BlockItem]?
     
     init(
         id: UUID = UUID(),

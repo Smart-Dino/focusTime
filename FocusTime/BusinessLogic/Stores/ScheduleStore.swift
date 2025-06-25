@@ -57,4 +57,8 @@ final class ScheduleStore: DataSource {
         try modelContext.save()
         item = fetchedItem
     }
+    
+    func eraseAllData() throws {
+        try modelContext.delete(model: Schedule.self)
+    }
 }

@@ -48,13 +48,13 @@ final class DeviceActivityMonitorExtension: DeviceActivityMonitor {
             let schedule = try? context.fetch(fetchDescriptor).first
             
             // Make sure we have our schedule.
-            guard let schedule else { return }
+            guard let schedule, let blockItems = schedule.blockItems else { return }
             
             // Add all the items to discourage.
             var applicationsToDiscourage = Set<ApplicationToken>()
             var applicationCategoriesToDiscourage = Set<ActivityCategoryToken>()
             
-            for blockItem in schedule.blockItems {
+            for blockItem in blockItems {
                 let blockedContent = blockItem.blockedContent
                 applicationsToDiscourage.formUnion(blockedContent.applicationTokens)
                 applicationCategoriesToDiscourage.formUnion(blockedContent.categoryTokens)

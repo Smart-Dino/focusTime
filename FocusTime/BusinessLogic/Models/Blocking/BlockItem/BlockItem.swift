@@ -15,19 +15,18 @@ final class BlockItem: SwiftDataItem {
     @Attribute(.unique) var id: UUID
     var name: String
     var emoji: String
-    var schedules: [Schedule]
+    var schedules: [Schedule]?
     var blockedContent: FamilyActivitySelection
     // MARK: - Dynamic
     var isEnabled: Bool = true // Shows whether the block is currently in action.
     // MARK: - Computed properties
     var schedulesDescription: String {
-        switch schedules.count {
-        case 0:
-            return "No schedules"
-        case 1:
+        guard let schedules, schedules.count >= 1 else { return "No schedules" }
+        
+        if schedules.count == 1 {
             guard let first = schedules.first else { return "No schedules" }
             return "\(first.days.daysDescription), \(first.startTime.localizedDescription()) – \(first.endTime.localizedDescription())"
-        default:
+        } else {
             return "\(schedules.count) schedules"
         }
     }

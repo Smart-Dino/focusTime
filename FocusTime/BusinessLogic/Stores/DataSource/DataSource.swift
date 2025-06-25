@@ -30,4 +30,5 @@ protocol DataSource {
     func fetch(descriptor: FetchDescriptor<Model>) throws -> [Model]
     
     func updateFields(of item: inout Model, using updates: (Model) -> Void) throws
+    func eraseAllData() throws
 }

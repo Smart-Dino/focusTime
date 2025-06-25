@@ -51,6 +51,12 @@ final class ShieldDebugViewModel {
     }
     
     // MARK: - Setters
+    func removeError(_ removeError: Bool) {
+        if removeError {
+            state.error = nil
+        }
+    }
+    
     func setStartTime(_ date: Date) {
         state.startTime = date
     }
@@ -77,9 +83,22 @@ final class ShieldDebugViewModel {
     
     #warning("Code methods to reset app state instead of reinstalling it each time")
     // MARK: - Methods
+    func eraseAllData() {
+        do {
+            try blockItemStore.eraseAllData()
+            try scheduleStore.eraseAllData()
+            fetchAllItems()
+        } catch {
+            state.error = error
+        }
+    }
+    
     func addScheduleToDB() async throws {
-        let blockItem = BlockItem(id: UUID(uuidString: "F0883B46-08B4-4FA7-9D84-560C32E2FF7C")!,
-                                  name: "Block",
+        let blockItems = try blockItemStore.fetch()
+        let scheduleItems = try blockItemStore.fetch()
+        guard blockItems.isEmpty || scheduleItems.isEmpty else { return }
+        
+        let blockItem = BlockItem(name: "Block",
                                   emoji: "❌",
                                   blockedContent: state.selection)
         
@@ -93,36 +112,47 @@ final class ShieldDebugViewModel {
         print(startComponent)
         print(endComponent)
         
-        let schedule = Schedule(id: UUID(uuidString: "F0883B46-08B4-4FA7-9D84-560C32E2FF7C")!,
-                                emoji: "🕑",
+        let schedule = Schedule(emoji: "🕑",
                                 name: "Schedule",
                                 days: state.daySelection,
                                 startTime: startComponent,
                                 endTime: endComponent,
                                 isActive: false)
         
-        try await blockItemStore.insert(blockItem)
-        try await scheduleStore.insert(schedule)
+        do {
+            try await blockItemStore.insert(blockItem)
+            try await scheduleStore.insert(schedule)
+        } catch {
+            state.error = error
+        }
         
-        try fetchAllItems()
+        fetchAllItems()
     }
     
-    func fetchAllItems() throws {
-        try state.schedules = scheduleStore.fetch()
-        try state.blockItems = blockItemStore.fetch()
+    func fetchAllItems() {
+        do {
+            try state.schedules = scheduleStore.fetch()
+            try state.blockItems = blockItemStore.fetch()
+        } catch {
+            state.error = error
+        }
     }
     
-    func appendBlockItemToSchedule() throws {
-        let blockItem = try blockItemStore.fetch().first(where: { $0.id.uuidString == "F0883B46-08B4-4FA7-9D84-560C32E2FF7C" })!
-        let schedule = try scheduleStore.fetch().first(where: { $0.id.uuidString == "F0883B46-08B4-4FA7-9D84-560C32E2FF7C" })!
-        
-        schedule.blockItems.append(blockItem)
+    func appendBlockItemToSchedule() {
+        do {
+            let blockItem = try blockItemStore.fetch(descriptor: .init()).first!
+            let schedule = try scheduleStore.fetch(descriptor: .init()).first!
+            
+            schedule.blockItems?.append(blockItem)
+        } catch {
+            state.error = error
+        }
     }
     
     func blockSelectionDuringSchedule() async {
         do {
-            let blockItem = try blockItemStore.fetch().first(where: { $0.id.uuidString == "F0883B46-08B4-4FA7-9D84-560C32E2FF7C" })!
-            let schedule = try scheduleStore.fetch().first(where: { $0.id.uuidString == "F0883B46-08B4-4FA7-9D84-560C32E2FF7C" })!
+            let blockItem = try blockItemStore.fetch(descriptor: .init()).first!
+            let schedule = try scheduleStore.fetch(descriptor: .init()).first!
             
             try await shieldManager.block(specific: blockItem.blockedContent, schedule: schedule)
         } catch {

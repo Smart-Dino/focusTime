@@ -45,6 +45,12 @@ struct ShieldDebugView: View {
                 }
             }
             
+            Button("Erase all data", role: .destructive) {
+                viewModel.eraseAllData()
+            }
+            .buttonBorderShape(.capsule)
+            .buttonStyle(.borderedProminent)
+            
             // MARK: - Status
             sectionSeparator(sectionName: "Status")
             VStack(alignment: .leading) {
@@ -69,7 +75,7 @@ struct ShieldDebugView: View {
                 }
             }
             .menuActionDismissBehavior(.disabled)
-
+            
             HStack {
                 DatePicker(
                     "Select start time",
@@ -112,12 +118,8 @@ struct ShieldDebugView: View {
             
             Button("Start schedule") {
                 Task {
-                    do {
-                        try viewModel.appendBlockItemToSchedule()
-                        await viewModel.blockSelectionDuringSchedule()
-                    } catch {
-                        print(error)
-                    }
+                    try viewModel.appendBlockItemToSchedule()
+                    await viewModel.blockSelectionDuringSchedule()
                 }
             }
             
@@ -153,6 +155,16 @@ struct ShieldDebugView: View {
                 viewModel.setSelection(selection)
             })
         )
+        .alert(
+            "There was an error",
+            isPresented: Binding(get: {
+                viewModel.state.error != nil
+            }, set: { bool in
+                viewModel.removeError(bool)
+            }),
+            actions: { }
+        )
+        .onAppear(perform: viewModel.fetchAllItems)
     }
     
     init(viewModel: ShieldDebugViewModel = ShieldDebugViewModel()) {

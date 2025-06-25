@@ -58,4 +58,8 @@ final class BlockItemStore: DataSource {
         try modelContext.save()
         item = fetchedItem
     }
+    
+    func eraseAllData() throws {
+        try modelContext.delete(model: BlockItem.self)
+    }
 }
