@@ -25,11 +25,11 @@ final class Schedule: SwiftDataItem {
     /// Returns a user-friendly description for a set of weekdays.
     var daysDescription: String {
         switch days {
-        case Set(Weekday.allCases.filter({ !$0.isWorkDay })): "Weekend"
-        case Weekday.weekdays:               "Weekdays"
-        case Set(Weekday.allCases):          "Every day"
+        case Weekday.weekends:      "Weekend"
+        case Weekday.weekdays:      "Weekdays"
+        case Set(Weekday.allCases): "Every day"
         case let days where days.count == 1: days.first!.description
-        default:                             "\(self.count) days"
+        default:                     "\(days.count) days"
         }
     }
     
@@ -51,5 +51,16 @@ final class Schedule: SwiftDataItem {
         self.endTime = endTime
         self.isActive = isActive
         self.blockItems = blockItems
+    }
+    
+    init(from item: ProtectedSchedule) {
+        self.id = item.id
+        self.emoji = item.emoji
+        self.name = item.name
+        self.days = item.days
+        self.startTime = item.startTime
+        self.endTime = item.endTime
+        self.isActive = item.isActive
+        self.blockItems = []
     }
 }

@@ -1,5 +1,5 @@
 //
-//  Weekdays.swift
+//  Weekday.swift
 //  FocusTime
 //
 //  Created by Maksym Horobets on 19.06.2025.
@@ -24,14 +24,22 @@ enum Weekday: Int, Codable, CaseIterable, Identifiable {
         }
     }
     
-    #warning("Finish this property")
-    var weekdays: Set<Self> {
+    static var weekdays: Set<Weekday> {
+        Set(Weekday.allCases.filter({ $0.isWorkDay }))
+    }
+    
+    static var weekends: Set<Weekday> {
         Set(Weekday.allCases.filter({ !$0.isWorkDay }))
     }
     
-    #warning("Finish this property")
-    static var allCases: [Self] {
-        []
+    /// Returns the days of the week reordered to start with the user's locale preference.
+    static var allCases: [Weekday] {
+        let start = Calendar.current.firstWeekday
+        return [.sunday, .monday, .tuesday, .wednesday, .thursday, .friday, .saturday].sorted {
+            let lhsOffset = ($0.rawValue - start + 7) % 7
+            let rhsOffset = ($1.rawValue - start + 7) % 7
+            return lhsOffset < rhsOffset
+        }
     }
     
     /// Human-readable name of the weekday.
@@ -44,16 +52,6 @@ enum Weekday: Int, Codable, CaseIterable, Identifiable {
         case .thursday:  "Thursday"
         case .friday:    "Friday"
         case .saturday:  "Saturday"
-        }
-    }
-
-    /// Returns the days of the week reordered to start with the user's locale preference.
-    static func localizedOrder(using calendar: Calendar = .current) -> [Weekday] {
-        let start = calendar.firstWeekday
-        return allCases.sorted {
-            let lhsOffset = ($0.rawValue - start + 7) % 7
-            let rhsOffset = ($1.rawValue - start + 7) % 7
-            return lhsOffset < rhsOffset
         }
     }
 }

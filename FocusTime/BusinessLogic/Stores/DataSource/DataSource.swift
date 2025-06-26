@@ -24,9 +24,8 @@ actor GlobalSourceActor {
 protocol DataSource {
     associatedtype Model: SwiftDataItem
     associatedtype ProtectedModel: Sendable
-    #warning("Protected model for sendable representation")
     
-    @GlobalSourceActor func insert(_ item: Model) async throws
+    @GlobalSourceActor func insert(_ item: ProtectedModel) async throws
     func delete(_ item: Model) throws
     func fetch() throws -> [Model]
     func fetch(descriptor: FetchDescriptor<Model>) throws -> [Model]
@@ -35,7 +34,6 @@ protocol DataSource {
     func eraseAllData() throws
 }
 
-@MainActor
-protocol MyDataSource: DataSource where Model == BlockItem, ProtectedModel == String {
-    
-}
+//protocol BlockItemDataSource: DataSource where Model == BlockItem, ProtectedModel == ProtectedBlockItem { }
+//
+//protocol ScheduleDataSource: DataSource where Model == Schedule, ProtectedModel == ProtectedSchedule { }

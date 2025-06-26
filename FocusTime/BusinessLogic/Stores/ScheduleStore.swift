@@ -10,9 +10,10 @@ import SwiftData
 
 @MainActor
 final class ScheduleStore: DataSource {
+    
     private let modelContainer: ModelContainer
     private let modelContext: ModelContext
-
+    
     init() {
         let config = ModelConfiguration(groupContainer: .identifier(appGroupIdentifier))
         let container = try! ModelContainer(
@@ -24,11 +25,12 @@ final class ScheduleStore: DataSource {
         self.modelContext = context
     }
     
-    @GlobalSourceActor func insert(_ item: Schedule) /*async*/ throws {
+    @GlobalSourceActor func insert(_ item: ProtectedSchedule) throws {
         let container = modelContainer
-        let context = ModelContext(container) // Create a separate, non-main context to write to
-        context.insert(item)
-        try context.save() // Apply the context to the DB
+        let context = ModelContext(container) // Create a separate, non-main context to write to.
+        let modelItem = Schedule(from: item) // Convert to model instance.
+        context.insert(modelItem)
+        try context.save() // Apply the context to the DB.
     }
     
     func delete(_ item: Schedule) throws {

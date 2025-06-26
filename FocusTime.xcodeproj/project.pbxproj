@@ -48,9 +48,11 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				BusinessLogic/Models/Blocking/BlockItem/BlockItem.swift,
+				BusinessLogic/Models/Blocking/BlockItem/ProtectedBlockItem.swift,
+				BusinessLogic/Models/Blocking/Schedule/ProtectedSchedule.swift,
 				BusinessLogic/Models/Blocking/Schedule/Schedule.swift,
 				BusinessLogic/Models/Blocking/Schedule/TimeComponents.swift,
-				BusinessLogic/Models/Blocking/Schedule/Weekdays.swift,
+				BusinessLogic/Models/Blocking/Schedule/Weekday.swift,
 				BusinessLogic/Stores/BlockItemStore.swift,
 				BusinessLogic/Stores/DataSource/DataSource.swift,
 				BusinessLogic/Stores/DataSource/DataSourceError.swift,

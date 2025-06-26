@@ -17,16 +17,16 @@ final class AppBlockingListViewModel {
     }
     
     private(set) var state: State
-    private let blockItemStore: MyDataSource
+    private let blockItemStore: BlockItemStore
     
-    init(state: State = State(), blockItemStore: MyDataSource) {
+    init(state: State = State(), blockItemStore: BlockItemStore = BlockItemStore()) {
         self.state = state
         self.blockItemStore = blockItemStore
     }
     
     func insertTestItemsIntoDatabase() async {
         for _ in 0..<100 {
-            let item = BlockItem(name: "Block", emoji: "😜", blockedContent: FamilyActivitySelection())
+            let item = ProtectedBlockItem(name: "Block", emoji: "😜", blockedContent: FamilyActivitySelection())
             try? await blockItemStore.insert(item)
         }
         await MainActor.run {
