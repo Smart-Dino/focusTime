@@ -19,6 +19,8 @@ struct TimeComponents: Codable {
         guard (0..<24).contains(hour), (0..<60).contains(minute) else { return nil }
         self.hour = hour
         self.minute = minute
+        
+        Date(timeIntervalSince1970: 28800)
     }
 
     /// Returns time in "HH:mm" format (e.g. "08:30").

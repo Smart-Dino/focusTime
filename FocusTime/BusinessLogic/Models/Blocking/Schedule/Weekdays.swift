@@ -10,10 +10,29 @@ import Foundation
 import Foundation
 
 /// Days of the week, starting with Sunday = 1 to match Calendar.
-enum Weekday: Int, Codable, CaseIterable, Comparable, Identifiable {
+enum Weekday: Int, Codable, CaseIterable, Identifiable {
     case sunday = 1, monday, tuesday, wednesday, thursday, friday, saturday
 
     var id: Int { rawValue }
+    
+    var isWorkDay: Bool {
+        switch self {
+        case .sunday, .saturday:
+            false
+        default:
+            true
+        }
+    }
+    
+    #warning("Finish this property")
+    var weekdays: Set<Self> {
+        Set(Weekday.allCases.filter({ !$0.isWorkDay }))
+    }
+    
+    #warning("Finish this property")
+    static var allCases: [Self] {
+        []
+    }
     
     /// Human-readable name of the weekday.
     var description: String {
@@ -28,21 +47,6 @@ enum Weekday: Int, Codable, CaseIterable, Comparable, Identifiable {
         }
     }
 
-    // Conform to Comparable based on fixed rawValue order (Sunday = 1).
-    static func < (lhs: Weekday, rhs: Weekday) -> Bool {
-        lhs.rawValue < rhs.rawValue
-    }
-
-    /// Weekdays: Monday–Friday
-    static var weekdays: Set<Weekday> {
-        [.monday, .tuesday, .wednesday, .thursday, .friday]
-    }
-
-    /// Weekend: Saturday and Sunday
-    static var weekend: Set<Weekday> {
-        [.saturday, .sunday]
-    }
-
     /// Returns the days of the week reordered to start with the user's locale preference.
     static func localizedOrder(using calendar: Calendar = .current) -> [Weekday] {
         let start = calendar.firstWeekday
@@ -50,19 +54,6 @@ enum Weekday: Int, Codable, CaseIterable, Comparable, Identifiable {
             let lhsOffset = ($0.rawValue - start + 7) % 7
             let rhsOffset = ($1.rawValue - start + 7) % 7
             return lhsOffset < rhsOffset
-        }
-    }
-}
-
-extension Set where Element == Weekday {
-    /// Returns a user-friendly description for a set of weekdays.
-    var daysDescription: String {
-        switch self {
-        case Weekday.weekend:                "Weekend"
-        case Weekday.weekdays:               "Weekdays"
-        case Set(Weekday.allCases):          "Every day"
-        case let days where days.count == 1: days.first!.description
-        default:                             "\(self.count) days"
         }
     }
 }

@@ -23,6 +23,8 @@ actor GlobalSourceActor {
 @MainActor
 protocol DataSource {
     associatedtype Model: SwiftDataItem
+    associatedtype ProtectedModel: Sendable
+    #warning("Protected model for sendable representation")
     
     @GlobalSourceActor func insert(_ item: Model) async throws
     func delete(_ item: Model) throws
@@ -31,4 +33,9 @@ protocol DataSource {
     
     func updateFields(of item: inout Model, using updates: (Model) -> Void) throws
     func eraseAllData() throws
+}
+
+@MainActor
+protocol MyDataSource: DataSource where Model == BlockItem, ProtectedModel == String {
+    
 }

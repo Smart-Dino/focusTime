@@ -22,6 +22,17 @@ final class Schedule: SwiftDataItem {
     @Relationship(deleteRule: .nullify, inverse: \BlockItem.schedules)
     var blockItems: [BlockItem]?
     
+    /// Returns a user-friendly description for a set of weekdays.
+    var daysDescription: String {
+        switch days {
+        case Set(Weekday.allCases.filter({ !$0.isWorkDay })): "Weekend"
+        case Weekday.weekdays:               "Weekdays"
+        case Set(Weekday.allCases):          "Every day"
+        case let days where days.count == 1: days.first!.description
+        default:                             "\(self.count) days"
+        }
+    }
+    
     init(
         id: UUID = UUID(),
         emoji: String,

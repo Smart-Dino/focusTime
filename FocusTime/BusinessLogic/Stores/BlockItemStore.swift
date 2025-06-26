@@ -10,7 +10,7 @@ import Foundation
 import FamilyControls
 
 @MainActor
-final class BlockItemStore: DataSource {
+final class BlockItemStore: MyDataSource {
     private let modelContainer: ModelContainer
     private let modelContext: ModelContext
 
@@ -25,11 +25,14 @@ final class BlockItemStore: DataSource {
         self.modelContext = context
     }
     
-    @GlobalSourceActor func insert(_ item: BlockItem) throws { // Implicitly async since runs in a different context
-        let container = modelContainer
-        let context = ModelContext(container) // Create a separate, non-main context to write to
-        context.insert(item)
-        try context.save() // Apply the context to the DB
+    #warning("Make a sendable copy of BlockItem")
+    func insert(_ item: BlockItem) throws { // Implicitly async since runs in a different context
+        Task { @GlobalSourceActor in
+            let container = modelContainer
+            let context = ModelContext(container) // Create a separate, non-main context to write to
+            context.insert(item)
+            try context.save() // Apply the context to the DB
+        }
     }
     
     func delete(_ item: BlockItem) throws {
