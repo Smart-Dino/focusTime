@@ -57,7 +57,7 @@
 				BusinessLogic/Stores/ScheduleStore.swift,
 				"Extentions/BlockItem+Codable.swift",
 				"Extentions/Schedule+Codable.swift",
-				GlobalAppConstants.swift,
+				Shared/AppValues.swift,
 			);
 			target = E97895A42E0AFCBE00E0AF42 /* FocusTimeActivityMonitor */;
 		};

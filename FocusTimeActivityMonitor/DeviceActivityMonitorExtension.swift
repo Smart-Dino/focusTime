@@ -17,7 +17,7 @@ final class DeviceActivityMonitorExtension: DeviceActivityMonitor {
     private let store = ManagedSettingsStore()
     private let container = try! ModelContainer(
         for: Schedule.self,
-        configurations: ModelConfiguration(allowsSave: false, groupContainer: .identifier(appGroupIdentifier))
+        configurations: ModelConfiguration(allowsSave: false, groupContainer: .identifier(AppValues.appGroupIdentifier))
     )
     
     override func intervalDidStart(for activity: DeviceActivityName) {
