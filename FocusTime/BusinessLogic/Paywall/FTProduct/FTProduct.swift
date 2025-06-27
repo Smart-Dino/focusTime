@@ -38,17 +38,6 @@ struct FTProduct: Identifiable, Equatable, Sendable {
     let trialPeriodDescription: String?
     
     // MARK: - Initializer
-    /// Initializes a new `FTProduct` with the provided metadata and optional subscription period.
-    ///
-    /// - Parameters:
-    ///   - id:               The unique identifier of the product (e.g. `"com.myapp.monthly"`).
-    ///   - title:            The localized display name of the product.
-    ///   - description:      A localized description of what the product offers.
-    ///   - price:            The cost of the product as a `Decimal`, avoiding binary‑floating rounding issues.
-    ///   - priceFormatStyle: The `Decimal.FormatStyle.Currency` used to format the `price`.
-    ///   - subscriptionPeriod: An optional subscription period as an `Int` (number of seconds).
-    ///                         (nil for one‑time purchases).
-    ///   - trialable:        Declares whether this product has a trial option on it.
     init(
         id: String = UUID().uuidString,
         title: String,
@@ -101,37 +90,4 @@ struct FTProduct: Identifiable, Equatable, Sendable {
         "\(price.description) \(format.currencyCode) / \(period)"
     }
 
-}
-
-
-// MARK: - Mocks
-extension FTProduct {
-    enum Mocks {
-        case weekly
-        case monthly
-        
-        var product: FTProduct {
-            get throws {
-                switch self {
-                case .weekly:
-                    try FTProductBuilder()
-                        .set(title: "Weekly")
-                        .set(description: "Unlock pro features for a week")
-                        .set(price: 0.37)
-                        .set(currency: .currency(code: "USD"))
-                        .set(subscriptionPeriod: PeriodConverter.weekly.durationInSeconds)
-                        .set(trialPeriod: 86400 * 3)
-                        .build()
-                case .monthly:
-                    try FTProductBuilder()
-                        .set(title: "Monthly")
-                        .set(description: "Unlock pro features for a month")
-                        .set(price: 2.99)
-                        .set(currency: .currency(code: "USD"))
-                        .set(subscriptionPeriod: PeriodConverter.monthly.durationInSeconds)
-                        .build()
-                }
-            }
-        }
-    }
 }
