@@ -26,7 +26,15 @@ extension FreePlanUpgradeView {
             static let loadingTitle = SharedPaywallConstants.Strings.loadingTitle
             
             // Purchase button states
-            static let tryButtonTitle = String(localized: "Try For $0,00", table: "PaywallLocalizable")
+            static let tryButtonTitle: String = {
+                let localPrice = Decimal(0).formatted(
+                    .currency(code: Locale.current.currency?.identifier ?? "USD")
+                        .presentation(.narrow)
+                        .rounded()
+                )
+                return String(localized: "Try For \(localPrice)", table: "PaywallLocalizable")
+            }()
+            
             static let pendingTitle = SharedPaywallConstants.Strings.pendingTitle
             static let subscribedTitle = SharedPaywallConstants.Strings.subscribedTitle
             

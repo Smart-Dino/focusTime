@@ -41,6 +41,8 @@ actor StoreKitPaymentManager: PaymentManager {
         // StoreKit Products
         self.skProducts = []
         self.productIdentifiers = productIdentifiers
+        
+        setup()
     }
     
     deinit {

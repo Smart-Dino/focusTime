@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "0 days" : {
+      "extractionState" : "manual"
+    },
     "0 seconds" : {
       "extractionState" : "manual"
     },
@@ -76,7 +79,7 @@
     "The requested product could not be found." : {
 
     },
-    "Try For $0,00" : {
+    "Try For %@" : {
 
     },
     "Try Free And Subscribe" : {
