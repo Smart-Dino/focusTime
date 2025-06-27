@@ -110,9 +110,7 @@ final class PlanSelectionPaywallViewModel {
         guard let product = state.superState.selectedProduct else { return }
         state.superState.isButtonDisabled = true
         
-        Task { [weak self] in
-            guard let self else { return }
-            
+        Task {
             if await superPaywallVM.isProductPurchased(product) {
                 state.superState.isButtonDisabled = true
                 
@@ -146,9 +144,7 @@ final class PlanSelectionPaywallViewModel {
 
 extension PlanSelectionPaywallViewModel: SuperPaywallViewModelDelegate {
     func didChangeUserEntitlementStatus(isPro: Bool) {
-        Task { [weak self] in
-            guard let self else { return }
-            
+        Task {
             await self.superPaywallVM.updatePurchaseResultForSelectedProduct(
                 state: self.state.superState
             )

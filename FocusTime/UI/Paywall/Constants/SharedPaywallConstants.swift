@@ -11,7 +11,7 @@ enum SharedPaywallConstants {
     
     // MARK: - Strings
     enum Strings {
-        static let appName = "DeepWave"
+        static let appName = SharedAppValues.appName ?? "App Name"
         static let appSlogan = "Focus within minutes"
         
         static let errorHeader = "An error occurred"
