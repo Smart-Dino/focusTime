@@ -21,6 +21,10 @@ extension OnboardingPaywallView {
             case priorityFeatures  = "Priority updates and new features"
             
             var id: String { rawValue }
+            var title: String {
+                String(localized: String.LocalizationValue(rawValue), table: "PaywallLocalizable")
+            }
+            
             var systemImage: String {
                 switch self {
                 case .unlimitedSessions:
@@ -64,11 +68,11 @@ extension OnboardingPaywallView {
         // MARK: - Strings
         enum Strings {
             // Purchase button states
-            static let tryButtonTitle = "Try Free And Subscribe"
+            static let tryButtonTitle = String(localized: "Try Free And Subscribe", table: "PaywallLocalizable")
             static let pendingTitle = SharedPaywallConstants.Strings.pendingTitle
             static let subscribedTitle = SharedPaywallConstants.Strings.subscribedTitle
             
-            static let featuresTitle = "Unlock All Features"
+            static let featuresTitle = String(localized: "Unlock All Features", table: "PaywallLocalizable")
             
             // UI
             static let appName = SharedPaywallConstants.Strings.appName

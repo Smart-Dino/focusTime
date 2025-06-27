@@ -21,17 +21,17 @@ extension PlanSelectionPaywallView {
         
         // MARK: - Strings
         enum Strings {
-            static let navigationTitle = "Get DeepWave Pro"
+            static let navigationTitle = String(localized: "Get DeepWave Pro", table: "PaywallLocalizable")
             static let loadingTitle = SharedPaywallConstants.Strings.loadingTitle
             // Title text for the subscription trial button.
-            static let startFreeTrial = "Start Free Trial"
+            static let startFreeTrial = String(localized: "Start Free Trial", table: "PaywallLocalizable")
             static let subscribeButtonTitle = SharedPaywallConstants.Strings.subscribeButtonTitle
             static let subscribedTitle = SharedPaywallConstants.Strings.subscribedTitle
             static let purchasedTitle = SharedPaywallConstants.Strings.purchasedTitle
             
             // Trial-related
-            static let trialDescription = "Try Free For 3 days"
-            static let noPaymentMessage = "No payment due now!"
+            static let trialDescription = String(localized: "Try Free For 3 days", table: "PaywallLocalizable")
+            static let noPaymentMessage = String(localized: "No payment due now!", table: "PaywallLocalizable")
             
             // Lifetime
             static let paidOnce = SharedPaywallConstants.Strings.paidOnce
@@ -41,8 +41,8 @@ extension PlanSelectionPaywallView {
             
             // Error
             static let errorHeader = SharedPaywallConstants.Strings.errorHeader
-            static let defaultTrialError = "Unable to load trial information."
-            static let subscribeButtonTerms  = "Subscription automatically renews unless canceled. You can cancel anytime."
+            static let defaultTrialError = String(localized: "Unable to load trial information.", table: "PaywallLocalizable")
+            static let subscribeButtonTerms  = String(localized: "Subscription automatically renews unless canceled. You can cancel anytime.", table: "PaywallLocalizable")
         }
         
     }

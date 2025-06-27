@@ -82,8 +82,7 @@ struct FTProduct: Identifiable, Equatable, Sendable {
     // MARK: - Helpers
     private static func periodDescription(from seconds: Int) -> String {
         PeriodConverter
-            .approximateComponents(seconds: seconds)
-            .descriptiveLargestUnitString
+            .localizedConciseTimeString(from: seconds)
     }
 
     private static func subscriptionDescription(price: Decimal, format: Decimal.FormatStyle.Currency, period: String) -> String {

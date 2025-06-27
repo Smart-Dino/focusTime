@@ -128,7 +128,7 @@ struct OnboardingPaywallView: View {
     private var features: some View {
         VStack(alignment: .leading) {
             ForEach(Constants.FeatureItems.allCases) { item in
-                FTListItemView(item.rawValue, systemImage: item.systemImage)
+                FTListItemView(item.title, systemImage: item.systemImage)
                     .padding(.vertical, Constants.Padding.featureList)
             }
         }

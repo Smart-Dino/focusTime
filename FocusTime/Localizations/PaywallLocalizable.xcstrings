@@ -1,0 +1,105 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "0 seconds" : {
+      "extractionState" : "manual"
+    },
+    "A purchase is already in progress. Please wait until it completes." : {
+
+    },
+    "An error occurred" : {
+
+    },
+    "An unknown error occurred during the purchase." : {
+
+    },
+    "App Name" : {
+
+    },
+    "Could not check whether the user is eligible for trial for the given subscription group." : {
+
+    },
+    "Dismiss current screen." : {
+
+    },
+    "Focus within minutes" : {
+
+    },
+    "Get DeepWave Pro" : {
+
+    },
+    "Loading..." : {
+
+    },
+    "No payment due now!" : {
+
+    },
+    "Paid once" : {
+
+    },
+    "Pending..." : {
+
+    },
+    "Privacy" : {
+
+    },
+    "Purchased!" : {
+
+    },
+    "Restore purchases" : {
+
+    },
+    "Start Free Trial" : {
+
+    },
+    "Subscribe" : {
+
+    },
+    "Subscribed!" : {
+
+    },
+    "Subscription automatically renews unless canceled. You can cancel anytime." : {
+
+    },
+    "Terms" : {
+
+    },
+    "The purchase could not be verified. Please try again later." : {
+
+    },
+    "The purchase is pending approval, possibly requiring parental or bank authorization. You'll be notified once it's complete." : {
+
+    },
+    "The purchase was cancelled by the user." : {
+
+    },
+    "The requested product could not be found." : {
+
+    },
+    "Try For $0,00" : {
+
+    },
+    "Try Free And Subscribe" : {
+
+    },
+    "Try Free For 3 days" : {
+
+    },
+    "Unable to load trial information." : {
+
+    },
+    "Unlock All Features" : {
+
+    },
+    "Upgrade to have unlimited scheduled sessions with **Pro version**" : {
+
+    },
+    "View All Plans" : {
+
+    },
+    "You're on a Free Plan" : {
+
+    }
+  },
+  "version" : "1.0"
+}

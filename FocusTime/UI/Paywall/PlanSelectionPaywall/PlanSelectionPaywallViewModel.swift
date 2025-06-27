@@ -108,7 +108,6 @@ final class PlanSelectionPaywallViewModel {
     
     private func configurePurchaseButtonAvailabilityBasedOnSelectedProduct() {
         guard let product = state.superState.selectedProduct else { return }
-        state.superState.isButtonDisabled = true
         
         Task {
             if await superPaywallVM.isProductPurchased(product) {

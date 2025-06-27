@@ -27,9 +27,6 @@ final class SuperPaywallViewModel {
         
         // Product
         var allProducts: [FTProduct] = []
-        //        var trialProducts: [FTProduct] {
-        //            allProducts.filter({ $0.trialPeriod != nil })
-        //        }
         
         // Purchase
         var selectedProduct: FTProduct?
