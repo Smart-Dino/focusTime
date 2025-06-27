@@ -115,46 +115,55 @@ struct FreePlanUpgradeView: View {
 
 // MARK: - Previews
 #Preview("MockPaymentManagerWithError") {
-    let productID = FTProduct.Mocks.weekly.product.id
-    let paymentManager = MockPaymentManagerWithPurchaseError()
-    NavigationStack {
-        FreePlanUpgradeView(
-            viewModel: .init(
-                state: .init(requestedProductID: productID),
-                superPaywallVM: .init(paymentManager: paymentManager),
-                flowDelegate: nil
+    if let productID = try? FTProduct.Mocks.weekly.product.id {
+        let paymentManager = MockPaymentManagerWithPurchaseError()
+        NavigationStack {
+            FreePlanUpgradeView(
+                viewModel: .init(
+                    state: .init(requestedProductID: productID),
+                    superPaywallVM: .init(paymentManager: paymentManager),
+                    flowDelegate: nil
+                )
             )
-        )
-        .preferredColorScheme(.dark)
+            .preferredColorScheme(.dark)
+        }
+    } else {
+        Text("Could not initialize the product.")
     }
 }
 
 #Preview("NonTrialableProduct") {
-    let productID = FTProduct.Mocks.monthly.product.id
-    let paymentManager = MockPaymentManagerWithPurchaseError()
-    NavigationStack {
-        FreePlanUpgradeView(
-            viewModel: .init(
-                state: .init(requestedProductID: productID),
-                superPaywallVM: .init(paymentManager: paymentManager),
-                flowDelegate: nil
+    if let productID = try? FTProduct.Mocks.monthly.product.id {
+        let paymentManager = MockPaymentManagerWithPurchaseError()
+        NavigationStack {
+            FreePlanUpgradeView(
+                viewModel: .init(
+                    state: .init(requestedProductID: productID),
+                    superPaywallVM: .init(paymentManager: paymentManager),
+                    flowDelegate: nil
+                )
             )
-        )
-        .preferredColorScheme(.dark)
+            .preferredColorScheme(.dark)
+        }
+    } else {
+        Text("Could not initialize the product.")
     }
 }
 
 #Preview("StoreKitPaymentManager") {
-    let productID = FTProduct.Mocks.monthly.product.id
-    let paymentManager = StoreKitPaymentManager()
-    NavigationStack {
-        FreePlanUpgradeView(
-            viewModel: .init(
-                state: .init(requestedProductID: productID),
-                superPaywallVM: .init(paymentManager: paymentManager),
-                flowDelegate: nil
+    if let productID = try? FTProduct.Mocks.monthly.product.id {
+        let paymentManager = StoreKitPaymentManager()
+        NavigationStack {
+            FreePlanUpgradeView(
+                viewModel: .init(
+                    state: .init(requestedProductID: productID),
+                    superPaywallVM: .init(paymentManager: paymentManager),
+                    flowDelegate: nil
+                )
             )
-        )
-        .preferredColorScheme(.dark)
+            .preferredColorScheme(.dark)
+        }
+    } else {
+        Text("Could not initialize the product.")
     }
 }

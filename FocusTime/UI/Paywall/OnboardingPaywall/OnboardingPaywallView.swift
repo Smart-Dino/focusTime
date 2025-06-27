@@ -145,15 +145,17 @@ struct OnboardingPaywallView: View {
 }
 
 #Preview {
-    let paymentManager = MockPaymentManagerWithPurchaseError()
-    NavigationStack {
-        OnboardingPaywallView(
-            viewModel: .init(
-                state: .init(requestedProductID: FTProduct.Mocks.weekly.product.id),
-                superPaywallVM: .init(paymentManager: paymentManager),
-                flowDelegate: nil
+    if let productID = try? FTProduct.Mocks.weekly.product.id {
+        let paymentManager = MockPaymentManagerWithPurchaseError()
+        NavigationStack {
+            OnboardingPaywallView(
+                viewModel: .init(
+                    state: .init(requestedProductID: productID),
+                    superPaywallVM: .init(paymentManager: paymentManager),
+                    flowDelegate: nil
+                )
             )
-        )
-        .preferredColorScheme(.dark)
+            .preferredColorScheme(.dark)
+        }
     }
 }
