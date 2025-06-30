@@ -17,10 +17,8 @@ enum Weekday: Int, Codable, CaseIterable, Identifiable {
     
     var isWorkDay: Bool {
         switch self {
-        case .sunday, .saturday:
-            false
-        default:
-            true
+        case .sunday, .saturday: false
+        default: true
         }
     }
     

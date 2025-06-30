@@ -15,8 +15,11 @@ final class BlockItem: SwiftDataItem {
     @Attribute(.unique) var id: UUID
     var name: String
     var emoji: String
-    var schedules: [Schedule]?
     var blockedContent: FamilyActivitySelection
+    
+    // MARK: Relationship
+    var schedules: [Schedule]?
+    
     // MARK: - Computed properties
     var schedulesDescription: String {
         guard let schedules, schedules.count >= 1 else { return "No schedules" }
@@ -28,26 +31,26 @@ final class BlockItem: SwiftDataItem {
             return "\(schedules.count) schedules"
         }
     }
-
     
-    init(id: UUID = UUID(),
-         name: String,
-         emoji: String,
-         schedules: [Schedule] = [],
-         blockedContent: FamilyActivitySelection,
-         isEnabled: Bool = true) {
+    
+    init(
+        id: UUID = UUID(),
+        name: String,
+        emoji: String,
+        blockedContent: FamilyActivitySelection,
+        schedules: [Schedule]? = nil
+    ) {
         self.id = id
         self.name = name
         self.emoji = emoji
-        self.schedules = schedules
         self.blockedContent = blockedContent
+        self.schedules = schedules
     }
     
     convenience init(from item: ProtectedBlockItem) {
         self.init(id: item.id,
                   name: item.name,
                   emoji: item.emoji,
-                  schedules: [],
                   blockedContent: item.blockedContent)
     }
 }

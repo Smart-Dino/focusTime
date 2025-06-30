@@ -17,8 +17,11 @@ final class Schedule: SwiftDataItem {
     var days: Set<Weekday>
     var startTime: TimeComponents
     var endTime: TimeComponents
-    var isActive: Bool
+    // I think we don't need isActive property,
+    // since we can just query the DeviceActivityCenter
+    // for active schedules.
     
+    // MARK: Relationship
     @Relationship(deleteRule: .nullify, inverse: \BlockItem.schedules)
     var blockItems: [BlockItem]?
     
@@ -41,7 +44,7 @@ final class Schedule: SwiftDataItem {
         startTime: TimeComponents,
         endTime: TimeComponents,
         isActive: Bool,
-        blockItems: [BlockItem] = []
+        blockItems: [BlockItem]? = nil
     ) {
         self.id = id
         self.emoji = emoji
@@ -53,14 +56,14 @@ final class Schedule: SwiftDataItem {
         self.blockItems = blockItems
     }
     
-    init(from item: ProtectedSchedule) {
-        self.id = item.id
-        self.emoji = item.emoji
-        self.name = item.name
-        self.days = item.days
-        self.startTime = item.startTime
-        self.endTime = item.endTime
-        self.isActive = item.isActive
-        self.blockItems = []
+    convenience init(from item: ProtectedSchedule) {
+        self.init(id: item.id,
+                  emoji: item.emoji,
+                  name: item.name,
+                  days: item.days,
+                  startTime: item.startTime,
+                  endTime: item.endTime,
+                  isActive: item.isActive)
     }
 }
+

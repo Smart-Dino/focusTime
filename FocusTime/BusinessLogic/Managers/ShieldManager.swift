@@ -14,6 +14,7 @@ import DeviceActivity
 protocol ShieldManager {
     // MARK: - Properties
     var isShieldActive: Bool { get }
+    var monitoredIdentifiers: Set<UUID> { get }
     // MARK: - Block
     func block() async throws
     func block(specific selection: FamilyActivitySelection) async throws
@@ -29,7 +30,14 @@ protocol ShieldManager {
 final class LiveShieldManager: ShieldManager {
     private let store: ManagedSettingsStore
     private let center: DeviceActivityCenter
+    
     private(set) var isShieldActive: Bool = false
+    var monitoredIdentifiers: Set<UUID> {
+        Set(center.activities.compactMap {
+            let uuidString = $0.rawValue.components(separatedBy: .whitespaces)[0]
+            return UUID(uuidString: uuidString)
+        })
+    }
     
     init() {
         let store = ManagedSettingsStore()

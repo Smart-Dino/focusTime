@@ -14,7 +14,6 @@ struct ProtectedSchedule: Sendable {
     let days: Set<Weekday>
     let startTime: TimeComponents
     let endTime: TimeComponents
-    let isActive: Bool
 
     init(
         id: UUID = UUID(),
@@ -23,7 +22,6 @@ struct ProtectedSchedule: Sendable {
         days: Set<Weekday>,
         startTime: TimeComponents,
         endTime: TimeComponents,
-        isActive: Bool
     ) {
         self.id = id
         self.emoji = emoji
@@ -31,6 +29,5 @@ struct ProtectedSchedule: Sendable {
         self.days = days
         self.startTime = startTime
         self.endTime = endTime
-        self.isActive = isActive
     }
 }
