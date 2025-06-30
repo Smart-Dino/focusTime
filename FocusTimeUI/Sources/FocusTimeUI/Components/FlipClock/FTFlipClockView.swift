@@ -19,8 +19,7 @@ public struct FTFlipClockView: View {
             FTFlipClockComponentView(value: $hours, configuration: configuration)
             FTFlipClockComponentView(value: $minutes, configuration: configuration)
         }
-        .onChange(of: seconds, formatTime)
-        .onAppear(perform: formatTime)
+        .onChange(of: seconds, initial: true, formatTime)
     }
     
     public init(
@@ -40,11 +39,11 @@ public struct FTFlipClockView: View {
 
 #Preview {
     // The timer is sped up for demonstration purposes.
-    @Previewable let timer = Timer.publish(every: 0.01, on: .current, in: .default).autoconnect()
+//    @Previewable let timer = Timer.publish(every: 0.01, on: .current, in: .default).autoconnect()
     @Previewable @State var timeLeft = 62_700 // 17:25
     FTFlipClockView(configuration: .init(), timeLeft: $timeLeft)
         .preferredColorScheme(.dark)
-        .onReceive(timer) { _ in
-            timeLeft -= 5
-        }
+//        .onReceive(timer) { _ in
+//            timeLeft -= 5
+//        }
 }
