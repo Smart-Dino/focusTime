@@ -14,41 +14,23 @@ struct TimePickerSheetView: View {
     let subtitle: String
     let pickerType: TimePickerType
     
+    @State private var internalHours: Int
+    @State private var internalMinutes: Int
+    
     init(initialDate: Date, title: String, subtitle: String, pickerType: TimePickerType, delegate: TimePickerSheetViewDelegate?) {
         self._selectedDate = State(initialValue: initialDate)
         self.title = title
         self.subtitle = subtitle
         self.pickerType = pickerType
         self.delegate = delegate
+        
+        _internalHours = State(initialValue: Calendar.current.component(.hour, from: initialDate))
+        _internalMinutes = State(initialValue: Calendar.current.component(.minute, from: initialDate))
     }
     
     private typealias Layout = FocusSessionView.Constants.TimePicker.Layout
     private typealias Strings = FocusSessionView.Constants.TimePicker.Strings
     private typealias Colors = FocusSessionView.Constants.TimePicker.Colors
-    
-    private var hours: Binding<Int> {
-        Binding(
-            get: { Calendar.current.component(.hour, from: selectedDate) },
-            set: { newHour in
-                let current = Calendar.current
-                if let newDate = current.date(bySettingHour: newHour, minute: current.component(.minute, from: selectedDate), second: 0, of: selectedDate) {
-                    selectedDate = newDate
-                }
-            }
-        )
-    }
-    
-    private var minutes: Binding<Int> {
-        Binding(
-            get: { Calendar.current.component(.minute, from: selectedDate) },
-            set: { newMinute in
-                let current = Calendar.current
-                if let newDate = current.date(bySettingHour: current.component(.hour, from: selectedDate), minute: newMinute, second: 0, of: selectedDate) {
-                    selectedDate = newDate
-                }
-            }
-        )
-    }
     
     var body: some View {
         ZStack {
@@ -80,14 +62,21 @@ struct TimePickerSheetView: View {
             }
             .foregroundColor(.white)
         }
+        .onChange(of: internalHours) {
+            updateSelectedDate(hours: internalHours, minutes: internalMinutes)
+        }
+        .onChange(of: internalMinutes) {
+            updateSelectedDate(hours: internalHours, minutes: internalMinutes)
+        }
         .onDisappear {
+
             delegate?.timePickerDidSave(date: selectedDate, type: pickerType)
         }
     }
     
     private var timePicker: some View {
         HStack(spacing: 0) {
-            Picker(Strings.hoursPickerTitle, selection: hours) {
+            Picker(Strings.hoursPickerTitle, selection: $internalHours) {
                 ForEach(0..<FocusSessionView.Constants.Time.hoursInDay, id: \.self) { hour in
                     Text("\(hour)").tag(hour)
                 }
@@ -95,8 +84,9 @@ struct TimePickerSheetView: View {
             .pickerStyle(.wheel)
             .frame(width: Layout.pickerWidth)
             .clipped()
-            
-            Picker(Strings.minutesPickerTitle, selection: minutes) {
+            .environment(\.locale, Locale(identifier: "en_GB"))
+
+            Picker(Strings.minutesPickerTitle, selection: $internalMinutes) {
                 ForEach(0..<FocusSessionView.Constants.Time.minutesInHour, id: \.self) { minute in
                     Text("\(minute)").tag(minute)
                 }
@@ -104,6 +94,18 @@ struct TimePickerSheetView: View {
             .pickerStyle(.wheel)
             .frame(width: Layout.pickerWidth)
             .clipped()
+            .environment(\.locale, Locale(identifier: "en_GB"))
+        }
+    }
+    
+    private func updateSelectedDate(hours: Int, minutes: Int) {
+        let calendar = Calendar.current
+        var components = calendar.dateComponents([.year, .month, .day], from: selectedDate)
+        components.hour = hours
+        components.minute = minutes
+        
+        if let newDate = calendar.date(from: components) {
+            selectedDate = newDate
         }
     }
 }

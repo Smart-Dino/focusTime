@@ -69,20 +69,19 @@ class FocusSessionViewModel {
         return sortedDays.map { $0.shortName }.joined(separator: ", ")
     }
     
+    private let twentyFourHourTimeFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        formatter.locale = Locale(identifier: "en_GB")
+        return formatter
+    }()
+    
     var formattedStartTime: String {
-        state.startTime.formatted(
-            Date.FormatStyle()
-                .hour(.twoDigits(amPM: .omitted))
-                .minute(.twoDigits)
-        )
+        twentyFourHourTimeFormatter.string(from: state.startTime)
     }
     
     var formattedEndTime: String {
-        state.endTime.formatted(
-            Date.FormatStyle()
-                .hour(.twoDigits(amPM: .omitted))
-                .minute(.twoDigits)
-        )
+        twentyFourHourTimeFormatter.string(from: state.endTime)
     }
     
     // MARK: - User Intent Methods
