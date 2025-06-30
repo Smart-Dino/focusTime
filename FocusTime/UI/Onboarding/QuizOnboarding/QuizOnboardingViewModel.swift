@@ -8,21 +8,17 @@
 import Foundation
 import Observation
 
-/// Uses Swift’s new `@Observable` macro for reactive data binding (iOS 17+).
-
 @MainActor
 @Observable
 final class QuizOnboardingViewModel {
-    
-    typealias QuizOption = QuizOnboardingView.Constants.QuizOption
-    
+      
     struct State {
-        var selectionStates: Set<QuizOption> = []
+        var selectionStates: Set<QuizOnboardingView.Constants.QuizOption> = []
     }
     
-    var state = State()
+    private(set) var state = State()
     
-    func toggleSelection(for option: QuizOption) {
+    func toggleSelection(for option: QuizOnboardingView.Constants.QuizOption) {
         if state.selectionStates.contains(option) {
             state.selectionStates.remove(option)
         } else {
@@ -30,7 +26,7 @@ final class QuizOnboardingViewModel {
         }
     }
     
-    func isOptionSelected(_ option: QuizOption) -> Bool {
+    func isOptionSelected(_ option: QuizOnboardingView.Constants.QuizOption) -> Bool {
         state.selectionStates.contains(option)
     }
 }
