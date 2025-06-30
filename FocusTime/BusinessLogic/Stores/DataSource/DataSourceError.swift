@@ -13,7 +13,7 @@ enum DataSourceError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .notFound:
-            "The requested model was not found in the modelContext."
+            String(localized: "The requested model was not found in the modelContext.", table: "ErrorLocalizable")
         }
     }
 }

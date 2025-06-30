@@ -15,7 +15,7 @@ final class ScheduleStore: DataSource {
     private let modelContext: ModelContext
     
     init() {
-        let config = ModelConfiguration(groupContainer: .identifier(appGroupIdentifier))
+        let config = ModelConfiguration(groupContainer: .identifier(AppValues.appGroupIdentifier))
         let container = try! ModelContainer(
             for: BlockItem.self,
             configurations: config

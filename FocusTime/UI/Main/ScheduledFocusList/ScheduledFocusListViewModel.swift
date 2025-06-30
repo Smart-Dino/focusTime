@@ -24,14 +24,12 @@ final class ScheduledFocusListViewModel {
     
     func insertTestItemsIntoDatabase() async {
         for _ in 0..<100 {
-            let schedule = ProtectedSchedule(
-                emoji: "🏠",
-                name: "Spend time with family",
-                days: [.saturday, .sunday],
-                startTime: TimeComponents(hour: 17, minute: 00)!,
-                endTime: TimeComponents(hour: 19, minute: 00)!,
-                isActive: false
-            )
+            let schedule = ProtectedSchedule(emoji: "🏠",
+                                             name: "Spend time with family",
+                                             days: [.saturday, .sunday],
+                                             startTime: TimeComponents(hour: 17, minute: 00)!,
+                                             endTime: TimeComponents(hour: 19, minute: 00)!)
+            
             try? await scheduleStore.insert(schedule)
         }
         await MainActor.run {

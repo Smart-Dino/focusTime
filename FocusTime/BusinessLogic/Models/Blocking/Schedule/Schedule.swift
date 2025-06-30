@@ -43,7 +43,6 @@ final class Schedule: SwiftDataItem {
         days: Set<Weekday>,
         startTime: TimeComponents,
         endTime: TimeComponents,
-        isActive: Bool,
         blockItems: [BlockItem]? = nil
     ) {
         self.id = id
@@ -52,7 +51,6 @@ final class Schedule: SwiftDataItem {
         self.days = days
         self.startTime = startTime
         self.endTime = endTime
-        self.isActive = isActive
         self.blockItems = blockItems
     }
     
@@ -62,8 +60,7 @@ final class Schedule: SwiftDataItem {
                   name: item.name,
                   days: item.days,
                   startTime: item.startTime,
-                  endTime: item.endTime,
-                  isActive: item.isActive)
+                  endTime: item.endTime)
     }
 }
 

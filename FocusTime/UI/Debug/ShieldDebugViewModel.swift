@@ -116,8 +116,7 @@ final class ShieldDebugViewModel {
                                 name: "Schedule",
                                 days: state.daySelection,
                                 startTime: startComponent,
-                                endTime: endComponent,
-                                isActive: false)
+                                endTime: endComponent)
         
         do {
             try await blockItemStore.insert(blockItem)
