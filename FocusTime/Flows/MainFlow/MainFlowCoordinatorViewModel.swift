@@ -42,13 +42,17 @@ final class MainFlowCoordinatorViewModel {
         var currentPath: [MainScreens] = []
     }
     private(set) var flowState: State!
+    private let scheduleStore: ScheduleStore
+    private let blockItemStore: BlockItemStore
     
     #warning("Find out how we would wire up the isPro property to here")
     
-    init() {
+    init(scheduleStore: ScheduleStore, blockItemStore: BlockItemStore) {
         self.flowState = State(
             currentTabScreen: .home
         )
+        self.scheduleStore = scheduleStore
+        self.blockItemStore = blockItemStore
     }
     
     func setScreens(_ screens: [MainScreens]) {
@@ -60,11 +64,11 @@ final class MainFlowCoordinatorViewModel {
     }
     
     func makeHomeViewModel() -> HomeViewModel {
-        HomeViewModel()
+        HomeViewModel(scheduleStore: scheduleStore)
     }
     
     func makeAppBlockListViewModel() -> AppBlockingListViewModel {
-        AppBlockingListViewModel()
+        AppBlockingListViewModel(blockItemStore: blockItemStore)
     }
     
 }

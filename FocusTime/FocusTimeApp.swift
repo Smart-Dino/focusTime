@@ -11,7 +11,7 @@ import SwiftUI
 struct FocusTimeApp: App {
     var body: some Scene {
         WindowGroup {
-            MainFlowCoordinatorView(viewModel: .init())
+            Text("No entry flow.")
         }
     }
 }

@@ -85,6 +85,10 @@ struct ScheduledFocusListView: View {
 
 #Preview {
     NavigationStack {
-        ScheduledFocusListView(viewModel: .init())
+        if let scheduleStore = ScheduleStore(isStoredInMemoryOnly: true) {
+            ScheduledFocusListView(viewModel: .init(scheduleStore: scheduleStore))
+        } else {
+            Text("Could not initialize ScheduleStore.")
+        }
     }
 }

@@ -16,15 +16,15 @@ protocol SwiftDataItem: Codable, Identifiable, PersistentModel { }
 // This is a custom-defined actor, much like MainActor is
 // so this actor will never cross MainActor and run DB writes off the main thread.
 @globalActor
-actor GlobalSourceActor {
-    static let shared = GlobalSourceActor()
+actor GlobalStoreActor {
+    static let shared = GlobalStoreActor()
 }
 
 @MainActor
 protocol DataSource {
     associatedtype Model: SwiftDataItem
     
-    @GlobalSourceActor func insert(_ item: Model) async throws
+    @GlobalStoreActor func insert(_ item: Model) async throws
     func delete(_ item: Model) throws
     func fetchAll() throws -> [Model]
     

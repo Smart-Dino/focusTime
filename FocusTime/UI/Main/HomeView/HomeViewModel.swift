@@ -15,12 +15,14 @@ final class HomeViewModel {
     }
     
     private(set) var state: State
+    private let scheduleStore: ScheduleStore
     
-    init(state: State = State()) {
+    init(state: State = State(), scheduleStore: ScheduleStore) {
         self.state = state
+        self.scheduleStore = scheduleStore
     }
     
     func makeScheduledFocusViewModel() -> ScheduledFocusListViewModel {
-        ScheduledFocusListViewModel()
+        ScheduledFocusListViewModel(scheduleStore: scheduleStore)
     }
 }

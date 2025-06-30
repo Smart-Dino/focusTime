@@ -17,7 +17,6 @@ final class Schedule: SwiftDataItem {
     var days: Set<Weekday>
     var startTime: TimeComponents
     var endTime: TimeComponents
-    var isActive: Bool
     
     @Relationship(inverse: \BlockItem.schedules)
     var blockItems: [BlockItem]
@@ -29,7 +28,6 @@ final class Schedule: SwiftDataItem {
         days: Set<Weekday>,
         startTime: TimeComponents,
         endTime: TimeComponents,
-        isActive: Bool,
         blockItems: [BlockItem] = []
     ) {
         self.id = id
@@ -38,7 +36,6 @@ final class Schedule: SwiftDataItem {
         self.days = days
         self.startTime = startTime
         self.endTime = endTime
-        self.isActive = isActive
         self.blockItems = blockItems
     }
 }

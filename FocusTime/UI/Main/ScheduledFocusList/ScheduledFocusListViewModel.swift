@@ -17,7 +17,7 @@ final class ScheduledFocusListViewModel {
     private(set) var state: State
     private let scheduleStore: ScheduleStore
     
-    init(state: State = State(), scheduleStore: ScheduleStore = ScheduleStore()) {
+    init(state: State = State(), scheduleStore: ScheduleStore) {
         self.state = state
         self.scheduleStore = scheduleStore
     }
@@ -29,13 +29,12 @@ final class ScheduledFocusListViewModel {
                 name: "Spend time with family",
                 days: [.saturday, .sunday],
                 startTime: TimeComponents(hour: 17, minute: 00)!,
-                endTime: TimeComponents(hour: 19, minute: 00)!,
-                isActive: false
-            )
+                endTime: TimeComponents(hour: 19, minute: 00)!)
+            
             try? await scheduleStore.insert(schedule)
         }
-        await MainActor.run {
-            state.items = try! scheduleStore.fetchAll()
+        try? await MainActor.run {
+            state.items = try scheduleStore.fetchAll()
         }
     }
 }

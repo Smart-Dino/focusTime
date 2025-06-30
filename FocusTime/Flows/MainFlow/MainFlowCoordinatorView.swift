@@ -91,6 +91,13 @@ struct MainFlowCoordinatorView: View {
 }
 
 #Preview {
-    let viewModel = MainFlowCoordinatorViewModel()
-    MainFlowCoordinatorView(viewModel: viewModel)
+    if let scheduleStore = ScheduleStore(isStoredInMemoryOnly: true),
+       let blockItemStore = BlockItemStore(isStoredInMemoryOnly: true) {
+        
+        let viewModel = MainFlowCoordinatorViewModel(scheduleStore: scheduleStore,
+                                                     blockItemStore: blockItemStore)
+        MainFlowCoordinatorView(viewModel: viewModel)
+    } else {
+        Text("Could not initialize stores.")
+    }
 }

@@ -37,6 +37,10 @@ struct TimeComponents: Codable {
         formatter.locale = locale
         formatter.timeStyle = .short
 
-        return formatter.string(from: calendar.date(from: components)!)
+        if let date = calendar.date(from: components) {
+            return formatter.string(from: date)
+        } else {
+            return description // return regular, universal description as fallback
+        }
     }
 }

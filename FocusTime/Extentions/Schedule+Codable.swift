@@ -9,7 +9,7 @@ import Foundation
 
 extension Schedule {
     enum CodingKeys: CodingKey {
-        case id, emoji, name, days, startTime, endTime, isActive, blockItem
+        case id, emoji, name, days, startTime, endTime, blockItem
     }
 }
 
@@ -22,7 +22,6 @@ extension Schedule: Codable {
         try container.encode(days, forKey: .days)
         try container.encode(startTime, forKey: .startTime)
         try container.encode(endTime, forKey: .endTime)
-        try container.encode(isActive, forKey: .isActive)
         try container.encode(blockItems, forKey: .blockItem)
     }
     
@@ -34,7 +33,6 @@ extension Schedule: Codable {
         let days = try container.decode(Set<Weekday>.self, forKey: .days)
         let startTime = try container.decode(TimeComponents.self, forKey: .startTime)
         let endTime = try container.decode(TimeComponents.self, forKey: .endTime)
-        let isActive = try container.decode(Bool.self, forKey: .isActive)
         let blockItems = try container.decode([BlockItem].self, forKey: .blockItem)
         
         self.init(
@@ -44,7 +42,6 @@ extension Schedule: Codable {
             days: days,
             startTime: startTime,
             endTime: endTime,
-            isActive: isActive,
             blockItems: blockItems
         )
     }

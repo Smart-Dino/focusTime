@@ -105,6 +105,10 @@ struct HomeView: View {
 
 #Preview {
     NavigationStack {
-        HomeView(viewModel: .init())
+        if let scheduleStore = ScheduleStore(isStoredInMemoryOnly: true) {
+            HomeView(viewModel: .init(scheduleStore: scheduleStore))
+        } else {
+            Text("Could not initialize ScheduleStore.")
+        }
     }
 }

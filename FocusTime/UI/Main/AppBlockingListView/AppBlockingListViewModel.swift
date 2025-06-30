@@ -19,7 +19,7 @@ final class AppBlockingListViewModel {
     private(set) var state: State
     private let blockItemStore: BlockItemStore
     
-    init(state: State = State(), blockItemStore: BlockItemStore = BlockItemStore()) {
+    init(state: State = State(), blockItemStore: BlockItemStore) {
         self.state = state
         self.blockItemStore = blockItemStore
     }
@@ -29,8 +29,9 @@ final class AppBlockingListViewModel {
             let item = BlockItem(name: "Block", emoji: "😜", blockedContent: FamilyActivitySelection())
             try? await blockItemStore.insert(item)
         }
-        await MainActor.run {
-            state.items = try! blockItemStore.fetchAll()
+        try? await MainActor.run {
+            state.items = try blockItemStore.fetchAll()
         }
     }
 }
+
