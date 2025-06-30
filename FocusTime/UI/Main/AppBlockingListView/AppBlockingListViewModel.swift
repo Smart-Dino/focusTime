@@ -26,7 +26,7 @@ final class AppBlockingListViewModel {
     
     func insertTestItemsIntoDatabase() async {
         for _ in 0..<100 {
-            let item = BlockItem(name: "Block", emoji: "😜", blockedContent: FamilyActivitySelection())
+            let item = ProtectedBlockItem(name: "Block", emoji: "😜", blockedContent: FamilyActivitySelection())
             try? await blockItemStore.insert(item)
         }
         await MainActor.run {

@@ -13,7 +13,7 @@ import FamilyControls
 final class BlockItemStore: DataSource {
     private let modelContainer: ModelContainer
     private let modelContext: ModelContext
-
+    
     init() {
         let config = ModelConfiguration(groupContainer: .identifier(appGroupIdentifier))
         let container = try! ModelContainer(
@@ -25,11 +25,12 @@ final class BlockItemStore: DataSource {
         self.modelContext = context
     }
     
-    @GlobalSourceActor func insert(_ item: BlockItem) throws { // Implicitly async since runs in a different context
+    @GlobalSourceActor func insert(_ item: ProtectedBlockItem) throws { // Implicitly async since runs in a different context.
         let container = modelContainer
-        let context = ModelContext(container) // Create a separate, non-main context to write to
-        context.insert(item)
-        try context.save() // Apply the context to the DB
+        let context = ModelContext(container) // Create a separate, non-main context to write to.
+        let modelItem = BlockItem(from: item) // Convert to model instance.
+        context.insert(modelItem)
+        try context.save() // Apply the context to the DB.
     }
     
     func delete(_ item: BlockItem) throws {

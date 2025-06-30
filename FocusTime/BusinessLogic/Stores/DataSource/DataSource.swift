@@ -23,8 +23,9 @@ actor GlobalSourceActor {
 @MainActor
 protocol DataSource {
     associatedtype Model: SwiftDataItem
+    associatedtype ProtectedModel: Sendable
     
-    @GlobalSourceActor func insert(_ item: Model) async throws
+    @GlobalSourceActor func insert(_ item: ProtectedModel) async throws
     func delete(_ item: Model) throws
     func fetch() throws -> [Model]
     func fetch(descriptor: FetchDescriptor<Model>) throws -> [Model]
@@ -32,3 +33,7 @@ protocol DataSource {
     func updateFields(of item: inout Model, using updates: (Model) -> Void) throws
     func eraseAllData() throws
 }
+
+//protocol BlockItemDataSource: DataSource where Model == BlockItem, ProtectedModel == ProtectedBlockItem { }
+//
+//protocol ScheduleDataSource: DataSource where Model == Schedule, ProtectedModel == ProtectedSchedule { }

@@ -24,7 +24,7 @@ final class ScheduledFocusListViewModel {
     
     func insertTestItemsIntoDatabase() async {
         for _ in 0..<100 {
-            let schedule = Schedule(
+            let schedule = ProtectedSchedule(
                 emoji: "🏠",
                 name: "Spend time with family",
                 days: [.saturday, .sunday],

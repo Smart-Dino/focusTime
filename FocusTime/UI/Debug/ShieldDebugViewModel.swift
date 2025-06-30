@@ -98,7 +98,7 @@ final class ShieldDebugViewModel {
         let scheduleItems = try blockItemStore.fetch()
         guard blockItems.isEmpty || scheduleItems.isEmpty else { return }
         
-        let blockItem = BlockItem(name: "Block",
+        let blockItem = ProtectedBlockItem(name: "Block",
                                   emoji: "❌",
                                   blockedContent: state.selection)
         
@@ -112,7 +112,7 @@ final class ShieldDebugViewModel {
         print(startComponent)
         print(endComponent)
         
-        let schedule = Schedule(emoji: "🕑",
+        let schedule = ProtectedSchedule(emoji: "🕑",
                                 name: "Schedule",
                                 days: state.daySelection,
                                 startTime: startComponent,

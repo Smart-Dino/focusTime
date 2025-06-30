@@ -61,7 +61,7 @@ struct ScheduledFocusListView: View {
                     FTScheduledFocusRowView(
                         emoji: schedule.emoji,
                         title: schedule.name,
-                        description: schedule.days.daysDescription
+                        description: schedule.daysDescription
                     )
                     .padding(1)
                 }
