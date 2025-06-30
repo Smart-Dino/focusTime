@@ -8,7 +8,7 @@
 import SwiftUI
 import FocusTimeUI
 
-struct FocusSessionView: View {
+struct FocusSessionView: View { 
     
     @State private var viewModel = FocusSessionViewModel()
     
