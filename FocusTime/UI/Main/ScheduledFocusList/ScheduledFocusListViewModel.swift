@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftData
 
 @MainActor
 @Observable
@@ -15,26 +16,32 @@ final class ScheduledFocusListViewModel {
     }
     
     private(set) var state: State
-    private let scheduleStore: ScheduleStore
+    private let modelContainer: ModelContainer
     
-    init(state: State = State(), scheduleStore: ScheduleStore) {
+    init(
+        state: State = State(),
+        modelContainer: ModelContainer
+    ) {
         self.state = state
-        self.scheduleStore = scheduleStore
+        self.modelContainer = modelContainer
     }
     
     func insertTestItemsIntoDatabase() async {
-        for _ in 0..<100 {
-            let schedule = Schedule(
-                emoji: "🏠",
-                name: "Spend time with family",
-                days: [.saturday, .sunday],
-                startTime: TimeComponents(hour: 17, minute: 00)!,
-                endTime: TimeComponents(hour: 19, minute: 00)!)
-            
-            try? await scheduleStore.insert(schedule)
-        }
-        try? await MainActor.run {
-            state.items = try scheduleStore.fetchAll()
+        Task.detached(priority: .userInitiated) {
+            let scheduleStore = ScheduleStore(modelContainer: self.modelContainer)
+            for _ in 0..<100 {
+                let schedule = ProtectedSchedule(
+                    emoji: "🏠",
+                    name: "Spend time with family",
+                    days: [.saturday, .sunday],
+                    startTime: TimeComponents(hour: 17, minute: 00)!,
+                    endTime: TimeComponents(hour: 19, minute: 00)!)
+                
+                try? await scheduleStore.insert(schedule)
+            }
+            try? await MainActor.run {
+                self.state.items = try self.modelContainer.mainContext.fetch(.init())
+            }
         }
     }
 }

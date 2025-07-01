@@ -17,20 +17,23 @@ final class AppBlockingListViewModel {
     }
     
     private(set) var state: State
-    private let blockItemStore: BlockItemStore
+    private let modelContainer: ModelContainer
     
-    init(state: State = State(), blockItemStore: BlockItemStore) {
+    init(state: State = State(), modelContainer: ModelContainer) {
         self.state = state
-        self.blockItemStore = blockItemStore
+        self.modelContainer = modelContainer
     }
     
     func insertTestItemsIntoDatabase() async {
-        for _ in 0..<100 {
-            let item = BlockItem(name: "Block", emoji: "😜", blockedContent: FamilyActivitySelection())
-            try? await blockItemStore.insert(item)
-        }
-        try? await MainActor.run {
-            state.items = try blockItemStore.fetchAll()
+        Task.detached(priority: .userInitiated) {
+            let blockItemStore = BlockItemStore(modelContainer: self.modelContainer)
+            for _ in 0..<100 {
+                let item = ProtectedBlockItem(emoji: "😜", name: "Block", blockedContent: FamilyActivitySelection())
+                try? await blockItemStore.insert(item)
+            }
+            try? await MainActor.run {
+                self.state.items = try self.modelContainer.mainContext.fetch(.init())
+            }
         }
     }
 }

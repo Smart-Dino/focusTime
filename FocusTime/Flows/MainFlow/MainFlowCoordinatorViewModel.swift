@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftData
 
 enum MainTabScreens: Equatable, Hashable {
     case home
@@ -42,17 +43,16 @@ final class MainFlowCoordinatorViewModel {
         var currentPath: [MainScreens] = []
     }
     private(set) var flowState: State!
-    private let scheduleStore: ScheduleStore
-    private let blockItemStore: BlockItemStore
+    private let modelContainer: ModelContainer
     
     #warning("Find out how we would wire up the isPro property to here")
     
-    init(scheduleStore: ScheduleStore, blockItemStore: BlockItemStore) {
-        self.flowState = State(
-            currentTabScreen: .home
-        )
-        self.scheduleStore = scheduleStore
-        self.blockItemStore = blockItemStore
+    init(
+        flowState: State = State(currentTabScreen: .home),
+        modelContainer: ModelContainer
+    ) {
+        self.flowState = flowState
+        self.modelContainer = modelContainer
     }
     
     func setScreens(_ screens: [MainScreens]) {
@@ -64,11 +64,11 @@ final class MainFlowCoordinatorViewModel {
     }
     
     func makeHomeViewModel() -> HomeViewModel {
-        HomeViewModel(scheduleStore: scheduleStore)
+        HomeViewModel(modelContainer: modelContainer)
     }
     
     func makeAppBlockListViewModel() -> AppBlockingListViewModel {
-        AppBlockingListViewModel(blockItemStore: blockItemStore)
+        AppBlockingListViewModel(modelContainer: modelContainer)
     }
     
 }

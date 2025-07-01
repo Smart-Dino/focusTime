@@ -11,31 +11,59 @@ import SwiftData
 @Model
 final class Schedule: SwiftDataItem {
     
-    @Attribute(.unique) var id: UUID
+    // Removed id because each Model instance gets a PersistenceIdentifier by default.
     var emoji: String
     var name: String
     var days: Set<Weekday>
     var startTime: TimeComponents
     var endTime: TimeComponents
+    // I think we don't need isActive property,
+    // since we can just query the DeviceActivityCenter
+    // for active schedules.
     
-    @Relationship(inverse: \BlockItem.schedules)
-    var blockItems: [BlockItem]
+    // MARK: Relationship
+    @Relationship(deleteRule: .nullify, inverse: \BlockItem.schedules)
+    var blockItems: [BlockItem]?
+
+    /// Returns a user-friendly description for a set of weekdays.
+    var daysDescription: String {
+        switch days {
+        case Weekday.weekends:      "Weekend"
+        case Weekday.weekdays:      "Weekdays"
+        case Set(Weekday.allCases): "Every day"
+        case let days where days.count == 1: days.first!.description
+        default:                     "\(days.count) days"
+        }
+    }
     
     init(
-        id: UUID = UUID(),
         emoji: String,
         name: String,
         days: Set<Weekday>,
         startTime: TimeComponents,
         endTime: TimeComponents,
-        blockItems: [BlockItem] = []
+        blockItems: [BlockItem]? = nil
     ) {
-        self.id = id
         self.emoji = emoji
         self.name = name
         self.days = days
         self.startTime = startTime
         self.endTime = endTime
         self.blockItems = blockItems
+    }
+    
+    convenience init(from item: ProtectedSchedule) {
+        self.init(emoji: item.emoji,
+                  name: item.name,
+                  days: item.days,
+                  startTime: item.startTime,
+                  endTime: item.endTime)
+    }
+    
+    func appendBlockItem(_ item: BlockItem) {
+        if blockItems == nil {
+            blockItems = []
+        }
+        blockItems!.append(item)
     }
 }

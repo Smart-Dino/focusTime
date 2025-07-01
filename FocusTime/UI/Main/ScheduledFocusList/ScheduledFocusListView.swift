@@ -61,7 +61,7 @@ struct ScheduledFocusListView: View {
                     FTScheduledFocusRowView(
                         emoji: schedule.emoji,
                         title: schedule.name,
-                        description: schedule.days.daysDescription
+                        description: schedule.daysDescription
                     )
                     .padding(1)
                 }
@@ -83,12 +83,13 @@ struct ScheduledFocusListView: View {
     }
 }
 
-#Preview {
-    NavigationStack {
-        if let scheduleStore = ScheduleStore(isStoredInMemoryOnly: true) {
-            ScheduledFocusListView(viewModel: .init(scheduleStore: scheduleStore))
-        } else {
-            Text("Could not initialize ScheduleStore.")
-        }
-    }
-}
+#warning("No preview.")
+//#Preview {
+//    NavigationStack {
+//        if let scheduleStore = ScheduleStore(isStoredInMemoryOnly: true) {
+//            ScheduledFocusListView(viewModel: .init(scheduleStore: scheduleStore))
+//        } else {
+//            Text("Could not initialize ScheduleStore.")
+//        }
+//    }
+//}

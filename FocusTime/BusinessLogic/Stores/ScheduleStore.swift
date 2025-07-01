@@ -8,51 +8,50 @@
 import Foundation
 import SwiftData
 
-@MainActor
-final class ScheduleStore: DataSource {
-    private let modelContainer: ModelContainer
-    private let modelContext: ModelContext
-
-    init?(isStoredInMemoryOnly: Bool = false) {
-        #warning("Memory only container")
-        let container = try? ModelContainer(
-            for: Schedule.self,
-            configurations: ModelConfiguration(isStoredInMemoryOnly: isStoredInMemoryOnly)
-        )
-        guard let container else { return nil }
-        
-        let context = container.mainContext
-        self.modelContainer = container
-        self.modelContext = context
-    }
+@ModelActor
+actor ScheduleStore: DataSource {
     
-    @GlobalStoreActor func insert(_ item: Schedule) /*async*/ throws {
+    func insert(_ item: ProtectedSchedule) throws {
         let container = modelContainer
-        let context = ModelContext(container) // Create a separate, non-main context to write to
-        context.insert(item)
-        try context.save() // Apply the context to the DB
+        let context = ModelContext(container) // Create a separate, non-main context to write to.
+        let modelItem = Schedule(from: item) // Convert to model instance.
+        context.insert(modelItem)
+        try context.save() // Apply the context to the DB.
     }
     
-    func delete(_ item: Schedule) throws {
-        // If there are ever any Sendable errors we can just take the item's ID as a parameter
-        // and remove that item by fetching the related item.
-        // try! context.fetch(FetchDescriptor<Schedule>(predicate: #Predicate { $0.id == itemID }))
+    func delete(id: PersistentIdentifier) throws {
+        // Fetch the item by id and delete it from the context, then save.
+        guard let item = try fetch(id: id) else { throw DataSourceError.notFound }
         modelContext.delete(item)
         try modelContext.save()
     }
     
-    func fetchAll() throws -> [Schedule] {
+    func fetch() throws -> [Schedule] {
         try modelContext.fetch(FetchDescriptor<Schedule>())
     }
     
-    func updateFields(of item: inout Schedule, using updates: (Schedule) -> Void) throws {
-        guard let fetchedItem = modelContext.model(for: item.id) as? Schedule else {
+    func fetch(id: PersistentIdentifier) throws -> Schedule? {
+        try modelContext.fetch(
+            FetchDescriptor(predicate: #Predicate<Schedule>{ $0.id == id })
+        ).first
+    }
+    
+    func fetch(descriptor: FetchDescriptor<Schedule>) throws -> [Schedule] {
+        try modelContext.fetch(descriptor)
+    }
+    
+    func updateFields(id: PersistentIdentifier, using updates: (Schedule) -> Void) throws {
+        // Fetch the item by id for update
+        guard let fetchedItem = try fetch(id: id) else {
             throw DataSourceError.notFound
         }
         
         updates(fetchedItem)
         
         try modelContext.save()
-        item = fetchedItem
+    }
+    
+    func eraseAllData() throws {
+        try modelContext.delete(model: Schedule.self)
     }
 }

@@ -36,7 +36,7 @@ struct MainFlowCoordinatorView: View {
                             Label("Blocks", systemImage: "hand.raised")
                             // Prevent system from filling system icons.
                                 .environment(\.symbolVariants, .none)
-
+                            
                         }
                         .tag(MainTabScreens.blocks)
                     Text("Empty for now")
@@ -47,7 +47,7 @@ struct MainFlowCoordinatorView: View {
                         }
                         .tag(MainTabScreens.profile)
                 }
-//                .toolbarBackground(Color.ftBackground, for: .tabBar) // Set a specific color
+                //                .toolbarBackground(Color.ftBackground, for: .tabBar) // Set a specific color
                 // as a background, but we don't do it because the tabbar is transparent
                 // in a non-scrolling content so we underlay our own behind it.
                 .toolbarBackground(.hidden, for: .tabBar) // Removes background and sets
@@ -59,7 +59,7 @@ struct MainFlowCoordinatorView: View {
                 if viewModel.flowState.currentTabScreen == .home {
                     ToolbarItem {
                         FTProUpgradeButtonView {
-                            #warning("Action is empty")
+#warning("Action is empty")
                         }
                     }
                 }
@@ -68,7 +68,7 @@ struct MainFlowCoordinatorView: View {
                     switch viewModel.flowState.currentTabScreen {
                     case .home:
                         FTPlusToolbarButtonView {
-                            #warning("Action is empty")
+#warning("Action is empty")
                         }
                     case .blocks: EmptyView()
                     case .profile: EmptyView()
@@ -90,14 +90,8 @@ struct MainFlowCoordinatorView: View {
     }
 }
 
-#Preview {
-    if let scheduleStore = ScheduleStore(isStoredInMemoryOnly: true),
-       let blockItemStore = BlockItemStore(isStoredInMemoryOnly: true) {
-        
-        let viewModel = MainFlowCoordinatorViewModel(scheduleStore: scheduleStore,
-                                                     blockItemStore: blockItemStore)
-        MainFlowCoordinatorView(viewModel: viewModel)
-    } else {
-        Text("Could not initialize stores.")
-    }
-}
+#warning("No preview.")
+//#Preview {
+//    let viewModel = MainFlowCoordinatorViewModel(flowState: <#T##State#>, modelContainer: <#T##ModelContainer#>)
+//    MainFlowCoordinatorView(viewModel: viewModel)
+//}

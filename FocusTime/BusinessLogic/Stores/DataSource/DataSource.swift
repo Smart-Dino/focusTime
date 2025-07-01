@@ -10,23 +10,17 @@ import Foundation
 
 // Typealias would not work here because
 // it will be treated as a redundant conformance to PersistentModel.
-protocol SwiftDataItem: Codable, Identifiable, PersistentModel { }
+protocol SwiftDataItem: Identifiable, PersistentModel { }
 
-// Serialize writes to the database on a custom, global actor.
-// This is a custom-defined actor, much like MainActor is
-// so this actor will never cross MainActor and run DB writes off the main thread.
-@globalActor
-actor GlobalStoreActor {
-    static let shared = GlobalStoreActor()
-}
-
-@MainActor
-protocol DataSource {
+protocol DataSource: ModelActor {
     associatedtype Model: SwiftDataItem
-    
-    @GlobalStoreActor func insert(_ item: Model) async throws
-    func delete(_ item: Model) throws
-    func fetchAll() throws -> [Model]
-    
-    func updateFields(of item: inout Model, using updates: (Model) -> Void) throws
+    associatedtype ProtectedModel: Sendable
+
+    func insert(_ item: ProtectedModel) throws
+    func delete(id: PersistentIdentifier) throws
+    func fetch() throws -> [Model]
+    func fetch(id: PersistentIdentifier) throws -> Model?
+    func fetch(descriptor: FetchDescriptor<Model>) throws -> [Model]
+    func updateFields(id: PersistentIdentifier, using updates: (Model) -> Void) throws
+    func eraseAllData() throws
 }

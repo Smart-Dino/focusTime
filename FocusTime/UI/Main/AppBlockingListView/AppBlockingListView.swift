@@ -93,8 +93,9 @@ struct AppBlockingListView: View {
     }
 }
 
-#Preview {
-    if let blockItemStore = BlockItemStore(isStoredInMemoryOnly: true) {
-        AppBlockingListView(viewModel: .init(blockItemStore: blockItemStore))
-    }
-}
+#warning("No preview.")
+//#Preview {
+//    if let blockItemStore = BlockItemStore(isStoredInMemoryOnly: true) {
+//        AppBlockingListView(viewModel: .init(blockItemStore: blockItemStore))
+//    }
+//}
