@@ -28,6 +28,7 @@ protocol DataSource {
     @GlobalSourceActor func insert(_ item: ProtectedModel) async throws
     func delete(_ item: Model) throws
     func fetch() throws -> [Model]
+    func fetch(id: UUID) throws -> Model?
     func fetch(descriptor: FetchDescriptor<Model>) throws -> [Model]
     
     func updateFields(of item: inout Model, using updates: (Model) -> Void) throws

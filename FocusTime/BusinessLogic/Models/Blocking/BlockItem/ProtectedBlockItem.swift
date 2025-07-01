@@ -11,19 +11,19 @@ import Foundation
 
 struct ProtectedBlockItem: Sendable {
     let id: UUID
-    let name: String
     let emoji: String
+    let name: String
     let blockedContent: FamilyActivitySelection
 
     init(
         id: UUID = UUID(),
-        name: String,
         emoji: String,
+        name: String,
         blockedContent: FamilyActivitySelection,
     ) {
         self.id = id
-        self.name = name
         self.emoji = emoji
+        self.name = name
         self.blockedContent = blockedContent
     }
 }

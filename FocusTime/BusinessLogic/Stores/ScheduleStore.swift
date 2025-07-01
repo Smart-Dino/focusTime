@@ -45,6 +45,12 @@ final class ScheduleStore: DataSource {
         try modelContext.fetch(FetchDescriptor<Schedule>())
     }
     
+    func fetch(id: UUID) throws -> Schedule? {
+        try modelContext.fetch(
+            FetchDescriptor(predicate: #Predicate<Schedule>{ $0.id == id })
+        ).first
+    }
+    
     func fetch(descriptor: FetchDescriptor<Schedule>) throws -> [Schedule] {
         try modelContext.fetch(descriptor)
     }

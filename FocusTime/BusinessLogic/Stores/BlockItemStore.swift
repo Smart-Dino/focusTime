@@ -45,6 +45,12 @@ final class BlockItemStore: DataSource {
         try modelContext.fetch(FetchDescriptor<BlockItem>())
     }
     
+    func fetch(id: UUID) throws -> BlockItem? {
+        try modelContext.fetch(
+            FetchDescriptor(predicate: #Predicate<BlockItem>{ $0.id == id })
+        ).first
+    }
+    
     func fetch(descriptor: FetchDescriptor<BlockItem>) throws -> [BlockItem] {
         try modelContext.fetch(descriptor)
     }

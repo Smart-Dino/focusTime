@@ -24,7 +24,7 @@ final class Schedule: SwiftDataItem {
     // MARK: Relationship
     @Relationship(deleteRule: .nullify, inverse: \BlockItem.schedules)
     var blockItems: [BlockItem]?
-    
+
     /// Returns a user-friendly description for a set of weekdays.
     var daysDescription: String {
         switch days {
@@ -61,6 +61,13 @@ final class Schedule: SwiftDataItem {
                   days: item.days,
                   startTime: item.startTime,
                   endTime: item.endTime)
+    }
+    
+    func appendBlockItem(_ item: BlockItem) {
+        if blockItems == nil {
+            blockItems = []
+        }
+        blockItems!.append(item)
     }
 }
 

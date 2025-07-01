@@ -98,9 +98,8 @@ final class ShieldDebugViewModel {
         let scheduleItems = try blockItemStore.fetch()
         guard blockItems.isEmpty || scheduleItems.isEmpty else { return }
         
-        let blockItem = ProtectedBlockItem(name: "Block",
-                                  emoji: "❌",
-                                  blockedContent: state.selection)
+        let blockItem = ProtectedBlockItem(emoji: "❌", name: "Block",
+                                           blockedContent: state.selection)
         
         
         let startTime = Calendar.current.dateComponents([.hour, .minute], from: state.startTime)
