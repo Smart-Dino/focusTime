@@ -18,7 +18,7 @@ protocol ShieldManager {
     // MARK: - Block
     func block() async throws
     func block(specific selection: FamilyActivitySelection) async throws
-    func block(specific selection: FamilyActivitySelection, schedule: Schedule) async throws
+    func block(during schedule: Schedule) async throws
     // MARK: - Unblock
     func unblock() async throws
     // MARK: - Auth
@@ -82,7 +82,10 @@ final class LiveShieldManager: ShieldManager {
     // - the system will not allow us to do so and throw an error.
     // We can solve this by having two separate schedules that are both 15+
     // mins in length but have less than 15 minutes in-between them!
-    func block(specific selection: FamilyActivitySelection, schedule: Schedule) async throws {
+    func block(during schedule: Schedule) async throws {
+        try await checkAuthorization()
+        defer { updateShieldStatus() }
+        
         // Start of interval + 15 mins.
         let intervalStart = schedule.startTime.dateComponents
         let startAddingFifteen = intervalStart.adding(minutes: 15)

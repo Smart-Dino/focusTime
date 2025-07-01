@@ -11,7 +11,7 @@ import Foundation
 // Fatal error: Unexpected property within Persisted Struct/Enum: _CalendarProtocol
 // https://fatbobman.com/en/posts/considerations-for-using-codable-and-enums-in-swiftdata-models/#:~:text=Such%20errors%20indicate,of%20the%20model.
 /// A simplified alternative to `DateComponents` that works with SwiftData.
-struct TimeComponents: Codable {
+struct TimeComponents: Codable, Hashable {
     private let timeSince1970: Int
 
     init?(secondsSince1970: Int) {

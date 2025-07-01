@@ -150,10 +150,9 @@ final class ShieldDebugViewModel {
     
     func blockSelectionDuringSchedule() async {
         do {
-            let blockItem = try blockItemStore.fetch(descriptor: .init()).first!
             let schedule = try scheduleStore.fetch(descriptor: .init()).first!
             
-            try await shieldManager.block(specific: blockItem.blockedContent, schedule: schedule)
+            try await shieldManager.block(during: schedule)
         } catch {
             state.error = error
         }
