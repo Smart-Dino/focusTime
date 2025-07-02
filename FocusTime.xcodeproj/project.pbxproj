@@ -491,7 +491,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = org.dino.smart.FocusTime;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = FocusTimeUpdated;
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = FocusTimeUpdatedProvisioning;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -526,7 +526,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = org.dino.smart.FocusTime;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = FocusTimeUpdated;
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = FocusTimeUpdatedProvisioning;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -596,7 +596,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = org.dino.smart.FocusTime.FocusTimeActivityMonitor;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = FocusTimeActivityMonitor;
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = FocusTimeActivityMonitorUpdated;
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -629,7 +629,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = org.dino.smart.FocusTime.FocusTimeActivityMonitor;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = FocusTimeActivityMonitor;
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = FocusTimeActivityMonitorUpdated;
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
