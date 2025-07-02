@@ -12,33 +12,44 @@ import FamilyControls
 @ModelActor
 actor BlockItemStore: DataSource { 
     
-    func insert(_ item: ProtectedBlockItem) throws { // Implicitly async since runs in a different context.
-        let container = modelContainer
-        let context = ModelContext(container) // Create a separate, non-main context to write to.
-        let modelItem = BlockItem(from: item) // Convert to model instance.
-        context.insert(modelItem)
-        try context.save() // Apply the context to the DB.
+    func insert(_ item: ProtectedBlockItem) throws {
+        let model = BlockItem(from: item) // Convert to model instance.
+        modelContext.insert(model)
+        try modelContext.save() // Apply the context to the DB.
     }
     
-    func delete(id: PersistentIdentifier) throws {
-        // If there are ever any Sendable errors we can just take the item's ID as a parameter
-        // and remove that item by fetching the related item.
-        // try! context.fetch(FetchDescriptor<BlockItem>(predicate: #Predicate { $0.id == itemID }))
-        guard let item = try fetch(id: id) else { throw DataSourceError.notFound }
-        modelContext.delete(item)
+    func insertBatch(_ items: [ProtectedBlockItem]) throws {
+        for item in items {
+            let model = BlockItem(from: item)
+            modelContext.insert(model)
+        }
         try modelContext.save()
     }
     
-    func fetch() throws -> [BlockItem] {
-        try modelContext.fetch(FetchDescriptor<BlockItem>())
+    func delete(id: PersistentIdentifier) throws {
+        guard let model = modelContext.model(for: id) as? BlockItem else {
+            throw DataSourceError.notFound
+        }
+        modelContext.delete(model)
+        try modelContext.save()
     }
     
-    func fetch(id: PersistentIdentifier) throws -> BlockItem? {
-        modelContext.model(for: id) as? BlockItem
+    func fetch() throws -> [ProtectedBlockItem] {
+        try modelContext
+            .fetch(FetchDescriptor<BlockItem>())
+            .map { ProtectedBlockItem(from: $0) }
     }
     
-    func fetch(descriptor: FetchDescriptor<BlockItem>) throws -> [BlockItem] {
-        try modelContext.fetch(descriptor)
+    func fetch(id: PersistentIdentifier) throws -> ProtectedBlockItem? {
+        guard let model = modelContext.model(for: id) as? BlockItem else {
+            throw DataSourceError.notFound
+        }
+        
+        return ProtectedBlockItem(from: model)
+    }
+    
+    func fetch(descriptor: FetchDescriptor<BlockItem>) throws -> [ProtectedBlockItem] {
+        try modelContext.fetch(descriptor).map{ ProtectedBlockItem(from: $0) }
     }
     
     func updateFields(id: PersistentIdentifier, using updates: (BlockItem) -> Void) throws {

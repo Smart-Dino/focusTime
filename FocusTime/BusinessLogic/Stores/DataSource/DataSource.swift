@@ -8,19 +8,33 @@
 import SwiftData
 import Foundation
 
-// Typealias would not work here because
-// it will be treated as a redundant conformance to PersistentModel.
-protocol SwiftDataItem: Identifiable, PersistentModel { }
 
-protocol DataSource: ModelActor {
-    associatedtype Model: SwiftDataItem
-    associatedtype ProtectedModel: Sendable
+protocol ProtectedModel: Sendable, Identifiable {
+    associatedtype Model: PersistentModel
+    
+    var persistentModelID: PersistentIdentifier? { get }
+    
+    init(from item: Model)
+}
 
-    func insert(_ item: ProtectedModel) throws
+extension ProtectedModel {
+    var id: Int { persistentModelID?.id.hashValue ?? UUID().hashValue }
+}
+
+protocol DataSource: ModelActor where SendableModel.Model == Model {
+    associatedtype Model: PersistentModel
+    associatedtype SendableModel: ProtectedModel
+
+    func insert(_ item: SendableModel) throws
+    func insertBatch(_ items: [SendableModel]) throws
+    
     func delete(id: PersistentIdentifier) throws
-    func fetch() throws -> [Model]
-    func fetch(id: PersistentIdentifier) throws -> Model?
-    func fetch(descriptor: FetchDescriptor<Model>) throws -> [Model]
+    
+    func fetch() throws -> [SendableModel]
+    func fetch(id: PersistentIdentifier) throws -> SendableModel?
+    func fetch(descriptor: FetchDescriptor<Model>) throws -> [SendableModel]
+    
     func updateFields(id: PersistentIdentifier, using updates: (Model) -> Void) throws
     func eraseAllData() throws
 }
+

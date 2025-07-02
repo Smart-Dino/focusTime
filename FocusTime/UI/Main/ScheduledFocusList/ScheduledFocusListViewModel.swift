@@ -12,7 +12,7 @@ import SwiftData
 @Observable
 final class ScheduledFocusListViewModel {
     struct State {
-        var items = [Schedule]()
+        var items = [ProtectedSchedule]()
     }
     
     private(set) var state: State
@@ -28,19 +28,21 @@ final class ScheduledFocusListViewModel {
     
     func insertTestItemsIntoDatabase() async {
         Task.detached(priority: .userInitiated) {
-            let scheduleStore = ScheduleStore(modelContainer: self.modelContainer)
-            for _ in 0..<100 {
-                let schedule = ProtectedSchedule(
+            let blockItemStore = ScheduleStore(modelContainer: self.modelContainer)
+            let itemsToInsert = Array(
+                repeating: ProtectedSchedule(
                     emoji: "🏠",
                     name: "Spend time with family",
                     days: [.saturday, .sunday],
                     startTime: TimeComponents(hour: 17, minute: 00)!,
-                    endTime: TimeComponents(hour: 19, minute: 00)!)
-                
-                try? await scheduleStore.insert(schedule)
-            }
-            try? await MainActor.run {
-                self.state.items = try self.modelContainer.mainContext.fetch(.init())
+                    endTime: TimeComponents(hour: 19, minute: 00)!
+                ),
+                count: 100000
+            )
+            try? await blockItemStore.insertBatch(itemsToInsert)
+            let insertedItems = try? await blockItemStore.fetch()
+            await MainActor.run {
+                self.state.items = insertedItems ?? []
             }
         }
     }

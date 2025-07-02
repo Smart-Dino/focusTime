@@ -13,7 +13,7 @@ import FamilyControls
 @Observable
 final class AppBlockingListViewModel {
     struct State {
-        var items = [BlockItem]()
+        var items = [ProtectedBlockItem]()
     }
     
     private(set) var state: State
@@ -27,14 +27,15 @@ final class AppBlockingListViewModel {
     func insertTestItemsIntoDatabase() async {
         Task.detached(priority: .userInitiated) {
             let blockItemStore = BlockItemStore(modelContainer: self.modelContainer)
-            for _ in 0..<100 {
-                let item = ProtectedBlockItem(emoji: "😜", name: "Block", blockedContent: FamilyActivitySelection())
-                try? await blockItemStore.insert(item)
-            }
-            try? await MainActor.run {
-                self.state.items = try self.modelContainer.mainContext.fetch(.init())
+            let itemsToInsert = Array(
+                repeating: ProtectedBlockItem(emoji: "😜", name: "Block", blockedContent: FamilyActivitySelection()),
+                count: 100000
+            )
+            try? await blockItemStore.insertBatch(itemsToInsert)
+            let insertedItems = try? await blockItemStore.fetch()
+            await MainActor.run {
+                self.state.items = insertedItems ?? []
             }
         }
     }
 }
-

@@ -12,37 +12,47 @@ import SwiftData
 actor ScheduleStore: DataSource {
     
     func insert(_ item: ProtectedSchedule) throws {
-        let container = modelContainer
-        let context = ModelContext(container) // Create a separate, non-main context to write to.
-        let modelItem = Schedule(from: item) // Convert to model instance.
-        context.insert(modelItem)
-        try context.save() // Apply the context to the DB.
+        let model = Schedule(from: item) // Convert to model instance.
+        modelContext.insert(model)
+        try modelContext.save() // Apply the context to the DB.
     }
     
-    func delete(id: PersistentIdentifier) throws {
-        // Fetch the item by id and delete it from the context, then save.
-        guard let item = try fetch(id: id) else { throw DataSourceError.notFound }
-        modelContext.delete(item)
+    func insertBatch(_ items: [ProtectedSchedule]) throws {
+        for item in items {
+            let model = Schedule(from: item)
+            modelContext.insert(model)
+        }
         try modelContext.save()
     }
     
-    func fetch() throws -> [Schedule] {
-        try modelContext.fetch(FetchDescriptor<Schedule>())
+    func delete(id: PersistentIdentifier) throws {
+        guard let model = modelContext.model(for: id) as? Schedule else {
+            throw DataSourceError.notFound
+        }
+        modelContext.delete(model)
+        try modelContext.save()
     }
     
-    func fetch(id: PersistentIdentifier) throws -> Schedule? {
-        try modelContext.fetch(
-            FetchDescriptor(predicate: #Predicate<Schedule>{ $0.id == id })
-        ).first
+    func fetch() throws -> [ProtectedSchedule] {
+        try modelContext
+            .fetch(FetchDescriptor<Schedule>())
+            .map { ProtectedSchedule(from: $0) }
     }
     
-    func fetch(descriptor: FetchDescriptor<Schedule>) throws -> [Schedule] {
-        try modelContext.fetch(descriptor)
+    func fetch(id: PersistentIdentifier) throws -> ProtectedSchedule? {
+        guard let model = modelContext.model(for: id) as? Schedule else {
+            throw DataSourceError.notFound
+        }
+        
+        return ProtectedSchedule(from: model)
+    }
+    
+    func fetch(descriptor: FetchDescriptor<Schedule>) throws -> [ProtectedSchedule] {
+        try modelContext.fetch(descriptor).map { ProtectedSchedule(from: $0) }
     }
     
     func updateFields(id: PersistentIdentifier, using updates: (Schedule) -> Void) throws {
-        // Fetch the item by id for update
-        guard let fetchedItem = try fetch(id: id) else {
+        guard let fetchedItem = modelContext.model(for: id) as? Schedule else {
             throw DataSourceError.notFound
         }
         

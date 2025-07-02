@@ -10,7 +10,7 @@ import SwiftData
 import FamilyControls
 
 @Model
-final class BlockItem: SwiftDataItem {
+final class BlockItem {
     // Removed id because each Model instance gets a PersistenceIdentifier by default.
     var name: String
     var emoji: String

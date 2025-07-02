@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 
 @Model
-final class Schedule: SwiftDataItem {
+final class Schedule {
     
     // Removed id because each Model instance gets a PersistenceIdentifier by default.
     var emoji: String
