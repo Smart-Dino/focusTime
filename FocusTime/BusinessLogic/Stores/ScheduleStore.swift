@@ -11,18 +11,24 @@ import SwiftData
 @ModelActor
 actor ScheduleStore: DataSource {
     
-    func insert(_ item: ProtectedSchedule) throws {
+    @discardableResult
+    func insert(_ item: ProtectedSchedule) throws -> PersistentIdentifier {
         let model = Schedule(from: item) // Convert to model instance.
         modelContext.insert(model)
         try modelContext.save() // Apply the context to the DB.
+        return model.persistentModelID
     }
     
-    func insertBatch(_ items: [ProtectedSchedule]) throws {
+    @discardableResult
+    func insertBatch(_ items: [ProtectedSchedule]) throws -> Set<PersistentIdentifier> {
+        var ids = Set<PersistentIdentifier>()
         for item in items {
             let model = Schedule(from: item)
             modelContext.insert(model)
+            ids.insert(model.persistentModelID)
         }
         try modelContext.save()
+        return ids
     }
     
     func delete(id: PersistentIdentifier) throws {
@@ -40,7 +46,11 @@ actor ScheduleStore: DataSource {
     }
     
     func fetch(id: PersistentIdentifier) throws -> ProtectedSchedule? {
-        guard let model = modelContext.model(for: id) as? Schedule else {
+        let descriptor = FetchDescriptor<Schedule>(
+            predicate: #Predicate { $0.id == id }
+        )
+        
+        guard let model = try? modelContext.fetch(descriptor).first else {
             throw DataSourceError.notFound
         }
         
@@ -52,11 +62,15 @@ actor ScheduleStore: DataSource {
     }
     
     func updateFields(id: PersistentIdentifier, using updates: (Schedule) -> Void) throws {
-        guard let fetchedItem = modelContext.model(for: id) as? Schedule else {
+        let descriptor = FetchDescriptor<Schedule>(
+            predicate: #Predicate { $0.id == id }
+        )
+        
+        guard let model = try? modelContext.fetch(descriptor).first else {
             throw DataSourceError.notFound
         }
         
-        updates(fetchedItem)
+        updates(model)
         
         try modelContext.save()
     }

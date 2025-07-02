@@ -10,8 +10,19 @@
 		E96207822DD4EF2B002F037F /* FocusTimeUI in Frameworks */ = {isa = PBXBuildFile; productRef = E96207812DD4EF2B002F037F /* FocusTimeUI */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		C6FE59EA2E156D8B003A2199 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 674FA6982DB05ACE0002FDC1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 674FA69F2DB05ACE0002FDC1;
+			remoteInfo = FocusTime;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		674FA6A02DB05ACE0002FDC1 /* FocusTime.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FocusTime.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C6FE59E62E156D8B003A2199 /* FocusTimeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FocusTimeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E962077F2DD4D1E5002F037F /* FocusTimeUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = FocusTimeUI; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -19,6 +30,11 @@
 		674FA6A22DB05ACE0002FDC1 /* FocusTime */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = FocusTime;
+			sourceTree = "<group>";
+		};
+		C6FE59E72E156D8B003A2199 /* FocusTimeTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = FocusTimeTests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -32,6 +48,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C6FE59E32E156D8B003A2199 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -40,6 +63,7 @@
 			children = (
 				E962077F2DD4D1E5002F037F /* FocusTimeUI */,
 				674FA6A22DB05ACE0002FDC1 /* FocusTime */,
+				C6FE59E72E156D8B003A2199 /* FocusTimeTests */,
 				674FA6A12DB05ACE0002FDC1 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -48,6 +72,7 @@
 			isa = PBXGroup;
 			children = (
 				674FA6A02DB05ACE0002FDC1 /* FocusTime.app */,
+				C6FE59E62E156D8B003A2199 /* FocusTimeTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -78,6 +103,29 @@
 			productReference = 674FA6A02DB05ACE0002FDC1 /* FocusTime.app */;
 			productType = "com.apple.product-type.application";
 		};
+		C6FE59E52E156D8B003A2199 /* FocusTimeTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C6FE59EE2E156D8B003A2199 /* Build configuration list for PBXNativeTarget "FocusTimeTests" */;
+			buildPhases = (
+				C6FE59E22E156D8B003A2199 /* Sources */,
+				C6FE59E32E156D8B003A2199 /* Frameworks */,
+				C6FE59E42E156D8B003A2199 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C6FE59EB2E156D8B003A2199 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				C6FE59E72E156D8B003A2199 /* FocusTimeTests */,
+			);
+			name = FocusTimeTests;
+			packageProductDependencies = (
+			);
+			productName = FocusTimeTests;
+			productReference = C6FE59E62E156D8B003A2199 /* FocusTimeTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -85,11 +133,15 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1620;
+				LastSwiftUpdateCheck = 2600;
 				LastUpgradeCheck = 1620;
 				TargetAttributes = {
 					674FA69F2DB05ACE0002FDC1 = {
 						CreatedOnToolsVersion = 16.2;
+					};
+					C6FE59E52E156D8B003A2199 = {
+						CreatedOnToolsVersion = 26.0;
+						TestTargetID = 674FA69F2DB05ACE0002FDC1;
 					};
 				};
 			};
@@ -111,12 +163,20 @@
 			projectRoot = "";
 			targets = (
 				674FA69F2DB05ACE0002FDC1 /* FocusTime */,
+				C6FE59E52E156D8B003A2199 /* FocusTimeTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		674FA69E2DB05ACE0002FDC1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C6FE59E42E156D8B003A2199 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -133,7 +193,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C6FE59E22E156D8B003A2199 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		C6FE59EB2E156D8B003A2199 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 674FA69F2DB05ACE0002FDC1 /* FocusTime */;
+			targetProxy = C6FE59EA2E156D8B003A2199 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		674FA6AC2DB05AD10002FDC1 /* Debug */ = {
@@ -321,6 +396,46 @@
 			};
 			name = Release;
 		};
+		C6FE59EC2E156D8B003A2199 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.dino.smart.FocusTimeTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FocusTime.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FocusTime";
+			};
+			name = Debug;
+		};
+		C6FE59ED2E156D8B003A2199 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.dino.smart.FocusTimeTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FocusTime.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FocusTime";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -338,6 +453,15 @@
 			buildConfigurations = (
 				674FA6AF2DB05AD10002FDC1 /* Debug */,
 				674FA6B02DB05AD10002FDC1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C6FE59EE2E156D8B003A2199 /* Build configuration list for PBXNativeTarget "FocusTimeTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C6FE59EC2E156D8B003A2199 /* Debug */,
+				C6FE59ED2E156D8B003A2199 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

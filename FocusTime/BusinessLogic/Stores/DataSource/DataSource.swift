@@ -11,7 +11,6 @@ import Foundation
 
 protocol ProtectedModel: Sendable, Identifiable {
     associatedtype Model: PersistentModel
-    
     var persistentModelID: PersistentIdentifier? { get }
     
     init(from item: Model)
@@ -25,8 +24,8 @@ protocol DataSource: ModelActor where SendableModel.Model == Model {
     associatedtype Model: PersistentModel
     associatedtype SendableModel: ProtectedModel
 
-    func insert(_ item: SendableModel) throws
-    func insertBatch(_ items: [SendableModel]) throws
+    func insert(_ item: SendableModel) throws  -> PersistentIdentifier
+    func insertBatch(_ items: [SendableModel]) throws -> Set<PersistentIdentifier>
     
     func delete(id: PersistentIdentifier) throws
     
