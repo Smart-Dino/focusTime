@@ -32,9 +32,7 @@ actor ScheduleStore: DataSource {
     }
     
     func delete(id: PersistentIdentifier) throws {
-        guard let model = modelContext.model(for: id) as? Schedule else {
-            throw DataSourceError.notFound
-        }
+        let model = try fetchForID(id)
         modelContext.delete(model)
         try modelContext.save()
     }
@@ -46,13 +44,7 @@ actor ScheduleStore: DataSource {
     }
     
     func fetch(id: PersistentIdentifier) throws -> ProtectedSchedule? {
-        let descriptor = FetchDescriptor<Schedule>(
-            predicate: #Predicate { $0.id == id }
-        )
-        
-        guard let model = try? modelContext.fetch(descriptor).first else {
-            throw DataSourceError.notFound
-        }
+        let model = try fetchForID(id)
         
         return ProtectedSchedule(from: model)
     }
@@ -62,13 +54,7 @@ actor ScheduleStore: DataSource {
     }
     
     func updateFields(id: PersistentIdentifier, using updates: (Schedule) -> Void) throws {
-        let descriptor = FetchDescriptor<Schedule>(
-            predicate: #Predicate { $0.id == id }
-        )
-        
-        guard let model = try? modelContext.fetch(descriptor).first else {
-            throw DataSourceError.notFound
-        }
+        let model = try fetchForID(id)
         
         updates(model)
         
@@ -79,3 +65,19 @@ actor ScheduleStore: DataSource {
         try modelContext.delete(model: Schedule.self)
     }
 }
+
+// MARK: Helpers
+extension ScheduleStore {
+    func fetchForID(_ id: PersistentIdentifier) throws -> Schedule {
+        let descriptor = FetchDescriptor<Schedule>(
+            predicate: #Predicate { $0.id == id }
+        )
+        
+        guard let model = try? modelContext.fetch(descriptor).first else {
+            throw DataSourceError.notFound
+        }
+        
+        return model
+    }
+}
+

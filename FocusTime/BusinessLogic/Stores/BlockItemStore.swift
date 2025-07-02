@@ -33,9 +33,7 @@ actor BlockItemStore: DataSource {
     }
     
     func delete(id: PersistentIdentifier) throws {
-        guard let model = modelContext.model(for: id) as? BlockItem else {
-            throw DataSourceError.notFound
-        }
+        let model = try fetchForID(id)
         modelContext.delete(model)
         try modelContext.save()
     }
@@ -47,13 +45,7 @@ actor BlockItemStore: DataSource {
     }
     
     func fetch(id: PersistentIdentifier) throws -> ProtectedBlockItem? {
-        let descriptor = FetchDescriptor<BlockItem>(
-            predicate: #Predicate { $0.id == id }
-        )
-        
-        guard let model = try? modelContext.fetch(descriptor).first else {
-            throw DataSourceError.notFound
-        }
+        let model = try fetchForID(id)
         
         return ProtectedBlockItem(from: model)
     }
@@ -63,13 +55,7 @@ actor BlockItemStore: DataSource {
     }
     
     func updateFields(id: PersistentIdentifier, using updates: (BlockItem) -> Void) throws {
-        let descriptor = FetchDescriptor<BlockItem>(
-            predicate: #Predicate { $0.id == id }
-        )
-        
-        guard let model = try? modelContext.fetch(descriptor).first else {
-            throw DataSourceError.notFound
-        }
+        let model = try fetchForID(id)
         
         updates(model)
         
@@ -78,5 +64,20 @@ actor BlockItemStore: DataSource {
     
     func eraseAllData() throws {
         try modelContext.delete(model: BlockItem.self)
+    }
+}
+
+// MARK: Helpers
+extension BlockItemStore {
+    func fetchForID(_ id: PersistentIdentifier) throws -> BlockItem {
+        let descriptor = FetchDescriptor<BlockItem>(
+            predicate: #Predicate { $0.id == id }
+        )
+        
+        guard let model = try? modelContext.fetch(descriptor).first else {
+            throw DataSourceError.notFound
+        }
+        
+        return model
     }
 }
