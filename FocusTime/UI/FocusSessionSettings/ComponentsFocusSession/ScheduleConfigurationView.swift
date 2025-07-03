@@ -8,18 +8,14 @@
 
 import SwiftUI
 
-// MARK: - ScheduleConfigurationView (Renamed from SessionConfigurationView)
-struct ScheduleConfigurationView: View { // Renamed struct
-    // MARK: - Refactored: Encapsulated properties into a single binding
-    @Binding var configuration: ScheduleConfiguration // Changed type
+struct ScheduleConfigurationView: View {
+    @Binding var configuration: ScheduleConfiguration
     
-    // MARK: - Refactored: Closures for actions instead of delegate
     let onDurationTap: () -> Void
     let onStartTimeTap: () -> Void
     let onEndTimeTap: () -> Void
     let onAppsBlockedTap: () -> Void
     
-    // MARK: - Body
     var body: some View {
         VStack(alignment: .leading, spacing: FocusSessionView.Constants.Configuration.Layout.mainSpacing) {
             HStack(spacing: FocusSessionView.Constants.Configuration.Layout.listIconSpacing) {
@@ -28,13 +24,13 @@ struct ScheduleConfigurationView: View { // Renamed struct
                     Spacer()
                     TextField(FocusSessionView.Constants.Configuration.Strings.listNamePlaceholder, text: $configuration.listName)
                         .multilineTextAlignment(.trailing)
-                        .foregroundStyle(.white) // Use foregroundStyle
+                        .foregroundStyle(.white)
                 }
                 .rowStyle()
                 
                 Group {
-                    if let selectedPreset = configuration.selectedPreset { // Changed to use FocusPreset enum
-                        Text(selectedPreset.iconName) // Assumed iconName is an emoji String
+                    if let selectedPreset = configuration.selectedPreset {
+                        Text(selectedPreset.iconName)
                             .font(.title)
                     } else {
                         EmptyView()
@@ -57,7 +53,7 @@ struct ScheduleConfigurationView: View { // Renamed struct
                 
                 Text(FocusSessionView.Constants.Configuration.Strings.scheduleInfo)
                     .font(.caption)
-                    .foregroundStyle(.gray) // Use foregroundStyle
+                    .foregroundStyle(.gray)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, FocusSessionView.Constants.Configuration.Layout.scheduleInfoHorizontalPadding)
             }
@@ -81,9 +77,9 @@ struct ScheduleConfigurationView: View { // Renamed struct
                         Text(FocusSessionView.Constants.Configuration.Strings.scheduledDays)
                         Spacer()
                         Text(formattedScheduledDays)
-                            .foregroundStyle(.white) // Use foregroundStyle
+                            .foregroundStyle(.white)
                         Image(systemName: FocusSessionView.Constants.Symbols.navigationChevron)
-                            .foregroundStyle(FocusSessionView.Constants.Colors.chevronColor) // Use foregroundStyle
+                            .foregroundStyle(FocusSessionView.Constants.Colors.chevronColor)
                     }
                 }
                 .rowStyle()
@@ -93,21 +89,21 @@ struct ScheduleConfigurationView: View { // Renamed struct
                         Text(FocusSessionView.Constants.Configuration.Strings.startTime)
                         Spacer()
                         Text(formattedStartTime)
-                            .foregroundStyle(.white) // Use foregroundStyle
+                            .foregroundStyle(.white)
                         Image(systemName: FocusSessionView.Constants.Symbols.navigationChevron)
-                            .foregroundStyle(FocusSessionView.Constants.Colors.chevronColor) // Use foregroundStyle
+                            .foregroundStyle(FocusSessionView.Constants.Colors.chevronColor)
                     }
                 }
                 .rowStyle()
                 
                 Button(action: onEndTimeTap) {
                     HStack {
-                        Text(FocusSessionView.Constants.Configuration.Strings.letEndTime) // Corrected constant name
+                        Text(FocusSessionView.Constants.Configuration.Strings.letEndTime)
                         Spacer()
                         Text(formattedEndTime)
-                            .foregroundStyle(.white) // Use foregroundStyle
+                            .foregroundStyle(.white)
                         Image(systemName: FocusSessionView.Constants.Symbols.navigationChevron)
-                            .foregroundStyle(FocusSessionView.Constants.Colors.chevronColor) // Use foregroundStyle
+                            .foregroundStyle(FocusSessionView.Constants.Colors.chevronColor)
                     }
                 }
                 .rowStyle()
@@ -117,9 +113,9 @@ struct ScheduleConfigurationView: View { // Renamed struct
                         Text(FocusSessionView.Constants.Configuration.Strings.duration)
                         Spacer()
                         Text(formattedDuration)
-                            .foregroundStyle(.white) // Use foregroundStyle
+                            .foregroundStyle(.white)
                         Image(systemName: FocusSessionView.Constants.Symbols.navigationChevron)
-                            .foregroundStyle(FocusSessionView.Constants.Colors.chevronColor) // Use foregroundStyle
+                            .foregroundStyle(FocusSessionView.Constants.Colors.chevronColor)
                     }
                 }
                 .rowStyle()
@@ -131,7 +127,7 @@ struct ScheduleConfigurationView: View { // Renamed struct
                     Spacer()
                     Text(FocusSessionView.Constants.Configuration.Strings.appsBlockedList)
                     Image(systemName: FocusSessionView.Constants.Symbols.navigationChevron)
-                        .foregroundStyle(FocusSessionView.Constants.Colors.chevronColor) // Use foregroundStyle
+                        .foregroundStyle(FocusSessionView.Constants.Colors.chevronColor)
                 }
             }
             .rowStyle()
@@ -140,16 +136,18 @@ struct ScheduleConfigurationView: View { // Renamed struct
     }
     
     private var formattedDuration: String {
-        let h = FocusSessionView.Constants.Time.hourSuffix
-        let m = FocusSessionView.Constants.Time.minuteSuffix
-        if configuration.selectedHours > 0 {
-            return "\(configuration.selectedHours)\(h) \(configuration.selectedMinutes)\(m)"
-        } else {
-            return "\(configuration.selectedMinutes)\(m)"
+        let formatter = DateComponentsFormatter()
+        formatter.unitsStyle = .abbreviated
+        formatter.allowedUnits = [.hour, .minute]
+        formatter.zeroFormattingBehavior = .dropAll
+        
+        if configuration.selectedHours == 0 && configuration.selectedMinutes == 0 {
+            return "0m"
         }
+        
+        return formatter.string(from: TimeInterval(configuration.selectedHours * 3600 + configuration.selectedMinutes * 60)) ?? "0m"
     }
     
-    // MARK: - Updated formattedScheduledDays logic
     private var formattedScheduledDays: String {
         if configuration.scheduledDays.isEmpty {
             return "Never"
@@ -164,9 +162,8 @@ struct ScheduleConfigurationView: View { // Renamed struct
             return "Weekdays"
         }
         
-        // If specific days are selected, show a count or list if few
         let sortedDays = configuration.scheduledDays.sorted()
-        if sortedDays.count <= 3 { // Arbitrary threshold, adjust as needed
+        if sortedDays.count <= 3 {
             return sortedDays.map { $0.shortName }.joined(separator: ", ")
         } else {
             return "\(sortedDays.count) days"

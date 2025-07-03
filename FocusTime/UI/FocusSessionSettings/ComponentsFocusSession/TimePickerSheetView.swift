@@ -8,13 +8,10 @@
 import SwiftUI
 
 struct TimePickerSheetView: View {
-    // MARK: - Properties
     @Binding var selectedDate: Date
     let title: String
     let subtitle: String
-    let pickerType: TimePickerType // Keep pickerType for potential logic within ViewModel if it existed
 
-    // MARK: - Body
     var body: some View {
         ZStack {
             FocusSessionView.Constants.Colors.sheetBackground
@@ -23,11 +20,11 @@ struct TimePickerSheetView: View {
             VStack(spacing: FocusSessionView.Constants.TimePicker.Layout.mainSpacing) {
                 Text(title)
                     .font(.headline)
-                    .foregroundStyle(Color.blue)
+                    .foregroundStyle(.blue)
 
                 Text(subtitle)
                     .font(.subheadline)
-                    .foregroundColor(.gray)
+                    .foregroundStyle(.gray)
                     .padding(.bottom)
 
                 timePicker
@@ -41,7 +38,6 @@ struct TimePickerSheetView: View {
         }
     }
 
-    // MARK: - Private Views
     private var timePicker: some View {
         DatePicker(
             "",
@@ -52,6 +48,6 @@ struct TimePickerSheetView: View {
         .labelsHidden()
         .frame(width: FocusSessionView.Constants.TimePicker.Layout.pickerWidth)
         .clipped()
-        .environment(\.locale, Locale(identifier: "en_GB"))
+        .environment(\.locale, Locale(identifier: "en_CH"))
     }
 }

@@ -10,10 +10,8 @@ import FocusTimeUI
 
 struct FocusSessionView: View {
     
-    // MARK: - Fixed: ViewModel initialized in init for mocking
     @State private var viewModel: FocusSessionViewModel
     
-    // MARK: - Initializer for ViewModel injection
     init(viewModel: FocusSessionViewModel = FocusSessionViewModel()) {
         _viewModel = State(initialValue: viewModel)
     }
@@ -22,47 +20,36 @@ struct FocusSessionView: View {
         
         NavigationStack {
             ZStack {
-                // MARK: - Fixed: Gradient background applied to ZStack
-                // Removed .containerRelativeFrame([.horizontal]) as it's often redundant with ZStack/ScrollView
-                // Removed .toolbarBackground(.hidden) to allow system blur
-                
                 ScrollView {
                     VStack(spacing: Constants.Layout.mainVStackSpacing) {
-                        // MARK: - Refactored: Pass a single binding to ScheduleConfigurationView
-                        ScheduleConfigurationView( // Renamed
-                            configuration: $viewModel.state.scheduleConfiguration, // New binding
+                        ScheduleConfigurationView(
+                            configuration: $viewModel.state.scheduleConfiguration,
                             onDurationTap: viewModel.presentDurationPicker,
                             onStartTimeTap: viewModel.presentStartTimePicker,
                             onEndTimeTap: viewModel.presentEndTimePicker,
                             onAppsBlockedTap: viewModel.presentAppBlockerSheet
                         )
                         
-                        // MARK: - Refactored: Pass binding to selectedPreset
                         FocusPresetGridView(
                             presets: viewModel.presets,
-                            selectedPreset: $viewModel.state.scheduleConfiguration.selectedPreset // Pass binding here
+                            selectedPreset: $viewModel.state.scheduleConfiguration.selectedPreset
                         )
                     }
                     .padding(.vertical)
-                    // Add padding to the bottom of the scroll view to make space for the floating button
-                    .padding(.bottom, FocusSessionView.Constants.Layout.floatingButtonBottomPadding + 60) // Adjust 60 for button height
+                    .padding(.bottom, FocusSessionView.Constants.Layout.floatingButtonBottomPadding + 60)
                 }
-                
             }
             .containerRelativeFrame([.horizontal])
-            .gradientBackground() // Apply background here
+            .gradientBackground()
             .navigationTitle(Constants.Strings.navigationTitle)
             .navigationBarTitleDisplayMode(.inline)
-            // MARK: - Fixed: Removed redundant ToolbarItem for title
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     Text(Constants.Strings.navigationTitle)
-                        .foregroundStyle(.white) // Use foregroundStyle
+                        .foregroundStyle(.white)
                         .bold()
                 }
-            }  
-            
-            // MARK: - Fixed: Floating Button using safeAreaInset
+            }
             .safeAreaInset(edge: .bottom) {
                 Button(Constants.Strings.startButtonTitle, systemImage: Constants.Symbols.startButtonIcon) {
                     viewModel.startTapped()
@@ -73,52 +60,43 @@ struct FocusSessionView: View {
                 .disabled(!viewModel.isStartButtonEnabled)
             }
             .containerRelativeFrame([.horizontal])
+            
             .sheet(isPresented: $viewModel.state.isDurationPickerPresented) {
                 DurationPickerSheetView(
-                    hours: $viewModel.state.scheduleConfiguration.selectedHours, // Pass binding directly
-                    minutes: $viewModel.state.scheduleConfiguration.selectedMinutes // Pass binding directly
+                    hours: $viewModel.state.scheduleConfiguration.selectedHours,
+                    minutes: $viewModel.state.scheduleConfiguration.selectedMinutes
                 )
                 .presentationDetents([.height(Constants.Layout.sheetHeight)])
-                // MARK: - Fixed: Removed .presentationDragIndicator(.hidden)
                 .presentationCornerRadius(Constants.Layout.sheetCornerRadius)
             }
             .sheet(isPresented: $viewModel.state.isStartTimePickerPresented) {
                 TimePickerSheetView(
-                    selectedDate: $viewModel.state.scheduleConfiguration.startTime, // Pass binding directly
+                    selectedDate: $viewModel.state.scheduleConfiguration.startTime,
                     title: Constants.TimePicker.Strings.startTimeTitle,
-                    subtitle: Constants.TimePicker.Strings.startTimeSubtitle,
-                    pickerType: .start
+                    subtitle: Constants.TimePicker.Strings.startTimeSubtitle
                 )
                 .presentationDetents([.height(Constants.Layout.sheetHeight)])
-                // MARK: - Fixed: Removed .presentationDragIndicator(.hidden)
                 .presentationCornerRadius(Constants.Layout.sheetCornerRadius)
             }
             .sheet(isPresented: $viewModel.state.isEndTimePickerPresented) {
                 TimePickerSheetView(
-                    selectedDate: $viewModel.state.scheduleConfiguration.endTime, // Pass binding directly
+                    selectedDate: $viewModel.state.scheduleConfiguration.endTime,
                     title: Constants.TimePicker.Strings.endTimeTitle,
-                    subtitle: Constants.TimePicker.Strings.endTimeSubtitle,
-                    pickerType: .end
+                    subtitle: Constants.TimePicker.Strings.endTimeSubtitle
                 )
                 .presentationDetents([.height(Constants.Layout.sheetHeight)])
-                // MARK: - Fixed: Removed .presentationDragIndicator(.hidden)
                 .presentationCornerRadius(Constants.Layout.sheetCornerRadius)
             }
             .sheet(isPresented: $viewModel.state.isAppBlockerSheetPresented) {
-                #warning("Change ContentView with actual view")
+#warning("Change ContentView with actual view")
                 ContentView()
                     .presentationDetents([.medium, .large])
-                    // MARK: - Fixed: Removed .presentationDragIndicator(.visible) (default is visible)
                     .presentationCornerRadius(Constants.Layout.sheetCornerRadius)
             }
-            
         }
-        
-        // MARK: - Fixed: Removed .preferredColorScheme(.dark)
-        // If the app is always dark, set this at the App level in FocusTimeApp.swift
+        .preferredColorScheme(.dark)
     }
 }
-
 
 
 // MARK: - Preview

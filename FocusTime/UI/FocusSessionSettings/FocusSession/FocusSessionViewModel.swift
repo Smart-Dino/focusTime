@@ -5,8 +5,7 @@
 //  Created by Keto Nioradze on 17.06.25.
 //
 
-import Foundation
-import SwiftUI // Needed for Color.init(hex:) in Constants
+import SwiftUI
 
 @Observable
 @MainActor
@@ -14,20 +13,17 @@ final class FocusSessionViewModel {
     
     // MARK: - State
     struct State {
-        // MARK: - Refactored: Consolidate session configuration into one struct
-        // Renamed from sessionConfiguration to scheduleConfiguration
         var scheduleConfiguration: ScheduleConfiguration = ScheduleConfiguration(
             listName: FocusSessionView.Constants.DefaultValues.listName,
             scheduleForLater: false,
             scheduledDays: [],
             startTime: FocusSessionView.Constants.DefaultValues.startTime,
             endTime: FocusSessionView.Constants.DefaultValues.endTime,
-            selectedPreset: nil, // Changed type to FocusPreset enum
+            selectedPreset: nil,
             selectedHours: FocusSessionView.Constants.DefaultValues.durationHours,
             selectedMinutes: FocusSessionView.Constants.DefaultValues.durationMinutes
         )
         
-        // Picker presentation states
         var isDurationPickerPresented: Bool = false
         var isStartTimePickerPresented: Bool = false
         var isEndTimePickerPresented: Bool = false
@@ -35,20 +31,17 @@ final class FocusSessionViewModel {
     }
     
     // MARK: - Properties
-    var state: State // Changed to a non-defaulted property
+    var state: State
     
     // MARK: - Static Data
-    // Presets are now directly from the FocusPreset.allCases
     let presets: [FocusPreset] = FocusPreset.allCases
     
     // MARK: - Initializers
-    init(state: State = State()) { // Added initializer for dependency injection
+    init(state: State = State()) {
         self.state = state
     }
     
     // MARK: - Computed Properties
-    // This computed property is used by the View and derives from the ViewModel's state.
-    // Keeping it here is appropriate as it combines state and static data.
     var selectedPresetIconName: String? {
         state.scheduleConfiguration.selectedPreset?.iconName
     }
@@ -57,7 +50,6 @@ final class FocusSessionViewModel {
         !state.scheduleConfiguration.listName.trimmingCharacters(in: .whitespaces).isEmpty
     }
     
-    // MARK: - User Intent Methods (Public API for View)
     func presentDurationPicker() {
         state.isDurationPickerPresented = true
     }
