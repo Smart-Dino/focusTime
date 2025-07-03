@@ -110,4 +110,51 @@ extension PersistenceTests {
         )
     }
     
+    @Test("Paging via fetch(page:amountPerPage:)")
+    func fetchPaging() async throws {
+        let (scheduleStore, blockItemStore) = makeStores()
+        let totalCount = 25
+        let pageSize = 10
+
+        // Insert schedules.
+        let schedulesToInsert = (0..<totalCount).map { i in
+            makeProtectedTestSchedule(name: "Schedule_\(i)")
+        }
+        try await scheduleStore.insertBatch(schedulesToInsert)
+
+        // Insert block items.
+        let blockItemsToInsert = (0..<totalCount).map { i in
+            makeProtectedTestBlockItem(name: "BlockItem_\(i)")
+        }
+        try await blockItemStore.insertBatch(blockItemsToInsert)
+
+        // Test paging for schedules.
+        let firstPage = try await scheduleStore.fetch(page: 0, amountPerPage: pageSize)
+        let secondPage = try await scheduleStore.fetch(page: 1, amountPerPage: pageSize)
+        let thirdPage = try await scheduleStore.fetch(page: 2, amountPerPage: pageSize)
+
+        #expect(firstPage.count == 10)
+        #expect(secondPage.count == 10)
+        #expect(thirdPage.count == 5)
+        withKnownIssue("Relational databases do not hold the sequence of the items in which they were added.") {
+            #expect(firstPage[0].name == "Schedule_0")
+            #expect(secondPage[0].name == "Schedule_10")
+            #expect(thirdPage[0].name == "Schedule_20")
+        }
+
+        // Test paging for block items.
+        let firstBlockPage = try await blockItemStore.fetch(page: 0, amountPerPage: pageSize)
+        let secondBlockPage = try await blockItemStore.fetch(page: 1, amountPerPage: pageSize)
+        let thirdBlockPage = try await blockItemStore.fetch(page: 2, amountPerPage: pageSize)
+
+        #expect(firstBlockPage.count == 10)
+        #expect(secondBlockPage.count == 10)
+        #expect(thirdBlockPage.count == 5)
+        withKnownIssue("Relational databases do not hold the sequence of the items in which they were added.") {
+            #expect(firstBlockPage[0].name == "BlockItem_0")
+            #expect(secondBlockPage[0].name == "BlockItem_10")
+            #expect(thirdBlockPage[0].name == "BlockItem_20")
+        }
+    }
+    
 }
