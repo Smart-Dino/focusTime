@@ -31,6 +31,8 @@ extension FocusSessionView {
             public static let mainVStackSpacing: CGFloat = 40
             public static let sheetHeight: CGFloat = 400
             public static let sheetCornerRadius: CGFloat = 25
+            public static let floatingButtonBottomPadding: CGFloat = 20
+            public static let floatingButtonHorizontalPadding: CGFloat = 20
         }
         
         // MARK: - General Colors
@@ -60,16 +62,7 @@ extension FocusSessionView {
         
         // MARK: - Static Data
         public enum Data { // MARK: - Made public
-            public static let presets: [FocusPreset] = [
-                .init(name: "Morning\nRoutine", iconName: "☀️"),
-                .init(name: "Social\nDetox", iconName: "📴"),
-                .init(name: "Work\nSprint", iconName: "⏱️"),
-                .init(name: "Zero\nDistraction", iconName: "🚫"),
-                .init(name: "Study", iconName: "📚"),
-                .init(name: "Creative", iconName: "🎨"),
-                .init(name: "Mindfulness", iconName: "🧠"),
-                .init(name: "Reading", iconName: "📖")
-            ]
+            @MainActor public static let presets: [FocusPreset] = FocusPreset.allCases
         }
         
         // MARK: - Time Related
@@ -88,8 +81,8 @@ extension FocusSessionView {
         }
         
         // MARK: - Constants for SessionConfigurationView
-        public enum Configuration { // MARK: - Made public
-            public enum Strings { // MARK: - Made public
+        public enum Configuration {
+            public enum Strings {
                 public static let listName = "List name"
                 public static let listNamePlaceholder = "Name"
                 public static let scheduleForLater = "Schedule for later"
@@ -100,10 +93,10 @@ extension FocusSessionView {
                 public static let appListPickerDestination = "App List Picker Screen"
                 public static let scheduledDays = "Scheduled Days"
                 public static let startTime = "Start time"
-                public static let endTime = "End time"
+                public static let letEndTime = "End time"
             }
             
-            public enum Layout { // MARK: - Made public
+            public enum Layout {
                 public static let mainSpacing: CGFloat = 16
                 public static let scheduleSectionSpacing: CGFloat = 8
                 public static let scheduleInfoHorizontalPadding: CGFloat = 4
@@ -111,7 +104,7 @@ extension FocusSessionView {
                 public static let selectedIconSize: CGFloat = 36
             }
             
-            public enum Colors { // MARK: - Made public
+            public enum Colors {
                 public static let toggleTint = Color.green
             }
         }
@@ -138,7 +131,6 @@ extension FocusSessionView {
                 public static let mainSpacing: CGFloat = 8
                 public static let size: CGFloat = 60
                 public static let cornerRadius: CGFloat = 20
-                public static let selectedBorderWidth: CGFloat = 2
             }
             
             public enum Colors { // MARK: - Made public

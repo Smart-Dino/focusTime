@@ -8,43 +8,83 @@
 import Foundation
 
 // MARK: - Placeholder models
-/// Represents a single preset in the grid
-struct FocusPreset: Identifiable, Hashable {
-    let id = UUID()
-    let name: String
-    let iconName: String
-}
 
-enum Weekday: String, CaseIterable, Identifiable, Codable, Comparable {
-    case sunday, monday, tuesday, wednesday, thursday, friday, saturday
-
-    var id: String { self.rawValue }
-
-    var shortName: String {
+public enum Weekday: String, CaseIterable, Identifiable, Comparable {
+    case monday, tuesday, wednesday, thursday, friday, saturday, sunday
+    
+    public var id: String { rawValue }
+    
+    public var shortName: String {
         switch self {
-        case .sunday: return "Sun"
         case .monday: return "Mon"
         case .tuesday: return "Tue"
         case .wednesday: return "Wed"
         case .thursday: return "Thu"
         case .friday: return "Fri"
         case .saturday: return "Sat"
+        case .sunday: return "Sun"
         }
     }
     
-    private var sortOrder: Int {
+    public static func < (lhs: Weekday, rhs: Weekday) -> Bool {
+        let order: [Weekday] = [.monday, .tuesday, .wednesday, .thursday, .friday, .saturday, .sunday]
+        guard let lhsIndex = order.firstIndex(of: lhs),
+              let rhsIndex = order.firstIndex(of: rhs) else {
+            return false
+        }
+        return lhsIndex < rhsIndex
+    }
+}
+
+
+// MARK: - FocusPreset Enum (Changed from struct to enum)
+public enum FocusPreset: String, CaseIterable, Identifiable {
+    case morningRoutine
+    case socialDetox
+    case workSprint
+    case zeroDistraction
+    case study
+    case creative
+    case mindfulness
+    case reading
+    
+    public var id: String { rawValue }
+    
+    public var name: String {
         switch self {
-        case .monday: return 1
-        case .tuesday: return 2
-        case .wednesday: return 3
-        case .thursday: return 4
-        case .friday: return 5
-        case .saturday: return 6
-        case .sunday: return 7
+        case .morningRoutine: return "Morning\nRoutine"
+        case .socialDetox: return "Social\nDetox"
+        case .workSprint: return "Work\nSprint"
+        case .zeroDistraction: return "Zero\nDistraction"
+        case .study: return "Study"
+        case .creative: return "Creative"
+        case .mindfulness: return "Mindfulness"
+        case .reading: return "Reading"
         }
     }
-
-    static func < (lhs: Weekday, rhs: Weekday) -> Bool {
-        lhs.sortOrder < rhs.sortOrder
+    
+    public var iconName: String {
+        switch self {
+        case .morningRoutine: return "☀️"
+        case .socialDetox: return "📴"
+        case .workSprint: return "⏱️"
+        case .zeroDistraction: return "🚫"
+        case .study: return "📚"
+        case .creative: return "🎨"
+        case .mindfulness: return "🧠"
+        case .reading: return "📖"
+        }
     }
+}
+
+// MARK: - ScheduleConfiguration Struct (Renamed from SessionConfiguration)
+public struct ScheduleConfiguration {
+    var listName: String
+    var scheduleForLater: Bool
+    var scheduledDays: Set<Weekday>
+    var startTime: Date
+    var endTime: Date
+    var selectedPreset: FocusPreset? 
+    var selectedHours: Int
+    var selectedMinutes: Int
 }
