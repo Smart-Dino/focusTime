@@ -43,6 +43,20 @@ actor ScheduleStore: PersistenceStore {
             .map { ProtectedSchedule(from: $0) }
     }
     
+    func fetch(page: Int = 0, amountPerPage: Int = 50) throws -> [ProtectedSchedule] {
+        let alreadyFetched = page * amountPerPage
+        
+        var descriptor = FetchDescriptor<Schedule>()
+        descriptor.fetchLimit = amountPerPage
+        descriptor.fetchOffset = alreadyFetched
+        
+        let fetched = try modelContext.fetch(descriptor)
+        
+        return fetched.map {
+            ProtectedSchedule(from: $0)
+        }
+    }
+    
     func fetch(id: PersistentIdentifier) throws -> ProtectedSchedule? {
         let model = try fetchForID(id)
         

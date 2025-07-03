@@ -12,11 +12,14 @@ import SwiftData
 @Observable
 final class ScheduledFocusListViewModel {
     struct State {
+        var page = 0
         var items = [ProtectedSchedule]()
     }
     
     private(set) var state: State
     private let modelContainer: ModelContainer
+    
+    var fetchTask: Task<Void, Never>?
     
     init(
         state: State = State(),
@@ -26,9 +29,9 @@ final class ScheduledFocusListViewModel {
         self.modelContainer = modelContainer
     }
     
-    func insertTestItemsIntoDatabase() async {
+    func insertTestItemsIntoDatabase() async throws {
         Task.detached(priority: .userInitiated) {
-            let blockItemStore = ScheduleStore(modelContainer: self.modelContainer)
+            let scheduleStore = ScheduleStore(modelContainer: self.modelContainer)
             let itemsToInsert = Array(
                 repeating: ProtectedSchedule(
                     emoji: "🏠",
@@ -39,11 +42,28 @@ final class ScheduledFocusListViewModel {
                 ),
                 count: 100000
             )
-            try? await blockItemStore.insertBatch(itemsToInsert)
-            let insertedItems = try? await blockItemStore.fetch()
+            try await scheduleStore.insertBatch(itemsToInsert)
+            await self.fetchNextPage()
+        }
+    }
+    
+    private func fetchNextPage() {
+        guard fetchTask == nil else { return }
+        self.fetchTask = Task.detached(priority: .userInitiated) {
+            let scheduleStore = ScheduleStore(modelContainer: self.modelContainer)
+            let insertedItems = try? await scheduleStore.fetch(page: self.state.page)
             await MainActor.run {
-                self.state.items = insertedItems ?? []
+                self.state.items.append(contentsOf: insertedItems ?? [])
+                self.state.page += 1
+                self.fetchTask = nil
+                print("Items on screen: \(self.state.items.count)")
             }
+        }
+    }
+    
+    func hasReachEndOfList(schedule: ProtectedSchedule) {
+        if schedule.id == state.items.last?.id {
+            fetchNextPage()
         }
     }
 }

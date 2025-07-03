@@ -18,6 +18,7 @@ protocol PersistenceStore: ModelActor where SendableModel.Model == Model {
     func delete(id: PersistentIdentifier) throws
     
     func fetch() throws -> [SendableModel]
+    func fetch(page: Int, amountPerPage: Int) throws -> [SendableModel]
     func fetch(id: PersistentIdentifier) throws -> SendableModel?
     func fetch(descriptor: FetchDescriptor<Model>) throws -> [SendableModel]
     

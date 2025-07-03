@@ -42,7 +42,7 @@ struct ScheduledFocusListView: View {
             ) {
                 #warning("Action is empty")
                 Task {
-                    await viewModel.insertTestItemsIntoDatabase()
+                    try await viewModel.insertTestItemsIntoDatabase()
                 }
             }
             .buttonStyle(.ftPrimary)
@@ -64,6 +64,7 @@ struct ScheduledFocusListView: View {
                         description: schedule.daysDescription
                     )
                     .padding(1)
+                    .onAppear { viewModel.hasReachEndOfList(schedule: schedule) }
                 }
             }
         }
