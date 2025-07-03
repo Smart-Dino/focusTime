@@ -15,14 +15,14 @@ final class FocusSessionViewModel {
     // MARK: - State
     struct State {
         // MARK: - Refactored: Consolidate session configuration into one struct
-        var sessionConfiguration: SessionConfiguration = SessionConfiguration(
+        // Renamed from sessionConfiguration to scheduleConfiguration
+        var scheduleConfiguration: ScheduleConfiguration = ScheduleConfiguration(
             listName: FocusSessionView.Constants.DefaultValues.listName,
             scheduleForLater: false,
             scheduledDays: [],
             startTime: FocusSessionView.Constants.DefaultValues.startTime,
             endTime: FocusSessionView.Constants.DefaultValues.endTime,
-            selectedPresetID: nil,
-            // MARK: - Added: Initialize new properties for SessionConfiguration
+            selectedPreset: nil, // Changed type to FocusPreset enum
             selectedHours: FocusSessionView.Constants.DefaultValues.durationHours,
             selectedMinutes: FocusSessionView.Constants.DefaultValues.durationMinutes
         )
@@ -34,19 +34,27 @@ final class FocusSessionViewModel {
         var isAppBlockerSheetPresented: Bool = false
     }
     
-    var state = State()
+    // MARK: - Properties
+    var state: State // Changed to a non-defaulted property
     
     // MARK: - Static Data
-    let presets: [FocusPreset] = FocusSessionView.Constants.Data.presets
+    // Presets are now directly from the FocusPreset.allCases
+    let presets: [FocusPreset] = FocusPreset.allCases
+    
+    // MARK: - Initializers
+    init(state: State = State()) { // Added initializer for dependency injection
+        self.state = state
+    }
     
     // MARK: - Computed Properties
+    // This computed property is used by the View and derives from the ViewModel's state.
+    // Keeping it here is appropriate as it combines state and static data.
     var selectedPresetIconName: String? {
-        guard let selectedID = state.sessionConfiguration.selectedPresetID else { return nil }
-        return presets.first { $0.id == selectedID }?.iconName
+        state.scheduleConfiguration.selectedPreset?.iconName
     }
     
     var isStartButtonEnabled: Bool {
-        !state.sessionConfiguration.listName.trimmingCharacters(in: .whitespaces).isEmpty
+        !state.scheduleConfiguration.listName.trimmingCharacters(in: .whitespaces).isEmpty
     }
     
     // MARK: - User Intent Methods (Public API for View)
@@ -67,27 +75,26 @@ final class FocusSessionViewModel {
     }
     
     func selectPreset(_ preset: FocusPreset) {
-        if state.sessionConfiguration.selectedPresetID == preset.id {
-            state.sessionConfiguration.selectedPresetID = nil
+        if state.scheduleConfiguration.selectedPreset == preset {
+            state.scheduleConfiguration.selectedPreset = nil
         } else {
-            state.sessionConfiguration.selectedPresetID = preset.id
+            state.scheduleConfiguration.selectedPreset = preset
         }
     }
     
     func startTapped() {
         print("Start button tapped!")
-        print("Current List Name: \(state.sessionConfiguration.listName)")
-        print("Schedule for Later is: \(state.sessionConfiguration.scheduleForLater)")
-        if let selectedPresetID = state.sessionConfiguration.selectedPresetID, let preset = presets.first(where: { $0.id == selectedPresetID }) {
-            print("Selected Preset: \(preset.name)")
+        print("Current List Name: \(state.scheduleConfiguration.listName)")
+        print("Schedule for Later is: \(state.scheduleConfiguration.scheduleForLater)")
+        if let selectedPreset = state.scheduleConfiguration.selectedPreset {
+            print("Selected Preset: \(selectedPreset.name)")
         } else {
             print("No preset selected.")
         }
-        print("Scheduled Days: \(state.sessionConfiguration.scheduledDays)")
-        print("Start Time: \(state.sessionConfiguration.startTime)")
-        print("End Time: \(state.sessionConfiguration.endTime)")
-        print("Selected Hours: \(state.sessionConfiguration.selectedHours)")
-        print("Selected Minutes: \(state.sessionConfiguration.selectedMinutes)")
+        print("Scheduled Days: \(state.scheduleConfiguration.scheduledDays)")
+        print("Start Time: \(state.scheduleConfiguration.startTime)")
+        print("End Time: \(state.scheduleConfiguration.endTime)")
+        print("Selected Hours: \(state.scheduleConfiguration.selectedHours)")
+        print("Selected Minutes: \(state.scheduleConfiguration.selectedMinutes)")
     }
 }
-

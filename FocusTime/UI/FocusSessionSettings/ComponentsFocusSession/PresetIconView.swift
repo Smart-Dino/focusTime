@@ -8,41 +8,27 @@
 import SwiftUI
 
 struct PresetIconView: View {
-    let preset: FocusPreset
+    let preset: FocusPreset 
     let isSelected: Bool
     
     var body: some View {
         VStack(spacing: FocusSessionView.Constants.PresetIcon.Layout.mainSpacing) {
-            ZStack {
-                Rectangle()
-                    .fill(FocusSessionView.Constants.PresetIcon.Colors.background)
-                    .frame(width: FocusSessionView.Constants.PresetIcon.Layout.size, height: FocusSessionView.Constants.PresetIcon.Layout.size)
-                    .cornerRadius(FocusSessionView.Constants.PresetIcon.Layout.cornerRadius)
-                
-                if isSelected {
-                    Rectangle()
-                        .fill(FocusSessionView.Constants.PresetIcon.Colors.selectedBackground)
-                        .frame(width: FocusSessionView.Constants.PresetIcon.Layout.size, height: FocusSessionView.Constants.PresetIcon.Layout.size)
-                        .cornerRadius(FocusSessionView.Constants.PresetIcon.Layout.cornerRadius)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: FocusSessionView.Constants.PresetIcon.Layout.cornerRadius)
-                                .stroke(FocusSessionView.Constants.PresetIcon.Colors.selectedBorder, lineWidth: FocusSessionView.Constants.PresetIcon.Layout.selectedBorderWidth)
-                        )
-                }
-                
-                Text(preset.iconName)
-                    .font(.title)
-            }
+            Text(preset.iconName) 
+                .font(.largeTitle)
+                .frame(width: FocusSessionView.Constants.PresetIcon.Layout.size, height: FocusSessionView.Constants.PresetIcon.Layout.size)
+                .background(isSelected ? FocusSessionView.Constants.PresetIcon.Colors.selectedBackground : FocusSessionView.Constants.PresetIcon.Colors.background)
+                .cornerRadius(FocusSessionView.Constants.PresetIcon.Layout.cornerRadius)
             
             Text(preset.name)
                 .font(.caption)
-                .foregroundColor(.gray)
                 .multilineTextAlignment(.center)
+                .foregroundStyle(.white)
         }
     }
 }
 
 
+
 #Preview {
-    PresetIconView(preset: FocusPreset(name: "Test", iconName: "Study"), isSelected: true)
+    PresetIconView(preset: .morningRoutine, isSelected: true)
 }

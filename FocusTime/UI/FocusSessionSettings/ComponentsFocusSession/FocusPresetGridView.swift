@@ -9,8 +9,8 @@ import SwiftUI
 
 struct FocusPresetGridView: View {
     let presets: [FocusPreset]
-    // MARK: - Refactored: Changed to @Binding for direct updates
-    @Binding var selectedPresetID: UUID?
+    // MARK: - Refactored: Changed to @Binding for direct updates, type changed to FocusPreset?
+    @Binding var selectedPreset: FocusPreset?
     
     var body: some View {
         VStack(alignment: .leading, spacing: FocusSessionView.Constants.PresetGrid.Layout.mainSpacing) {
@@ -19,7 +19,7 @@ struct FocusPresetGridView: View {
                     .font(.headline)
                 Text(FocusSessionView.Constants.PresetGrid.Strings.subtitle)
                     .font(.subheadline)
-                    .foregroundColor(.gray)
+                    .foregroundStyle(.gray) // Use foregroundStyle
             }
             .padding(.horizontal)
             
@@ -27,20 +27,20 @@ struct FocusPresetGridView: View {
                 ForEach(presets) { preset in
                     Button(action: {
                         // MARK: - Refactored: Directly modify the binding
-                        if selectedPresetID == preset.id {
-                            selectedPresetID = nil
+                        if selectedPreset == preset {
+                            selectedPreset = nil
                         } else {
-                            selectedPresetID = preset.id
+                            selectedPreset = preset
                         }
                     }) {
                         PresetIconView(
                             preset: preset,
-                            isSelected: selectedPresetID == preset.id
+                            isSelected: selectedPreset == preset
                         )
                     }
                 }
             }
-            .padding(.horizontal)
+           // .padding(.horizontal)
         }
     }
 }
