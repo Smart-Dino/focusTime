@@ -46,7 +46,7 @@ actor ScheduleStore: PersistenceStore {
     func fetch(page: Int = 0, amountPerPage: Int = 50) throws -> [ProtectedSchedule] {
         let alreadyFetched = page * amountPerPage
         
-        var descriptor = FetchDescriptor<Schedule>(sortBy: [.init(\.persistentModelID)])
+        var descriptor = FetchDescriptor<Schedule>()
         descriptor.fetchLimit = amountPerPage
         descriptor.fetchOffset = alreadyFetched
         
