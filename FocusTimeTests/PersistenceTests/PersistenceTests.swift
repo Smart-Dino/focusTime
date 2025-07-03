@@ -13,6 +13,7 @@ import SwiftData
 struct PersistenceTests {
     // MARK: - Properties
     let modelContainer: ModelContainer
+    let coordinator: RelationshipCoordinator
     
     // MARK: - Initializer
     init() {
@@ -20,6 +21,7 @@ struct PersistenceTests {
         let config = ModelConfiguration(isStoredInMemoryOnly: true, groupContainer: .identifier(AppValues.appGroupIdentifier))
         let container = try! ModelContainer(for: schema, configurations: config)
         self.modelContainer = container
+        self.coordinator = RelationshipCoordinator(modelContainer: container)
     }
 
     @Test("Test adding to the database.")
@@ -87,7 +89,7 @@ struct PersistenceTests {
         try await blockItemStore.delete(id: insertResults.blockItemModelID)
         
         // Evaluate.
-        await #expect(throws: DataSourceError.notFound, performing: {
+        await #expect(throws: PersistenceStoreError.notFound, performing: {
             let _ = try await scheduleStore.fetch(id: insertResults.scheduleModelID)
             let _ = try await blockItemStore.fetch(id: insertResults.blockItemModelID)
         })

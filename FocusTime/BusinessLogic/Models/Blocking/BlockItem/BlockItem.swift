@@ -49,11 +49,4 @@ final class BlockItem {
                   emoji: item.emoji,
                   blockedContent: item.blockedContent)
     }
-    
-    func appendSchedule(_ item: Schedule) {
-        if schedules == nil {
-            schedules = []
-        }
-        schedules!.append(item)
-    }
 }

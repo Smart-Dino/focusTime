@@ -10,7 +10,7 @@ import Foundation
 import FamilyControls
 
 @ModelActor
-actor BlockItemStore: DataSource { 
+actor BlockItemStore: PersistenceStore { 
     
     @discardableResult
     func insert(_ item: ProtectedBlockItem) throws -> PersistentIdentifier {
@@ -75,7 +75,7 @@ extension BlockItemStore {
         )
         
         guard let model = try? modelContext.fetch(descriptor).first else {
-            throw DataSourceError.notFound
+            throw PersistenceStoreError.notFound
         }
         
         return model

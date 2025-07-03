@@ -22,12 +22,12 @@ extension PersistenceTests {
         try await blockItemStore.delete(id: insertResults.blockItemModelID)
         
         // Evaluate.
-        // We expect the DataSourceError.notFound error to be thrown
+        // We expect the PersistenceStoreError.notFound error to be thrown
         // while performing the fetch of non-existent items.
-        await #expect(throws: DataSourceError.notFound, performing: {
+        await #expect(throws: PersistenceStoreError.notFound, performing: {
             try await scheduleStore.fetch(id: insertResults.scheduleModelID)
         })
-        await #expect(throws: DataSourceError.notFound, performing: {
+        await #expect(throws: PersistenceStoreError.notFound, performing: {
             try await blockItemStore.fetch(id: insertResults.blockItemModelID)
         })
     }

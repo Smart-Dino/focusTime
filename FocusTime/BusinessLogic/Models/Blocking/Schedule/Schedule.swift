@@ -59,11 +59,4 @@ final class Schedule {
                   startTime: item.startTime,
                   endTime: item.endTime)
     }
-    
-    func appendBlockItem(_ item: BlockItem) {
-        if blockItems == nil {
-            blockItems = []
-        }
-        blockItems!.append(item)
-    }
 }

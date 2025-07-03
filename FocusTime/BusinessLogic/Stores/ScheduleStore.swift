@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 
 @ModelActor
-actor ScheduleStore: DataSource {
+actor ScheduleStore: PersistenceStore {
     
     @discardableResult
     func insert(_ item: ProtectedSchedule) throws -> PersistentIdentifier {
@@ -74,7 +74,7 @@ extension ScheduleStore {
         )
         
         guard let model = try? modelContext.fetch(descriptor).first else {
-            throw DataSourceError.notFound
+            throw PersistenceStoreError.notFound
         }
         
         return model
