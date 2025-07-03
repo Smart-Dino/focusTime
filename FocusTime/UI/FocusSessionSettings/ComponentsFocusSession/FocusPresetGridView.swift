@@ -9,7 +9,6 @@ import SwiftUI
 
 struct FocusPresetGridView: View {
     let presets: [FocusPreset]
-    // MARK: - Refactored: Changed to @Binding for direct updates, type changed to FocusPreset?
     @Binding var selectedPreset: FocusPreset?
     
     var body: some View {
@@ -19,14 +18,13 @@ struct FocusPresetGridView: View {
                     .font(.headline)
                 Text(FocusSessionView.Constants.PresetGrid.Strings.subtitle)
                     .font(.subheadline)
-                    .foregroundStyle(.gray) // Use foregroundStyle
+                    .foregroundStyle(.gray)
             }
             .padding(.horizontal)
             
             LazyVGrid(columns: FocusSessionView.Constants.PresetGrid.Layout.gridColumns, spacing: FocusSessionView.Constants.PresetGrid.Layout.gridVSpacing) {
                 ForEach(presets) { preset in
                     Button(action: {
-                        // MARK: - Refactored: Directly modify the binding
                         if selectedPreset == preset {
                             selectedPreset = nil
                         } else {
@@ -40,7 +38,6 @@ struct FocusPresetGridView: View {
                     }
                 }
             }
-           // .padding(.horizontal)
         }
     }
 }

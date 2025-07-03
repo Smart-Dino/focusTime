@@ -9,14 +9,13 @@ import SwiftUI
 
 struct DaysPickerPopup: View {
     // MARK: - Properties
-    @Binding var scheduledDays: Set<Weekday> // Changed from let and delegate
+    @Binding var scheduledDays: Set<Weekday>
 
     // MARK: - Body
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             ForEach(Weekday.allCases.sorted()) { day in
                 Button(action: {
-                    // Directly modify the bound scheduledDays
                     if scheduledDays.contains(day) {
                         scheduledDays.remove(day)
                     } else {

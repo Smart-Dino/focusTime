@@ -6,15 +6,11 @@
 //
 
 import SwiftUI
-// import FocusTimeUI // No longer explicitly needed as constants are accessed via FocusSessionView
 
 struct DurationPickerSheetView: View {
     // MARK: - Properties
-    // Use @Binding for hours and minutes to allow parent view to update them directly
     @Binding var hours: Int
     @Binding var minutes: Int
-
-    // No custom init needed, Swift provides memberwise init for @Binding properties.
 
     // MARK: - Body
     var body: some View {
@@ -23,31 +19,24 @@ struct DurationPickerSheetView: View {
                 .ignoresSafeArea()
 
             VStack(spacing: FocusSessionView.Constants.DurationPicker.Layout.mainSpacing) {
-                // Comment addressed: Removed custom grabber as system provides it.
-                // FocusSessionView sets .presentationDragIndicator(.hidden) so no grabber will be shown.
-
                 Text(FocusSessionView.Constants.DurationPicker.Strings.title)
-                    .font(.title2.bold()) // Comment addressed: Increased font size
-                    .foregroundStyle(Color.blue)
+                    .font(.title2.bold())
+                    .foregroundStyle(.blue)
 
                 Text(FocusSessionView.Constants.DurationPicker.Strings.subtitle)
                     .font(.subheadline)
-                    .foregroundColor(.gray)
+                    .foregroundStyle(.gray) 
                     .padding(.bottom)
 
-                // Comment addressed: Using .background {} for clarity
                 durationPicker
                     .padding(.bottom)
                     .frame(width: FocusSessionView.Constants.DurationPicker.Layout.containerWidth, height: FocusSessionView.Constants.DurationPicker.Layout.containerHeight)
-                    .background { // Applied background using a closure
+                    .background {
                         FocusSessionView.Constants.DurationPicker.Colors.pickerBackground
                             .cornerRadius(FocusSessionView.Constants.DurationPicker.Layout.containerCornerRadius)
                     }
             }
-            // Comment addressed: Removed .foregroundColor(.white) as preferredColorScheme(.dark) should handle this.
-            // If specific text elements need white, apply .foregroundStyle(.white) to them individually.
         }
-        // No .onDisappear needed for saving values, as @Binding updates the source directly.
     }
 
     // MARK: - Private Views
