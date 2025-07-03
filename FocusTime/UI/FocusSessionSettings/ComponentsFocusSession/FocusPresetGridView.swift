@@ -9,10 +9,9 @@ import SwiftUI
 
 struct FocusPresetGridView: View {
     let presets: [FocusPreset]
-    let selectedPresetID: UUID?
+    // MARK: - Refactored: Changed to @Binding for direct updates
+    @Binding var selectedPresetID: UUID?
     
-    weak var delegate: FocusPresetGridViewDelegate?
-            
     var body: some View {
         VStack(alignment: .leading, spacing: FocusSessionView.Constants.PresetGrid.Layout.mainSpacing) {
             VStack(alignment: .leading) {
@@ -26,7 +25,14 @@ struct FocusPresetGridView: View {
             
             LazyVGrid(columns: FocusSessionView.Constants.PresetGrid.Layout.gridColumns, spacing: FocusSessionView.Constants.PresetGrid.Layout.gridVSpacing) {
                 ForEach(presets) { preset in
-                    Button(action: { delegate?.focusPresetGridDidSelectPreset(preset) }) {
+                    Button(action: {
+                        // MARK: - Refactored: Directly modify the binding
+                        if selectedPresetID == preset.id {
+                            selectedPresetID = nil
+                        } else {
+                            selectedPresetID = preset.id
+                        }
+                    }) {
                         PresetIconView(
                             preset: preset,
                             isSelected: selectedPresetID == preset.id

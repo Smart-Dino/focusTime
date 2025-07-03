@@ -48,6 +48,3 @@ enum Weekday: String, CaseIterable, Identifiable, Codable, Comparable {
         lhs.sortOrder < rhs.sortOrder
     }
 }
-
-
-

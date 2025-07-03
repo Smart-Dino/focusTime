@@ -19,22 +19,19 @@ struct FocusSessionView: View {
                 VStack {
                     ScrollView {
                         VStack(spacing: Constants.Layout.mainVStackSpacing) {
+                            // MARK: - Refactored: Pass a single binding to SessionConfigurationView
                             SessionConfigurationView(
-                                listName: viewModel.state.listName,
-                                selectedIconName: viewModel.selectedPresetIconName,
-                                scheduleForLater: viewModel.state.scheduleForLater,
-                                formattedDuration: viewModel.formattedDuration,
-                                scheduledDays: $viewModel.state.scheduledDays, // Pass binding here
-                                formattedScheduledDays: viewModel.formattedScheduledDays,
-                                formattedStartTime: viewModel.formattedStartTime,
-                                formattedEndTime: viewModel.formattedEndTime,
-                                delegate: viewModel
+                                configuration: $viewModel.state.sessionConfiguration, // New binding
+                                onDurationTap: viewModel.presentDurationPicker,
+                                onStartTimeTap: viewModel.presentStartTimePicker,
+                                onEndTimeTap: viewModel.presentEndTimePicker,
+                                onAppsBlockedTap: viewModel.presentAppBlockerSheet
                             )
                             
+                            // MARK: - Refactored: Pass binding to selectedPresetID
                             FocusPresetGridView(
                                 presets: viewModel.presets,
-                                selectedPresetID: viewModel.state.selectedPresetID,
-                                delegate: viewModel
+                                selectedPresetID: $viewModel.state.sessionConfiguration.selectedPresetID // Pass binding here
                             )
                         }
                         .padding(.vertical)
@@ -61,8 +58,8 @@ struct FocusSessionView: View {
             .toolbarBackground(.hidden)
             .sheet(isPresented: $viewModel.state.isDurationPickerPresented) {
                 DurationPickerSheetView(
-                    hours: $viewModel.state.selectedHours, // Pass binding directly
-                    minutes: $viewModel.state.selectedMinutes // Pass binding directly
+                    hours: $viewModel.state.sessionConfiguration.selectedHours, // Pass binding directly
+                    minutes: $viewModel.state.sessionConfiguration.selectedMinutes // Pass binding directly
                 )
                 .presentationDetents([.height(Constants.Layout.sheetHeight)])
                 .presentationDragIndicator(.hidden)
@@ -70,7 +67,7 @@ struct FocusSessionView: View {
             }
             .sheet(isPresented: $viewModel.state.isStartTimePickerPresented) {
                 TimePickerSheetView(
-                    selectedDate: $viewModel.state.startTime, // Pass binding directly
+                    selectedDate: $viewModel.state.sessionConfiguration.startTime, // Pass binding directly
                     title: Constants.TimePicker.Strings.startTimeTitle,
                     subtitle: Constants.TimePicker.Strings.startTimeSubtitle,
                     pickerType: .start
@@ -81,7 +78,7 @@ struct FocusSessionView: View {
             }
             .sheet(isPresented: $viewModel.state.isEndTimePickerPresented) {
                 TimePickerSheetView(
-                    selectedDate: $viewModel.state.endTime, // Pass binding directly
+                    selectedDate: $viewModel.state.sessionConfiguration.endTime, // Pass binding directly
                     title: Constants.TimePicker.Strings.endTimeTitle,
                     subtitle: Constants.TimePicker.Strings.endTimeSubtitle,
                     pickerType: .end
@@ -102,6 +99,7 @@ struct FocusSessionView: View {
         .preferredColorScheme(.dark)
     }
 }
+
 
 
 

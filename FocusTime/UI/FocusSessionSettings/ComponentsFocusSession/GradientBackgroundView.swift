@@ -59,6 +59,7 @@ extension View {
     }
 }
 
+
 #Preview {
     GradientBackgroundView()
 }
