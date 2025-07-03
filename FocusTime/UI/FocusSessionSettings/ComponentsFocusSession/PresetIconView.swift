@@ -11,32 +11,27 @@ struct PresetIconView: View {
     let preset: FocusPreset
     let isSelected: Bool
     
-    private typealias Layout = FocusSessionView.Constants.PresetIcon.Layout
-    private typealias Colors = FocusSessionView.Constants.PresetIcon.Colors
-    
     var body: some View {
-        VStack(spacing: Layout.mainSpacing) {
+        VStack(spacing: FocusSessionView.Constants.PresetIcon.Layout.mainSpacing) {
             ZStack {
                 Rectangle()
-                    .fill(Colors.background)
-                    .frame(width: Layout.size, height: Layout.size)
-                    .cornerRadius(Layout.cornerRadius)
+                    .fill(FocusSessionView.Constants.PresetIcon.Colors.background)
+                    .frame(width: FocusSessionView.Constants.PresetIcon.Layout.size, height: FocusSessionView.Constants.PresetIcon.Layout.size)
+                    .cornerRadius(FocusSessionView.Constants.PresetIcon.Layout.cornerRadius)
                 
                 if isSelected {
                     Rectangle()
-                        .fill(Colors.selectedBackground)
-                        .frame(width: Layout.size, height: Layout.size)
-                        .cornerRadius(Layout.cornerRadius)
+                        .fill(FocusSessionView.Constants.PresetIcon.Colors.selectedBackground)
+                        .frame(width: FocusSessionView.Constants.PresetIcon.Layout.size, height: FocusSessionView.Constants.PresetIcon.Layout.size)
+                        .cornerRadius(FocusSessionView.Constants.PresetIcon.Layout.cornerRadius)
                         .overlay(
-                            RoundedRectangle(cornerRadius: Layout.cornerRadius)
-                                .stroke(Colors.selectedBorder, lineWidth: Layout.selectedBorderWidth)
+                            RoundedRectangle(cornerRadius: FocusSessionView.Constants.PresetIcon.Layout.cornerRadius)
+                                .stroke(FocusSessionView.Constants.PresetIcon.Colors.selectedBorder, lineWidth: FocusSessionView.Constants.PresetIcon.Layout.selectedBorderWidth)
                         )
                 }
                 
-                Image(preset.iconName)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: Layout.size * Layout.iconScaleFactor, height: Layout.size * Layout.iconScaleFactor)
+                Text(preset.iconName)
+                    .font(.title)
             }
             
             Text(preset.name)

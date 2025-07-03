@@ -38,6 +38,7 @@ extension FocusSessionView {
             static let background = Color(red: 0.07, green: 0.09, blue: 0.11)
             static let navigationBarBackground = Color(red: 0.07, green: 0.09, blue: 0.11)
             static let sheetBackground = Color(red: 0.1, green: 0.1, blue: 0.12)
+            static let chevronColor = Color.blue // New constant for chevron color
         }
         
         // MARK: - Symbols
@@ -60,14 +61,14 @@ extension FocusSessionView {
         // MARK: - Static Data
         enum Data {
             static let presets: [FocusPreset] = [
-                .init(name: "Morning\nRoutine", iconName: "MorningRoutine"),
-                .init(name: "Social\nDetox", iconName: "SocialDetox"),
-                .init(name: "Work\nSprint", iconName: "WorkSprint"),
-                .init(name: "Zero\nDistraction", iconName: "ZeroDistraction"),
-                .init(name: "Study", iconName: "Study"),
-                .init(name: "Creative", iconName: "Creative"),
-                .init(name: "Mindfulness", iconName: "MindFulness"),
-                .init(name: "Reading", iconName: "Reading")
+                .init(name: "Morning\nRoutine", iconName: "☀️"),
+                .init(name: "Social\nDetox", iconName: "📴"),
+                .init(name: "Work\nSprint", iconName: "⏱️"),
+                .init(name: "Zero\nDistraction", iconName: "🚫"),
+                .init(name: "Study", iconName: "📚"),
+                .init(name: "Creative", iconName: "🎨"),
+                .init(name: "Mindfulness", iconName: "🧠"),
+                .init(name: "Reading", iconName: "📖")
             ]
         }
         
@@ -110,17 +111,17 @@ extension FocusSessionView {
                 static let selectedIconSize: CGFloat = 36
                 static let popupYOffset: CGFloat = 4
                 static let popupAnimationDuration: TimeInterval = 0.2
-                static let chevronRotationDegrees: Double = -180
+                static let chevronRotationDegrees: Double = 90
             }
             
             enum Colors {
-                static let toggleTint = Color.blue
+                static let toggleTint = Color.green
                 static let tapCatchingBackground = Color.black.opacity(0.001)
             }
             
             enum ZIndex {
                 static let backgroundDim: Double = 1
-                static let popup: Double = 2
+                static let popup: Double = 0.5
                 static let activeRow: Double = 3
             }
         }
@@ -148,7 +149,6 @@ extension FocusSessionView {
                 static let size: CGFloat = 60
                 static let cornerRadius: CGFloat = 20
                 static let selectedBorderWidth: CGFloat = 2
-                static let iconScaleFactor: CGFloat = 0.6
             }
             
             enum Colors {

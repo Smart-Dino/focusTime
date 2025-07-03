@@ -12,7 +12,7 @@ import Foundation
 struct FocusPreset: Identifiable, Hashable {
     let id = UUID()
     let name: String
-    let iconName: String 
+    let iconName: String
 }
 
 enum Weekday: String, CaseIterable, Identifiable, Codable, Comparable {
@@ -48,5 +48,6 @@ enum Weekday: String, CaseIterable, Identifiable, Codable, Comparable {
         lhs.sortOrder < rhs.sortOrder
     }
 }
+
 
 
