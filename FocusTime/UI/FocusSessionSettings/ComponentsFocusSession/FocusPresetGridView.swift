@@ -12,23 +12,19 @@ struct FocusPresetGridView: View {
     let selectedPresetID: UUID?
     
     weak var delegate: FocusPresetGridViewDelegate?
-    
-    private let gridColumns = FocusSessionView.Constants.PresetGrid.Layout.gridColumns
-    private typealias Strings = FocusSessionView.Constants.PresetGrid.Strings
-    private typealias Layout = FocusSessionView.Constants.PresetGrid.Layout
-    
+            
     var body: some View {
-        VStack(alignment: .leading, spacing: Layout.mainSpacing) {
+        VStack(alignment: .leading, spacing: FocusSessionView.Constants.PresetGrid.Layout.mainSpacing) {
             VStack(alignment: .leading) {
-                Text(Strings.title)
+                Text(FocusSessionView.Constants.PresetGrid.Strings.title)
                     .font(.headline)
-                Text(Strings.subtitle)
+                Text(FocusSessionView.Constants.PresetGrid.Strings.subtitle)
                     .font(.subheadline)
                     .foregroundColor(.gray)
             }
             .padding(.horizontal)
             
-            LazyVGrid(columns: gridColumns, spacing: Layout.gridVSpacing) {
+            LazyVGrid(columns: FocusSessionView.Constants.PresetGrid.Layout.gridColumns, spacing: FocusSessionView.Constants.PresetGrid.Layout.gridVSpacing) {
                 ForEach(presets) { preset in
                     Button(action: { delegate?.focusPresetGridDidSelectPreset(preset) }) {
                         PresetIconView(
@@ -42,5 +38,3 @@ struct FocusPresetGridView: View {
         }
     }
 }
-
-

@@ -8,7 +8,8 @@
 import Foundation
 
 @Observable
-class FocusSessionViewModel {
+@MainActor
+final class FocusSessionViewModel {
     
     // MARK: - State
     struct State {
@@ -102,14 +103,6 @@ class FocusSessionViewModel {
         state.isDurationPickerPresented = true
     }
     
-    func toggleScheduledDay(_ day: Weekday) {
-        if state.scheduledDays.contains(day) {
-            state.scheduledDays.remove(day)
-        } else {
-            state.scheduledDays.insert(day)
-        }
-    }
-    
     func presentStartTimePicker() {
         state.isStartTimePickerPresented = true
     }
@@ -150,7 +143,6 @@ class FocusSessionViewModel {
     }
 }
 
-
 // MARK: - Extensions
 extension FocusSessionViewModel: SessionConfigurationViewDelegate {
     func sessionConfigurationDidUpdateListName(to newName: String) {
@@ -165,9 +157,6 @@ extension FocusSessionViewModel: SessionConfigurationViewDelegate {
         presentDurationPicker()
     }
     
-    func sessionConfigurationDidToggleDay(_ day: Weekday) {
-        toggleScheduledDay(day)
-    }
     
     func sessionConfigurationDidTapStartTime() {
         presentStartTimePicker()
@@ -188,19 +177,4 @@ extension FocusSessionViewModel: FocusPresetGridViewDelegate {
     }
 }
 
-extension FocusSessionViewModel: DurationPickerSheetViewDelegate {
-    func durationPickerDidSave(hours: Int, minutes: Int){
-        updateDuration(hours: hours, minutes: minutes)
-    }
-}
 
-extension FocusSessionViewModel: TimePickerSheetViewDelegate {
-    func timePickerDidSave(date: Date, type: TimePickerType) {
-        switch type {
-        case .start:
-            updateStartTime(to: date)
-        case .end:
-            updateEndTime(to: date)
-        }
-    }
-}

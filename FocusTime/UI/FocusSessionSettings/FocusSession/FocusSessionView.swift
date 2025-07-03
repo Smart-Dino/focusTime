@@ -8,7 +8,7 @@
 import SwiftUI
 import FocusTimeUI
 
-struct FocusSessionView: View { 
+struct FocusSessionView: View {
     
     @State private var viewModel = FocusSessionViewModel()
     
@@ -24,7 +24,7 @@ struct FocusSessionView: View {
                                 selectedIconName: viewModel.selectedPresetIconName,
                                 scheduleForLater: viewModel.state.scheduleForLater,
                                 formattedDuration: viewModel.formattedDuration,
-                                scheduledDays: viewModel.state.scheduledDays, 
+                                scheduledDays: $viewModel.state.scheduledDays, // Pass binding here
                                 formattedScheduledDays: viewModel.formattedScheduledDays,
                                 formattedStartTime: viewModel.formattedStartTime,
                                 formattedEndTime: viewModel.formattedEndTime,
@@ -61,9 +61,8 @@ struct FocusSessionView: View {
             .toolbarBackground(.hidden)
             .sheet(isPresented: $viewModel.state.isDurationPickerPresented) {
                 DurationPickerSheetView(
-                    initialHours: viewModel.state.selectedHours,
-                    initialMinutes: viewModel.state.selectedMinutes,
-                    delegate: viewModel
+                    hours: $viewModel.state.selectedHours, // Pass binding directly
+                    minutes: $viewModel.state.selectedMinutes // Pass binding directly
                 )
                 .presentationDetents([.height(Constants.Layout.sheetHeight)])
                 .presentationDragIndicator(.hidden)
@@ -71,11 +70,10 @@ struct FocusSessionView: View {
             }
             .sheet(isPresented: $viewModel.state.isStartTimePickerPresented) {
                 TimePickerSheetView(
-                    initialDate: viewModel.state.startTime,
+                    selectedDate: $viewModel.state.startTime, // Pass binding directly
                     title: Constants.TimePicker.Strings.startTimeTitle,
                     subtitle: Constants.TimePicker.Strings.startTimeSubtitle,
-                    pickerType: .start,
-                    delegate: viewModel
+                    pickerType: .start
                 )
                 .presentationDetents([.height(Constants.Layout.sheetHeight)])
                 .presentationDragIndicator(.hidden)
@@ -83,19 +81,18 @@ struct FocusSessionView: View {
             }
             .sheet(isPresented: $viewModel.state.isEndTimePickerPresented) {
                 TimePickerSheetView(
-                    initialDate: viewModel.state.endTime,
+                    selectedDate: $viewModel.state.endTime, // Pass binding directly
                     title: Constants.TimePicker.Strings.endTimeTitle,
                     subtitle: Constants.TimePicker.Strings.endTimeSubtitle,
-                    pickerType: .end,
-                    delegate: viewModel
+                    pickerType: .end
                 )
                 .presentationDetents([.height(Constants.Layout.sheetHeight)])
                 .presentationDragIndicator(.hidden)
                 .presentationCornerRadius(Constants.Layout.sheetCornerRadius)
             }
             .sheet(isPresented: $viewModel.state.isAppBlockerSheetPresented) {
-#warning("Change ContentView with actual view")
-                ContentView() 
+                #warning("Change ContentView with actual view")
+                ContentView()
                     .presentationDetents([.medium, .large])
                     .presentationDragIndicator(.visible)
                     .presentationCornerRadius(Constants.Layout.sheetCornerRadius)
@@ -105,6 +102,7 @@ struct FocusSessionView: View {
         .preferredColorScheme(.dark)
     }
 }
+
 
 
 // MARK: - Preview

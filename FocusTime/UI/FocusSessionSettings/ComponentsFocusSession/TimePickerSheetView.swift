@@ -8,104 +8,58 @@
 import SwiftUI
 
 struct TimePickerSheetView: View {
-    @State private var selectedDate: Date
-    weak var delegate: TimePickerSheetViewDelegate?
+    // MARK: - Properties
+    @Binding var selectedDate: Date // Changed to Binding
     let title: String
     let subtitle: String
-    let pickerType: TimePickerType
-    
-    @State private var internalHours: Int
-    @State private var internalMinutes: Int
-    
-    init(initialDate: Date, title: String, subtitle: String, pickerType: TimePickerType, delegate: TimePickerSheetViewDelegate?) {
-        self._selectedDate = State(initialValue: initialDate)
-        self.title = title
-        self.subtitle = subtitle
-        self.pickerType = pickerType
-        self.delegate = delegate
-        
-        _internalHours = State(initialValue: Calendar.current.component(.hour, from: initialDate))
-        _internalMinutes = State(initialValue: Calendar.current.component(.minute, from: initialDate))
-    }
-    
-    private typealias Layout = FocusSessionView.Constants.TimePicker.Layout
-    private typealias Strings = FocusSessionView.Constants.TimePicker.Strings
-    private typealias Colors = FocusSessionView.Constants.TimePicker.Colors
-    
+    let pickerType: TimePickerType // Keep pickerType for potential logic within ViewModel if it existed
+
+    // Removed internalHours, internalMinutes, and custom init.
+    // Swift will synthesize a memberwise initializer for @Binding and let properties.
+
+    // MARK: - Body
     var body: some View {
         ZStack {
             FocusSessionView.Constants.Colors.sheetBackground
                 .ignoresSafeArea()
-            
-            VStack(spacing: Layout.mainSpacing) {
-                Capsule()
-                    .fill(Color.gray)
-                    .frame(width: Layout.dragIndicatorWidth, height: Layout.dragIndicatorHeight)
-                
+
+            VStack(spacing: FocusSessionView.Constants.TimePicker.Layout.mainSpacing) {
+                // Comment addressed: Removed custom grabber, system handles it
                 Text(title)
                     .font(.headline)
                     .foregroundStyle(Color.blue)
-                
+
                 Text(subtitle)
                     .font(.subheadline)
                     .foregroundColor(.gray)
                     .padding(.bottom)
-                
-                ZStack {
-                    Colors.pickerBackground
-                    
-                    timePicker
-                        .padding(.bottom)
-                }
-                .frame(width: Layout.containerWidth, height: Layout.containerHeight)
-                .cornerRadius(Layout.containerCornerRadius)
-            }
-            .foregroundColor(.white)
-        }
-        .onChange(of: internalHours) {
-            updateSelectedDate(hours: internalHours, minutes: internalMinutes)
-        }
-        .onChange(of: internalMinutes) {
-            updateSelectedDate(hours: internalHours, minutes: internalMinutes)
-        }
-        .onDisappear {
 
-            delegate?.timePickerDidSave(date: selectedDate, type: pickerType)
+                // Comment addressed: Using .background {} for clarity
+                timePicker
+                    .padding(.bottom)
+                    .frame(width: FocusSessionView.Constants.TimePicker.Layout.containerWidth, height: FocusSessionView.Constants.TimePicker.Layout.containerHeight)
+                    .background { // Applied background using a closure
+                        FocusSessionView.Constants.TimePicker.Colors.pickerBackground
+                            .cornerRadius(FocusSessionView.Constants.TimePicker.Layout.containerCornerRadius)
+                    }
+            }
+            // Comment addressed: Removed .foregroundColor(.white)
         }
+        // No .onChange or .onDisappear needed, as @Binding directly updates selectedDate.
     }
-    
+
+    // MARK: - Private Views
     private var timePicker: some View {
-        HStack(spacing: 0) {
-            Picker(Strings.hoursPickerTitle, selection: $internalHours) {
-                ForEach(0..<FocusSessionView.Constants.Time.hoursInDay, id: \.self) { hour in
-                    Text("\(hour)").tag(hour)
-                }
-            }
-            .pickerStyle(.wheel)
-            .frame(width: Layout.pickerWidth)
-            .clipped()
-            .environment(\.locale, Locale(identifier: "en_GB"))
-
-            Picker(Strings.minutesPickerTitle, selection: $internalMinutes) {
-                ForEach(0..<FocusSessionView.Constants.Time.minutesInHour, id: \.self) { minute in
-                    Text("\(minute)").tag(minute)
-                }
-            }
-            .pickerStyle(.wheel)
-            .frame(width: Layout.pickerWidth)
-            .clipped()
-            .environment(\.locale, Locale(identifier: "en_GB"))
-        }
-    }
-    
-    private func updateSelectedDate(hours: Int, minutes: Int) {
-        let calendar = Calendar.current
-        var components = calendar.dateComponents([.year, .month, .day], from: selectedDate)
-        components.hour = hours
-        components.minute = minutes
-        
-        if let newDate = calendar.date(from: components) {
-            selectedDate = newDate
-        }
+        // Using SwiftUI's native DatePicker for time selection
+        DatePicker(
+            "",
+            selection: $selectedDate, // Binding directly to selectedDate
+            displayedComponents: .hourAndMinute
+        )
+        .datePickerStyle(.wheel)
+        .labelsHidden() // Hide default labels for cleaner look if not needed
+        .frame(width: FocusSessionView.Constants.TimePicker.Layout.pickerWidth)
+        .clipped()
+        .environment(\.locale, Locale(identifier: "en_GB")) // Keep locale if specific formatting is desired
     }
 }

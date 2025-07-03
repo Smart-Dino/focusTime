@@ -6,82 +6,70 @@
 //
 
 import SwiftUI
-import FocusTimeUI
+// import FocusTimeUI // No longer explicitly needed as constants are accessed via FocusSessionView
 
 struct DurationPickerSheetView: View {
-    
-    @State private var hours: Int
-    @State private var minutes: Int
-    
-    weak var delegate: DurationPickerSheetViewDelegate?
-    
-    init(initialHours: Int, initialMinutes: Int, delegate: DurationPickerSheetViewDelegate?) {
-        self._hours = State(initialValue: initialHours)
-        self._minutes = State(initialValue: initialMinutes)
-        self.delegate = delegate
-    }
-    
-    private typealias Strings = FocusSessionView.Constants.DurationPicker.Strings
-    private typealias Layout = FocusSessionView.Constants.DurationPicker.Layout
-    private typealias Colors = FocusSessionView.Constants.DurationPicker.Colors
-    
+    // MARK: - Properties
+    // Use @Binding for hours and minutes to allow parent view to update them directly
+    @Binding var hours: Int
+    @Binding var minutes: Int
+
+    // No custom init needed, Swift provides memberwise init for @Binding properties.
+
+    // MARK: - Body
     var body: some View {
         ZStack {
             FocusSessionView.Constants.Colors.sheetBackground
                 .ignoresSafeArea()
-            
-            VStack(spacing: Layout.mainSpacing) {
-                Capsule()
-                    .fill(Color.gray)
-                    .frame(width: Layout.dragIndicatorWidth, height: Layout.dragIndicatorHeight)
-                
-                Text(Strings.title)
-                    .font(.headline)
+
+            VStack(spacing: FocusSessionView.Constants.DurationPicker.Layout.mainSpacing) {
+                // Comment addressed: Removed custom grabber as system provides it.
+                // FocusSessionView sets .presentationDragIndicator(.hidden) so no grabber will be shown.
+
+                Text(FocusSessionView.Constants.DurationPicker.Strings.title)
+                    .font(.title2.bold()) // Comment addressed: Increased font size
                     .foregroundStyle(Color.blue)
-                
-                Text(Strings.subtitle)
+
+                Text(FocusSessionView.Constants.DurationPicker.Strings.subtitle)
                     .font(.subheadline)
                     .foregroundColor(.gray)
                     .padding(.bottom)
-                
-                ZStack {
-                    Colors.pickerBackground
-                    
-                    durationPicker
-                        .padding(.bottom)
-                }
-                .frame(width: Layout.containerWidth, height: Layout.containerHeight)
-                .cornerRadius(Layout.containerCornerRadius)
+
+                // Comment addressed: Using .background {} for clarity
+                durationPicker
+                    .padding(.bottom)
+                    .frame(width: FocusSessionView.Constants.DurationPicker.Layout.containerWidth, height: FocusSessionView.Constants.DurationPicker.Layout.containerHeight)
+                    .background { // Applied background using a closure
+                        FocusSessionView.Constants.DurationPicker.Colors.pickerBackground
+                            .cornerRadius(FocusSessionView.Constants.DurationPicker.Layout.containerCornerRadius)
+                    }
             }
-            .foregroundColor(.white)
+            // Comment addressed: Removed .foregroundColor(.white) as preferredColorScheme(.dark) should handle this.
+            // If specific text elements need white, apply .foregroundStyle(.white) to them individually.
         }
-        .onDisappear {
-            delegate?.durationPickerDidSave(hours: hours, minutes: minutes)
-        }
+        // No .onDisappear needed for saving values, as @Binding updates the source directly.
     }
-    
+
+    // MARK: - Private Views
     private var durationPicker: some View {
         HStack(spacing: 0) {
-            Picker(Strings.hoursPickerTitle, selection: $hours) {
+            Picker(FocusSessionView.Constants.DurationPicker.Strings.hoursPickerTitle, selection: $hours) {
                 ForEach(0..<FocusSessionView.Constants.Time.hoursInDay, id: \.self) { hour in
                     Text("\(hour)").tag(hour)
                 }
             }
             .pickerStyle(.wheel)
-            .frame(width: Layout.pickerWidth)
+            .frame(width: FocusSessionView.Constants.DurationPicker.Layout.pickerWidth)
             .clipped()
-            
-            Picker(Strings.minutesPickerTitle, selection: $minutes) {
+
+            Picker(FocusSessionView.Constants.DurationPicker.Strings.minutesPickerTitle, selection: $minutes) {
                 ForEach(0..<FocusSessionView.Constants.Time.minutesInHour, id: \.self) { minute in
                     Text("\(minute)").tag(minute)
                 }
             }
             .pickerStyle(.wheel)
-            .frame(width: Layout.pickerWidth)
+            .frame(width: FocusSessionView.Constants.DurationPicker.Layout.pickerWidth)
             .clipped()
         }
     }
 }
-
-
-

@@ -11,7 +11,7 @@ import Observation
 @MainActor
 @Observable
 final class QuizOnboardingViewModel {
-      
+
     struct State {
         var selectionStates: Set<QuizOnboardingView.Constants.QuizOption> = []
         

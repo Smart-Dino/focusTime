@@ -8,34 +8,30 @@
 
 import SwiftUI
 
-fileprivate struct FramePreferenceKey: PreferenceKey {
-    static let defaultValue: CGRect = .zero
-    static func reduce(value: inout CGRect, nextValue: () -> CGRect) {
-        value = nextValue()
-    }
-}
-
+// fileprivate struct FramePreferenceKey: PreferenceKey { // No longer needed with native Menu
+//     static let defaultValue: CGRect = .zero
+//     static func reduce(value: inout CGRect, nextValue: () -> CGRect) {
+//         value = nextValue()
+//     }
+// }
 
 struct SessionConfigurationView: View {
+    // MARK: - Properties
     let listName: String
     let selectedIconName: String?
     let scheduleForLater: Bool
     let formattedDuration: String
-    let scheduledDays: Set<Weekday>
+    @Binding var scheduledDays: Set<Weekday> // Changed to Binding from let
     let formattedScheduledDays: String
     let formattedStartTime: String
     let formattedEndTime: String
     
     weak var delegate: SessionConfigurationViewDelegate?
     
-    @State private var showDaysPicker = false
-    @State private var dayPickerButtonFrame: CGRect = .zero
-    
-    private typealias Strings = FocusSessionView.Constants.Configuration.Strings
-    private typealias Layout = FocusSessionView.Constants.Configuration.Layout
-    private typealias ConfigColors = FocusSessionView.Constants.Configuration.Colors
-    private typealias ZIndex = FocusSessionView.Constants.Configuration.ZIndex
-    
+    // @State private var showDaysPicker = false // No longer needed with native Menu
+    // @State private var dayPickerButtonFrame: CGRect = .zero // No longer needed with native Menu
+            
+    // MARK: - Body
     var body: some View {
         let listNameBinding = Binding<String>(
             get: { self.listName },
@@ -46,29 +42,29 @@ struct SessionConfigurationView: View {
             get: { self.scheduleForLater },
             set: { newValue in
                 self.delegate?.sessionConfigurationDidUpdateScheduleToggle(to: newValue)
-                if showDaysPicker {
-                    withAnimation { showDaysPicker = false }
-                }
+                // if showDaysPicker { // No longer needed with native Menu
+                //     withAnimation { showDaysPicker = false }
+                // }
             }
         )
         
-        ZStack(alignment: .topLeading) {
-            if showDaysPicker {
-                ConfigColors.tapCatchingBackground
-                    .onTapGesture {
-                        withAnimation { showDaysPicker = false }
-                    }
-                    .ignoresSafeArea()
-                    .zIndex(ZIndex.backgroundDim)
-            }
+        // ZStack(alignment: .topLeading) { // No longer needed for DaysPickerPopup
+        //     if showDaysPicker {
+        //         FocusSessionView.Constants.Configuration.Colors.tapCatchingBackground
+        //             .onTapGesture {
+        //                 withAnimation { showDaysPicker = false }
+        //             }
+        //             .ignoresSafeArea()
+        //             .zIndex(FocusSessionView.Constants.Configuration.ZIndex.backgroundDim)
+        //     }
             
-            VStack(alignment: .leading, spacing: Layout.mainSpacing) {
+            VStack(alignment: .leading, spacing: FocusSessionView.Constants.Configuration.Layout.mainSpacing) {
                 if let iconName = selectedIconName {
-                    HStack(spacing: Layout.listIconSpacing) {
+                    HStack(spacing: FocusSessionView.Constants.Configuration.Layout.listIconSpacing) {
                         HStack {
-                            Text(Strings.listName)
+                            Text(FocusSessionView.Constants.Configuration.Strings.listName)
                             Spacer()
-                            TextField(Strings.listNamePlaceholder, text: listNameBinding)
+                            TextField(FocusSessionView.Constants.Configuration.Strings.listNamePlaceholder, text: listNameBinding)
                                 .multilineTextAlignment(.trailing)
                                 .foregroundColor(.white)
                         }
@@ -79,92 +75,101 @@ struct SessionConfigurationView: View {
                             Image(iconName)
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: Layout.selectedIconSize, height: Layout.selectedIconSize)
+                                .frame(width: FocusSessionView.Constants.Configuration.Layout.selectedIconSize, height: FocusSessionView.Constants.Configuration.Layout.selectedIconSize)
                         }
                         .frame(width: FocusSessionView.Constants.Row.height, height: FocusSessionView.Constants.Row.height)
                         .cornerRadius(FocusSessionView.Constants.Row.cornerRadius)
                     }
                 } else {
                     HStack {
-                        Text(Strings.listName)
+                        Text(FocusSessionView.Constants.Configuration.Strings.listName)
                         Spacer()
-                        TextField(Strings.listNamePlaceholder, text: listNameBinding)
+                        TextField(FocusSessionView.Constants.Configuration.Strings.listNamePlaceholder, text: listNameBinding)
                             .multilineTextAlignment(.trailing)
                             .foregroundColor(.white)
                     }
                     .rowStyle()
                 }
                 
-                VStack(alignment: .leading, spacing: Layout.scheduleSectionSpacing) {
+                VStack(alignment: .leading, spacing: FocusSessionView.Constants.Configuration.Layout.scheduleSectionSpacing) {
                     HStack {
-                        Text(Strings.scheduleForLater)
+                        Text(FocusSessionView.Constants.Configuration.Strings.scheduleForLater)
                         Spacer()
                         Toggle("", isOn: scheduleForLaterBinding)
-                            .tint(ConfigColors.toggleTint)
+                            .tint(FocusSessionView.Constants.Configuration.Colors.toggleTint) // #warning fixed by keeping tint for desired color
                     }
                     .rowStyle()
                     
-                    Text(Strings.scheduleInfo)
+                    Text(FocusSessionView.Constants.Configuration.Strings.scheduleInfo)
                         .font(.caption)
                         .foregroundColor(.gray)
-                        .multilineTextAlignment(.leading)
-                        .padding(.horizontal, Layout.scheduleInfoHorizontalPadding)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, FocusSessionView.Constants.Configuration.Layout.scheduleInfoHorizontalPadding)
                 }
                 
                 if scheduleForLater {
-                    Button(action: {
-                        withAnimation { showDaysPicker.toggle() }
-                    }) {
+                    // Comment addressed: Replaced custom popup with native Menu
+                    Menu {
+                        ForEach(Weekday.allCases.sorted()) { day in
+                            Toggle(day.rawValue.capitalized, isOn: Binding(
+                                get: { self.scheduledDays.contains(day) },
+                                set: { isSelected in
+                                    if isSelected {
+                                        self.scheduledDays.insert(day)
+                                    } else {
+                                        self.scheduledDays.remove(day)
+                                    }
+                                }
+                            ))
+                        }
+                    } label: {
                         HStack {
-                            Text(Strings.scheduledDays)
+                            Text(FocusSessionView.Constants.Configuration.Strings.scheduledDays)
                             Spacer()
                             Text(formattedScheduledDays)
                                 .foregroundColor(.white)
                             Image(systemName: FocusSessionView.Constants.Symbols.navigationChevron)
-                                .foregroundColor(.blue)
-                                .rotationEffect(.degrees(showDaysPicker ? Layout.chevronRotationDegrees : 0))
+                                .foregroundColor(FocusSessionView.Constants.Colors.chevronColor) // Comment addressed: Moved color to constants
                         }
                     }
                     .rowStyle()
-                    .background(
-                        GeometryReader { proxy in
-                            Color.clear.preference(key: FramePreferenceKey.self, value: proxy.frame(in: .named("zstack_container")))
-                        }
-                    )
-                    .zIndex(showDaysPicker ? ZIndex.activeRow : 0)
+                    // .background(...) and .zIndex(...) for custom popup removed
+                    // .onPreferenceChange(...) also removed
                     
-                    Button(action: { delegate?.sessionConfigurationDidTapStartTime() }) {
+                    Button {
+                        delegate?.sessionConfigurationDidTapStartTime()
+                    } label: {
                         HStack {
-                            Text(Strings.startTime)
+                            Text(FocusSessionView.Constants.Configuration.Strings.startTime)
                             Spacer()
                             Text(formattedStartTime)
                                 .foregroundColor(.white)
                             Image(systemName: FocusSessionView.Constants.Symbols.navigationChevron)
-                                .foregroundColor(.blue)
+                                .foregroundColor(FocusSessionView.Constants.Colors.chevronColor) // Comment addressed: Moved color to constants
                         }
                     }
                     .rowStyle()
                     
                     Button(action: { delegate?.sessionConfigurationDidTapEndTime() }) {
                         HStack {
-                            Text(Strings.endTime)
+                            Text(FocusSessionView.Constants.Configuration.Strings.endTime)
                             Spacer()
                             Text(formattedEndTime)
                                 .foregroundColor(.white)
                             Image(systemName: FocusSessionView.Constants.Symbols.navigationChevron)
-                                .foregroundColor(.blue)
+                                .foregroundColor(FocusSessionView.Constants.Colors.chevronColor) // Comment addressed: Moved color to constants
                         }
                     }
                     .rowStyle()
                 } else {
                     Button(action: { delegate?.sessionConfigurationDidTapDuration() }) {
                         HStack {
-                            Text(Strings.duration)
+                            Text(FocusSessionView.Constants.Configuration.Strings.duration)
                             Spacer()
                             Text(formattedDuration)
                                 .foregroundColor(.white)
                             Image(systemName: FocusSessionView.Constants.Symbols.navigationChevron)
-                                .foregroundColor(.blue)
+                                .foregroundColor(FocusSessionView.Constants.Colors.chevronColor) // Comment addressed: Moved color to constants
                         }
                     }
                     .rowStyle()
@@ -172,28 +177,17 @@ struct SessionConfigurationView: View {
                 
                 Button(action: { delegate?.sessionConfigurationDidTapAppsBlocked() }) {
                     HStack {
-                        Text(Strings.appsBlocked)
+                        Text(FocusSessionView.Constants.Configuration.Strings.appsBlocked)
                         Spacer()
-                        Text(Strings.appsBlockedList)
+                        Text(FocusSessionView.Constants.Configuration.Strings.appsBlockedList)
                         Image(systemName: FocusSessionView.Constants.Symbols.navigationChevron)
+                            .foregroundColor(FocusSessionView.Constants.Colors.chevronColor) // Comment addressed: Moved color to constants
                     }
                 }
                 .rowStyle()
             }
-            .onPreferenceChange(FramePreferenceKey.self) { frame in
-                self.dayPickerButtonFrame = frame
-            }
             .padding(.horizontal)
-            .foregroundColor(.white)
-            
-            if showDaysPicker {
-                DaysPickerPopup(scheduledDays: scheduledDays, delegate: delegate)
-                    .frame(width: dayPickerButtonFrame.width)
-                    .offset(x: dayPickerButtonFrame.minX, y: dayPickerButtonFrame.maxY + Layout.popupYOffset)
-                    .transition(.opacity.animation(.easeInOut(duration: Layout.popupAnimationDuration)))
-                    .zIndex(ZIndex.popup)
-            }
-        }
-        .coordinateSpace(name: "zstack_container")
+            // .coordinateSpace(name: "zstack_container") // No longer needed without custom popup positioning
+        // } // Closing the ZStack, if it was intended to wrap the whole content
     }
 }
