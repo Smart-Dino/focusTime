@@ -103,8 +103,13 @@ struct HomeView: View {
     }
 }
 
-#Preview {
-    NavigationStack {
-        HomeView(viewModel: .init())
-    }
-}
+#warning("No preview.")
+//#Preview {
+//    NavigationStack {
+//        if let scheduleStore = ScheduleStore(isStoredInMemoryOnly: true) {
+//            HomeView(viewModel: .init(scheduleStore: scheduleStore))
+//        } else {
+//            Text("Could not initialize ScheduleStore.")
+//        }
+//    }
+//}

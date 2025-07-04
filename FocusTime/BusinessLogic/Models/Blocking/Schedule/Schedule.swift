@@ -9,9 +9,9 @@ import Foundation
 import SwiftData
 
 @Model
-final class Schedule: SwiftDataItem {
+final class Schedule {
     
-    @Attribute(.unique) var id: UUID
+    // Removed id because each Model instance gets a PersistenceIdentifier by default.
     var emoji: String
     var name: String
     var days: Set<Weekday>
@@ -37,7 +37,6 @@ final class Schedule: SwiftDataItem {
     }
     
     init(
-        id: UUID = UUID(),
         emoji: String,
         name: String,
         days: Set<Weekday>,
@@ -45,7 +44,6 @@ final class Schedule: SwiftDataItem {
         endTime: TimeComponents,
         blockItems: [BlockItem]? = nil
     ) {
-        self.id = id
         self.emoji = emoji
         self.name = name
         self.days = days
@@ -55,19 +53,11 @@ final class Schedule: SwiftDataItem {
     }
     
     convenience init(from item: ProtectedSchedule) {
-        self.init(id: item.id,
-                  emoji: item.emoji,
+        self.init(emoji: item.emoji,
                   name: item.name,
                   days: item.days,
                   startTime: item.startTime,
                   endTime: item.endTime)
-    }
-    
-    func appendBlockItem(_ item: BlockItem) {
-        if blockItems == nil {
-            blockItems = []
-        }
-        blockItems!.append(item)
     }
 }
 

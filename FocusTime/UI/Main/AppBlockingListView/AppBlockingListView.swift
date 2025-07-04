@@ -49,7 +49,7 @@ struct AppBlockingListView: View {
             Button(Constants.Strings.newBlocklistButtonTitle, systemImage: "plus.circle") {
                 #warning("Placeholder code")
                 Task {
-                    await viewModel.insertTestItemsIntoDatabase()
+                    try await viewModel.insertTestItemsIntoDatabase()
                 }
             }
             .buttonStyle(.ftPrimary)
@@ -74,6 +74,7 @@ struct AppBlockingListView: View {
                         description: block.schedulesDescription,
                     )
                     .padding(1)
+                    .onAppear { viewModel.hasReachEndOfList(blockItem: block) }
                 }
             }
         }
@@ -93,6 +94,9 @@ struct AppBlockingListView: View {
     }
 }
 
-#Preview {
-    AppBlockingListView(viewModel: .init())
-}
+#warning("No preview.")
+//#Preview {
+//    if let blockItemStore = BlockItemStore(isStoredInMemoryOnly: true) {
+//        AppBlockingListView(viewModel: .init(blockItemStore: blockItemStore))
+//    }
+//}

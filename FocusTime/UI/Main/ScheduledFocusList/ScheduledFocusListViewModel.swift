@@ -6,34 +6,64 @@
 //
 
 import Foundation
+import SwiftData
 
 @MainActor
 @Observable
 final class ScheduledFocusListViewModel {
     struct State {
-        var items = [Schedule]()
+        var page = 0
+        var items = [ProtectedSchedule]()
     }
     
     private(set) var state: State
-    private let scheduleStore: ScheduleStore
+    private let modelContainer: ModelContainer
     
-    init(state: State = State(), scheduleStore: ScheduleStore = ScheduleStore()) {
+    var fetchTask: Task<Void, Never>?
+    
+    init(
+        state: State = State(),
+        modelContainer: ModelContainer
+    ) {
         self.state = state
-        self.scheduleStore = scheduleStore
+        self.modelContainer = modelContainer
     }
     
-    func insertTestItemsIntoDatabase() async {
-        for _ in 0..<100 {
-            let schedule = ProtectedSchedule(emoji: "🏠",
-                                             name: "Spend time with family",
-                                             days: [.saturday, .sunday],
-                                             startTime: TimeComponents(hour: 17, minute: 00)!,
-                                             endTime: TimeComponents(hour: 19, minute: 00)!)
-            
-            try? await scheduleStore.insert(schedule)
+    func insertTestItemsIntoDatabase() async throws {
+        Task.detached(priority: .userInitiated) {
+            let scheduleStore = ScheduleStore(modelContainer: self.modelContainer)
+            let itemsToInsert = Array(
+                repeating: ProtectedSchedule(
+                    emoji: "🏠",
+                    name: "Spend time with family",
+                    days: [.saturday, .sunday],
+                    startTime: TimeComponents(hour: 17, minute: 00)!,
+                    endTime: TimeComponents(hour: 19, minute: 00)!
+                ),
+                count: 100000
+            )
+            try await scheduleStore.insertBatch(itemsToInsert)
+            await self.fetchNextPage()
         }
-        await MainActor.run {
-            state.items = try! scheduleStore.fetch()
+    }
+    
+    private func fetchNextPage() {
+        guard fetchTask == nil else { return }
+        self.fetchTask = Task.detached(priority: .userInitiated) {
+            let scheduleStore = ScheduleStore(modelContainer: self.modelContainer)
+            let insertedItems = try? await scheduleStore.fetch(page: self.state.page)
+            await MainActor.run {
+                self.state.items.append(contentsOf: insertedItems ?? [])
+                self.state.page += 1
+                self.fetchTask = nil
+                print("Items on screen: \(self.state.items.count)")
+            }
+        }
+    }
+    
+    func hasReachEndOfList(schedule: ProtectedSchedule) {
+        if schedule.id == state.items.last?.id {
+            fetchNextPage()
         }
     }
 }

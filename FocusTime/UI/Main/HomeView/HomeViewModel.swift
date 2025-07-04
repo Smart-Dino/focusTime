@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftData
 
 @MainActor
 @Observable
@@ -15,12 +16,17 @@ final class HomeViewModel {
     }
     
     private(set) var state: State
+    private let modelContainer: ModelContainer
     
-    init(state: State = State()) {
+    init(
+        state: State = State(),
+        modelContainer: ModelContainer
+    ) {
         self.state = state
+        self.modelContainer = modelContainer
     }
     
     func makeScheduledFocusViewModel() -> ScheduledFocusListViewModel {
-        ScheduledFocusListViewModel()
+        ScheduledFocusListViewModel(modelContainer: modelContainer)
     }
 }

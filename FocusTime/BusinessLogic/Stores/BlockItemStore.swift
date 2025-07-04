@@ -9,61 +9,90 @@ import SwiftData
 import Foundation
 import FamilyControls
 
-@MainActor
-final class BlockItemStore: DataSource {
-    private let modelContainer: ModelContainer
-    private let modelContext: ModelContext
+@ModelActor
+actor BlockItemStore: PersistenceStore { 
     
-    init() {
-        let config = ModelConfiguration(groupContainer: .identifier(AppValues.appGroupIdentifier))
-        let container = try! ModelContainer(
-            for: BlockItem.self,
-            configurations: config
-        )
-        let context = container.mainContext
-        self.modelContainer = container
-        self.modelContext = context
+    @discardableResult
+    func insert(_ item: ProtectedBlockItem) throws -> PersistentIdentifier {
+        let model = BlockItem(from: item) // Convert to model instance.
+        modelContext.insert(model)
+        try modelContext.save() // Apply the context to the DB.
+        return model.persistentModelID
     }
     
-    @GlobalSourceActor func insert(_ item: ProtectedBlockItem) throws { // Implicitly async since runs in a different context.
-        let container = modelContainer
-        let context = ModelContext(container) // Create a separate, non-main context to write to.
-        let modelItem = BlockItem(from: item) // Convert to model instance.
-        context.insert(modelItem)
-        try context.save() // Apply the context to the DB.
+    @discardableResult
+    func insertBatch(_ items: [ProtectedBlockItem]) throws -> Set<PersistentIdentifier> {
+        var ids = Set<PersistentIdentifier>()
+        for item in items {
+            let model = BlockItem(from: item)
+            modelContext.insert(model)
+            ids.insert(model.persistentModelID)
+        }
+        try modelContext.save()
+        return ids
     }
     
-    func delete(_ item: BlockItem) throws {
-        // If there are ever any Sendable errors we can just take the item's ID as a parameter
-        // and remove that item by fetching the related item.
-        // try! context.fetch(FetchDescriptor<BlockItem>(predicate: #Predicate { $0.id == itemID }))
-        modelContext.delete(item)
+    func delete(id: PersistentIdentifier) throws {
+        let model = try fetchForID(id)
+        modelContext.delete(model)
         try modelContext.save()
     }
     
-    func fetch() throws -> [BlockItem] {
-        try modelContext.fetch(FetchDescriptor<BlockItem>())
+    func fetch() throws -> [ProtectedBlockItem] {
+        try modelContext
+            .fetch(FetchDescriptor<BlockItem>())
+            .map { ProtectedBlockItem(from: $0) }
     }
     
-    func fetch(id: UUID) throws -> BlockItem? {
-        try modelContext.fetch(
-            FetchDescriptor(predicate: #Predicate<BlockItem>{ $0.id == id })
-        ).first
+    func fetch(page: Int = 0, amountPerPage: Int = 50) throws -> [ProtectedBlockItem] {
+        let alreadyFetched = page * amountPerPage
+        
+        var descriptor = FetchDescriptor<BlockItem>()
+        descriptor.fetchLimit = amountPerPage
+        descriptor.fetchOffset = alreadyFetched
+        
+        let fetched = try modelContext.fetch(descriptor)
+        
+        return fetched.map {
+            ProtectedBlockItem(from: $0)
+        }
     }
     
-    func fetch(descriptor: FetchDescriptor<BlockItem>) throws -> [BlockItem] {
-        try modelContext.fetch(descriptor)
+    func fetch(id: PersistentIdentifier) throws -> ProtectedBlockItem? {
+        let model = try fetchForID(id)
+        
+        return ProtectedBlockItem(from: model)
     }
     
-    func updateFields(of item: inout BlockItem, using updates: (BlockItem) -> Void) throws {
-        guard let fetchedItem = modelContext.model(for: item.id) as? BlockItem else {
-            throw DataSourceError.notFound
+    func fetch(descriptor: FetchDescriptor<BlockItem>) throws -> [ProtectedBlockItem] {
+        try modelContext.fetch(descriptor).map{ ProtectedBlockItem(from: $0) }
+    }
+    
+    func updateFields(id: PersistentIdentifier, using updates: (BlockItem) -> Void) throws {
+        let model = try fetchForID(id)
+        
+        updates(model)
+        
+        try modelContext.save()
+    }
+    
+    func eraseAllData() throws {
+        try modelContext.delete(model: BlockItem.self)
+    }
+}
+
+// MARK: Helpers
+extension BlockItemStore {
+    func fetchForID(_ id: PersistentIdentifier) throws -> BlockItem {
+        let descriptor = FetchDescriptor<BlockItem>(
+            predicate: #Predicate { $0.id == id }
+        )
+        
+        guard let model = try? modelContext.fetch(descriptor).first else {
+            throw PersistenceStoreError.notFound
         }
         
-        updates(fetchedItem)
-        
-        try modelContext.save()
-        item = fetchedItem
+        return model
     }
     
     func eraseAllData() throws {

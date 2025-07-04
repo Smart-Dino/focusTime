@@ -35,7 +35,7 @@
             parallelizable = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "C631087D2E13E02800001B52"
+               BlueprintIdentifier = "C6FE59E52E156D8B003A2199"
                BuildableName = "FocusTimeTests.xctest"
                BlueprintName = "FocusTimeTests"
                ReferencedContainer = "container:FocusTime.xcodeproj">

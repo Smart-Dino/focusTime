@@ -10,9 +10,8 @@ import SwiftData
 import FamilyControls
 
 @Model
-final class BlockItem: SwiftDataItem {
-    // MARK: - Saved properties
-    @Attribute(.unique) var id: UUID
+final class BlockItem {
+    // Removed id because each Model instance gets a PersistenceIdentifier by default.
     var name: String
     var emoji: String
     var blockedContent: FamilyActivitySelection
@@ -34,13 +33,11 @@ final class BlockItem: SwiftDataItem {
     
     
     init(
-        id: UUID = UUID(),
         name: String,
         emoji: String,
         blockedContent: FamilyActivitySelection,
         schedules: [Schedule]? = nil
     ) {
-        self.id = id
         self.name = name
         self.emoji = emoji
         self.blockedContent = blockedContent
@@ -48,16 +45,8 @@ final class BlockItem: SwiftDataItem {
     }
     
     convenience init(from item: ProtectedBlockItem) {
-        self.init(id: item.id,
-                  name: item.name,
+        self.init(name: item.name,
                   emoji: item.emoji,
                   blockedContent: item.blockedContent)
-    }
-    
-    func appendSchedule(_ item: Schedule) {
-        if schedules == nil {
-            schedules = []
-        }
-        schedules!.append(item)
     }
 }

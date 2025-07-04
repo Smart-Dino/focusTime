@@ -8,65 +8,94 @@
 import Foundation
 import SwiftData
 
-@MainActor
-final class ScheduleStore: DataSource {
+@ModelActor
+actor ScheduleStore: PersistenceStore {
     
-    private let modelContainer: ModelContainer
-    private let modelContext: ModelContext
-    
-    init() {
-        let config = ModelConfiguration(groupContainer: .identifier(AppValues.appGroupIdentifier))
-        let container = try! ModelContainer(
-            for: BlockItem.self,
-            configurations: config
-        )
-        let context = container.mainContext
-        self.modelContainer = container
-        self.modelContext = context
+    @discardableResult
+    func insert(_ item: ProtectedSchedule) throws -> PersistentIdentifier {
+        let model = Schedule(from: item) // Convert to model instance.
+        modelContext.insert(model)
+        try modelContext.save() // Apply the context to the DB.
+        return model.persistentModelID
     }
     
-    @GlobalSourceActor func insert(_ item: ProtectedSchedule) throws {
-        let container = modelContainer
-        let context = ModelContext(container) // Create a separate, non-main context to write to.
-        let modelItem = Schedule(from: item) // Convert to model instance.
-        context.insert(modelItem)
-        try context.save() // Apply the context to the DB.
-    }
-    
-    func delete(_ item: Schedule) throws {
-        // If there are ever any Sendable errors we can just take the item's ID as a parameter
-        // and remove that item by fetching the related item.
-        // try! context.fetch(FetchDescriptor<Schedule>(predicate: #Predicate { $0.id == itemID }))
-        modelContext.delete(item)
-        try modelContext.save()
-    }
-    
-    func fetch() throws -> [Schedule] {
-        try modelContext.fetch(FetchDescriptor<Schedule>())
-    }
-    
-    func fetch(id: UUID) throws -> Schedule? {
-        try modelContext.fetch(
-            FetchDescriptor(predicate: #Predicate<Schedule>{ $0.id == id })
-        ).first
-    }
-    
-    func fetch(descriptor: FetchDescriptor<Schedule>) throws -> [Schedule] {
-        try modelContext.fetch(descriptor)
-    }
-    
-    func updateFields(of item: inout Schedule, using updates: (Schedule) -> Void) throws {
-        guard let fetchedItem = modelContext.model(for: item.id) as? Schedule else {
-            throw DataSourceError.notFound
+    @discardableResult
+    func insertBatch(_ items: [ProtectedSchedule]) throws -> Set<PersistentIdentifier> {
+        var ids = Set<PersistentIdentifier>()
+        for item in items {
+            let model = Schedule(from: item)
+            modelContext.insert(model)
+            ids.insert(model.persistentModelID)
         }
+        try modelContext.save()
+        return ids
+    }
+    
+    func delete(id: PersistentIdentifier) throws {
+        let model = try fetchForID(id)
+        modelContext.delete(model)
+        try modelContext.save()
+    }
+    
+    func fetch() throws -> [ProtectedSchedule] {
+        try modelContext
+            .fetch(FetchDescriptor<Schedule>())
+            .map { ProtectedSchedule(from: $0) }
+    }
+    
+    func fetch(page: Int = 0, amountPerPage: Int = 50) throws -> [ProtectedSchedule] {
+        let alreadyFetched = page * amountPerPage
         
-        updates(fetchedItem)
+        var descriptor = FetchDescriptor<Schedule>()
+        descriptor.fetchLimit = amountPerPage
+        descriptor.fetchOffset = alreadyFetched
+        
+        let fetched = try modelContext.fetch(descriptor)
+        
+        return fetched.map {
+            ProtectedSchedule(from: $0)
+        }
+    }
+    
+    func fetch(id: PersistentIdentifier) throws -> ProtectedSchedule? {
+        let model = try fetchForID(id)
+        
+        return ProtectedSchedule(from: model)
+    }
+    
+    func fetch(descriptor: FetchDescriptor<Schedule>) throws -> [ProtectedSchedule] {
+        try modelContext.fetch(descriptor).map { ProtectedSchedule(from: $0) }
+    }
+    
+    func updateFields(id: PersistentIdentifier, using updates: (Schedule) -> Void) throws {
+        let model = try fetchForID(id)
+        
+        updates(model)
         
         try modelContext.save()
-        item = fetchedItem
+    }
+    
+    func eraseAllData() throws {
+        try modelContext.delete(model: Schedule.self)
     }
     
     func eraseAllData() throws {
         try modelContext.delete(model: Schedule.self)
     }
 }
+
+// MARK: Helpers
+extension ScheduleStore {
+    func fetchForID(_ id: PersistentIdentifier) throws -> Schedule {
+        let descriptor = FetchDescriptor<Schedule>(
+            predicate: #Predicate { $0.id == id }
+        )
+        
+        guard let model = try? modelContext.fetch(descriptor).first else {
+            throw PersistenceStoreError.notFound
+        }
+        
+        return model
+    }
+}
+
