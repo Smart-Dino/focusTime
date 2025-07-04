@@ -11,7 +11,8 @@ import FamilyControls
 
 @Model
 final class BlockItem {
-    // Removed id because each Model instance gets a PersistenceIdentifier by default.
+    // Brought back the custom identifier for easier access across targets.
+    var id: UUID
     var name: String
     var emoji: String
     var blockedContent: FamilyActivitySelection
@@ -33,11 +34,13 @@ final class BlockItem {
     
     
     init(
+        id: UUID = UUID(),
         name: String,
         emoji: String,
         blockedContent: FamilyActivitySelection,
         schedules: [Schedule]? = nil
     ) {
+        self.id = id
         self.name = name
         self.emoji = emoji
         self.blockedContent = blockedContent
@@ -45,7 +48,8 @@ final class BlockItem {
     }
     
     convenience init(from item: ProtectedBlockItem) {
-        self.init(name: item.name,
+        self.init(id: item.id,
+                  name: item.name,
                   emoji: item.emoji,
                   blockedContent: item.blockedContent)
     }

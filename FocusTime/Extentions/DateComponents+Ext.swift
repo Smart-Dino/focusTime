@@ -60,8 +60,8 @@ extension DateComponents {
     /// let updated = components.adding(minutes: 15)
     /// // updated.hour == 0, updated.minute == 5
     /// ```
-    func adding(minutes: Int) -> DateComponents {
-        guard let hour = self.hour, let minute = self.minute else { return self }
+    func adding(minutes: Int) -> DateComponents? {
+        guard let hour = self.hour, let minute = self.minute else { return nil }
 
         let totalMinutes = hour * 60 + minute + minutes
         let newHour = (totalMinutes / 60) % 24

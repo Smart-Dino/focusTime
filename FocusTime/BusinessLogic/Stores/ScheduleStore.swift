@@ -78,17 +78,13 @@ actor ScheduleStore: PersistenceStore {
     func eraseAllData() throws {
         try modelContext.delete(model: Schedule.self)
     }
-    
-    func eraseAllData() throws {
-        try modelContext.delete(model: Schedule.self)
-    }
 }
 
 // MARK: Helpers
 extension ScheduleStore {
     func fetchForID(_ id: PersistentIdentifier) throws -> Schedule {
         let descriptor = FetchDescriptor<Schedule>(
-            predicate: #Predicate { $0.id == id }
+            predicate: #Predicate { $0.persistentModelID == id }
         )
         
         guard let model = try? modelContext.fetch(descriptor).first else {
@@ -98,4 +94,3 @@ extension ScheduleStore {
         return model
     }
 }
-

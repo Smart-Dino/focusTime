@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 import FamilyControls
 
 struct ShieldDebugView: View {
@@ -46,7 +47,9 @@ struct ShieldDebugView: View {
             }
             
             Button("Erase all data", role: .destructive) {
-                viewModel.eraseAllData()
+                Task {
+                    await viewModel.eraseAllData()
+                }
             }
             .buttonBorderShape(.capsule)
             .buttonStyle(.borderedProminent)
@@ -54,7 +57,6 @@ struct ShieldDebugView: View {
             // MARK: - Status
             sectionSeparator(sectionName: "Status")
             VStack(alignment: .leading) {
-                Text("Is blocked: \(viewModel.shieldManager.isShieldActive.description)")
                 Text("Apps chosen: \(viewModel.state.selection.applicationTokens.count)")
                 Text("Categories chosen: \(viewModel.state.selection.categoryTokens.count)")
             }
@@ -108,17 +110,13 @@ struct ShieldDebugView: View {
             
             Button("Create schedule") {
                 Task {
-                    do {
-                        try await viewModel.addScheduleToDB()
-                    } catch {
-                        print(error)
-                    }
+                    await viewModel.addScheduleToDB()
                 }
             }
             
             Button("Start schedule") {
                 Task {
-                    try viewModel.appendBlockItemToSchedule()
+                    await viewModel.appendBlockItemToSchedule()
                     await viewModel.blockSelectionDuringSchedule()
                 }
             }
@@ -162,12 +160,19 @@ struct ShieldDebugView: View {
             }, set: { bool in
                 viewModel.removeError(bool)
             }),
-            actions: { }
+            actions: {},
+            message: {
+                if let error = viewModel.state.error {
+                    Text(error.localizedDescription)
+                }
+            }
         )
-        .onAppear(perform: viewModel.fetchAllItems)
+        .task {
+            await viewModel.fetchAllItems()
+        }
     }
     
-    init(viewModel: ShieldDebugViewModel = ShieldDebugViewModel()) {
+    init(viewModel: ShieldDebugViewModel) {
         self.viewModel = viewModel
     }
     
@@ -182,5 +187,9 @@ struct ShieldDebugView: View {
 }
 
 #Preview {
-    ShieldDebugView()
+    ShieldDebugView(
+        viewModel: .init(
+            modelContainer: PreviewData.memoryOnlyModelContainer
+        )
+    )
 }

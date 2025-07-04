@@ -17,9 +17,7 @@ struct PersistenceTests {
     
     // MARK: - Initializer
     init() {
-        let schema = Schema([BlockItem.self, Schedule.self])
-        let config = ModelConfiguration(isStoredInMemoryOnly: true, groupContainer: .identifier(AppValues.appGroupIdentifier))
-        let container = try! ModelContainer(for: schema, configurations: config)
+        let container = SharedTestHelpers.generateTestModelContainer()
         self.modelContainer = container
         self.coordinator = RelationshipCoordinator(modelContainer: container)
     }

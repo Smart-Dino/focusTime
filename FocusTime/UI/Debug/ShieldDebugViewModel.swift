@@ -5,10 +5,9 @@
 //  Created by Maksym Horobets on 24.06.2025.
 //
 
+import SwiftData
 import Foundation
 import FamilyControls
-
-extension FamilyActivitySelection: @unchecked @retroactive Sendable {}
 
 @MainActor
 @Observable
@@ -19,35 +18,44 @@ final class ShieldDebugViewModel {
         var error: Error? = nil
         
         var selection: FamilyActivitySelection = .init()
-        var daySelection: Set<Weekday> = .init()
+        var daySelection: Set<Weekday> = Set(Weekday.allCases)
         
         var startTime: Date = .now
         var endTime: Date = .now
         
-        var schedules: [Schedule] = .init()
-        var blockItems: [BlockItem] = .init()
+        var schedules: [ProtectedSchedule] = .init()
+        var blockItems: [ProtectedBlockItem] = .init()
         
         var isAppSelectionPresented = false
     }
     
     // MARK: - Properties
     private(set) var state: State
-    let shieldManager: ShieldManager
+    // Shield-related.
+    private let shieldManager: ShieldManager
+    private let activityRegistrar: DeviceActivityRegistrar
+    // Model-related.
     private let scheduleStore: ScheduleStore
     private let blockItemStore: BlockItemStore
+    private let relationshipCoordinator: RelationshipCoordinator
+    
+    // Prepare for future async fetching tasks.
+    private var fetchTask: Task<Void, Never>? = nil
     
     // MARK: - Initializer
     init(
         state: State = State(),
         shieldManager: ShieldManager = LiveShieldManager(),
-        scheduleStore: ScheduleStore = ScheduleStore(),
-        blockItemStore: BlockItemStore = BlockItemStore()
-        
+        modelContainer: ModelContainer,
     ) {
         self.state = state
         self.shieldManager = shieldManager
-        self.scheduleStore = scheduleStore
-        self.blockItemStore = blockItemStore
+        self.activityRegistrar = LiveDeviceActivityRegistrar()
+        self.scheduleStore = ScheduleStore(modelContainer: modelContainer)
+        self.blockItemStore = BlockItemStore(modelContainer: modelContainer)
+        self.relationshipCoordinator = RelationshipCoordinator(modelContainer: modelContainer)
+        
+        activityRegistrar.unregisterAll()
     }
     
     // MARK: - Setters
@@ -81,67 +89,89 @@ final class ShieldDebugViewModel {
         }
     }
     
-    #warning("Code methods to reset app state instead of reinstalling it each time")
     // MARK: - Methods
-    func eraseAllData() {
+    func eraseAllData() async {
         do {
-            try blockItemStore.eraseAllData()
-            try scheduleStore.eraseAllData()
-            fetchAllItems()
+            try await blockItemStore.eraseAllData()
+            try await scheduleStore.eraseAllData()
+            await fetchAllItems()
         } catch {
             state.error = error
         }
     }
     
-    func addScheduleToDB() async throws {
-        let blockItems = try blockItemStore.fetch()
-        let scheduleItems = try blockItemStore.fetch()
-        guard blockItems.isEmpty || scheduleItems.isEmpty else { return }
-        
-        let blockItem = ProtectedBlockItem(emoji: "❌", name: "Block",
-                                           blockedContent: state.selection)
-        
-        
-        let startTime = Calendar.current.dateComponents([.hour, .minute], from: state.startTime)
-        let endTime = Calendar.current.dateComponents([.hour, .minute], from: state.endTime)
-        
-        let startComponent = TimeComponents(hour: startTime.hour!, minute: startTime.minute!)!
-        let endComponent = TimeComponents(hour: endTime.hour!, minute: endTime.minute!)!
-        
-        print(startComponent)
-        print(endComponent)
-        
-        let schedule = ProtectedSchedule(emoji: "🕑",
-                                name: "Schedule",
-                                days: state.daySelection,
-                                startTime: startComponent,
-                                endTime: endComponent)
-        
+    func addScheduleToDB() async {
         do {
-            try await blockItemStore.insert(blockItem)
-            try await scheduleStore.insert(schedule)
-        } catch {
-            state.error = error
-        }
-        
-        fetchAllItems()
-    }
-    
-    func fetchAllItems() {
-        do {
-            try state.schedules = scheduleStore.fetch()
-            try state.blockItems = blockItemStore.fetch()
-        } catch {
-            state.error = error
-        }
-    }
-    
-    func appendBlockItemToSchedule() {
-        do {
-            let blockItem = try blockItemStore.fetch(descriptor: .init()).first!
-            let schedule = try scheduleStore.fetch(descriptor: .init()).first!
+            let blockItems = try await blockItemStore.fetch()
+            let scheduleItems = try await scheduleStore.fetch()
             
-            schedule.blockItems?.append(blockItem)
+            // Ensure we only add if both stores are empty
+            guard blockItems.isEmpty && scheduleItems.isEmpty else { return }
+            
+            let blockItem = ProtectedBlockItem(emoji: "❌", name: "Block",
+                                               blockedContent: state.selection)
+            
+            let startTime = Calendar.current.dateComponents([.hour, .minute], from: state.startTime)
+            let endTime = Calendar.current.dateComponents([.hour, .minute], from: state.endTime)
+            
+            guard let startHour = startTime.hour,
+                  let startMinute = startTime.minute,
+                  let endHour = endTime.hour,
+                  let endMinute = endTime.minute,
+                  let startComponent = TimeComponents(hour: startHour, minute: startMinute),
+                  let endComponent = TimeComponents(hour: endHour, minute: endMinute)
+            else {
+                state.error = ShieldDebugError.timeComponent
+                return
+            }
+            
+            let schedule = ProtectedSchedule(emoji: "🕑",
+                                             name: "Schedule",
+                                             days: state.daySelection,
+                                             startTime: startComponent,
+                                             endTime: endComponent)
+            
+            do {
+                try await blockItemStore.insert(blockItem)
+                try await scheduleStore.insert(schedule)
+            } catch {
+                state.error = error
+            }
+            
+            await fetchAllItems()
+        } catch {
+            state.error = error
+        }
+    }
+    
+    func fetchAllItems() async {
+        do {
+            state.schedules = try await scheduleStore.fetch()
+            state.blockItems = try await blockItemStore.fetch()
+        } catch {
+            state.error = error
+        }
+    }
+    
+    func appendBlockItemToSchedule() async {
+        do {
+            guard let blockItem = try await blockItemStore.fetch(descriptor: .init()).first else {
+                return
+            }
+            guard let schedule = try await scheduleStore.fetch(descriptor: .init()).first else {
+                return
+            }
+            
+            guard let blockItemModelID = blockItem.persistentModelID,
+                  let schedulesModelID = schedule.persistentModelID
+            else {
+                throw ShieldDebugError.invalidPersistentIdentifiers
+            }
+            
+            try await relationshipCoordinator.relate(blockItemID: blockItemModelID,
+                                                     scheduleID: schedulesModelID)
+            
+            await fetchAllItems()
         } catch {
             state.error = error
         }
@@ -149,9 +179,11 @@ final class ShieldDebugViewModel {
     
     func blockSelectionDuringSchedule() async {
         do {
-            let schedule = try scheduleStore.fetch(descriptor: .init()).first!
+            guard let schedule = try await scheduleStore.fetch(descriptor: .init()).first else {
+                return
+            }
             
-            try await shieldManager.block(during: schedule)
+            try await activityRegistrar.registerActivity(during: schedule)
         } catch {
             state.error = error
         }
@@ -182,3 +214,4 @@ final class ShieldDebugViewModel {
         }
     }
 }
+

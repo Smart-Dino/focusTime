@@ -7,20 +7,20 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C66B28102E1825160018E7AC /* FocusTimeActivityMonitor.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E97895A52E0AFCBE00E0AF42 /* FocusTimeActivityMonitor.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		E96207822DD4EF2B002F037F /* FocusTimeUI in Frameworks */ = {isa = PBXBuildFile; productRef = E96207812DD4EF2B002F037F /* FocusTimeUI */; };
 		E97895A82E0AFCBF00E0AF42 /* DeviceActivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E97895A72E0AFCBE00E0AF42 /* DeviceActivity.framework */; };
-		E97895B02E0AFCBF00E0AF42 /* FocusTimeActivityMonitor.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E97895A52E0AFCBE00E0AF42 /* FocusTimeActivityMonitor.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		C63108822E13E02800001B52 /* PBXContainerItemProxy */ = {
+		C60711EE2E17E5F700798317 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 674FA6982DB05ACE0002FDC1 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 674FA69F2DB05ACE0002FDC1;
 			remoteInfo = FocusTime;
 		};
-		E97895AE2E0AFCBF00E0AF42 /* PBXContainerItemProxy */ = {
+		C66B28162E1825630018E7AC /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 674FA6982DB05ACE0002FDC1 /* Project object */;
 			proxyType = 1;
@@ -30,13 +30,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		E97895B52E0AFCBF00E0AF42 /* Embed Foundation Extensions */ = {
+		C66B28132E1825160018E7AC /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				E97895B02E0AFCBF00E0AF42 /* FocusTimeActivityMonitor.appex in Embed Foundation Extensions */,
+				C66B28102E1825160018E7AC /* FocusTimeActivityMonitor.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -55,17 +55,18 @@
 		E977C59E2E0B0AF40035A6AF /* Exceptions for "FocusTime" folder in "FocusTimeActivityMonitor" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				BusinessLogic/Managers/DeviceActivityHandler.swift,
 				BusinessLogic/Models/Blocking/BlockItem/BlockItem.swift,
 				BusinessLogic/Models/Blocking/BlockItem/ProtectedBlockItem.swift,
 				BusinessLogic/Models/Blocking/Schedule/ProtectedSchedule.swift,
 				BusinessLogic/Models/Blocking/Schedule/Schedule.swift,
 				BusinessLogic/Models/Blocking/Schedule/TimeComponents.swift,
 				BusinessLogic/Models/Blocking/Schedule/Weekday.swift,
-				BusinessLogic/Stores/BlockItemStore.swift,
-				BusinessLogic/Stores/DataSource/DataSource.swift,
-				BusinessLogic/Stores/DataSource/DataSourceError.swift,
-				BusinessLogic/Stores/ScheduleStore.swift,
+				BusinessLogic/Stores/Protocols/PersistenceStore.swift,
+				BusinessLogic/Stores/Protocols/PersistenceStoreError.swift,
+				BusinessLogic/Stores/Protocols/ProtectedModel.swift,
 				"Extentions/BlockItem+Codable.swift",
+				"Extentions/DateComponents+Ext.swift",
 				"Extentions/Schedule+Codable.swift",
 				Shared/AppValues.swift,
 			);
@@ -114,13 +115,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		C6FE59E32E156D8B003A2199 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		C631087B2E13E02800001B52 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -178,12 +172,12 @@
 				674FA69C2DB05ACE0002FDC1 /* Sources */,
 				674FA69D2DB05ACE0002FDC1 /* Frameworks */,
 				674FA69E2DB05ACE0002FDC1 /* Resources */,
-				E97895B52E0AFCBF00E0AF42 /* Embed Foundation Extensions */,
+				C66B28132E1825160018E7AC /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				E97895AF2E0AFCBF00E0AF42 /* PBXTargetDependency */,
+				C66B28172E1825630018E7AC /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				674FA6A22DB05ACE0002FDC1 /* FocusTime */,
@@ -319,14 +313,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		E97895A12E0AFCBE00E0AF42 /* Sources */ = {
+		C6FE59E22E156D8B003A2199 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		C6FE59E22E156D8B003A2199 /* Sources */ = {
+		E97895A12E0AFCBE00E0AF42 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -336,15 +330,15 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		E97895AF2E0AFCBF00E0AF42 /* PBXTargetDependency */ = {
+		C66B28172E1825630018E7AC /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = E97895A42E0AFCBE00E0AF42 /* FocusTimeActivityMonitor */;
-			targetProxy = E97895AE2E0AFCBF00E0AF42 /* PBXContainerItemProxy */;
+			targetProxy = C66B28162E1825630018E7AC /* PBXContainerItemProxy */;
 		};
-				C6FE59EB2E156D8B003A2199 /* PBXTargetDependency */ = {
+		C6FE59EB2E156D8B003A2199 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 674FA69F2DB05ACE0002FDC1 /* FocusTime */;
-			targetProxy = C6FE59EA2E156D8B003A2199 /* PBXContainerItemProxy */;
+			targetProxy = C60711EE2E17E5F700798317 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -540,6 +534,46 @@
 			};
 			name = Release;
 		};
+		C6FE59EC2E156D8B003A2199 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.dino.smart.FocusTimeTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FocusTime.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FocusTime";
+			};
+			name = Debug;
+		};
+		C6FE59ED2E156D8B003A2199 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.dino.smart.FocusTimeTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FocusTime.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FocusTime";
+			};
+			name = Release;
+		};
 		E97895B32E0AFCBF00E0AF42 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -568,7 +602,7 @@
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -601,48 +635,8 @@
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
-		C6FE59EC2E156D8B003A2199 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = org.dino.smart.FocusTimeTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FocusTime.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FocusTime";
-			};
-			name = Debug;
-		};
-		C6FE59ED2E156D8B003A2199 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = org.dino.smart.FocusTimeTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FocusTime.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FocusTime";
 			};
 			name = Release;
 		};
@@ -667,20 +661,20 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		E97895B22E0AFCBF00E0AF42 /* Build configuration list for PBXNativeTarget "FocusTimeActivityMonitor" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				E97895B32E0AFCBF00E0AF42 /* Debug */,
-				E97895B42E0AFCBF00E0AF42 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		C6FE59EE2E156D8B003A2199 /* Build configuration list for PBXNativeTarget "FocusTimeTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C6FE59EC2E156D8B003A2199 /* Debug */,
 				C6FE59ED2E156D8B003A2199 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E97895B22E0AFCBF00E0AF42 /* Build configuration list for PBXNativeTarget "FocusTimeActivityMonitor" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E97895B32E0AFCBF00E0AF42 /* Debug */,
+				E97895B42E0AFCBF00E0AF42 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

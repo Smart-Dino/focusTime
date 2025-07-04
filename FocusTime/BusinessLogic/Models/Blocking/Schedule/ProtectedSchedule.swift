@@ -10,7 +10,8 @@ import Foundation
 
 struct ProtectedSchedule: ProtectedModel {
     
-    var persistentModelID: PersistentIdentifier?
+    let id: UUID
+    let persistentModelID: PersistentIdentifier?
     
     let emoji: String
     let name: String
@@ -21,6 +22,7 @@ struct ProtectedSchedule: ProtectedModel {
     var daysDescription: String
 
     init(
+        id: UUID = UUID(),
         persistentModelID: PersistentIdentifier? = nil,
         emoji: String,
         name: String,
@@ -29,6 +31,7 @@ struct ProtectedSchedule: ProtectedModel {
         endTime: TimeComponents,
         daysDescription: String = "0 days"
     ) {
+        self.id = id
         self.persistentModelID = persistentModelID
         self.emoji = emoji
         self.name = name
@@ -39,7 +42,8 @@ struct ProtectedSchedule: ProtectedModel {
     }
     
     init(from item: Schedule) {
-        self.init(persistentModelID: item.persistentModelID,
+        self.init(id: item.id,
+                  persistentModelID: item.persistentModelID,
                   emoji: item.emoji,
                   name: item.name,
                   days: item.days,

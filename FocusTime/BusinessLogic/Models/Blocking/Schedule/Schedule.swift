@@ -10,8 +10,8 @@ import SwiftData
 
 @Model
 final class Schedule {
-    
-    // Removed id because each Model instance gets a PersistenceIdentifier by default.
+    // Brought back the custom identifier for easier access across targets.
+    var id: UUID
     var emoji: String
     var name: String
     var days: Set<Weekday>
@@ -37,6 +37,7 @@ final class Schedule {
     }
     
     init(
+        id: UUID = UUID(),
         emoji: String,
         name: String,
         days: Set<Weekday>,
@@ -44,6 +45,7 @@ final class Schedule {
         endTime: TimeComponents,
         blockItems: [BlockItem]? = nil
     ) {
+        self.id = id
         self.emoji = emoji
         self.name = name
         self.days = days

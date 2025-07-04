@@ -47,8 +47,8 @@ extension PersistenceTests {
         scheduleStore: ScheduleStore,
         blockItemStore: BlockItemStore
     ) async throws -> (
-        scheduleModelID: Schedule.ID,
-        blockItemModelID: BlockItem.ID,
+        scheduleModelID: PersistentIdentifier,
+        blockItemModelID: PersistentIdentifier,
         protectedSchedule: ProtectedSchedule,
         protectedBlockItem: ProtectedBlockItem
     ) {

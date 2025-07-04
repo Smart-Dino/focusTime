@@ -10,7 +10,7 @@ import Foundation
 import FamilyControls
 
 @ModelActor
-actor BlockItemStore: PersistenceStore { 
+actor BlockItemStore: PersistenceStore {
     
     @discardableResult
     func insert(_ item: ProtectedBlockItem) throws -> PersistentIdentifier {
@@ -85,7 +85,7 @@ actor BlockItemStore: PersistenceStore {
 extension BlockItemStore {
     func fetchForID(_ id: PersistentIdentifier) throws -> BlockItem {
         let descriptor = FetchDescriptor<BlockItem>(
-            predicate: #Predicate { $0.id == id }
+            predicate: #Predicate { $0.persistentModelID == id }
         )
         
         guard let model = try? modelContext.fetch(descriptor).first else {
@@ -93,9 +93,5 @@ extension BlockItemStore {
         }
         
         return model
-    }
-    
-    func eraseAllData() throws {
-        try modelContext.delete(model: BlockItem.self)
     }
 }
