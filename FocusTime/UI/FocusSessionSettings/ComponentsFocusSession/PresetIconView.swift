@@ -6,17 +6,18 @@
 //
 
 import SwiftUI
+import FocusTimeUI 
 
 struct PresetIconView: View {
-    let preset: FocusPreset 
+    let preset: FocusPreset
     let isSelected: Bool
     
     var body: some View {
         VStack(spacing: FocusSessionView.Constants.PresetIcon.Layout.mainSpacing) {
-            Text(preset.iconName) 
+            Text(preset.iconName)
                 .font(.largeTitle)
                 .frame(width: FocusSessionView.Constants.PresetIcon.Layout.size, height: FocusSessionView.Constants.PresetIcon.Layout.size)
-                .background(isSelected ? FocusSessionView.Constants.PresetIcon.Colors.selectedBackground : FocusSessionView.Constants.PresetIcon.Colors.background)
+                .background(isSelected ? Color.ftPresetSelectedBackground : Color.ftPresetBackground)
                 .cornerRadius(FocusSessionView.Constants.PresetIcon.Layout.cornerRadius)
             
             Text(preset.name)

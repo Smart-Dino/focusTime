@@ -24,13 +24,13 @@ struct FocusPresetGridView: View {
             
             LazyVGrid(columns: FocusSessionView.Constants.PresetGrid.Layout.gridColumns, spacing: FocusSessionView.Constants.PresetGrid.Layout.gridVSpacing) {
                 ForEach(presets) { preset in
-                    Button(action: {
+                    Button {
                         if selectedPreset == preset {
                             selectedPreset = nil
                         } else {
                             selectedPreset = preset
                         }
-                    }) {
+                    } label: {
                         PresetIconView(
                             preset: preset,
                             isSelected: selectedPreset == preset

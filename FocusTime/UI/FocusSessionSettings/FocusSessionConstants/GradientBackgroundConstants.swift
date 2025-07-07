@@ -6,13 +6,14 @@
 //
 
 import SwiftUI
+import FocusTimeUI 
 
 extension FocusSessionView.Constants {
     enum Gradient {
         enum Colors {
-            static let backgroundDeep = Color(hex: "#000C10")
-            static let gradientTop = Color(hex: "#0E4D76")
-            static let gradientBottom = Color(hex: "#9D71FE")
+            static let backgroundDeep = Color.ftDeepBackground
+            static let gradientTop = Color.ftGradientTop
+            static let gradientBottom = Color.ftGradientBottom
         }
         enum Layout {
             static let gradientOpacity: CGFloat = 0.3

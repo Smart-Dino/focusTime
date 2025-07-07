@@ -51,8 +51,10 @@ struct FocusSessionView: View {
                 }
             }
             .safeAreaInset(edge: .bottom) {
-                Button(Constants.Strings.startButtonTitle, systemImage: Constants.Symbols.startButtonIcon) {
+                Button {
                     viewModel.startTapped()
+                } label: {
+                    Label(Constants.Strings.startButtonTitle, systemImage: Constants.Symbols.startButtonIcon)
                 }
                 .buttonStyle(FTPrimaryButtonStyle())
                 .padding(.horizontal, Constants.Layout.floatingButtonHorizontalPadding)
@@ -103,4 +105,3 @@ struct FocusSessionView: View {
 #Preview {
     FocusSessionView()
 }
-

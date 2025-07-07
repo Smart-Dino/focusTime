@@ -11,13 +11,13 @@ extension FocusSessionView {
     
     public enum Constants {
         // MARK: - General Strings
-        public enum Strings { // MARK: - Made public
+        public enum Strings { 
             public static let navigationTitle = "Focus Setup"
             public static let startButtonTitle = "Start"
         }
         
         // MARK: - General Layout
-        public enum Layout { // MARK: - Made public
+        public enum Layout {
             public static let mainVStackSpacing: CGFloat = 40
             public static let sheetHeight: CGFloat = 400
             public static let sheetCornerRadius: CGFloat = 25
@@ -26,7 +26,7 @@ extension FocusSessionView {
         }
         
         // MARK: - General Colors
-        public enum Colors { // MARK: - Made public
+        public enum Colors {
             public static let background = Color(red: 0.07, green: 0.09, blue: 0.11)
             public static let navigationBarBackground = Color(red: 0.07, green: 0.09, blue: 0.11)
             public static let sheetBackground = Color(red: 0.1, green: 0.1, blue: 0.12)
@@ -34,14 +34,14 @@ extension FocusSessionView {
         }
         
         // MARK: - Symbols
-        public enum Symbols { // MARK: - Made public
+        public enum Symbols {
             public static let startButtonIcon = "hourglass"
             public static let navigationChevron = "chevron.right"
         }
         
         
         // MARK: - Default Values for ViewModel
-        public enum DefaultValues { // MARK: - Made public
+        public enum DefaultValues {
             public static let listName = "Focus Session"
             public static let durationHours = 0
             public static let durationMinutes = 30
@@ -51,7 +51,7 @@ extension FocusSessionView {
         
         
         // MARK: - Static Data
-        public enum Data { // MARK: - Made public
+        public enum Data {
             @MainActor public static let presets: [FocusPreset] = FocusPreset.allCases
         }
     }

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FocusTimeUI
 
 extension FocusSessionView.Constants {
     // MARK: - Constants for DaysPickerPopup
@@ -19,7 +20,7 @@ extension FocusSessionView.Constants {
         }
         enum Colors {
             static let divider = Color.white.opacity(0.15)
-            static let background = Color(red: 0.2, green: 0.2, blue: 0.22)
+            static let background = Color.ftDaysPickerBackground
             static let shadow = Color.black.opacity(0.3)
         }
         enum Symbols {
