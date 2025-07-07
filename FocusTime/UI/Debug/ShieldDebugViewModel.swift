@@ -111,19 +111,20 @@ final class ShieldDebugViewModel {
             let blockItem = ProtectedBlockItem(emoji: "❌", name: "Block",
                                                blockedContent: state.selection)
             
-            let startTime = Calendar.current.dateComponents([.hour, .minute], from: state.startTime)
-            let endTime = Calendar.current.dateComponents([.hour, .minute], from: state.endTime)
-            
-            guard let startHour = startTime.hour,
-                  let startMinute = startTime.minute,
-                  let endHour = endTime.hour,
-                  let endMinute = endTime.minute,
-                  let startComponent = TimeComponents(hour: startHour, minute: startMinute),
-                  let endComponent = TimeComponents(hour: endHour, minute: endMinute)
-            else {
+            guard let startComponent = TimeComponents(from: state.startTime),
+                  let endComponent = TimeComponents(from: state.endTime) else {
                 state.error = ShieldDebugError.timeComponent
                 return
             }
+            
+            print(startComponent)
+            print(endComponent)
+            
+            print(startComponent.dateComponents)
+            print(endComponent.dateComponents)
+            
+            print(startComponent.timeSince1970)
+            print(endComponent.timeSince1970)
             
             let schedule = ProtectedSchedule(emoji: "🕑",
                                              name: "Schedule",

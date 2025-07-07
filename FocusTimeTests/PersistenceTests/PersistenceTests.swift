@@ -22,7 +22,7 @@ struct PersistenceTests {
         self.coordinator = RelationshipCoordinator(modelContainer: container)
     }
 
-    @Test("Test adding to the database.")
+    @Test("Test adding to the database.", .tags(.persistenceStore))
     func createAndRead() async throws {
         let (scheduleStore, blockItemStore) = makeStores()
         let insertResults = try await insertTestItems(scheduleStore: scheduleStore,
@@ -37,7 +37,7 @@ struct PersistenceTests {
         #expect(insertResults.protectedBlockItem.name == blockItemModel.name)
     }
     
-    @Test("Test editing items in the database.")
+    @Test("Test editing items in the database.", .tags(.persistenceStore))
     func update() async throws {
         // New data to edit.
         let newName = "Test name"
@@ -74,7 +74,7 @@ struct PersistenceTests {
         )
     }
     
-    @Test("Test removing items from the database.")
+    @Test("Test removing items from the database.", .tags(.persistenceStore))
     func delete() async throws {
         let (scheduleStore, blockItemStore) = makeStores()
         
@@ -93,3 +93,4 @@ struct PersistenceTests {
         })
     }
 }
+

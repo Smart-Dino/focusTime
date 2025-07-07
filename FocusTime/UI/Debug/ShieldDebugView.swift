@@ -20,8 +20,12 @@ struct ShieldDebugView: View {
                     ForEach(viewModel.state.schedules) { schedule in
                         HStack {
                             Text(schedule.emoji)
-                            VStack {
-                                Text(schedule.name)
+                            VStack(alignment: .leading) {
+                                HStack {
+                                    Text(schedule.name)
+                                    Text(schedule.startTime.description + " - " + schedule.endTime.description)
+                                        .font(.footnote)
+                                }
                                 Text("Id: " + schedule.id.uuidString)
                                     .foregroundStyle(.secondary)
                             }
@@ -36,7 +40,7 @@ struct ShieldDebugView: View {
                     ForEach(viewModel.state.blockItems) { blockItem in
                         HStack {
                             Text(blockItem.emoji)
-                            VStack {
+                            VStack(alignment: .leading) {
                                 Text(blockItem.name)
                                 Text("Id: " + blockItem.id.uuidString)
                                     .foregroundStyle(.secondary)

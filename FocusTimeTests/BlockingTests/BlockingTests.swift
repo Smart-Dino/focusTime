@@ -82,14 +82,16 @@ struct BlockingTests {
     
     @Test("Scheduled blocking.",
           arguments: [
-            (TimeComponents(hour: 17, minute: 00)!, TimeComponents(hour: 21, minute: 00)!),
-            (TimeComponents(hour: 13, minute: 00)!, TimeComponents(hour: 14, minute: 00)!),
-            (TimeComponents(hour: 13, minute: 25)!, TimeComponents(hour: 13, minute: 30)!),
-            (TimeComponents(hour: 11, minute: 11)!, TimeComponents(hour: 11, minute: 12)!),
-            (TimeComponents(hour: 00, minute: 00)!, TimeComponents(hour: 01, minute: 00)!),
-            (TimeComponents(hour: 15, minute: 00)!, TimeComponents(hour: 14, minute: 00)!)
+            (17, 0, 21, 0),
+            (13, 0, 14, 0),
+            (13, 25, 13, 30),
+            (11, 11, 11, 12),
+            (0, 0, 1, 0),
+            (15, 0, 14, 0)
           ])
-    func scheduledBlocking(startTime: TimeComponents, endTime: TimeComponents) async throws {
+    func scheduledBlocking(startHour: Int, startMinute: Int, endHour: Int, endMinute: Int) async throws {
+        let startTime = try #require(TimeComponents(hour: startHour, minute: startMinute))
+        let endTime = try #require(TimeComponents(hour: endHour, minute: endMinute))
         // Setup.
         let schedule = ProtectedSchedule(emoji: "🧪",
                                          name: "Test",
