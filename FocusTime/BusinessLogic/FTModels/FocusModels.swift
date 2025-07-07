@@ -16,13 +16,13 @@ public enum Weekday: String, CaseIterable, Identifiable, Comparable {
     
     public var shortName: String {
         switch self {
-        case .monday: return "Mon"
-        case .tuesday: return "Tue"
-        case .wednesday: return "Wed"
-        case .thursday: return "Thu"
-        case .friday: return "Fri"
-        case .saturday: return "Sat"
-        case .sunday: return "Sun"
+        case .monday: return String(localized: "Mon", comment: "Short name for Monday")
+        case .tuesday: return String(localized: "Tue", comment: "Short name for Tuesday")
+        case .wednesday: return String(localized: "Wed", comment: "Short name for Wednesday")
+        case .thursday: return String(localized: "Thu", comment: "Short name for Thursday")
+        case .friday: return String(localized: "Fri", comment: "Short name for Friday")
+        case .saturday: return String(localized: "Sat", comment: "Short name for Saturday")
+        case .sunday: return String(localized: "Sun", comment: "Short name for Sunday")
         }
     }
     
@@ -37,7 +37,7 @@ public enum Weekday: String, CaseIterable, Identifiable, Comparable {
 }
 
 
-// MARK: - FocusPreset Enum (Changed from struct to enum)
+// MARK: - FocusPreset Enum
 public enum FocusPreset: String, CaseIterable, Identifiable {
     case morningRoutine
     case socialDetox
@@ -52,14 +52,14 @@ public enum FocusPreset: String, CaseIterable, Identifiable {
     
     public var name: String {
         switch self {
-        case .morningRoutine: return "Morning\nRoutine"
-        case .socialDetox: return "Social\nDetox"
-        case .workSprint: return "Work\nSprint"
-        case .zeroDistraction: return "Zero\nDistraction"
-        case .study: return "Study"
-        case .creative: return "Creative"
-        case .mindfulness: return "Mindfulness"
-        case .reading: return "Reading"
+        case .morningRoutine: return String(localized: "Morning\nRoutine", comment: "Focus preset: Morning Routine")
+        case .socialDetox: return String(localized: "Social\nDetox", comment: "Focus preset: Social Detox")
+        case .workSprint: return String(localized: "Work\nSprint", comment: "Focus preset: Work Sprint")
+        case .zeroDistraction: return String(localized: "Zero\nDistraction", comment: "Focus preset: Zero Distraction")
+        case .study: return String(localized: "Study", comment: "Focus preset: Study")
+        case .creative: return String(localized: "Creative", comment: "Focus preset: Creative")
+        case .mindfulness: return String(localized: "Mindfulness", comment: "Focus preset: Mindfulness")
+        case .reading: return String(localized: "Reading", comment: "Focus preset: Reading")
         }
     }
     
@@ -77,14 +77,14 @@ public enum FocusPreset: String, CaseIterable, Identifiable {
     }
 }
 
-// MARK: - ScheduleConfiguration Struct (Renamed from SessionConfiguration)
+// MARK: - ScheduleConfiguration Struct
 public struct ScheduleConfiguration {
     var listName: String
     var scheduleForLater: Bool
     var scheduledDays: Set<Weekday>
     var startTime: Date
     var endTime: Date
-    var selectedPreset: FocusPreset? 
+    var selectedPreset: FocusPreset?
     var selectedHours: Int
     var selectedMinutes: Int
 }

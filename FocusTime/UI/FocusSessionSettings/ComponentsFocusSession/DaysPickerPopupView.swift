@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FocusTimeUI 
 
 struct DaysPickerPopup: View {
     // MARK: - Properties
@@ -15,18 +16,18 @@ struct DaysPickerPopup: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             ForEach(Weekday.allCases.sorted()) { day in
-                Button(action: {
+                Button {
                     if scheduledDays.contains(day) {
                         scheduledDays.remove(day)
                     } else {
                         scheduledDays.insert(day)
                     }
-                }) {
+                } label: {
                     HStack(spacing: FocusSessionView.Constants.DaysPickerPopup.Layout.itemSpacing) {
                         Image(systemName: FocusSessionView.Constants.DaysPickerPopup.Symbols.checkmark)
                             .font(.body.weight(.bold))
                             .opacity(scheduledDays.contains(day) ? 1 : 0)
-                        Text(day.rawValue.capitalized)
+                        Text(LocalizedStringKey(day.rawValue.capitalized))
                         Spacer()
                     }
                     .padding(.horizontal)
@@ -42,7 +43,7 @@ struct DaysPickerPopup: View {
         }
         .background(
             RoundedRectangle(cornerRadius: FocusSessionView.Constants.DaysPickerPopup.Layout.cornerRadius)
-                .fill(FocusSessionView.Constants.DaysPickerPopup.Colors.background)
+                .fill(Color.ftDaysPickerBackground)
         )
         .compositingGroup()
         .shadow(color: FocusSessionView.Constants.DaysPickerPopup.Colors.shadow, radius: FocusSessionView.Constants.DaysPickerPopup.Layout.shadowRadius, y: FocusSessionView.Constants.DaysPickerPopup.Layout.shadowY)

@@ -6,12 +6,13 @@
 //
 
 import SwiftUI
+import FocusTimeUI 
 
 extension FocusSessionView.Constants {
     // MARK: - Constants for RowStyle
     public enum Row {
         public static let height: CGFloat = 64
         public static let cornerRadius: CGFloat = 12
-        public static let background = Color(hex: "#2C2C2E")
+        public static let background = Color.ftRowBackground
     }
 }

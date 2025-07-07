@@ -7,6 +7,7 @@
 
 
 import SwiftUI
+import FocusTimeUI 
 
 struct ScheduleConfigurationView: View {
     @Binding var configuration: ScheduleConfiguration
@@ -37,7 +38,7 @@ struct ScheduleConfigurationView: View {
                     }
                 }
                 .frame(width: FocusSessionView.Constants.Row.height, height: FocusSessionView.Constants.Row.height)
-                .background(FocusSessionView.Constants.Row.background)
+                .background(Color.ftRowBackground)
                 .cornerRadius(FocusSessionView.Constants.Row.cornerRadius)
             }
             
@@ -61,7 +62,7 @@ struct ScheduleConfigurationView: View {
             if configuration.scheduleForLater {
                 Menu {
                     ForEach(Weekday.allCases.sorted()) { day in
-                        Toggle(day.rawValue.capitalized, isOn: Binding(
+                        Toggle(LocalizedStringKey(day.rawValue.capitalized), isOn: Binding(
                             get: { self.configuration.scheduledDays.contains(day) },
                             set: { isSelected in
                                 if isSelected {
@@ -84,7 +85,9 @@ struct ScheduleConfigurationView: View {
                 }
                 .rowStyle()
                 
-                Button(action: onStartTimeTap) {
+                Button {
+                    onStartTimeTap()
+                } label: {
                     HStack {
                         Text(FocusSessionView.Constants.Configuration.Strings.startTime)
                         Spacer()
@@ -96,7 +99,9 @@ struct ScheduleConfigurationView: View {
                 }
                 .rowStyle()
                 
-                Button(action: onEndTimeTap) {
+                Button {
+                    onEndTimeTap()
+                } label: {
                     HStack {
                         Text(FocusSessionView.Constants.Configuration.Strings.letEndTime)
                         Spacer()
@@ -108,7 +113,9 @@ struct ScheduleConfigurationView: View {
                 }
                 .rowStyle()
             } else {
-                Button(action: onDurationTap) {
+                Button {
+                    onDurationTap()
+                } label: {
                     HStack {
                         Text(FocusSessionView.Constants.Configuration.Strings.duration)
                         Spacer()
@@ -121,7 +128,9 @@ struct ScheduleConfigurationView: View {
                 .rowStyle()
             }
             
-            Button(action: onAppsBlockedTap) {
+            Button {
+                onAppsBlockedTap()
+            } label: {
                 HStack {
                     Text(FocusSessionView.Constants.Configuration.Strings.appsBlocked)
                     Spacer()
@@ -142,31 +151,31 @@ struct ScheduleConfigurationView: View {
         formatter.zeroFormattingBehavior = .dropAll
         
         if configuration.selectedHours == 0 && configuration.selectedMinutes == 0 {
-            return "0m"
+            return String(localized: "0m", comment: "Zero minutes duration")
         }
         
-        return formatter.string(from: TimeInterval(configuration.selectedHours * 3600 + configuration.selectedMinutes * 60)) ?? "0m"
+        return formatter.string(from: TimeInterval(configuration.selectedHours * 3600 + configuration.selectedMinutes * 60)) ?? String(localized: "0m", comment: "Fallback zero minutes duration")
     }
     
     private var formattedScheduledDays: String {
         if configuration.scheduledDays.isEmpty {
-            return "Never"
+            return String(localized: "Never", comment: "No scheduled days")
         }
         if configuration.scheduledDays.count == Weekday.allCases.count {
-            return "Every Day"
+            return String(localized: "Every Day", comment: "Scheduled for every day")
         }
         if configuration.scheduledDays == Set([.saturday, .sunday]) {
-            return "Weekends"
+            return String(localized: "Weekends", comment: "Scheduled for weekends")
         }
         if configuration.scheduledDays == Set([.monday, .tuesday, .wednesday, .thursday, .friday]) {
-            return "Weekdays"
+            return String(localized: "Weekdays", comment: "Scheduled for weekdays")
         }
         
         let sortedDays = configuration.scheduledDays.sorted()
         if sortedDays.count <= 3 {
-            return sortedDays.map { $0.shortName }.joined(separator: ", ")
+            return sortedDays.map { $0.shortName }.joined(separator: String(localized: ", ", comment: "Separator for list of days"))
         } else {
-            return "\(sortedDays.count) days"
+            return String(localized: "\(sortedDays.count) days", comment: "Number of days scheduled")
         }
     }
     
