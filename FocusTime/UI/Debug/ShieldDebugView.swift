@@ -174,6 +174,11 @@ struct ShieldDebugView: View {
         .task {
             await viewModel.fetchAllItems()
         }
+        .onAppear {
+            let defaults = UserDefaults(suiteName: AppValues.appGroupIdentifier)!
+            let logArray = defaults.value(forKey: "LOG_STRINGS")
+            print(logArray ?? [])
+        }
     }
     
     init(viewModel: ShieldDebugViewModel) {

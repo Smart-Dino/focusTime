@@ -61,7 +61,7 @@ final class LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         
         // Start monitoring events.
         try center.startMonitoring(deviceActivityStartName, during: deviceActivityScheduleStart)
-        try center.startMonitoring(deviceActivityEndName, during: deviceActivityScheduleEnd)
+//        try center.startMonitoring(deviceActivityEndName, during: deviceActivityScheduleEnd)
     }
     
     func unregisterAll() {
