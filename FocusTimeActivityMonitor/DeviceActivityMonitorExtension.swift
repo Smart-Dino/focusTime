@@ -51,7 +51,7 @@ final class DeviceActivityMonitorExtension: DeviceActivityMonitor {
                     defaults.set(logs, forKey: key)
                     break
                 }
-                logs.append("Run, time \(formatted).")
+                logs.append("Run, time \(formatted) - \(Date().formatted(date: .omitted, time: .complete)).")
                 defaults.set(logs, forKey: key)
                 
                 
