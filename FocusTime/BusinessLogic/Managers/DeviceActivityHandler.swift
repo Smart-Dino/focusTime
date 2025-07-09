@@ -12,22 +12,13 @@ import FamilyControls
 import ManagedSettings
 
 struct DeviceActivityHandler {
-    private let store: ManagedSettingsStore
     private let container: ModelContainer
     
-    init(
-        store: ManagedSettingsStore,
-        container: ModelContainer
-    ) {
-        self.store = store
+    init(container: ModelContainer) {
         self.container = container
     }
     
-    func handleIntervalStart(for activity: DeviceActivityName) {
-        // Create context from scratch because using mainContext in a
-        // non-isolated to MainActor environment is not allowed.
-        let context = ModelContext(container)
-        
+    func handleBlockingStart(for activity: DeviceActivityName) {
         // Separate id and the start-end identifier.
         let idComponents = activity.rawValue.components(separatedBy: .whitespaces)
         
@@ -35,36 +26,69 @@ struct DeviceActivityHandler {
         // are compiled down to NSPredicate under the hood. NSPredicate cannot understand or evaluate Swift-specific
         // expressions like `id.uuidString`.
         // As a result, using `id.uuidString == identifier` silently fails and returns no matches.
-        guard let identifier = UUID(uuidString: idComponents[0]) else { return }
+        guard let identifier = UUID(uuidString: idComponents[0]),
+              let isFallback = Bool(idComponents[1])
+        else { return }
         
-        // Determine if it is a start or the end of the schedule.
-        let blockingPhase = idComponents[1]
+        let schedule = fetchSchedule(id: identifier)
         
-        if blockingPhase == "start" {
-            // Fetch the schedule.
-            let fetchDescriptor = FetchDescriptor<Schedule>(
-                predicate: #Predicate<Schedule> { $0.id == identifier }
-            )
-            let schedule = try? context.fetch(fetchDescriptor).first
+        // Make sure we have our schedule.
+        guard let schedule, let blockItems = schedule.blockItems else { return }
+        
+        // Make sure the current day is the block day.
+        guard schedule.days.contains(Weekday.currentDay) else { return }
+        
+        // Block user's selections.
+        guard let blockItems = schedule.blockItems else { return }
+        let selections = blockItems.map(\.blockedContent)
+        Self.blockSelections(selections: selections)
+        
+        // Sendability workaround since DeviceActivityName is not sendable.
+        let stringActivityName = activity.rawValue
+        if isFallback {
+            let endTimeComponent = schedule.endTime
+            Task {
+                while !Task.isCancelled {
+                    try? await Task.sleep(nanoseconds: 1_000_000_000)
+                    
+                    let currentTimeComponent = TimeComponents(from: .now)
+                    
+                    if currentTimeComponent == endTimeComponent {
+                        Self.unblockAll()
+                        break
+                    }
+                }
+                DeviceActivityCenter()
+                    .stopMonitoring(
+                        [DeviceActivityName(stringActivityName)]
+                    )
+            }
             
-            // Make sure we have our schedule.
-            guard let schedule, let blockItems = schedule.blockItems else { return }
-            
-            // Make sure the current day is the block day.
-            guard schedule.days.contains(Weekday.currentDay) else { return }
-            
-            let selections = blockItems.map(\.blockedContent)
-            blockSelections(selections: selections)
-            
-        } else {
-            unblockAll()
         }
         
         
     }
     
+    func handleBlockingEnd(for activity: DeviceActivityName) {
+        Self.unblockAll()
+    }
+    
+    private func fetchSchedule(id: UUID) -> Schedule? {
+        // Create context from scratch because using mainContext in a
+        // non-isolated to MainActor environment is not allowed.
+        let context = ModelContext(container)
+        
+        // Fetch the schedule.
+        let fetchDescriptor = FetchDescriptor<Schedule>(
+            predicate: #Predicate<Schedule> { $0.id == id }
+        )
+        
+        return try? context.fetch(fetchDescriptor).first
+    }
+    
     // MARK: - Helpers
-    private func blockSelections(selections: [FamilyActivitySelection]) {
+    static private func blockSelections(selections: [FamilyActivitySelection]) {
+        let store = ManagedSettingsStore()
         // Add all the items to discourage.
         var applicationsToDiscourage = Set<ApplicationToken>()
         var applicationCategoriesToDiscourage = Set<ActivityCategoryToken>()
@@ -74,22 +98,12 @@ struct DeviceActivityHandler {
             applicationCategoriesToDiscourage.formUnion(selection.categoryTokens)
         }
         
-        // Block selected applications.
-//        if applicationsToDiscourage.isEmpty {
-//            store.shield.applications = nil
-//        } else {
-            store.shield.applications = applicationsToDiscourage
-//        }
-        
-        // Block selected categories.
-//        if applicationCategoriesToDiscourage.isEmpty {
-//            store.shield.applicationCategories = nil
-//        } else {
-            store.shield.applicationCategories = .specific(applicationCategoriesToDiscourage)
-//        }
+        store.shield.applications = applicationsToDiscourage
+        store.shield.applicationCategories = .specific(applicationCategoriesToDiscourage)
     }
     
-    private func unblockAll() {
+    static private func unblockAll() {
+        let store = ManagedSettingsStore()
         store.shield.applications = nil
         store.shield.applicationCategories = nil
     }

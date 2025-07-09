@@ -31,37 +31,50 @@ final class LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
     // We can solve this by having two separate schedules that are both 15+
     // mins in length but have less than 15 minutes in-between them!
     func registerActivity(during schedule: ProtectedSchedule) async throws {
-        guard schedule.persistentModelID != nil else { throw ShieldManagerError.noPersistentItem }
+        // Try to schedule event.
+        // If schedule fails - use fallback method.
         try await checkAuthorization()
         
-        // Start of interval + 15 mins.
+        do {
+            try registerRegularActivity(for: schedule)
+        } catch {
+            // If this fails - error will get thrown from the function.
+            try registerFallbackActivity(for: schedule)
+        }
+    }
+    
+    private func registerRegularActivity(for schedule: ProtectedSchedule) throws {
+        guard schedule.persistentModelID != nil else { throw ShieldManagerError.noPersistentItem }
+        
         let intervalStart = schedule.startTime.dateComponents
-        guard let startAddingFifteen = intervalStart.adding(minutes: 15) else {
-            throw ShieldManagerError.couldNotSetTime
-        }
-        
-        // End of interval + 15 mins.
         let intervalEnd = schedule.endTime.dateComponents
-        guard let endAddingFifteen = intervalEnd.adding(minutes: 15) else {
-            throw ShieldManagerError.couldNotSetTime
-        }
-        
-        // Generate ids for querying DB.
-        let deviceActivityStartName = DeviceActivityName(schedule.id.uuidString + " start")
-        let deviceActivityEndName = DeviceActivityName(schedule.id.uuidString + " end")
-        
-        // Schedule both events.
-        let deviceActivityScheduleStart = DeviceActivitySchedule(intervalStart: intervalStart,
-                                                            intervalEnd: startAddingFifteen,
+        let deviceActivitySchedule = DeviceActivitySchedule(intervalStart: intervalStart,
+                                                            intervalEnd: intervalEnd,
                                                             repeats: true)
         
-        let deviceActivityScheduleEnd = DeviceActivitySchedule(intervalStart: intervalEnd,
-                                                            intervalEnd: endAddingFifteen,
+        // Let the DeviceActivityMonitorExtension know that we need a regular scenario.
+        let isFallback = false.description
+        let deviceActivityName = DeviceActivityName(schedule.id.uuidString + " " + isFallback)
+        
+        try center.startMonitoring(deviceActivityName, during: deviceActivitySchedule)
+        
+    }
+    
+    private func registerFallbackActivity(for schedule: ProtectedSchedule) throws {
+        guard schedule.persistentModelID != nil else { throw ShieldManagerError.noPersistentItem }
+        
+        let intervalStart = schedule.startTime.dateComponents
+        // Shift interval end to satisfy DeviceActivityCenter - workaround.
+        guard let intervalEnd = schedule.endTime.dateComponents.adding(minutes: 15) else { throw ShieldManagerError.couldNotSetTime }
+        let deviceActivitySchedule = DeviceActivitySchedule(intervalStart: intervalStart,
+                                                            intervalEnd: intervalEnd,
                                                             repeats: true)
         
-        // Start monitoring events.
-        try center.startMonitoring(deviceActivityStartName, during: deviceActivityScheduleStart)
-//        try center.startMonitoring(deviceActivityEndName, during: deviceActivityScheduleEnd)
+        // Let the DeviceActivityMonitorExtension know that we need a fallback scenario.
+        let isFallback = true.description
+        let deviceActivityName = DeviceActivityName(schedule.id.uuidString + " " + isFallback)
+        
+        try center.startMonitoring(deviceActivityName, during: deviceActivitySchedule)
     }
     
     func unregisterAll() {
