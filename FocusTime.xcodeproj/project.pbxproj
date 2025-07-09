@@ -7,11 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0C037A3F2E1D362200DAAC9D /* OnboardingKit in Frameworks */ = {isa = PBXBuildFile; productRef = 0C037A3E2E1D362200DAAC9D /* OnboardingKit */; };
 		0C60F8882E12BDF100EEA3F3 /* OnboardingLocalizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 0C60F8872E12BDF000EEA3F3 /* OnboardingLocalizable.xcstrings */; };
 		E96207822DD4EF2B002F037F /* FocusTimeUI in Frameworks */ = {isa = PBXBuildFile; productRef = E96207812DD4EF2B002F037F /* FocusTimeUI */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0C037A412E1E410A00DAAC9D /* OnboardingKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = OnboardingKit; path = /Users/ketonioradze/Downloads/OnboardingKit; sourceTree = "<absolute>"; };
 		0C60F8872E12BDF000EEA3F3 /* OnboardingLocalizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = OnboardingLocalizable.xcstrings; sourceTree = "<group>"; };
 		674FA6A02DB05ACE0002FDC1 /* FocusTime.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FocusTime.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E962077F2DD4D1E5002F037F /* FocusTimeUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = FocusTimeUI; sourceTree = "<group>"; };
@@ -30,6 +32,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0C037A3F2E1D362200DAAC9D /* OnboardingKit in Frameworks */,
 				E96207822DD4EF2B002F037F /* FocusTimeUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -40,6 +43,7 @@
 		674FA6972DB05ACE0002FDC1 = {
 			isa = PBXGroup;
 			children = (
+				0C037A412E1E410A00DAAC9D /* OnboardingKit */,
 				0C60F8872E12BDF000EEA3F3 /* OnboardingLocalizable.xcstrings */,
 				E962077F2DD4D1E5002F037F /* FocusTimeUI */,
 				674FA6A22DB05ACE0002FDC1 /* FocusTime */,
@@ -76,6 +80,7 @@
 			name = FocusTime;
 			packageProductDependencies = (
 				E96207812DD4EF2B002F037F /* FocusTimeUI */,
+				0C037A3E2E1D362200DAAC9D /* OnboardingKit */,
 			);
 			productName = FocusTime;
 			productReference = 674FA6A02DB05ACE0002FDC1 /* FocusTime.app */;
@@ -107,6 +112,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				E96207802DD4EF2B002F037F /* XCLocalSwiftPackageReference "FocusTimeUI" */,
+				0C037A3D2E1D362200DAAC9D /* XCRemoteSwiftPackageReference "OnboardingKit" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 674FA6A12DB05ACE0002FDC1 /* Products */;
@@ -302,10 +308,12 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = FocusTime/FocusTime.entitlements;
-				CODE_SIGN_STYLE = Automatic;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"FocusTime/Preview Content\"";
-				DEVELOPMENT_TEAM = 242HT6L8AJ;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 242HT6L8AJ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -321,6 +329,8 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dino.smart.FocusTime;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = FocusTimeProvisioning;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -357,7 +367,23 @@
 		};
 /* End XCLocalSwiftPackageReference section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		0C037A3D2E1D362200DAAC9D /* XCRemoteSwiftPackageReference "OnboardingKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Smart-Dino/OnboardingKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
+		0C037A3E2E1D362200DAAC9D /* OnboardingKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0C037A3D2E1D362200DAAC9D /* XCRemoteSwiftPackageReference "OnboardingKit" */;
+			productName = OnboardingKit;
+		};
 		E96207812DD4EF2B002F037F /* FocusTimeUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = FocusTimeUI;
