@@ -53,10 +53,13 @@ final class LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
                                                             repeats: true)
         
         // Let the DeviceActivityMonitorExtension know that we need a regular scenario.
-        let isFallback = false.description
-        let deviceActivityName = DeviceActivityName(schedule.id.uuidString + " " + isFallback)
+        guard let activityIdentifier = CodableActivityIdentifier(scheduleID: schedule.id,
+                                                                 isFallback: false).jsonString
+        else { throw ShieldManagerError.couldNotGenerateIdentifier }
         
-        try center.startMonitoring(deviceActivityName, during: deviceActivitySchedule)
+        let activityName = DeviceActivityName(activityIdentifier)
+        
+        try center.startMonitoring(activityName, during: deviceActivitySchedule)
         
     }
     
@@ -71,10 +74,13 @@ final class LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
                                                             repeats: true)
         
         // Let the DeviceActivityMonitorExtension know that we need a fallback scenario.
-        let isFallback = true.description
-        let deviceActivityName = DeviceActivityName(schedule.id.uuidString + " " + isFallback)
+        guard let activityIdentifier = CodableActivityIdentifier(scheduleID: schedule.id,
+                                                                 isFallback: true).jsonString
+        else { throw ShieldManagerError.couldNotGenerateIdentifier }
         
-        try center.startMonitoring(deviceActivityName, during: deviceActivitySchedule)
+        let activityName = DeviceActivityName(activityIdentifier)
+        
+        try center.startMonitoring(activityName, during: deviceActivitySchedule)
     }
     
     func unregisterAll() {

@@ -19,18 +19,9 @@ struct DeviceActivityHandler {
     }
     
     func handleBlockingStart(for activity: DeviceActivityName) {
-        // Separate id and the start-end identifier.
-        let idComponents = activity.rawValue.components(separatedBy: .whitespaces)
+        guard let activityIdentifier = try? CodableActivityIdentifier(from: activity) else { return }
         
-        // Convert the string-based schedule identifier back into a UUID because SwiftData's #Predicate closures
-        // are compiled down to NSPredicate under the hood. NSPredicate cannot understand or evaluate Swift-specific
-        // expressions like `id.uuidString`.
-        // As a result, using `id.uuidString == identifier` silently fails and returns no matches.
-        guard let identifier = UUID(uuidString: idComponents[0]),
-              let isFallback = Bool(idComponents[1])
-        else { return }
-        
-        let schedule = fetchSchedule(id: identifier)
+        let schedule = fetchSchedule(id: activityIdentifier.scheduleID)
         
         // Make sure we have our schedule.
         guard let schedule, let blockItems = schedule.blockItems else { return }
@@ -39,13 +30,13 @@ struct DeviceActivityHandler {
         guard schedule.days.contains(Weekday.currentDay) else { return }
         
         // Block user's selections.
-        guard let blockItems = schedule.blockItems else { return }
         let selections = blockItems.map(\.blockedContent)
         Self.blockSelections(selections: selections)
         
         // Sendability workaround since DeviceActivityName is not sendable.
         let stringActivityName = activity.rawValue
-        if isFallback {
+        
+        if activityIdentifier.isFallback {
             let endTimeComponent = schedule.endTime
             Task {
                 while !Task.isCancelled {
