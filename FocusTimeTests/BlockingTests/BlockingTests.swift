@@ -40,7 +40,7 @@ struct BlockingTests {
         let container = SharedTestHelpers.generateTestModelContainer()
         self.shieldManager = LiveShieldManager()
         self.activityRegistrar = LiveDeviceActivityRegistrar(center: center)
-        self.activityHandler = DeviceActivityHandler(store: store, container: container)
+        self.activityHandler = DeviceActivityHandler(container: container)
         
         // Stores.
         self.scheduleStore = ScheduleStore(modelContainer: container)
@@ -103,57 +103,74 @@ struct BlockingTests {
         let scheduleModelID = try await scheduleStore.insert(schedule)
         let fetchedSchedule = try #require(try await scheduleStore.fetch(id: scheduleModelID))
         
+        // Register the activity.
         try await activityRegistrar.registerActivity(during: fetchedSchedule)
-        // Evaluate.
-        let startSchedule = try #require(center.schedule(for: DeviceActivityName(rawValue: fetchedSchedule.id.uuidString + " start")))
-        let endSchedule = try #require(center.schedule(for: DeviceActivityName(rawValue: fetchedSchedule.id.uuidString + " end")))
         
-        let startComponents = startSchedule.intervalStart
-        let endComponents = endSchedule.intervalStart
+        // Fetch the registered schedule.
+        let activities = center.activities
         
-        #expect(
-            startTime.dateComponents == startComponents
-            && endTime.dateComponents == endComponents
+        let registeredScheduleName = try #require(
+            activities.first(where: { $0.rawValue.contains(fetchedSchedule.id.uuidString) })
         )
+        
+        // Decide the identifier to check whether it was scheduled with fallback.
+        let decodedIdentifier = try #require(try CodableActivityIdentifier(from: registeredScheduleName))
+        let wasScheduledWithFallback = decodedIdentifier.isFallback
+        
+        let registeredSchedule = try #require(
+            center.schedule(for: registeredScheduleName)
+        )
+        
+        if !wasScheduledWithFallback {
+            #expect(registeredSchedule.intervalStart == startTime.dateComponents &&
+                    registeredSchedule.intervalEnd == endTime.dateComponents)
+        } else {
+            // In case of fallback the intervalEnd is usually shifted 15 minutes, so we don't check that.
+            #expect(registeredSchedule.intervalStart == startTime.dateComponents)
+        }
     }
     
     @Test("Testing blocking from a database item.", .tags(.persistenceStore))
     func blockFromDatabase() async throws {
         // Setup selection.
-        let applications = Set<ApplicationToken>() // Cannot add any tokens here...
-        let categories = Set<ActivityCategoryToken>() // Cannot add any tokens here...
-        
+        let applications = Set<ApplicationToken>()
+        let categories = Set<ActivityCategoryToken>()
+
         var selection = FamilyActivitySelection()
         selection.applicationTokens = applications
         selection.categoryTokens = categories
-        
+
         // Create a schedule with selection.
         let scheduleModelID = try await insertTestScheduleRelatedToBlockItem(with: selection)
-        
+
         // Fetch schedule model.
         let fetchedSchedule = try #require(try await scheduleStore.fetch(id: scheduleModelID))
+
+        // Build the activity identifier and name.
+        let activityIdentifier = CodableActivityIdentifier(scheduleID: fetchedSchedule.id, isFallback: false)
+        let activityIdentifierJSON = try #require(activityIdentifier.jsonString)
         
-        // Start schedule.
+        let activityName = DeviceActivityName(activityIdentifierJSON)
+
+        // Start schedule in the registrar.
         try await activityRegistrar.registerActivity(during: fetchedSchedule)
-        
-        // Simulate starting the start interval.
-        let startActivityName = DeviceActivityName(rawValue: fetchedSchedule.id.uuidString + " start")
-        activityHandler.handleIntervalStart(for: startActivityName)
-        
+
+        // Simulate starting the interval.
+        activityHandler.handleBlockingStart(for: activityName)
+
         try #require(shieldManager.isShieldActive)
-        
+
         #expect(
-            store.shield.applications == Set<ApplicationToken>()
-            && store.shield.applicationCategories == .specific(categories)
+            store.shield.applications == Set<ApplicationToken>() &&
+            store.shield.applicationCategories == .specific(categories)
         )
-        
-        // Simulate starting the end interval.
-        let endActivityName = DeviceActivityName(rawValue: fetchedSchedule.id.uuidString + " end")
-        activityHandler.handleIntervalStart(for: endActivityName)
-        
+
+        // Simulate ending the interval.
+        activityHandler.handleBlockingEnd(for: activityName)
+
         #expect(
-            store.shield.applications == nil
-            && store.shield.applicationCategories == nil
+            store.shield.applications == nil &&
+            store.shield.applicationCategories == nil
         )
     }
     
