@@ -55,7 +55,7 @@
 		E977C59E2E0B0AF40035A6AF /* Exceptions for "FocusTime" folder in "FocusTimeActivityMonitor" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				BusinessLogic/Managers/DeviceActivityHandler.swift,
+				BusinessLogic/Managers/DeviceActivityHandler/DeviceActivityHandler.swift,
 				BusinessLogic/Models/Blocking/BlockItem/BlockItem.swift,
 				BusinessLogic/Models/Blocking/BlockItem/ProtectedBlockItem.swift,
 				BusinessLogic/Models/Blocking/CodableActivityIdentifier/CodableActivityIdentifier.swift,

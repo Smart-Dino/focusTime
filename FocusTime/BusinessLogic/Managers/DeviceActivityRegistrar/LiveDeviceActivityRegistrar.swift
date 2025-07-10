@@ -24,12 +24,7 @@ final class LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
     init(center: DeviceActivityCenter = DeviceActivityCenter()) {
         self.center = center
     }
-    
-    // The reason why we schedule two schedules instead of one
-    // is because if the user wants an interval to be less than 15 minutes
-    // - the system will not allow us to do so and throw an error.
-    // We can solve this by having two separate schedules that are both 15+
-    // mins in length but have less than 15 minutes in-between them!
+
     func registerActivity(during schedule: ProtectedSchedule) async throws {
         // Try to schedule event.
         // If schedule fails - use fallback method.
