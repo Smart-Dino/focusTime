@@ -58,6 +58,7 @@
 				BusinessLogic/Managers/DeviceActivityHandler.swift,
 				BusinessLogic/Models/Blocking/BlockItem/BlockItem.swift,
 				BusinessLogic/Models/Blocking/BlockItem/ProtectedBlockItem.swift,
+				BusinessLogic/Models/Blocking/CodableActivityIdentifier/CodableActivityIdentifier.swift,
 				BusinessLogic/Models/Blocking/Schedule/ProtectedSchedule.swift,
 				BusinessLogic/Models/Blocking/Schedule/Schedule.swift,
 				BusinessLogic/Models/Blocking/Schedule/TimeComponents.swift,
