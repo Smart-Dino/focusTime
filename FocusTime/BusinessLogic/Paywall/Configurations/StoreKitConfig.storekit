@@ -14,75 +14,56 @@
 
   ],
   "products" : [
-    {
-      "displayPrice" : "399.9",
-      "familyShareable" : false,
-      "internalID" : "33F0539F",
-      "localizations" : [
-        {
-          "description" : "Unlock this app forever",
-          "displayName" : "Lifetime",
-          "locale" : "en_US"
-        }
-      ],
-      "productID" : "org.dino.smart.focustime.lifetime",
-      "referenceName" : "Lifetime",
-      "type" : "NonConsumable"
-    }
+
   ],
   "settings" : {
     "_askToBuyEnabled" : true,
+    "_billingGracePeriodEnabled" : false,
     "_billingIssuesEnabled" : true,
+    "_disableDialogs" : false,
     "_failTransactionsEnabled" : false,
     "_locale" : "en_US",
+    "_renewalBillingIssuesEnabled" : false,
     "_storefront" : "USA",
     "_storeKitErrors" : [
       {
-        "current" : null,
         "enabled" : false,
         "name" : "Load Products"
       },
       {
-        "current" : null,
         "enabled" : false,
         "name" : "Purchase"
       },
       {
-        "current" : null,
         "enabled" : false,
         "name" : "Verification"
       },
       {
-        "current" : null,
         "enabled" : false,
         "name" : "App Store Sync"
       },
       {
-        "current" : null,
         "enabled" : false,
         "name" : "Subscription Status"
       },
       {
-        "current" : null,
         "enabled" : false,
         "name" : "App Transaction"
       },
       {
-        "current" : null,
         "enabled" : false,
         "name" : "Manage Subscriptions Sheet"
       },
       {
-        "current" : null,
         "enabled" : false,
         "name" : "Refund Request Sheet"
       },
       {
-        "current" : null,
         "enabled" : false,
         "name" : "Offer Code Redeem Sheet"
       }
-    ]
+    ],
+    "_timeRate" : 0
   },
   "subscriptionGroups" : [
     {
@@ -103,12 +84,7 @@
           "familyShareable" : false,
           "groupNumber" : 1,
           "internalID" : "F99C34B6",
-          "introductoryOffer" : {
-            "displayPrice" : "0.99",
-            "internalID" : "909AE3F0",
-            "paymentMode" : "free",
-            "subscriptionPeriod" : "P3D"
-          },
+          "introductoryOffer" : null,
           "localizations" : [
             {
               "description" : "Unlock pro features for a month",
@@ -136,7 +112,11 @@
           "familyShareable" : false,
           "groupNumber" : 1,
           "internalID" : "8140C7CD",
-          "introductoryOffer" : null,
+          "introductoryOffer" : {
+            "internalID" : "9A6D17A9",
+            "paymentMode" : "free",
+            "subscriptionPeriod" : "P3D"
+          },
           "localizations" : [
             {
               "description" : "Unlock pro features for a week",

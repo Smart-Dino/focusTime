@@ -5,6 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "FocusTimeUI",
+    defaultLocalization: "en",
     platforms: [
         .iOS(.v17)
     ],

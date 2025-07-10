@@ -10,14 +10,14 @@ import Foundation
 extension SlideOnboardingView {
     enum Constants {
         enum Strings {
-            static let title = "RIDE THE WAVES OF PRODUCTIVITY"
-            static let nextButton = "Next"
-            static let skipButton = "Skip"
-            static let startButton = "Start Focusing"
-            static let alertTitle = "Before you go..."
-            static let alertMessage = "Are you sure you want to skip the onboarding?"
-            static let skipAnyway = "Skip anyway"
-            static let goBack = "Go back"
+            static let title = String(localized: "RIDE THE WAVES OF PRODUCTIVITY", table: "OnboardingLocalizable")
+            static let nextButton = String(localized: "Next", table: "OnboardingLocalizable")
+            static let skipButton = String(localized: "Skip", table: "OnboardingLocalizable")
+            static let startButton = String(localized: "Start Focusing", table: "OnboardingLocalizable")
+            static let alertTitle = String(localized: "Before you go...", table: "OnboardingLocalizable")
+            static let alertMessage = String(localized: "Are you sure you want to skip the onboarding?", table: "OnboardingLocalizable")
+            static let skipAnyway = String(localized: "Skip anyway", table: "OnboardingLocalizable")
+            static let goBack = String(localized: "Go back", table: "OnboardingLocalizable")
         }
 
         enum Layout {
@@ -36,24 +36,25 @@ enum SlideOnboardingStep: CaseIterable {
 
     var subtitle1: String {
         switch self {
-        case .step1: return "Wave Cycles"
-        case .step2: return "Tide Blocker"
-        case .step3: return "Current Tracker"
-        case .step4: return "Ocean of Achievement"
+        case .step1: return String(localized: "Wave Cycles", table: "OnboardingLocalizable")
+        case .step2: return String(localized: "Tide Blocker", table: "OnboardingLocalizable")
+        case .step3: return String(localized: "Current Tracker", table: "OnboardingLocalizable")
+        case .step4: return String(localized: "Ocean of Achievement", table: "OnboardingLocalizable")
         }
+        
     }
 
     var subtitle2: String {
         switch self {
         case .step1:
-            return "25-minute focus sessions followed by 5-minute recovery breaks, modeled after the natural rhythm of ocean waves"
-        case .step2:
-            return "Automatically silences notifications and blocks distracting apps during your focus sessions, keeping your mental waters clear"
-        case .step3:
-            return "Visualize your productivity patterns with intuitive analytics that show your focus trends and improvements over time"
-        case .step4:
-            return "Collect unique marine-themed awards as you develop stronger focus habits and reach new productivity depths"
-        }
+             return String(localized: "25-minute focus sessions followed by 5-minute recovery breaks, modeled after the natural rhythm of ocean waves", table: "OnboardingLocalizable")
+         case .step2:
+             return String(localized: "Automatically silences notifications and blocks distracting apps during your focus sessions, keeping your mental waters clear", table: "OnboardingLocalizable")
+         case .step3:
+             return String(localized: "Visualize your productivity patterns with intuitive analytics that show your focus trends and improvements over time", table: "OnboardingLocalizable")
+         case .step4:
+             return String(localized: "Collect unique marine-themed awards as you develop stronger focus habits and reach new productivity depths", table: "OnboardingLocalizable")
+         }
     }
     
     var imageName: String {

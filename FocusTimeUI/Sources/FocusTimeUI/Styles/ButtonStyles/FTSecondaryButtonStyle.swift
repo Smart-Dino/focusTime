@@ -21,6 +21,7 @@ import SwiftUI
 ///       .buttonStyle(FTSecondaryButtonStyle())
 ///   ```
 public struct FTSecondaryButtonStyle: ButtonStyle {
+    @Environment(\.isEnabled) private var isEnabled
     
     /// Initializes the primary button style.
     public init() { }
@@ -33,8 +34,7 @@ public struct FTSecondaryButtonStyle: ButtonStyle {
             .background(.ultraThinMaterial)
             .clipShape(.capsule)
             .opacity(configuration.isPressed ? 0.8 : 1)
-        // TODO: We would need to discuss a way to implement it with UI/UX team
-        #warning("ButtonStyle does not implement disable state")
+            .opacity(isEnabled ? 1 : 0.3)
     }
     
 }

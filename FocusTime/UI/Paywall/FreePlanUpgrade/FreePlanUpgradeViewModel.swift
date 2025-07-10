@@ -14,170 +14,123 @@ import Foundation
 final class FreePlanUpgradeViewModel {
     // MARK: - Nested declarations
     struct State {
-        var error: Error?
+        let requestedProductID: String
+        var superState: SuperPaywallViewModel.State
         
-        var trialProduct: FTProduct
-        var purchaseResult: FTProduct.PurchaseResult?
+        // Dynamic strings
+        static let stringConstants = FreePlanUpgradeView.Constants.Strings.self
+        var purchaseButtonTitle    = stringConstants.tryButtonTitle
+        var trialPeriodDescription = stringConstants.loadingTitle
         
-        var isButtonDisabled: Bool = true
-        var purchaseButtonTitle = FreePlanUpgradeView.Constants.Strings.tryButtonTitle
-        var formattedPrice: String?
-        var trialPeriodDescription: String = FreePlanUpgradeView.Constants.Strings.loadingMessage
+        init(
+            requestedProductID: String,
+            superState: SuperPaywallViewModel.State = .init()
+        ) {
+            self.requestedProductID = requestedProductID
+            self.superState = superState
+        }
     }
     
     // MARK: - Properties
     private(set) var state: State
-    private var subscriptionTask: Task<Void, Never>?
+    private var superPaywallVM: SuperPaywallViewModel
     
-    // Made this property private becase it is injected
-    // through the initializer, not a property.
-    private let paymentManager: PaymentManager
+    // The flow delegate property is accessed by SubscriptionUtilityLinksView in the view
+    let flowDelegate: PaywallNavigationDelegate?
     
     // MARK: - Initializers
     init(
         state: State,
-        paymentManager: PaymentManager
+        superPaywallVM: SuperPaywallViewModel,
+        flowDelegate: PaywallNavigationDelegate?
     ) {
         self.state = state
-        self.paymentManager = paymentManager
+        self.superPaywallVM = superPaywallVM
+        self.flowDelegate = flowDelegate
+        superPaywallVM.delegate = self
     }
     
-    // A deinitializer is called immediately before a class instance is deallocated
-    // - so we should have access to self.state before it deinits?
-    deinit {
-        Task { [weak self] in
-            await self?.subscriptionTask?.cancel()
-        }
-    }
-    
-    // MARK: - State setter methods
-    func updateError(showError: Bool) {
-        if !showError {
-            state.error = nil
-        }
-    }
     
     // MARK: - Methods
-    // MARK: Setup
-    func startListeningToSubscriptionUpdates() {
-        subscriptionTask?.cancel()
-        
-        subscriptionTask = Task { [weak self] in
-            guard let self else { return }
-            for await update in await self.paymentManager.updatesStream() {
-                if update == .internalUpdate {
-                    self.updatePurchaseResult()
-                }
-            }
+    // MARK: State setter methods
+    func keepShowingError(showError: Bool) {
+        if !showError {
+            state.superState.error = nil
         }
+    }
+    
+    // MARK: Setup
+    func fetchProducts() async {
+        await superPaywallVM.fetchProducts(state: state.superState)
+        state.superState.isButtonDisabled = false
+    }
+    
+    func selectRequestedProduct() {
+        superPaywallVM.selectProductWithID(state.requestedProductID, state: state.superState)
+    }
+    
+    func getCurrentPaymentManager() -> PaymentManager {
+        superPaywallVM.getCurrentPaymentManager()
     }
     
     func setupProductInfo() {
-        print("Setup product info")
-        let trialProduct = state.trialProduct
-        guard trialProduct.trialPeriod != nil else {
-            let error = FreePlanUpgradeError.invalidProduct
-            state.error = error
+        guard let product = state.superState.selectedProduct else {
+            let error = PaymentError.productNotFound
+            state.superState.error = error
             state.trialPeriodDescription = error.localizedDescription
             // Dismiss view?
             return
         }
         
-        let price = trialProduct.priceString
-        let period = trialProduct.periodString ?? ""
-        state.formattedPrice = period.isEmpty ? price : "\(price) / \(period)"
-        
-        if let description = trialProduct.trialPeriodDescription {
+        if let description = product.trialPeriodDescription {
             state.trialPeriodDescription = description
-        }
-        updatePurchaseResult()
-    }
-    
-    private func updatePurchaseResult() {
-        Task { [weak self] in
-            guard let self else { return }
-
-            let isPurchased = await paymentManager.isPurchased(state.trialProduct)
-            state.purchaseResult = isPurchased ? .success : nil
-            
-            self.updateUIBasedOnPurchaseResult()
         }
     }
     
     private func updateUIBasedOnPurchaseResult() {
-        guard let result = state.purchaseResult else {
-            // Reset to default if result is nil
-            state.purchaseButtonTitle = FreePlanUpgradeView.Constants.Strings.tryButtonTitle
-            state.isButtonDisabled = false
-            return
-        }
-
-        switch result {
+        guard let purchaseResult = state.superState.purchaseResult else { return }
+        
+        switch purchaseResult {
         case .success:
-            state.purchaseButtonTitle = FreePlanUpgradeView.Constants.Strings.subscribedMessage
-            state.isButtonDisabled = true
-            state.error = nil
-
-        case .pending:
-            state.purchaseButtonTitle = FreePlanUpgradeView.Constants.Strings.pendingMessage
-            state.isButtonDisabled = true
-            state.error = PaymentError.pending
-
-        case .userCancelled:
-            state.purchaseButtonTitle = FreePlanUpgradeView.Constants.Strings.tryButtonTitle
-            state.isButtonDisabled = false
-            state.error = PaymentError.userCancelled
-        }
-    }
-    
-    // MARK: Actions
-    func subscribeToFreeTrial() {
-        Task { [weak self] in
-            guard let self else { return }
+            state.purchaseButtonTitle = State.stringConstants.subscribedTitle
+            state.superState.isButtonDisabled = true
+            state.superState.error = nil
             
-            do {
-                let result = try await paymentManager.purchase(state.trialProduct)
-                
-                switch result {
-                case .success:
-                    state.purchaseResult = .success
-                case .userCancelled:
-                    state.purchaseResult = .userCancelled
-                case .pending:
-                    state.purchaseResult = .pending
-                case nil:
-                    state.error = PaymentError.unknown
-                }
-                
-                updateUIBasedOnPurchaseResult()
-            } catch {
-                state.error = error
-            }
+        case .pending:
+            state.purchaseButtonTitle = State.stringConstants.pendingTitle
+            state.superState.isButtonDisabled = true
+            state.superState.error = PaymentError.pending
+            
+        case .userCancelled:
+            state.purchaseButtonTitle = State.stringConstants.tryButtonTitle
+            state.superState.isButtonDisabled = false
+            state.superState.error = PaymentError.userCancelled
         }
     }
     
-    func restorePurchase() {
-        Task { [weak self] in
-            guard let self else { return }
-            do {
-                try await self.paymentManager.restorePurchases()
-            } catch {
-                state.error = error
-            }
-        }
+    func initiatePurchaseWithCurrentProduct() async {
+        await superPaywallVM.subscribeToCurrentRequestedProduct(state: state.superState)
+        updateUIBasedOnPurchaseResult()
     }
     
-    // MARK: Navigation
+    func dismissView() {
+        flowDelegate?.paywallDidRequestDismissal()
+    }
+    
     func viewAllPlans() {
-        // Show all plans
+        flowDelegate?.paywallDidRequestPlanSelection()
     }
-    
-    func openTermsOfService() {
-        // Open ToS
+}
+
+extension FreePlanUpgradeViewModel: SuperPaywallViewModelDelegate {
+    func didChangeUserEntitlementStatus(isPro: Bool) {
+        Task {
+            await self.superPaywallVM.updatePurchaseResultForSelectedProduct(
+                state: self.state.superState
+            )
+            updateUIBasedOnPurchaseResult()
+            
+            if isPro { flowDelegate?.paywallDidRequestDismissal() }
+        }
     }
-    
-    func openPrivacy() {
-        // Open Privacy
-    }
-    
 }

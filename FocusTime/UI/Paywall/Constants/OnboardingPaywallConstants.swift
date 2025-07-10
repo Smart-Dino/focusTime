@@ -5,7 +5,8 @@
 //  Created by Maksym Horobets on 15.05.2025.
 //
 
-import Foundation
+import SwiftUI
+import FocusTimeUI
 
 extension OnboardingPaywallView {
     /// Organized and sorted ``OnboardingPaywallView`` constants.
@@ -20,6 +21,33 @@ extension OnboardingPaywallView {
             case priorityFeatures  = "Priority updates and new features"
             
             var id: String { rawValue }
+            var title: String {
+                String(localized: String.LocalizationValue(rawValue), table: "PaywallLocalizable")
+            }
+            
+            var systemImage: String {
+                switch self {
+                case .unlimitedSessions:
+                    "arrow.trianglehead.2.clockwise.rotate.90"
+                case .unlimitedApps:
+                    "lock.circle"
+                case .deepFocus:
+                    "clock"
+                case .whiteNoise:
+                    "speaker.wave.2"
+                case .priorityFeatures:
+                    "icloud.and.arrow.up"
+                }
+            }
+        }
+        // MARK: - Gradient
+        enum Gradient {
+            // Colors
+            static let glowColor: Color = .ftDarkBlue.opacity(0.5)
+            static let secondColor: Color = .black
+            // Radius
+            static let startRadius: CGFloat = 1
+            static let endRadius: CGFloat = 1500
         }
         // MARK: - Typography
         enum FontSize {
@@ -29,23 +57,27 @@ extension OnboardingPaywallView {
         // MARK: - Layout
         enum Padding {
             /// Padding around each feature in the list.
-            static let featureList: CGFloat = 10
+            static let featureList: CGFloat = 12
         }
         
         enum CornerRadius {
             /// Corner radius for primary container.
-            static let card: CGFloat = 40
+            static let card: CGFloat = 35
         }
         
         // MARK: - Strings
         enum Strings {
-            // Product terms
-            static let paidOnce = SharedPaywallConstants.Strings.paidOnce
-            static let tryButtonTitle = "Try free and subscribe."
+            // Purchase button states
+            static let tryButtonTitle = String(localized: "Try Free And Subscribe", table: "PaywallLocalizable")
+            static let pendingTitle = SharedPaywallConstants.Strings.pendingTitle
+            static let subscribedTitle = SharedPaywallConstants.Strings.subscribedTitle
+            
+            static let featuresTitle = String(localized: "Unlock All Features", table: "PaywallLocalizable")
             
             // UI
-            static let loadingMessage = SharedPaywallConstants.Strings.loadingMessage
-            static let dismissButtonTitle = SharedPaywallConstants.Strings.dismissButtonTitle
+            static let appName = SharedPaywallConstants.Strings.appName
+            static let appSlogan = SharedPaywallConstants.Strings.appSlogan
+            static let loadingTitle = SharedPaywallConstants.Strings.loadingTitle
             
             // Error
             static let errorHeader = SharedPaywallConstants.Strings.errorHeader

@@ -76,12 +76,14 @@ public struct FTProductOptionView: View {
             ZStack {
                 if isSelected {
                 RoundedRectangle(cornerRadius: 16)
-                        .opacity(0.1)
+                        .fill(.ftMainBlue)
+                        .opacity(0.3)
                 }
                 RoundedRectangle(cornerRadius: 16)
-                    .stroke(lineWidth: 2)
+                    .stroke(.ftMainBlue, lineWidth: 1.2)
             }
         }
+        .contentShape(.rect)
     }
     
     /// Initializes a view for displaying a product or subscription option.

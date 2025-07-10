@@ -50,25 +50,25 @@ enum PeriodConverter: Sendable {
         }
     }
     
-    // This method cannot be an extension on DateComponents,
-    // since it relies on static properties of PeriodConverter
-    /// Convert seconds back to approximate time components for display purposes.
-    /// - Parameter seconds: The total duration in seconds
-    /// - Returns: DateComponents with years, months, and days set
-    static func approximateComponents(seconds: Int) -> DateComponents {
-        let totalDays = Double(seconds) / Double(secondsPerDay)
-        
-        let years = Int(totalDays / averageDaysPerYear)
-        let remainingDaysAfterYears = totalDays - (Double(years) * averageDaysPerYear)
-        
-        let months = Int(remainingDaysAfterYears / averageDaysPerMonth)
-        let remainingDays = Int(remainingDaysAfterYears - (Double(months) * averageDaysPerMonth))
-        
-        var components = DateComponents()
-        components.year = years
-        components.month = months
-        components.day = remainingDays
-        
-        return components
+    /// Returns a concise string for the largest significant time unit, e.g., "2 years", "1 month", or "0 seconds".
+    ///
+    /// - Prioritizes from years down to seconds.
+    /// - If all components are nil or zero, defaults to "0 seconds".
+    /// - For positive 1, the unit is singular (e.g., "1 year"); otherwise, it's plural (e.g., "0 years", "-1 years", "2 years").
+    static func localizedConciseTimeString(from seconds: Int) -> String {
+        let formatter = DateComponentsFormatter()
+        formatter.unitsStyle = .full
+        formatter.allowedUnits = [.year, .month, .weekOfMonth, .day]
+        formatter.maximumUnitCount = 1           // Only the largest non-zero unit
+        formatter.zeroFormattingBehavior = .dropAll
+        formatter.includesApproximationPhrase = false
+        formatter.includesTimeRemainingPhrase = false
+        formatter.calendar = .current
+
+        let timeInterval = TimeInterval(seconds)
+        return formatter.string(from: timeInterval) ?? String(localized: "0 seconds",
+                                                              table: "PaywallLocalizable",
+                                                              comment: "Fallback for zero duration")
     }
+
 }
