@@ -7,19 +7,10 @@
     "0 seconds" : {
       "extractionState" : "manual"
     },
-    "A purchase is already in progress. Please wait until it completes." : {
-
-    },
     "An error occurred" : {
 
     },
-    "An unknown error occurred during the purchase." : {
-
-    },
     "App Name" : {
-
-    },
-    "Could not check whether the user is eligible for trial for the given subscription group." : {
 
     },
     "Dismiss current screen." : {
@@ -65,18 +56,6 @@
 
     },
     "Terms" : {
-
-    },
-    "The purchase could not be verified. Please try again later." : {
-
-    },
-    "The purchase is pending approval, possibly requiring parental or bank authorization. You'll be notified once it's complete." : {
-
-    },
-    "The purchase was cancelled by the user." : {
-
-    },
-    "The requested product could not be found." : {
 
     },
     "Try For %@" : {

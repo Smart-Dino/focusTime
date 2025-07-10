@@ -7,11 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		C66B28102E1825160018E7AC /* FocusTimeActivityMonitor.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E97895A52E0AFCBE00E0AF42 /* FocusTimeActivityMonitor.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		0C60F8882E12BDF100EEA3F3 /* OnboardingLocalizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 0C60F8872E12BDF000EEA3F3 /* OnboardingLocalizable.xcstrings */; };
 		E96207822DD4EF2B002F037F /* FocusTimeUI in Frameworks */ = {isa = PBXBuildFile; productRef = E96207812DD4EF2B002F037F /* FocusTimeUI */; };
 		E97895A82E0AFCBF00E0AF42 /* DeviceActivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E97895A72E0AFCBE00E0AF42 /* DeviceActivity.framework */; };
-		E97895B02E0AFCBF00E0AF42 /* FocusTimeActivityMonitor.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E97895A52E0AFCBE00E0AF42 /* FocusTimeActivityMonitor.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -22,31 +19,9 @@
 			remoteGlobalIDString = 674FA69F2DB05ACE0002FDC1;
 			remoteInfo = FocusTime;
 		};
-		C66B28162E1825630018E7AC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 674FA6982DB05ACE0002FDC1 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = E97895A42E0AFCBE00E0AF42;
-			remoteInfo = FocusTimeActivityMonitor;
-		};
 /* End PBXContainerItemProxy section */
 
-/* Begin PBXCopyFilesBuildPhase section */
-		C66B28132E1825160018E7AC /* Embed Foundation Extensions */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 13;
-			files = (
-				C66B28102E1825160018E7AC /* FocusTimeActivityMonitor.appex in Embed Foundation Extensions */,
-			);
-			name = "Embed Foundation Extensions";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
-
 /* Begin PBXFileReference section */
-		0C60F8872E12BDF000EEA3F3 /* OnboardingLocalizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = OnboardingLocalizable.xcstrings; sourceTree = "<group>"; };
 		674FA6A02DB05ACE0002FDC1 /* FocusTime.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FocusTime.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C6FE59E62E156D8B003A2199 /* FocusTimeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FocusTimeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E962077F2DD4D1E5002F037F /* FocusTimeUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = FocusTimeUI; sourceTree = "<group>"; };
@@ -55,6 +30,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		C62AC4CD2E1FDF5A003FCE96 /* Exceptions for "FocusTime" folder in "FocusTime" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Localizations/OnboardingLocalizable.xcstrings,
+			);
+			target = 674FA69F2DB05ACE0002FDC1 /* FocusTime */;
+		};
 		E977C59E2E0B0AF40035A6AF /* Exceptions for "FocusTime" folder in "FocusTimeActivityMonitor" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -69,8 +51,6 @@
 				BusinessLogic/Stores/Protocols/PersistenceStore.swift,
 				BusinessLogic/Stores/Protocols/PersistenceStoreError.swift,
 				BusinessLogic/Stores/Protocols/ProtectedModel.swift,
-				"Extentions/BlockItem+Codable.swift",
-				"Extentions/Schedule+Codable.swift",
 				Shared/AppValues.swift,
 			);
 			target = E97895A42E0AFCBE00E0AF42 /* FocusTimeActivityMonitor */;
@@ -88,6 +68,7 @@
 		674FA6A22DB05ACE0002FDC1 /* FocusTime */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
+				C62AC4CD2E1FDF5A003FCE96 /* Exceptions for "FocusTime" folder in "FocusTime" target */,
 				E977C59E2E0B0AF40035A6AF /* Exceptions for "FocusTime" folder in "FocusTimeActivityMonitor" target */,
 			);
 			path = FocusTime;
@@ -138,7 +119,6 @@
 		674FA6972DB05ACE0002FDC1 = {
 			isa = PBXGroup;
 			children = (
-				0C60F8872E12BDF000EEA3F3 /* OnboardingLocalizable.xcstrings */,
 				E962077F2DD4D1E5002F037F /* FocusTimeUI */,
 				674FA6A22DB05ACE0002FDC1 /* FocusTime */,
 				C6FE59E72E156D8B003A2199 /* FocusTimeTests */,
@@ -176,12 +156,10 @@
 				674FA69C2DB05ACE0002FDC1 /* Sources */,
 				674FA69D2DB05ACE0002FDC1 /* Frameworks */,
 				674FA69E2DB05ACE0002FDC1 /* Resources */,
-				E97895B52E0AFCBF00E0AF42 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				E97895AF2E0AFCBF00E0AF42 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				674FA6A22DB05ACE0002FDC1 /* FocusTime */,
@@ -334,11 +312,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		C66B28172E1825630018E7AC /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = E97895A42E0AFCBE00E0AF42 /* FocusTimeActivityMonitor */;
-			targetProxy = C66B28162E1825630018E7AC /* PBXContainerItemProxy */;
-		};
 		C6FE59EB2E156D8B003A2199 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 674FA69F2DB05ACE0002FDC1 /* FocusTime */;

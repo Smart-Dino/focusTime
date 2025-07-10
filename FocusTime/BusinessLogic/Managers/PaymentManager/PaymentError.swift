@@ -25,19 +25,19 @@ enum PaymentError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .pending:
-            String(localized: "The purchase is pending approval, possibly requiring parental or bank authorization. You'll be notified once it's complete.", table: "PaywallLocalizable")
+            String(localized: "The purchase is pending approval, possibly requiring parental or bank authorization. You'll be notified once it's complete.", table: "ErrorLocalizable")
         case .userCancelled:
-            String(localized: "The purchase was cancelled by the user.", table: "PaywallLocalizable")
+            String(localized: "The purchase was cancelled by the user.", table: "ErrorLocalizable")
         case .failedVerification:
-            String(localized: "The purchase could not be verified. Please try again later.", table: "PaywallLocalizable")
+            String(localized: "The purchase could not be verified. Please try again later.", table: "ErrorLocalizable")
         case .purchaseInProgress:
-            String(localized: "A purchase is already in progress. Please wait until it completes.", table: "PaywallLocalizable")
+            String(localized: "A purchase is already in progress. Please wait until it completes.", table: "ErrorLocalizable")
         case .productNotFound:
-            String(localized: "The requested product could not be found.", table: "PaywallLocalizable")
+            String(localized: "The requested product could not be found.", table: "ErrorLocalizable")
         case .eligibilityCheckFail:
-            String(localized: "Could not check whether the user is eligible for trial for the given subscription group.", table: "PaywallLocalizable")
+            String(localized: "Could not check whether the user is eligible for trial for the given subscription group.", table: "ErrorLocalizable")
         case .unknown:
-            String(localized: "An unknown error occurred during the purchase.", table: "PaywallLocalizable")
+            String(localized: "An unknown error occurred during the purchase.", table: "ErrorLocalizable")
         }
     }
 }
