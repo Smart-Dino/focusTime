@@ -8,8 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		C66B28102E1825160018E7AC /* FocusTimeActivityMonitor.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E97895A52E0AFCBE00E0AF42 /* FocusTimeActivityMonitor.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		0C60F8882E12BDF100EEA3F3 /* OnboardingLocalizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 0C60F8872E12BDF000EEA3F3 /* OnboardingLocalizable.xcstrings */; };
 		E96207822DD4EF2B002F037F /* FocusTimeUI in Frameworks */ = {isa = PBXBuildFile; productRef = E96207812DD4EF2B002F037F /* FocusTimeUI */; };
 		E97895A82E0AFCBF00E0AF42 /* DeviceActivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E97895A72E0AFCBE00E0AF42 /* DeviceActivity.framework */; };
+		E97895B02E0AFCBF00E0AF42 /* FocusTimeActivityMonitor.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E97895A52E0AFCBE00E0AF42 /* FocusTimeActivityMonitor.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,6 +46,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0C60F8872E12BDF000EEA3F3 /* OnboardingLocalizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = OnboardingLocalizable.xcstrings; sourceTree = "<group>"; };
 		674FA6A02DB05ACE0002FDC1 /* FocusTime.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FocusTime.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C6FE59E62E156D8B003A2199 /* FocusTimeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FocusTimeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E962077F2DD4D1E5002F037F /* FocusTimeUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = FocusTimeUI; sourceTree = "<group>"; };
@@ -67,7 +70,6 @@
 				BusinessLogic/Stores/Protocols/PersistenceStoreError.swift,
 				BusinessLogic/Stores/Protocols/ProtectedModel.swift,
 				"Extentions/BlockItem+Codable.swift",
-				"Extentions/DateComponents+Ext.swift",
 				"Extentions/Schedule+Codable.swift",
 				Shared/AppValues.swift,
 			);
@@ -136,6 +138,7 @@
 		674FA6972DB05ACE0002FDC1 = {
 			isa = PBXGroup;
 			children = (
+				0C60F8872E12BDF000EEA3F3 /* OnboardingLocalizable.xcstrings */,
 				E962077F2DD4D1E5002F037F /* FocusTimeUI */,
 				674FA6A22DB05ACE0002FDC1 /* FocusTime */,
 				C6FE59E72E156D8B003A2199 /* FocusTimeTests */,
@@ -173,12 +176,12 @@
 				674FA69C2DB05ACE0002FDC1 /* Sources */,
 				674FA69D2DB05ACE0002FDC1 /* Frameworks */,
 				674FA69E2DB05ACE0002FDC1 /* Resources */,
-				C66B28132E1825160018E7AC /* Embed Foundation Extensions */,
+				E97895B52E0AFCBF00E0AF42 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				C66B28172E1825630018E7AC /* PBXTargetDependency */,
+				E97895AF2E0AFCBF00E0AF42 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				674FA6A22DB05ACE0002FDC1 /* FocusTime */,

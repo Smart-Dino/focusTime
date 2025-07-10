@@ -39,7 +39,7 @@ struct QuizOnboardingView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: Constants.Layout.quizSpacing) {
                         ForEach(Constants.QuizOption.allCases) { option in
-                            Toggle(option.rawValue, isOn: Binding(
+                            Toggle(option.localizedString, isOn: Binding(
                                 get: { viewModel.isOptionSelected(option) },
                                 set: { _ in viewModel.toggleSelection(for: option) }
                             ))

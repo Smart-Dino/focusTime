@@ -16,9 +16,9 @@ extension QuizOnboardingView {
         }
         
         enum Strings {
-            static let title = "What challenges your focus most often?"
-            static let subtitle = "Add one or more options that work for you."
-            static let nextButton = "Next"
+            static let title = String(localized: "What challenges your focus most often?", table: "OnboardingLocalizable")
+            static let subtitle = String(localized: "Add one or more options that work for you.", table: "OnboardingLocalizable")
+            static let nextButton = String(localized: "Next", table: "OnboardingLocalizable")
         }
         
         enum QuizOption: String, CaseIterable, Identifiable, Hashable {
@@ -29,6 +29,10 @@ extension QuizOnboardingView {
             case mentalFatigue = "🧘 Mental fatigue"
             
             var id: String { rawValue }
+            
+            var localizedString: String {
+                String(localized: String.LocalizationValue(rawValue), table: "OnboardingLocalizable")
+            }
         }
     }
 }

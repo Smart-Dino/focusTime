@@ -11,21 +11,21 @@ enum SharedConstants {
     
     // MARK: - Strings
     enum Strings {
-        static let appName = "DeepWave"
-        static let appSlogan = "Focus within minutes"
+        static let appName = SharedAppValues.appName ?? String(localized: "App Name", table: "PaywallLocalizable")
+        static let appSlogan = String(localized: "Focus within minutes", table: "PaywallLocalizable")
         
-        static let errorHeader = "An error occurred"
-        static let dismissButtonTitle = "Dismiss current screen."
-        static let viewPlansButton = "View All Plans"
-        static let subscribeButtonTitle = "Subscribe"
+        static let errorHeader = String(localized: "An error occurred", table: "PaywallLocalizable")
+        static let dismissButtonTitle = String(localized: "Dismiss current screen.", table: "PaywallLocalizable")
+        static let viewPlansButton = String(localized: "View All Plans", table: "PaywallLocalizable")
+        static let subscribeButtonTitle = String(localized: "Subscribe", table: "PaywallLocalizable")
         // Lifetime
-        static let paidOnce = "Paid once"
+        static let paidOnce = String(localized: "Paid once", table: "PaywallLocalizable")
         // Button states
-        static let loadingTitle = "Loading..."
-        static let pendingTitle = "Pending..."
-        static let subscribeTitle = "Subscribe"
-        static let subscribedTitle = "Subscribed!"
-        static let purchasedTitle = "Purchased!"
+        static let loadingTitle = String(localized: "Loading...", table: "PaywallLocalizable")
+        static let pendingTitle = String(localized: "Pending...", table: "PaywallLocalizable")
+        static let subscribeTitle = String(localized: "Subscribe", table: "PaywallLocalizable")
+        static let subscribedTitle = String(localized: "Subscribed!", table: "PaywallLocalizable")
+        static let purchasedTitle = String(localized: "Purchased!", table: "PaywallLocalizable")
     }
     
     // MARK: - Typography

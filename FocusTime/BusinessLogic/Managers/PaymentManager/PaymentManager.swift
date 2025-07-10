@@ -82,10 +82,14 @@ actor MockPaymentManagerWithPurchaseError: PaymentManager {
     ) {
         self.isPro = isPro
         self.trialUsed = trialUsed
-        self.products = [
-            FTProduct.Mocks.weekly.product,
-            FTProduct.Mocks.monthly.product
-        ]
+        do {
+            self.products = [
+                try FTProduct.Mocks.weekly.product,
+                try FTProduct.Mocks.monthly.product
+            ]
+        } catch {
+            self.products = []
+        }
     }
 
     // MARK: - Methods

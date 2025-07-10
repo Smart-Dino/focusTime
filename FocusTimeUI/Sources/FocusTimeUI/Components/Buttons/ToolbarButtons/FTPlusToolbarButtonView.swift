@@ -17,7 +17,7 @@ public struct FTDismissToolbarButtonView: View {
     
     public var body: some View {
         Button(
-            "Dismiss current screen.",
+            "Dismiss current screen.", // This one is not String - LocalizedStringKey, so it will appear in xcstrings.
             systemImage: "xmark",
             action: dismissAction
         )
