@@ -48,8 +48,6 @@
 				BusinessLogic/Models/Blocking/Schedule/Schedule.swift,
 				BusinessLogic/Models/Blocking/Schedule/TimeComponents.swift,
 				BusinessLogic/Models/Blocking/Schedule/Weekday.swift,
-				BusinessLogic/Stores/Protocols/PersistenceStore.swift,
-				BusinessLogic/Stores/Protocols/PersistenceStoreError.swift,
 				BusinessLogic/Stores/Protocols/ProtectedModel.swift,
 				Shared/AppValues.swift,
 			);

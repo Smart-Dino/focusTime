@@ -8,6 +8,7 @@
 import SwiftUI
 import SwiftData
 import FamilyControls
+import DeviceActivity
 
 struct ShieldDebugView: View {
     @State private var viewModel: ShieldDebugViewModel
@@ -175,9 +176,7 @@ struct ShieldDebugView: View {
             await viewModel.fetchAllItems()
         }
         .onAppear {
-            let defaults = UserDefaults(suiteName: AppValues.appGroupIdentifier)!
-            let logArray = defaults.value(forKey: "LOG_STRINGS")
-            print(logArray ?? [])
+            print(DeviceActivityCenter().activities)
         }
     }
     

@@ -5,11 +5,10 @@
 //  Created by Maksym Horobets on 24.06.2025.
 //
 
-import DeviceActivity
-import ManagedSettings
-import Foundation
 import SwiftData
-import FamilyControls
+import Foundation
+import DeviceActivity
+
 
 // Optionally override any of the functions below.
 // Make sure that your class name matches the NSExtensionPrincipalClass in your Info.plist.

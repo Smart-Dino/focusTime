@@ -63,7 +63,9 @@ final class LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         
         let intervalStart = schedule.startTime.dateComponents
         // Shift interval end to satisfy DeviceActivityCenter - workaround.
-        guard let intervalEnd = schedule.endTime.dateComponents.adding(minutes: 15) else { throw ShieldManagerError.couldNotSetTime }
+        guard let intervalEnd = schedule.endTime.dateComponents.adding(minutes: 15) else {
+            throw ShieldManagerError.couldNotSetTime
+        }
         let deviceActivitySchedule = DeviceActivitySchedule(intervalStart: intervalStart,
                                                             intervalEnd: intervalEnd,
                                                             repeats: true)
