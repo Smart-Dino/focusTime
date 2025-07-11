@@ -68,43 +68,54 @@ struct ShieldDebugView: View {
             
             // MARK: - Selection
             sectionSeparator(sectionName: "Selection")
-            Menu("Select days") {
-                ForEach(Weekday.allCases) { weekday in
-                    Button {
-                        viewModel.toggleSelectionFor(weekday: weekday)
-                    } label: {
-                        if viewModel.state.daySelection.contains(weekday) {
-                            Label(weekday.description, systemImage: "checkmark")
-                        } else {
-                            Text(weekday.description)
+            
+            Picker("Block Type", selection: Binding(
+                get: { viewModel.state.scheduleType },
+                set: { newValue in
+                    viewModel.setScheduleType(newValue)
+                })
+            ) {
+                Text("Scheduled").tag(ShieldDebugViewModel.State.ScheduleType.scheduled)
+                Text("One-time").tag(ShieldDebugViewModel.State.ScheduleType.oneTime)
+            }
+            .pickerStyle(.segmented)
+            
+            if viewModel.state.scheduleType == .scheduled {
+                HStack {
+                    DatePicker(
+                        "Select start time",
+                        selection:
+                            Binding(get: {
+                                viewModel.state.startTime
+                            }, set: { date in
+                                viewModel.setStartTime(date)
+                            }),
+                        displayedComponents: [.hourAndMinute]
+                    )
+                    .datePickerStyle(.compact)
+                    DatePicker(
+                        "Select end time",
+                        selection:
+                            Binding(get: {
+                                viewModel.state.endTime
+                            }, set: { date in
+                                viewModel.setEndTime(date)
+                            }),
+                        displayedComponents: [.hourAndMinute]
+                    )
+                }
+            } else if viewModel.state.scheduleType == .oneTime {
+                VStack(alignment: .leading) {
+                    Text("Block duration (minutes)")
+                    Stepper(value: Binding(
+                        get: { viewModel.state.duration },
+                        set: { newValue in
+                            viewModel.setDuration(newValue)
                         }
+                    ), in: 1...240) {
+                        Text("\(viewModel.state.duration) minutes")
                     }
                 }
-            }
-            .menuActionDismissBehavior(.disabled)
-            
-            HStack {
-                DatePicker(
-                    "Select start time",
-                    selection:
-                        Binding(get: {
-                            viewModel.state.startTime
-                        }, set: { date in
-                            viewModel.setStartTime(date)
-                        }),
-                    displayedComponents: [.hourAndMinute]
-                )
-                .datePickerStyle(.compact)
-                DatePicker(
-                    "Select end time",
-                    selection:
-                        Binding(get: {
-                            viewModel.state.endTime
-                        }, set: { date in
-                            viewModel.setEndTime(date)
-                        }),
-                    displayedComponents: [.hourAndMinute]
-                )
             }
             
             Button("Toggle selection sheet") {
@@ -119,7 +130,7 @@ struct ShieldDebugView: View {
                 }
             }
             
-            Button("Start schedule") {
+            Button(viewModel.state.scheduleType == .scheduled ? "Start schedule" : "Start one-time block") {
                 Task {
                     await viewModel.appendBlockItemToSchedule()
                     await viewModel.blockSelectionDuringSchedule()

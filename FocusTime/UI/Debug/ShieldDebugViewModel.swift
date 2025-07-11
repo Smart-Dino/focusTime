@@ -15,13 +15,20 @@ final class ShieldDebugViewModel {
     // MARK: - Nested declarations
     @MainActor
     struct State {
+        enum ScheduleType {
+            case scheduled
+            case oneTime
+        }
+        
         var error: Error? = nil
         
         var selection: FamilyActivitySelection = .init()
         var daySelection: Set<Weekday> = Set(Weekday.allCases)
         
+        var scheduleType: Self.ScheduleType = .scheduled
         var startTime: Date = .now
         var endTime: Date = .now
+        var duration: Int = 1 // Minutes
         
         var schedules: [ProtectedSchedule] = .init()
         var blockItems: [ProtectedBlockItem] = .init()
@@ -82,6 +89,14 @@ final class ShieldDebugViewModel {
         state.selection = selection
     }
     
+    func setScheduleType(_ type: State.ScheduleType) {
+        state.scheduleType = type
+    }
+    
+    func setDuration(_ duration: Int) {
+        state.duration = duration
+    }
+    
     func toggleSelectionFor(weekday: Weekday) {
         if state.daySelection.contains(weekday) {
             state.daySelection.remove(weekday)
@@ -112,26 +127,24 @@ final class ShieldDebugViewModel {
             let blockItem = ProtectedBlockItem(emoji: "❌", name: "Block",
                                                blockedContent: state.selection)
             
-            guard let startComponent = TimeComponents(from: state.startTime),
-                  let endComponent = TimeComponents(from: state.endTime) else {
-                state.error = ShieldDebugError.timeComponent
-                return
+            var type: ScheduleType!
+            
+            switch state.scheduleType {
+            case .oneTime:
+                type = .oneTime(duration: state.duration * 60) // Minutes to seconds.
+            case .scheduled:
+                guard let startComponent = TimeComponents(from: state.startTime),
+                      let endComponent = TimeComponents(from: state.endTime) else {
+                    state.error = ShieldDebugError.timeComponent
+                    return
+                }
+                type = .scheduled(startTime: startComponent, endTime: endComponent)
             }
-            
-            print(startComponent)
-            print(endComponent)
-            
-            print(startComponent.dateComponents)
-            print(endComponent.dateComponents)
-            
-            print(startComponent.timeSince1970)
-            print(endComponent.timeSince1970)
             
             let schedule = ProtectedSchedule(emoji: "🕑",
                                              name: "Schedule",
                                              days: state.daySelection,
-                                             type: .scheduled(startTime: startComponent,
-                                                              endTime: endComponent))
+                                             type: type)
             
             do {
                 try await blockItemStore.insert(blockItem)
