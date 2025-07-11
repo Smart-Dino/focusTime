@@ -13,7 +13,10 @@ import DeviceActivity
 // Optionally override any of the functions below.
 // Make sure that your class name matches the NSExtensionPrincipalClass in your Info.plist.
 final class DeviceActivityMonitorExtension: DeviceActivityMonitor {
-    let handler = DeviceActivityHandler(container: container)
+    let handler = DeviceActivityHandler(
+        container: container,
+        shieldManager: LiveShieldManager(isRunningInExtension: true)
+    )
     
     override func intervalDidStart(for activity: DeviceActivityName) {
         super.intervalDidStart(for: activity)

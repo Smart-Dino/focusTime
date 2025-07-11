@@ -8,8 +8,7 @@
 import Foundation
 import FamilyControls
 
-@MainActor
-protocol ShieldManager {
+protocol ShieldManager: Sendable {
     // MARK: - Properties
     var isShieldActive: Bool { get }
     // MARK: - Block

@@ -61,7 +61,7 @@ struct ScheduledFocusListView: View {
                     FTScheduledFocusRowView(
                         emoji: schedule.emoji,
                         title: schedule.name,
-                        description: schedule.daysDescription
+                        description: schedule.days.description
                     )
                     .padding(1)
                     .onAppear { viewModel.hasReachEndOfList(schedule: schedule) }

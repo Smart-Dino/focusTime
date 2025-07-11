@@ -13,9 +13,11 @@ import ManagedSettings
 
 struct DeviceActivityHandler {
     private let container: ModelContainer
+    private let shieldManager: ShieldManager
     
-    init(container: ModelContainer) {
+    init(container: ModelContainer, shieldManager: ShieldManager) {
         self.container = container
+        self.shieldManager = shieldManager
     }
     
     func handleBlockingStart(for activity: DeviceActivityName) {
@@ -24,20 +26,47 @@ struct DeviceActivityHandler {
         let schedule = fetchSchedule(id: activityIdentifier.scheduleID)
         
         // Make sure we have our schedule.
-        guard let schedule, let blockItems = schedule.blockItems else { return }
+        guard let schedule else { return }
+
+        switch schedule.type {
+        case .scheduled(_, let endTime):
+            handleRegularBlocking(schedule: schedule,
+                                  activity: activity,
+                                  activityIdentifier: activityIdentifier,
+                                  endTime: endTime)
+        case .oneTime:
+            handleDurationBlocking()
+            // We don't need to handle the end of the interval anymore.
+            DeviceActivityCenter().stopMonitoring([activity])
+        }
         
+    }
+    
+    private func handleDurationBlocking() {
+        Task {
+            try? await shieldManager.unblock()
+        }
+    }
+    
+    private func handleRegularBlocking(
+        schedule: Schedule,
+        activity: DeviceActivityName,
+        activityIdentifier: CodableActivityIdentifier,
+        endTime endTimeComponent: TimeComponents
+    ) {
         // Make sure the current day is the block day.
-        guard schedule.days.contains(Weekday.currentDay) else { return }
+        guard let blockItems = schedule.blockItems, schedule.days.contains(Weekday.currentDay) else { return }
         
         // Block user's selections.
         let selections = blockItems.map(\.blockedContent)
-        Self.blockSelections(selections: selections)
+        Task {
+            try? await shieldManager.block(specific: selections)
+        }
         
         // Sendability workaround since DeviceActivityName is not sendable.
         let stringActivityName = activity.rawValue
         
         if activityIdentifier.isFallback {
-            let endTimeComponent = schedule.endTime
             Task {
                 while !Task.isCancelled {
                     try? await Task.sleep(nanoseconds: 1_000_000_000)
@@ -45,7 +74,9 @@ struct DeviceActivityHandler {
                     let currentTimeComponent = TimeComponents(from: .now)
                     
                     if currentTimeComponent == endTimeComponent {
-                        Self.unblockAll()
+                        Task {
+                            try? await shieldManager.unblock()
+                        }
                         break
                     }
                 }
@@ -56,12 +87,12 @@ struct DeviceActivityHandler {
             }
             
         }
-        
-        
     }
     
     func handleBlockingEnd(for activity: DeviceActivityName) {
-        Self.unblockAll()
+        Task {
+            try? await shieldManager.unblock()
+        }
     }
     
     private func fetchSchedule(id: UUID) -> Schedule? {
@@ -78,24 +109,24 @@ struct DeviceActivityHandler {
     }
     
     // MARK: - Helpers
-    static private func blockSelections(selections: [FamilyActivitySelection]) {
-        let store = ManagedSettingsStore()
-        // Add all the items to discourage.
-        var applicationsToDiscourage = Set<ApplicationToken>()
-        var applicationCategoriesToDiscourage = Set<ActivityCategoryToken>()
-        
-        for selection in selections {
-            applicationsToDiscourage.formUnion(selection.applicationTokens)
-            applicationCategoriesToDiscourage.formUnion(selection.categoryTokens)
-        }
-        
-        store.shield.applications = applicationsToDiscourage
-        store.shield.applicationCategories = .specific(applicationCategoriesToDiscourage)
-    }
-    
-    static private func unblockAll() {
-        let store = ManagedSettingsStore()
-        store.shield.applications = nil
-        store.shield.applicationCategories = nil
-    }
+//    static private func blockSelections(selections: [FamilyActivitySelection]) {
+//        let store = ManagedSettingsStore()
+//        // Add all the items to discourage.
+//        var applicationsToDiscourage = Set<ApplicationToken>()
+//        var applicationCategoriesToDiscourage = Set<ActivityCategoryToken>()
+//        
+//        for selection in selections {
+//            applicationsToDiscourage.formUnion(selection.applicationTokens)
+//            applicationCategoriesToDiscourage.formUnion(selection.categoryTokens)
+//        }
+//        
+//        store.shield.applications = applicationsToDiscourage
+//        store.shield.applicationCategories = .specific(applicationCategoriesToDiscourage)
+//    }
+//    
+//    static private func unblockAll() {
+//        let store = ManagedSettingsStore()
+//        store.shield.applications = nil
+//        store.shield.applicationCategories = nil
+//    }
 }

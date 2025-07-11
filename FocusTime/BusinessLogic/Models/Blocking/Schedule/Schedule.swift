@@ -15,8 +15,7 @@ final class Schedule {
     var emoji: String
     var name: String
     var days: Set<Weekday>
-    var startTime: TimeComponents
-    var endTime: TimeComponents
+    var type: ScheduleType
     // I think we don't need isActive property,
     // since we can just query the DeviceActivityCenter
     // for active schedules.
@@ -24,33 +23,20 @@ final class Schedule {
     // MARK: Relationship
     @Relationship(deleteRule: .nullify, inverse: \BlockItem.schedules)
     var blockItems: [BlockItem]?
-
-    /// Returns a user-friendly description for a set of weekdays.
-    var daysDescription: String {
-        switch days {
-        case Weekday.weekends:      "Weekend"
-        case Weekday.weekdays:      "Weekdays"
-        case Set(Weekday.allCases): "Every day"
-        case let days where days.count == 1: days.first!.description
-        default:                     "\(days.count) days"
-        }
-    }
     
     init(
         id: UUID = UUID(),
         emoji: String,
         name: String,
         days: Set<Weekday>,
-        startTime: TimeComponents,
-        endTime: TimeComponents,
+        type: ScheduleType,
         blockItems: [BlockItem]? = nil
     ) {
         self.id = id
         self.emoji = emoji
         self.name = name
         self.days = days
-        self.startTime = startTime
-        self.endTime = endTime
+        self.type = type
         self.blockItems = blockItems
     }
     
@@ -58,8 +44,7 @@ final class Schedule {
         self.init(emoji: item.emoji,
                   name: item.name,
                   days: item.days,
-                  startTime: item.startTime,
-                  endTime: item.endTime)
+                  type: item.type)
     }
 }
 

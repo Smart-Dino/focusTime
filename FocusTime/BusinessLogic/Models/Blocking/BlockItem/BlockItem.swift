@@ -26,7 +26,7 @@ final class BlockItem {
         
         if schedules.count == 1 {
             guard let first = schedules.first else { return "No schedules" }
-            return "\(first.daysDescription), \(first.startTime.description) – \(first.endTime.description)"
+            return "\(first.days.description), \(first.type.description)"
         } else {
             return "\(schedules.count) schedules"
         }

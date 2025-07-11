@@ -50,7 +50,8 @@ final class ShieldDebugViewModel {
     ) {
         self.state = state
         self.shieldManager = shieldManager
-        self.activityRegistrar = LiveDeviceActivityRegistrar()
+        self.activityRegistrar = LiveDeviceActivityRegistrar(shieldManager: shieldManager,
+                                                             modelContainer: modelContainer)
         self.scheduleStore = ScheduleStore(modelContainer: modelContainer)
         self.blockItemStore = BlockItemStore(modelContainer: modelContainer)
         self.relationshipCoordinator = RelationshipCoordinator(modelContainer: modelContainer)
@@ -129,8 +130,8 @@ final class ShieldDebugViewModel {
             let schedule = ProtectedSchedule(emoji: "🕑",
                                              name: "Schedule",
                                              days: state.daySelection,
-                                             startTime: startComponent,
-                                             endTime: endComponent)
+                                             type: .scheduled(startTime: startComponent,
+                                                              endTime: endComponent))
             
             do {
                 try await blockItemStore.insert(blockItem)
@@ -184,7 +185,7 @@ final class ShieldDebugViewModel {
                 return
             }
             
-            try await activityRegistrar.registerActivity(during: schedule)
+            try await activityRegistrar.registerRegularActivity(during: schedule)
         } catch {
             state.error = error
         }

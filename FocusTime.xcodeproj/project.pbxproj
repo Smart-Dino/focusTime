@@ -62,15 +62,20 @@
 		E977C59E2E0B0AF40035A6AF /* Exceptions for "FocusTime" folder in "FocusTimeActivityMonitor" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				BusinessLogic/Helpers/PeriodConverter.swift,
 				BusinessLogic/Managers/DeviceActivityHandler/DeviceActivityHandler.swift,
+				BusinessLogic/Managers/ShieldManager/LiveShieldManager.swift,
+				BusinessLogic/Managers/ShieldManager/ShieldManager.swift,
 				BusinessLogic/Models/Blocking/BlockItem/BlockItem.swift,
 				BusinessLogic/Models/Blocking/BlockItem/ProtectedBlockItem.swift,
 				BusinessLogic/Models/Blocking/CodableActivityIdentifier/CodableActivityIdentifier.swift,
+				BusinessLogic/Models/Blocking/Schedule/Helpers/ScheduleType.swift,
 				BusinessLogic/Models/Blocking/Schedule/Helpers/TimeComponents.swift,
 				BusinessLogic/Models/Blocking/Schedule/Helpers/Weekday.swift,
 				BusinessLogic/Models/Blocking/Schedule/ProtectedSchedule.swift,
 				BusinessLogic/Models/Blocking/Schedule/Schedule.swift,
 				BusinessLogic/Stores/Protocols/ProtectedModel.swift,
+				"Extentions/FamilyActivitySelection+Sendable.swift",
 				Shared/AppValues.swift,
 			);
 			target = E97895A42E0AFCBE00E0AF42 /* FocusTimeActivityMonitor */;

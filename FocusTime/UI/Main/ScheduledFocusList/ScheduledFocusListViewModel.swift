@@ -37,8 +37,8 @@ final class ScheduledFocusListViewModel {
                     emoji: "🏠",
                     name: "Spend time with family",
                     days: [.saturday, .sunday],
-                    startTime: TimeComponents(hour: 17, minute: 00)!,
-                    endTime: TimeComponents(hour: 19, minute: 00)!
+                    type: .scheduled(startTime: TimeComponents(hour: 17, minute: 00)!,
+                                     endTime: TimeComponents(hour: 19, minute: 00)!)
                 ),
                 count: 100000
             )

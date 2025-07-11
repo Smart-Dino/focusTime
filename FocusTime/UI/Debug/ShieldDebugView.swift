@@ -24,7 +24,7 @@ struct ShieldDebugView: View {
                             VStack(alignment: .leading) {
                                 HStack {
                                     Text(schedule.name)
-                                    Text(schedule.startTime.description + " - " + schedule.endTime.description)
+                                    Text(schedule.type.description)
                                         .font(.footnote)
                                 }
                                 Text("Id: " + schedule.id.uuidString)
