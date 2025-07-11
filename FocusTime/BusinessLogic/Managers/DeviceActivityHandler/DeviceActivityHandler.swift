@@ -107,26 +107,4 @@ struct DeviceActivityHandler {
         
         return try? context.fetch(fetchDescriptor).first
     }
-    
-    // MARK: - Helpers
-//    static private func blockSelections(selections: [FamilyActivitySelection]) {
-//        let store = ManagedSettingsStore()
-//        // Add all the items to discourage.
-//        var applicationsToDiscourage = Set<ApplicationToken>()
-//        var applicationCategoriesToDiscourage = Set<ActivityCategoryToken>()
-//        
-//        for selection in selections {
-//            applicationsToDiscourage.formUnion(selection.applicationTokens)
-//            applicationCategoriesToDiscourage.formUnion(selection.categoryTokens)
-//        }
-//        
-//        store.shield.applications = applicationsToDiscourage
-//        store.shield.applicationCategories = .specific(applicationCategoriesToDiscourage)
-//    }
-//    
-//    static private func unblockAll() {
-//        let store = ManagedSettingsStore()
-//        store.shield.applications = nil
-//        store.shield.applicationCategories = nil
-//    }
 }
