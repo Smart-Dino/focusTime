@@ -10,11 +10,6 @@ import FocusTimeUI
 
 extension FocusSessionView.Constants {
     enum Gradient {
-        enum Colors {
-            static let backgroundDeep = Color.ftDeepBackground
-            static let gradientTop = Color.ftGradientTop
-            static let gradientBottom = Color.ftGradientBottom
-        }
         enum Layout {
             static let gradientOpacity: CGFloat = 0.3
             static let blurRadius: CGFloat = 100

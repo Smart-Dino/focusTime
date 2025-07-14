@@ -17,7 +17,7 @@ struct PresetIconView: View {
             Text(preset.iconName)
                 .font(.largeTitle)
                 .frame(width: FocusSessionView.Constants.PresetIcon.Layout.size, height: FocusSessionView.Constants.PresetIcon.Layout.size)
-                .background(isSelected ? Color.ftPresetSelectedBackground : Color.ftPresetBackground)
+                .background(isSelected ? Color.ftPresetSelectedBackgroundColor : Color.ftPresetBackgroundColor)
                 .cornerRadius(FocusSessionView.Constants.PresetIcon.Layout.cornerRadius)
             
             Text(preset.name)
@@ -27,7 +27,6 @@ struct PresetIconView: View {
         }
     }
 }
-
 
 
 #Preview {

@@ -27,9 +27,9 @@ extension FocusSessionView.Constants {
         public enum Layout {
             public static let mainSpacing: CGFloat = 16
             public static let scheduleSectionSpacing: CGFloat = 8
-            public static let scheduleInfoHorizontalPadding: CGFloat = 4
             public static let listIconSpacing: CGFloat = 12
             public static let selectedIconSize: CGFloat = 36
+            public static let scheduledDaysTextPadding: CGFloat = 16
         }
         
         public enum Colors {

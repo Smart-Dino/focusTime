@@ -11,14 +11,14 @@ import FocusTimeUI
 struct GradientBackgroundView: View {
     var body: some View {
         ZStack {
-            Color.ftDeepBackground
+            Color.ftBackground
                 .ignoresSafeArea()
             
             Circle()
                 .fill(
                     EllipticalGradient(
                         gradient: .init(colors: [
-                            Color.ftGradientTop.opacity(FocusSessionView.Constants.Gradient.Layout.gradientOpacity),
+                            Color.ftGradientTopColor.opacity(FocusSessionView.Constants.Gradient.Layout.gradientOpacity),
                             .clear
                         ]),
                         center: .center,
@@ -34,7 +34,7 @@ struct GradientBackgroundView: View {
                 .fill(
                     EllipticalGradient(
                         gradient: .init(colors: [
-                            Color.ftGradientBottom.opacity(FocusSessionView.Constants.Gradient.Layout.gradientOpacity),
+                            Color.ftGradientBottomColor.opacity(FocusSessionView.Constants.Gradient.Layout.gradientOpacity),
                             .clear
                         ]),
                         center: .center,

@@ -7,16 +7,23 @@
 
 
 import SwiftUI
-import FocusTimeUI 
+import FocusTimeUI
 
 struct ScheduleConfigurationView: View {
+    
+    public struct Actions {
+        let onDurationTap: () -> Void
+        let onStartTimeTap: () -> Void
+        let onEndTimeTap: () -> Void
+        let onAppsBlockedTap: () -> Void
+        let onScheduledDaysTap: () -> Void
+    }
+    
+    // MARK: - Properties
     @Binding var configuration: ScheduleConfiguration
+    let actions: Actions
     
-    let onDurationTap: () -> Void
-    let onStartTimeTap: () -> Void
-    let onEndTimeTap: () -> Void
-    let onAppsBlockedTap: () -> Void
-    
+    // MARK: - Body
     var body: some View {
         VStack(alignment: .leading, spacing: FocusSessionView.Constants.Configuration.Layout.mainSpacing) {
             HStack(spacing: FocusSessionView.Constants.Configuration.Layout.listIconSpacing) {
@@ -38,7 +45,7 @@ struct ScheduleConfigurationView: View {
                     }
                 }
                 .frame(width: FocusSessionView.Constants.Row.height, height: FocusSessionView.Constants.Row.height)
-                .background(Color.ftRowBackground)
+                .background(Color.ftPresetBackgroundColor)
                 .cornerRadius(FocusSessionView.Constants.Row.cornerRadius)
             }
             
@@ -54,9 +61,7 @@ struct ScheduleConfigurationView: View {
                 
                 Text(FocusSessionView.Constants.Configuration.Strings.scheduleInfo)
                     .font(.caption)
-                    .foregroundStyle(.gray)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, FocusSessionView.Constants.Configuration.Layout.scheduleInfoHorizontalPadding)
+                    .multilineTextAlignment(.leading)
             }
             
             if configuration.scheduleForLater {
@@ -77,16 +82,20 @@ struct ScheduleConfigurationView: View {
                     HStack {
                         Text(FocusSessionView.Constants.Configuration.Strings.scheduledDays)
                         Spacer()
-                        Text(formattedScheduledDays)
-                            .foregroundStyle(.white)
                         Image(systemName: FocusSessionView.Constants.Symbols.navigationChevron)
                             .foregroundStyle(FocusSessionView.Constants.Colors.chevronColor)
                     }
                 }
                 .rowStyle()
                 
+                if !configuration.scheduledDays.isEmpty {
+                    Text(formattedFullScheduledDays)
+                        .font(.caption)
+                }
+                
+                
                 Button {
-                    onStartTimeTap()
+                    actions.onStartTimeTap()
                 } label: {
                     HStack {
                         Text(FocusSessionView.Constants.Configuration.Strings.startTime)
@@ -100,7 +109,7 @@ struct ScheduleConfigurationView: View {
                 .rowStyle()
                 
                 Button {
-                    onEndTimeTap()
+                    actions.onEndTimeTap()
                 } label: {
                     HStack {
                         Text(FocusSessionView.Constants.Configuration.Strings.letEndTime)
@@ -114,7 +123,7 @@ struct ScheduleConfigurationView: View {
                 .rowStyle()
             } else {
                 Button {
-                    onDurationTap()
+                    actions.onDurationTap()
                 } label: {
                     HStack {
                         Text(FocusSessionView.Constants.Configuration.Strings.duration)
@@ -129,7 +138,7 @@ struct ScheduleConfigurationView: View {
             }
             
             Button {
-                onAppsBlockedTap()
+                actions.onAppsBlockedTap()
             } label: {
                 HStack {
                     Text(FocusSessionView.Constants.Configuration.Strings.appsBlocked)
@@ -158,9 +167,6 @@ struct ScheduleConfigurationView: View {
     }
     
     private var formattedScheduledDays: String {
-        if configuration.scheduledDays.isEmpty {
-            return String(localized: "Never", comment: "No scheduled days")
-        }
         if configuration.scheduledDays.count == Weekday.allCases.count {
             return String(localized: "Every Day", comment: "Scheduled for every day")
         }
@@ -178,6 +184,25 @@ struct ScheduleConfigurationView: View {
             return String(localized: "\(sortedDays.count) days", comment: "Number of days scheduled")
         }
     }
+    
+    private var formattedFullScheduledDays: String {
+        if configuration.scheduledDays.isEmpty {
+            return String(localized: "Never", comment: "No scheduled days")
+        }
+        if configuration.scheduledDays.count == Weekday.allCases.count {
+            return String(localized: "Every Day", comment: "Scheduled for every day")
+        }
+        if configuration.scheduledDays == Set([.saturday, .sunday]) {
+            return String(localized: "Weekends", comment: "Scheduled for weekends")
+        }
+        if configuration.scheduledDays == Set([.monday, .tuesday, .wednesday, .thursday, .friday]) {
+            return String(localized: "Weekdays", comment: "Scheduled for weekdays")
+        }
+        
+        let sortedDays = configuration.scheduledDays.sorted()
+        return sortedDays.map { $0.fullName }.joined(separator: String(localized: ", ", comment: "Separator for list of days"))
+    }
+    
     
     private let twentyFourHourTimeFormatter: DateFormatter = {
         let formatter = DateFormatter()

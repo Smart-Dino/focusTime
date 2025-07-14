@@ -20,7 +20,6 @@ extension FocusSessionView.Constants {
         }
         enum Colors {
             static let divider = Color.white.opacity(0.15)
-            static let background = Color.ftDaysPickerBackground
             static let shadow = Color.black.opacity(0.3)
         }
         enum Symbols {

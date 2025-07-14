@@ -45,7 +45,11 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "674FA69F2DB05ACE0002FDC1"
+<<<<<<< HEAD
             BuildableName = "&quot;FocusTime&quot;.app"
+=======
+            BuildableName = "FocusTime.app"
+>>>>>>> f625479 (Refactor: Refactored PR changes)
             BlueprintName = "FocusTime"
             ReferencedContainer = "container:FocusTime.xcodeproj">
          </BuildableReference>
