@@ -37,11 +37,13 @@ nonisolated struct TimeComponents: Codable, Hashable, CustomStringConvertible {
         return formatter.string(from: date)
     }
     
+    /// Abbreviated description of the length of component in hours and minutes.
     var durationDescription: String {
-        let hours = dateComponents.hour ?? 0
-        let minutes = dateComponents.minute ?? 0
-
-        return String(format: "%02d:%02d", hours, minutes)
+        let formatter = DateComponentsFormatter()
+        formatter.allowedUnits = [.hour, .minute]
+        formatter.unitsStyle = .abbreviated
+        
+        return formatter.string(from: dateComponents) ?? "-"
     }
     
     /// Provides the hour and minute components for the stored time.
