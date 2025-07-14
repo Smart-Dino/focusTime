@@ -37,6 +37,13 @@ nonisolated struct TimeComponents: Codable, Hashable, CustomStringConvertible {
         return formatter.string(from: date)
     }
     
+    var durationDescription: String {
+        let hours = dateComponents.hour ?? 0
+        let minutes = dateComponents.minute ?? 0
+
+        return String(format: "%02d:%02d", hours, minutes)
+    }
+    
     /// Provides the hour and minute components for the stored time.
     var dateComponents: DateComponents {
         // Prepare calendar.
@@ -55,9 +62,7 @@ nonisolated struct TimeComponents: Codable, Hashable, CustomStringConvertible {
     }
     
     /// Initializes with seconds since midnight (00:00:00 UTC).
-    /// - Parameter secondsSince1970: Number of seconds since midnight; must be in range 0..<86400.
-    init?(secondsSince1970: Int) {
-        guard (0..<24*60*60).contains(secondsSince1970) else { return nil }
+    init(secondsSince1970: Int) {
         self.timeSince1970 = secondsSince1970
     }
     
@@ -65,8 +70,7 @@ nonisolated struct TimeComponents: Codable, Hashable, CustomStringConvertible {
     /// - Parameters:
     ///   - hour: Hour value in 0..<24.
     ///   - minute: Minute value in 0..<60.
-    init?(hour: Int, minute: Int) {
-        guard (0..<24).contains(hour), (0..<60).contains(minute) else { return nil }
+    init(hour: Int, minute: Int) {
         let hoursAsSeconds = hour * 60 * 60
         let minutesAsSeconds = minute * 60
         let totalSeconds = hoursAsSeconds + minutesAsSeconds
