@@ -12,7 +12,7 @@ struct RowStyle: ViewModifier {
         content
             .padding()
             .frame(height: FocusSessionView.Constants.Row.height)
-            .background(FocusSessionView.Constants.Row.background)
+            .background(Color.ftPresetBackgroundColor)
             .cornerRadius(FocusSessionView.Constants.Row.cornerRadius)
             .tint(.white)
     }

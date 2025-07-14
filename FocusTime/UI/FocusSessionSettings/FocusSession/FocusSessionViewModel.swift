@@ -10,7 +10,16 @@ import SwiftUI
 @Observable
 @MainActor
 final class FocusSessionViewModel {
-    
+
+    enum SheetType: Identifiable {
+        case durationPicker
+        case startTimePicker
+        case endTimePicker
+        case appBlockerSheet
+
+        var id: Int { self.hashValue }
+    }
+
     // MARK: - State
     struct State {
         var scheduleConfiguration: ScheduleConfiguration = ScheduleConfiguration(
@@ -23,49 +32,47 @@ final class FocusSessionViewModel {
             selectedHours: FocusSessionView.Constants.DefaultValues.durationHours,
             selectedMinutes: FocusSessionView.Constants.DefaultValues.durationMinutes
         )
-        
-        var isDurationPickerPresented: Bool = false
-        var isStartTimePickerPresented: Bool = false
-        var isEndTimePickerPresented: Bool = false
-        var isAppBlockerSheetPresented: Bool = false
+
+        var activeSheet: SheetType?
     }
-    
+
     // MARK: - Properties
     var state: State
-    
+
     // MARK: - Static Data
     let presets: [FocusPreset] = FocusPreset.allCases
-    
+
     // MARK: - Initializers
     init(state: State = State()) {
         self.state = state
     }
-    
+
     // MARK: - Computed Properties
     var selectedPresetIconName: String? {
         state.scheduleConfiguration.selectedPreset?.iconName
     }
-    
+
     var isStartButtonEnabled: Bool {
         !state.scheduleConfiguration.listName.trimmingCharacters(in: .whitespaces).isEmpty
     }
-    
+
+    // MARK: - Action Methods (Public API)
     func presentDurationPicker() {
-        state.isDurationPickerPresented = true
+        state.activeSheet = .durationPicker
     }
-    
+
     func presentStartTimePicker() {
-        state.isStartTimePickerPresented = true
+        state.activeSheet = .startTimePicker
     }
-    
+
     func presentEndTimePicker() {
-        state.isEndTimePickerPresented = true
+        state.activeSheet = .endTimePicker
     }
-    
+
     func presentAppBlockerSheet() {
-        state.isAppBlockerSheetPresented = true
+        state.activeSheet = .appBlockerSheet
     }
-    
+
     func selectPreset(_ preset: FocusPreset) {
         if state.scheduleConfiguration.selectedPreset == preset {
             state.scheduleConfiguration.selectedPreset = nil
@@ -73,7 +80,7 @@ final class FocusSessionViewModel {
             state.scheduleConfiguration.selectedPreset = preset
         }
     }
-    
+
     func startTapped() {
         print("Start button tapped!")
         print("Current List Name: \(state.scheduleConfiguration.listName)")

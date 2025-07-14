@@ -11,6 +11,7 @@ import FocusTimeUI
 struct FocusSessionView: View {
     
     @State private var viewModel: FocusSessionViewModel
+    @State private var sheetDurationViewModel: DurationPickerSheetViewModel?
     
     init(viewModel: FocusSessionViewModel = FocusSessionViewModel()) {
         _viewModel = State(initialValue: viewModel)
@@ -24,10 +25,13 @@ struct FocusSessionView: View {
                     VStack(spacing: Constants.Layout.mainVStackSpacing) {
                         ScheduleConfigurationView(
                             configuration: $viewModel.state.scheduleConfiguration,
-                            onDurationTap: viewModel.presentDurationPicker,
-                            onStartTimeTap: viewModel.presentStartTimePicker,
-                            onEndTimeTap: viewModel.presentEndTimePicker,
-                            onAppsBlockedTap: viewModel.presentAppBlockerSheet
+                            actions: .init(
+                                onDurationTap: viewModel.presentDurationPicker,
+                                onStartTimeTap: viewModel.presentStartTimePicker,
+                                onEndTimeTap: viewModel.presentEndTimePicker,
+                                onAppsBlockedTap: viewModel.presentAppBlockerSheet,
+                                onScheduledDaysTap: {}
+                            )
                         )
                         
                         FocusPresetGridView(
@@ -36,20 +40,12 @@ struct FocusSessionView: View {
                         )
                     }
                     .padding(.vertical)
-                    .padding(.bottom, FocusSessionView.Constants.Layout.floatingButtonBottomPadding + 60)
                 }
             }
             .containerRelativeFrame([.horizontal])
             .gradientBackground()
             .navigationTitle(Constants.Strings.navigationTitle)
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    Text(Constants.Strings.navigationTitle)
-                        .foregroundStyle(.white)
-                        .bold()
-                }
-            }
             .safeAreaInset(edge: .bottom) {
                 Button {
                     viewModel.startTapped()
@@ -58,48 +54,65 @@ struct FocusSessionView: View {
                 }
                 .buttonStyle(FTPrimaryButtonStyle())
                 .padding(.horizontal, Constants.Layout.floatingButtonHorizontalPadding)
-                .padding(.bottom, Constants.Layout.floatingButtonBottomPadding)
                 .disabled(!viewModel.isStartButtonEnabled)
             }
             .containerRelativeFrame([.horizontal])
             
-            .sheet(isPresented: $viewModel.state.isDurationPickerPresented) {
-                DurationPickerSheetView(
-                    hours: $viewModel.state.scheduleConfiguration.selectedHours,
-                    minutes: $viewModel.state.scheduleConfiguration.selectedMinutes
-                )
-                .presentationDetents([.height(Constants.Layout.sheetHeight)])
-                .presentationCornerRadius(Constants.Layout.sheetCornerRadius)
-            }
-            .sheet(isPresented: $viewModel.state.isStartTimePickerPresented) {
-                TimePickerSheetView(
-                    selectedDate: $viewModel.state.scheduleConfiguration.startTime,
-                    title: Constants.TimePicker.Strings.startTimeTitle,
-                    subtitle: Constants.TimePicker.Strings.startTimeSubtitle
-                )
-                .presentationDetents([.height(Constants.Layout.sheetHeight)])
-                .presentationCornerRadius(Constants.Layout.sheetCornerRadius)
-            }
-            .sheet(isPresented: $viewModel.state.isEndTimePickerPresented) {
-                TimePickerSheetView(
-                    selectedDate: $viewModel.state.scheduleConfiguration.endTime,
-                    title: Constants.TimePicker.Strings.endTimeTitle,
-                    subtitle: Constants.TimePicker.Strings.endTimeSubtitle
-                )
-                .presentationDetents([.height(Constants.Layout.sheetHeight)])
-                .presentationCornerRadius(Constants.Layout.sheetCornerRadius)
-            }
-            .sheet(isPresented: $viewModel.state.isAppBlockerSheetPresented) {
+            // MARK: - Consolidated Sheet Presentation
+            .sheet(item: $viewModel.state.activeSheet) { sheetType in
+                switch sheetType {
+                case .durationPicker:
+                    if let sheetDurationViewModel {
+                        DurationPickerSheetView(viewModel: sheetDurationViewModel)
+                            .presentationDetents([.height(Constants.Layout.sheetHeight)])
+                            .presentationCornerRadius(Constants.Layout.sheetCornerRadius)
+                            .onDisappear {
+                                viewModel.state.scheduleConfiguration.selectedHours = sheetDurationViewModel.hours
+                                viewModel.state.scheduleConfiguration.selectedMinutes = sheetDurationViewModel.minutes
+                                self.sheetDurationViewModel = nil
+                                viewModel.state.activeSheet = nil
+                            }
+                    } else {
+                        Text(Constants.Strings.durationPickerSheetErrorTitle)
+                    }
+                    
+                case .startTimePicker:
+                    TimePickerSheetView(
+                        selectedDate: $viewModel.state.scheduleConfiguration.startTime,
+                        title: TimePickerConstants.Strings.startTimeTitle,
+                        subtitle: TimePickerConstants.Strings.startTimeSubtitle
+                    )
+                    .presentationDetents([.height(Constants.Layout.sheetHeight)])
+                    .presentationCornerRadius(Constants.Layout.sheetCornerRadius)
+                    
+                case .endTimePicker:
+                    TimePickerSheetView(
+                        selectedDate: $viewModel.state.scheduleConfiguration.endTime,
+                        title: TimePickerConstants.Strings.endTimeTitle,
+                        subtitle: TimePickerConstants.Strings.endTimeSubtitle
+                    )
+                    .presentationDetents([.height(Constants.Layout.sheetHeight)])
+                    .presentationCornerRadius(Constants.Layout.sheetCornerRadius)
+                    
+                case .appBlockerSheet:
 #warning("Change ContentView with actual view")
-                ContentView()
+                    FocusPresetGridView(
+                        presets: viewModel.presets,
+                        selectedPreset: $viewModel.state.scheduleConfiguration.selectedPreset
+                    )
                     .presentationDetents([.medium, .large])
                     .presentationCornerRadius(Constants.Layout.sheetCornerRadius)
+                }
+            }
+            .preferredColorScheme(.dark)
+            .onChange(of: viewModel.state.activeSheet) { oldValue, newValue in
+                if newValue == .durationPicker && self.sheetDurationViewModel == nil {
+                    self.sheetDurationViewModel = DurationPickerSheetViewModel(hours: viewModel.state.scheduleConfiguration.selectedHours, minutes: viewModel.state.scheduleConfiguration.selectedMinutes)
+                }
             }
         }
-        .preferredColorScheme(.dark)
     }
 }
-
 
 // MARK: - Preview
 #Preview {

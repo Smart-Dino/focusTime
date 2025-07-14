@@ -14,6 +14,7 @@ extension FocusSessionView {
         public enum Strings { 
             public static let navigationTitle = "Focus Setup"
             public static let startButtonTitle = "Start"
+            public static let durationPickerSheetErrorTitle = "Error: DurationPickerSheetViewModel not initialized."
         }
         
         // MARK: - General Layout
@@ -21,15 +22,11 @@ extension FocusSessionView {
             public static let mainVStackSpacing: CGFloat = 40
             public static let sheetHeight: CGFloat = 400
             public static let sheetCornerRadius: CGFloat = 25
-            public static let floatingButtonBottomPadding: CGFloat = 20
             public static let floatingButtonHorizontalPadding: CGFloat = 20
         }
         
         // MARK: - General Colors
         public enum Colors {
-            public static let background = Color(red: 0.07, green: 0.09, blue: 0.11)
-            public static let navigationBarBackground = Color(red: 0.07, green: 0.09, blue: 0.11)
-            public static let sheetBackground = Color(red: 0.1, green: 0.1, blue: 0.12)
             public static let chevronColor = Color.blue
         }
         
@@ -47,12 +44,6 @@ extension FocusSessionView {
             public static let durationMinutes = 30
             public static let startTime: Date = Calendar.current.date(from: DateComponents(hour: 9, minute: 0))!
             public static let endTime: Date = Calendar.current.date(from: DateComponents(hour: 17, minute: 0))!
-        }
-        
-        
-        // MARK: - Static Data
-        public enum Data {
-            @MainActor public static let presets: [FocusPreset] = FocusPreset.allCases
         }
     }
 }

@@ -7,12 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0C60F8882E12BDF100EEA3F3 /* OnboardingLocalizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 0C60F8872E12BDF000EEA3F3 /* OnboardingLocalizable.xcstrings */; };
+		0C037A3F2E1D362200DAAC9D /* OnboardingKit in Frameworks */ = {isa = PBXBuildFile; productRef = 0C037A3E2E1D362200DAAC9D /* OnboardingKit */; };
 		E96207822DD4EF2B002F037F /* FocusTimeUI in Frameworks */ = {isa = PBXBuildFile; productRef = E96207812DD4EF2B002F037F /* FocusTimeUI */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		0C60F8872E12BDF000EEA3F3 /* OnboardingLocalizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = OnboardingLocalizable.xcstrings; sourceTree = "<group>"; };
+		0C037A412E1E410A00DAAC9D /* OnboardingKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = OnboardingKit; path = /Users/ketonioradze/Downloads/OnboardingKit; sourceTree = "<absolute>"; };
 		674FA6A02DB05ACE0002FDC1 /* FocusTime.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FocusTime.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E962077F2DD4D1E5002F037F /* FocusTimeUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = FocusTimeUI; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -30,6 +30,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0C037A3F2E1D362200DAAC9D /* OnboardingKit in Frameworks */,
 				E96207822DD4EF2B002F037F /* FocusTimeUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -40,7 +41,7 @@
 		674FA6972DB05ACE0002FDC1 = {
 			isa = PBXGroup;
 			children = (
-				0C60F8872E12BDF000EEA3F3 /* OnboardingLocalizable.xcstrings */,
+				0C037A412E1E410A00DAAC9D /* OnboardingKit */,
 				E962077F2DD4D1E5002F037F /* FocusTimeUI */,
 				674FA6A22DB05ACE0002FDC1 /* FocusTime */,
 				674FA6A12DB05ACE0002FDC1 /* Products */,
@@ -76,6 +77,7 @@
 			name = FocusTime;
 			packageProductDependencies = (
 				E96207812DD4EF2B002F037F /* FocusTimeUI */,
+				0C037A3E2E1D362200DAAC9D /* OnboardingKit */,
 			);
 			productName = FocusTime;
 			productReference = 674FA6A02DB05ACE0002FDC1 /* FocusTime.app */;
@@ -107,6 +109,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				E96207802DD4EF2B002F037F /* XCLocalSwiftPackageReference "FocusTimeUI" */,
+				0C037A3D2E1D362200DAAC9D /* XCRemoteSwiftPackageReference "OnboardingKit" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 674FA6A12DB05ACE0002FDC1 /* Products */;
@@ -123,7 +126,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0C60F8882E12BDF100EEA3F3 /* OnboardingLocalizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -357,7 +359,23 @@
 		};
 /* End XCLocalSwiftPackageReference section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		0C037A3D2E1D362200DAAC9D /* XCRemoteSwiftPackageReference "OnboardingKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Smart-Dino/OnboardingKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
+		0C037A3E2E1D362200DAAC9D /* OnboardingKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0C037A3D2E1D362200DAAC9D /* XCRemoteSwiftPackageReference "OnboardingKit" */;
+			productName = OnboardingKit;
+		};
 		E96207812DD4EF2B002F037F /* FocusTimeUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = FocusTimeUI;

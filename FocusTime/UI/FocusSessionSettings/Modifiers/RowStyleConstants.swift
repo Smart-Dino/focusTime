@@ -13,6 +13,5 @@ extension FocusSessionView.Constants {
     public enum Row {
         public static let height: CGFloat = 64
         public static let cornerRadius: CGFloat = 12
-        public static let background = Color.ftRowBackground
     }
 }

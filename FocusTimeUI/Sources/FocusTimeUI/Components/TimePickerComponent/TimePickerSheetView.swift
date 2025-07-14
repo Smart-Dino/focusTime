@@ -7,17 +7,23 @@
 
 import SwiftUI
 
-struct TimePickerSheetView: View {
-    @Binding var selectedDate: Date
-    let title: String
-    let subtitle: String
+public struct TimePickerSheetView: View {
+    @Binding public var selectedDate: Date
+    public let title: String
+    public let subtitle: String
 
-    var body: some View {
+    public init(selectedDate: Binding<Date>, title: String, subtitle: String) {
+        _selectedDate = selectedDate
+        self.title = title
+        self.subtitle = subtitle
+    }
+
+    public var body: some View {
         ZStack {
-            FocusSessionView.Constants.Colors.sheetBackground
+            Color.ftPresetBackgroundColor
                 .ignoresSafeArea()
 
-            VStack(spacing: FocusSessionView.Constants.TimePicker.Layout.mainSpacing) {
+            VStack(spacing: TimePickerConstants.Layout.mainSpacing) {
                 Text(title)
                     .font(.headline)
                     .foregroundStyle(.blue)
@@ -29,13 +35,14 @@ struct TimePickerSheetView: View {
 
                 timePicker
                     .padding(.bottom)
-                    .frame(width: FocusSessionView.Constants.TimePicker.Layout.containerWidth, height: FocusSessionView.Constants.TimePicker.Layout.containerHeight)
+                    .frame(width: TimePickerConstants.Layout.containerWidth, height: TimePickerConstants.Layout.containerHeight)
                     .background {
-                        FocusSessionView.Constants.TimePicker.Colors.pickerBackground
-                            .cornerRadius(FocusSessionView.Constants.TimePicker.Layout.containerCornerRadius)
+                        Color.ftTimePickerBackgroundColor
+                            .cornerRadius(TimePickerConstants.Layout.containerCornerRadius)
                     }
             }
         }
+        .presentationDragIndicator(.visible)
     }
 
     private var timePicker: some View {
@@ -46,7 +53,7 @@ struct TimePickerSheetView: View {
         )
         .datePickerStyle(.wheel)
         .labelsHidden()
-        .frame(width: FocusSessionView.Constants.TimePicker.Layout.pickerWidth)
+        .frame(width: TimePickerConstants.Layout.pickerWidth)
         .clipped()
         .environment(\.locale, Locale(identifier: "en_CH"))
     }

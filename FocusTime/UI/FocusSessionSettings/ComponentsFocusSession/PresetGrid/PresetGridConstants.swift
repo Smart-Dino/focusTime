@@ -32,11 +32,5 @@ extension FocusSessionView.Constants {
             public static let size: CGFloat = 60
             public static let cornerRadius: CGFloat = 20
         }
-        
-        public enum Colors {
-            public static let background = Color.ftPresetBackground
-            public static let selectedBackground = Color.ftPresetSelectedBackground
-            public static let selectedBorder = Color.blue
-        }
     }
 }

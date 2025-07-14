@@ -6,33 +6,25 @@
 //
 
 import SwiftUI
-import FocusTimeUI 
+import FocusTimeUI
 
 struct DaysPickerPopup: View {
-    // MARK: - Properties
-    @Binding var scheduledDays: Set<Weekday>
-
-    // MARK: - Body
+    @Bindable var viewModel: DaysPickerPopupViewModel
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             ForEach(Weekday.allCases.sorted()) { day in
                 Button {
-                    if scheduledDays.contains(day) {
-                        scheduledDays.remove(day)
-                    } else {
-                        scheduledDays.insert(day)
-                    }
+                    viewModel.toggleDay(day)
                 } label: {
                     HStack(spacing: FocusSessionView.Constants.DaysPickerPopup.Layout.itemSpacing) {
                         Image(systemName: FocusSessionView.Constants.DaysPickerPopup.Symbols.checkmark)
                             .font(.body.weight(.bold))
-                            .opacity(scheduledDays.contains(day) ? 1 : 0)
                         Text(LocalizedStringKey(day.rawValue.capitalized))
                         Spacer()
                     }
                     .padding(.horizontal)
                     .padding(.vertical, FocusSessionView.Constants.DaysPickerPopup.Layout.verticalPadding)
-                    .foregroundColor(.white)
                 }
                 if day != Weekday.allCases.sorted().last {
                     Divider()
@@ -43,7 +35,7 @@ struct DaysPickerPopup: View {
         }
         .background(
             RoundedRectangle(cornerRadius: FocusSessionView.Constants.DaysPickerPopup.Layout.cornerRadius)
-                .fill(Color.ftDaysPickerBackground)
+                .fill(Color.ftTimePickerBackgroundColor)
         )
         .compositingGroup()
         .shadow(color: FocusSessionView.Constants.DaysPickerPopup.Colors.shadow, radius: FocusSessionView.Constants.DaysPickerPopup.Layout.shadowRadius, y: FocusSessionView.Constants.DaysPickerPopup.Layout.shadowY)
