@@ -67,6 +67,7 @@
 				BusinessLogic/Managers/ShieldManager/LiveShieldManager.swift,
 				BusinessLogic/Managers/ShieldManager/ShieldManager.swift,
 				BusinessLogic/Models/Blocking/BlockItem/BlockItem.swift,
+				BusinessLogic/Models/Blocking/BlockItem/Helpers/ProtectedActivitySelection.swift,
 				BusinessLogic/Models/Blocking/BlockItem/ProtectedBlockItem.swift,
 				BusinessLogic/Models/Blocking/CodableActivityIdentifier/CodableActivityIdentifier.swift,
 				BusinessLogic/Models/Blocking/Schedule/Helpers/ScheduleType.swift,
@@ -75,7 +76,6 @@
 				BusinessLogic/Models/Blocking/Schedule/ProtectedSchedule.swift,
 				BusinessLogic/Models/Blocking/Schedule/Schedule.swift,
 				BusinessLogic/Stores/Protocols/ProtectedModel.swift,
-				"Extentions/FamilyActivitySelection+Sendable.swift",
 				Shared/AppValues.swift,
 			);
 			target = E97895A42E0AFCBE00E0AF42 /* FocusTimeActivityMonitor */;

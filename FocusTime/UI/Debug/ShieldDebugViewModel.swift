@@ -125,7 +125,7 @@ final class ShieldDebugViewModel {
             guard blockItems.isEmpty && scheduleItems.isEmpty else { return }
             
             let blockItem = ProtectedBlockItem(emoji: "❌", name: "Block",
-                                               blockedContent: state.selection)
+                                               blockedContent: ProtectedActivitySelection(state.selection))
             
             var type: ScheduleType!
             
@@ -206,7 +206,7 @@ final class ShieldDebugViewModel {
     
     func blockSelection() async {
         do {
-            try await shieldManager.block(specific: state.selection)
+            try await shieldManager.block(specific: ProtectedActivitySelection(state.selection))
         } catch {
             state.error = error
         }

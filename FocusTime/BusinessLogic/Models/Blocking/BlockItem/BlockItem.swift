@@ -15,7 +15,7 @@ final class BlockItem {
     var id: UUID
     var name: String
     var emoji: String
-    var blockedContent: FamilyActivitySelection
+    var blockedContent: ProtectedActivitySelection
     
     // MARK: Relationship
     var schedules: [Schedule]?
@@ -37,7 +37,7 @@ final class BlockItem {
         id: UUID = UUID(),
         name: String,
         emoji: String,
-        blockedContent: FamilyActivitySelection,
+        blockedContent: ProtectedActivitySelection,
         schedules: [Schedule]? = nil
     ) {
         self.id = id

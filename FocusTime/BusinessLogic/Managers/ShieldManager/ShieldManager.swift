@@ -13,8 +13,8 @@ protocol ShieldManager: Sendable {
     var isShieldActive: Bool { get }
     // MARK: - Block
     func block() async throws
-    func block(specific selection: FamilyActivitySelection) async throws
-    func block(specific selections: [FamilyActivitySelection]) async throws
+    func block(specific selection: ProtectedActivitySelection) async throws
+    func block(specific selections: [ProtectedActivitySelection]) async throws
     // MARK: - Unblock
     func unblock() async throws
     func checkAuthorization() async throws 

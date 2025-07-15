@@ -33,7 +33,7 @@ final class AppBlockingListViewModel {
             let itemsToInsert = Array(
                 repeating: ProtectedBlockItem(emoji: "😜",
                                               name: "Block",
-                                              blockedContent: FamilyActivitySelection()),
+                                              blockedContent: ProtectedActivitySelection(.init())),
                 count: 100000
             )
             try await blockItemStore.insertBatch(itemsToInsert)
