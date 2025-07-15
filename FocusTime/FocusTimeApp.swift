@@ -11,7 +11,7 @@ import SwiftUI
 struct FocusTimeApp: App {
     var body: some Scene {
         WindowGroup {
-            PlanSelectionPaywallView(viewModel: .init(superPaywallVM: .init(paymentManager: StoreKitPaymentManager()), flowDelegate: nil))
+            SlideOnboardingView()
         }
     }
 }

@@ -13,9 +13,7 @@ import FocusTimeUI
 struct SlideOnboardingView: View {
     // MARK: - Properties
     @State private var viewModel = SlideOnboardingViewModel()
-    
-    private let progressItems = SlideOnboardingStep.allCases
-    
+        
     // MARK: - Body
     var body: some View {
         VStack {
@@ -26,9 +24,9 @@ struct SlideOnboardingView: View {
                     .multilineTextAlignment(.center)
                  
                 FTProgressBarView(
-                    items: progressItems,
+                    items: viewModel.state.progressItems,
                     selectedItem: Binding(
-                        get: { progressItems[viewModel.state.currentIndex] },
+                        get: { viewModel.state.currentStep },
                         set: { _ in } ))
                 .padding(.top, Constants.Layout.progressBarTopPadding)
             }

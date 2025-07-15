@@ -14,6 +14,10 @@ final class QuizOnboardingViewModel {
       
     struct State {
         var selectionStates: Set<QuizOnboardingView.Constants.QuizOption> = []
+        
+        func isOptionSelected(_ option: QuizOnboardingView.Constants.QuizOption) -> Bool {
+            selectionStates.contains(option)
+        }
     }
     
     private(set) var state = State()
@@ -24,9 +28,5 @@ final class QuizOnboardingViewModel {
         } else {
             state.selectionStates.insert(option)
         }
-    }
-    
-    func isOptionSelected(_ option: QuizOnboardingView.Constants.QuizOption) -> Bool {
-        state.selectionStates.contains(option)
     }
 }
