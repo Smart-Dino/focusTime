@@ -10,6 +10,9 @@
     "Could not check whether the user is eligible for trial for the given subscription group." : {
 
     },
+    "Could not find the registered device activity." : {
+
+    },
     "Could not generate a codable representation of the identifier." : {
 
     },
@@ -20,6 +23,9 @@
 
     },
     "No identifier found during conversion; attempted to fetch a model that may not exist with ProtectedModel." : {
+
+    },
+    "No matching activity was found in DeviceActivityCenter for the provided identifier." : {
 
     },
     "Selected item does not exist, make sure you saved your changes." : {

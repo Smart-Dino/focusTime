@@ -63,7 +63,7 @@ final class LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         duration: Int
     ) throws {
         guard let persistentModelID = schedule.persistentModelID else {
-            throw ShieldManagerError.noPersistentItem
+            throw DeviceActivityRegistrarError.noPersistentItem
         }
         
         // Block starts from now.
@@ -71,7 +71,7 @@ final class LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
             let scheduleStore = ScheduleStore(modelContainer: self.modelContainer)
             let protectedBlockItems = try await scheduleStore.fetchRelatedObjects(id: persistentModelID)
             
-            await MainActor.run {
+            _ = await MainActor.run {
                 Task {
                     try? await self.shieldManager.block(specific: protectedBlockItems.map(\.blockedContent))
                 }
@@ -91,7 +91,7 @@ final class LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         // Let the DeviceActivityMonitorExtension know that we need a regular scenario.
         guard let activityIdentifier = CodableActivityIdentifier(scheduleID: schedule.id,
                                                                  isFallback: false).jsonString
-        else { throw ShieldManagerError.couldNotGenerateIdentifier }
+        else { throw DeviceActivityRegistrarError.couldNotGenerateIdentifier }
         
         let activityName = DeviceActivityName(activityIdentifier)
         
@@ -103,7 +103,7 @@ final class LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         startTime: TimeComponents,
         endTime: TimeComponents
     ) throws {
-        guard schedule.persistentModelID != nil else { throw ShieldManagerError.noPersistentItem }
+        guard schedule.persistentModelID != nil else { throw DeviceActivityRegistrarError.noPersistentItem }
         
         let intervalStart = startTime.dateComponents
         let intervalEnd = endTime.dateComponents
@@ -114,7 +114,7 @@ final class LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         // Let the DeviceActivityMonitorExtension know that we need a regular scenario.
         guard let activityIdentifier = CodableActivityIdentifier(scheduleID: schedule.id,
                                                                  isFallback: false).jsonString
-        else { throw ShieldManagerError.couldNotGenerateIdentifier }
+        else { throw DeviceActivityRegistrarError.couldNotGenerateIdentifier }
         
         let activityName = DeviceActivityName(activityIdentifier)
         
@@ -127,12 +127,12 @@ final class LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         startTime: TimeComponents,
         endTime: TimeComponents
     ) throws {
-        guard schedule.persistentModelID != nil else { throw ShieldManagerError.noPersistentItem }
+        guard schedule.persistentModelID != nil else { throw DeviceActivityRegistrarError.noPersistentItem }
         
         let intervalStart = startTime.dateComponents
         // Shift interval end to satisfy DeviceActivityCenter - workaround.
         guard let intervalEnd = endTime.dateComponents.adding(seconds: 15 * 60) else {
-            throw ShieldManagerError.couldNotSetTime
+            throw DeviceActivityRegistrarError.couldNotSetTime
         }
         let deviceActivitySchedule = DeviceActivitySchedule(intervalStart: intervalStart,
                                                             intervalEnd: intervalEnd,
@@ -141,11 +141,18 @@ final class LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         // Let the DeviceActivityMonitorExtension know that we need a fallback scenario.
         guard let activityIdentifier = CodableActivityIdentifier(scheduleID: schedule.id,
                                                                  isFallback: true).jsonString
-        else { throw ShieldManagerError.couldNotGenerateIdentifier }
+        else { throw DeviceActivityRegistrarError.couldNotGenerateIdentifier }
         
         let activityName = DeviceActivityName(activityIdentifier)
         
         try center.startMonitoring(activityName, during: deviceActivitySchedule)
+    }
+    
+    func unregisterActivity(during schedule: ProtectedSchedule) async throws {
+        guard let activity = center.activities.first(where: { $0.rawValue.contains(schedule.id.uuidString) }) else {
+            throw DeviceActivityRegistrarError.activityNotFound
+        }
+        center.stopMonitoring([activity])
     }
     
     func unregisterAll() {
@@ -156,3 +163,4 @@ final class LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         try await AuthorizationCenter.shared.requestAuthorization(for: .individual)
     }
 }
+
