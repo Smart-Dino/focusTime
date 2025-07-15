@@ -9,13 +9,16 @@ import Foundation
 import FamilyControls
 
 struct ProtectedActivitySelection: Codable {
-    private let data: Data
+    private let data: Data?
     
     nonisolated var nonisolatedSelection: FamilyActivitySelection {
-        try! JSONDecoder().decode(FamilyActivitySelection.self, from: data)
+        guard let data,
+              let result = try? JSONDecoder().decode(FamilyActivitySelection.self, from: data)
+        else { return FamilyActivitySelection() }
+        return result
     }
     
     init(_ activitySelection: FamilyActivitySelection) {
-        self.data = try! JSONEncoder().encode(activitySelection)
+        self.data = try? JSONEncoder().encode(activitySelection)
     }
 }
