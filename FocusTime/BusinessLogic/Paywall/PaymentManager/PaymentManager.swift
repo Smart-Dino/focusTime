@@ -95,13 +95,13 @@ actor MockPaymentManagerWithPurchaseError: PaymentManager {
     // MARK: - Methods
     func isProUserChangesStream() -> AsyncStream<Bool> {
         AsyncStream { continuation in
-            continuation.yield(true)
+            continuation.yield(isPro)
         }
     }
 
     func eligibleForIntro(product: FTProduct) async throws(PaymentError) -> Bool {
         if !trialUsed {
-            if products.first(where: { $0.trialPeriod != nil }) != nil {
+            if product.trialPeriod != nil {
                 return true
             }
         }

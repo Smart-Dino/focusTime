@@ -11,7 +11,7 @@ import os
 
 actor StoreKitPaymentManager: PaymentManager {
     static let logger = Logger(
-        subsystem: Bundle.main.bundleIdentifier!,
+        subsystem: Bundle.main.bundleIdentifier ?? "org.dino.smart.FocusTime",
         category: String(describing: StoreKitPaymentManager.self)
     )
     
