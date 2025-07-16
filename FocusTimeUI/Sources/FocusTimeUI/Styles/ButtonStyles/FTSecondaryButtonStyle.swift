@@ -33,8 +33,7 @@ public struct FTSecondaryButtonStyle: ButtonStyle {
             .padding(.vertical, 7)
             .background(.ultraThinMaterial)
             .clipShape(.capsule)
-            .opacity(configuration.isPressed ? 0.8 : 1)
-            .opacity(isEnabled ? 1 : 0.3)
+            .opacity(isEnabled ? (configuration.isPressed ? 0.8 : 1) : 0.3)
     }
     
 }
