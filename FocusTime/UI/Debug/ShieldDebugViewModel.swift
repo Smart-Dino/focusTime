@@ -62,7 +62,9 @@ final class ShieldDebugViewModel {
         self.blockItemStore = BlockItemStore(modelContainer: modelContainer)
         self.relationshipCoordinator = RelationshipCoordinator(modelContainer: modelContainer)
         
-        activityRegistrar.unregisterAll()
+        Task {
+            await activityRegistrar.unregisterAll()
+        }
     }
     
     // MARK: - Setters

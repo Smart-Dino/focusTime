@@ -13,7 +13,6 @@ import ManagedSettings
 import FamilyControls
 @testable import FocusTime
 
-@MainActor
 @Suite("Tests related to the app blocking.", .serialized)
 struct BlockingTests {
     // MARK: Native Managers
@@ -31,7 +30,7 @@ struct BlockingTests {
     // MARK: Reused declarations
     let allCategories = ShieldSettings.ActivityCategoryPolicy<Application>.all()
     
-    init() {
+    init() async {
         // Native managers.
         self.store = ManagedSettingsStore()
         self.center = DeviceActivityCenter()
@@ -139,9 +138,10 @@ struct BlockingTests {
         try await activityRegistrar.registerActivity(during: fetchedSchedule)
 
         // Simulate starting the interval.
-        activityHandler.handleBlockingStart(for: activityName)
-
-        try #require(shieldManager.isShieldActive)
+        await activityHandler.handleBlockingStart(for: activityName)
+        
+        let isShieldActive = await shieldManager.isShieldActive
+        try #require(isShieldActive)
 
         #expect(
             store.shield.applications == Set<ApplicationToken>() &&
@@ -149,7 +149,7 @@ struct BlockingTests {
         )
 
         // Simulate ending the interval.
-        activityHandler.handleBlockingEnd(for: activityName)
+        await activityHandler.handleBlockingEnd(for: activityName)
 
         #expect(
             store.shield.applications == nil &&

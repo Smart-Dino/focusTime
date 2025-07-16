@@ -10,8 +10,7 @@ import SwiftData
 import DeviceActivity
 import FamilyControls
 
-@MainActor
-final class LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
+actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
     private let center: DeviceActivityCenter
     private let shieldManager: ShieldManager
     private let modelContainer: ModelContainer
@@ -32,11 +31,11 @@ final class LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         self.modelContainer = modelContainer
         self.shieldManager = shieldManager
     }
-
+    
     // Try to schedule event.
     // If schedule fails - use fallback method.
     func registerActivity(during schedule: ProtectedSchedule) async throws {
-        try await checkAuthorization()
+        try await AuthorizationCenter.shared.requestAuthorization(for: .individual)
         
         switch schedule.type {
         case .scheduled(let startTime, let endTime):
@@ -66,15 +65,17 @@ final class LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
             throw DeviceActivityRegistrarError.noPersistentItem
         }
         
+        // Copy values to avoid capturing self in the Tasks.
+        let modelContainer = self.modelContainer
+        let shieldManager = self.shieldManager
+        
         // Block starts from now.
         Task.detached {
-            let scheduleStore = ScheduleStore(modelContainer: self.modelContainer)
+            let scheduleStore = ScheduleStore(modelContainer: modelContainer)
             let protectedBlockItems = try await scheduleStore.fetchRelatedObjects(id: persistentModelID)
             
-            _ = await MainActor.run {
-                Task {
-                    try? await self.shieldManager.block(specific: protectedBlockItems.map(\.blockedContent))
-                }
+            Task { @MainActor in
+                try? await shieldManager.block(specific: protectedBlockItems.map(\.blockedContent))
             }
         }
         
@@ -157,10 +158,6 @@ final class LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
     
     func unregisterAll() {
         center.stopMonitoring()
-    }
-    
-    func checkAuthorization() async throws {
-        try await AuthorizationCenter.shared.requestAuthorization(for: .individual)
     }
 }
 

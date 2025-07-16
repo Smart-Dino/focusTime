@@ -7,8 +7,7 @@
 
 import Foundation
 
-@MainActor
-protocol DeviceActivityRegistrar: AnyObject {
+protocol DeviceActivityRegistrar: Actor {
     // MARK: - Properties
     var monitoredIdentifiers: Set<UUID> { get }
     // MARK: - Methods

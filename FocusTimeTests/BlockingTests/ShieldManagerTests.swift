@@ -12,6 +12,7 @@ import ManagedSettings
 @testable import FocusTime
 
 @Suite("Tests for the ShieldManager implementations", .serialized)
+@ShieldActor
 struct ShieldManagerTests {
     let store: ManagedSettingsStore
     let shieldManager: ShieldManager

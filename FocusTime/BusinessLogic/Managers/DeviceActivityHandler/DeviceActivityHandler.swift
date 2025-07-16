@@ -30,7 +30,7 @@ struct DeviceActivityHandler: Sendable {
 
         switch schedule.type {
         case .scheduled(_, let endTime):
-            handleRegularBlocking(schedule: schedule,
+            await handleRegularBlocking(schedule: schedule,
                                   activity: activity,
                                   activityIdentifier: activityIdentifier,
                                   endTime: endTime)
@@ -51,15 +51,13 @@ struct DeviceActivityHandler: Sendable {
         activity: DeviceActivityName,
         activityIdentifier: CodableActivityIdentifier,
         endTime endTimeComponent: TimeComponents
-    ) {
+    ) async {
         // Make sure the current day is the block day.
         guard let blockItems = schedule.blockItems, schedule.days.contains(Weekday.currentDay) else { return }
         
         // Block user's selections.
         let selections = blockItems.map(\.blockedContent)
-        Task {
-            try? await shieldManager.block(specific: selections)
-        }
+        try? await shieldManager.block(specific: selections)
         
         // Sendability workaround since DeviceActivityName is not sendable.
         let stringActivityName = activity.rawValue
