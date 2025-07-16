@@ -21,7 +21,7 @@ protocol PaymentManager: Actor {
     // MARK: - Service
     /// Used to load/reload data into payment manager's public and private properties.
     /// - Important: Recommended to use on every paywall screen launch. Access the needed data after awaiting this method.
-    func reloadData() async
+    func reloadData() async throws
     
     // MARK: - Convenience
     /// Returns the `FTProduct` associated with the given product identifier.

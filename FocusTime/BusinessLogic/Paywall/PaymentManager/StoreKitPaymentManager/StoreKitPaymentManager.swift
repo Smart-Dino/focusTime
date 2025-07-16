@@ -51,7 +51,7 @@ actor StoreKitPaymentManager: PaymentManager {
     }
     
     func setup() async {
-        await reloadData()
+        try? await reloadData()
         let task = listenForTransactions()
         self.updateListenerTask = task
     }
