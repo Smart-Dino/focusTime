@@ -25,17 +25,17 @@ final class LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
     
     init(
         center: DeviceActivityCenter = DeviceActivityCenter(),
-        shieldManager: ShieldManager,
-        modelContainer: ModelContainer
+        modelContainer: ModelContainer,
+        shieldManager: ShieldManager
     ) {
         self.center = center
-        self.shieldManager = shieldManager
         self.modelContainer = modelContainer
+        self.shieldManager = shieldManager
     }
 
     // Try to schedule event.
     // If schedule fails - use fallback method.
-    func registerRegularActivity(during schedule: ProtectedSchedule) async throws {
+    func registerActivity(during schedule: ProtectedSchedule) async throws {
         try await checkAuthorization()
         
         switch schedule.type {

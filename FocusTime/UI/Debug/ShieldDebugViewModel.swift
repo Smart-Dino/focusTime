@@ -57,8 +57,7 @@ final class ShieldDebugViewModel {
     ) {
         self.state = state
         self.shieldManager = shieldManager
-        self.activityRegistrar = LiveDeviceActivityRegistrar(shieldManager: shieldManager,
-                                                             modelContainer: modelContainer)
+        self.activityRegistrar = LiveDeviceActivityRegistrar(modelContainer: modelContainer, shieldManager: shieldManager)
         self.scheduleStore = ScheduleStore(modelContainer: modelContainer)
         self.blockItemStore = BlockItemStore(modelContainer: modelContainer)
         self.relationshipCoordinator = RelationshipCoordinator(modelContainer: modelContainer)
@@ -198,7 +197,7 @@ final class ShieldDebugViewModel {
                 return
             }
             
-            try await activityRegistrar.registerRegularActivity(during: schedule)
+            try await activityRegistrar.registerActivity(during: schedule)
         } catch {
             state.error = error
         }

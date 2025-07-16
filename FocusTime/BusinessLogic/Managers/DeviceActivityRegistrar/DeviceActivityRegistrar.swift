@@ -12,7 +12,7 @@ protocol DeviceActivityRegistrar: AnyObject {
     // MARK: - Properties
     var monitoredIdentifiers: Set<UUID> { get }
     // MARK: - Methods
-    func registerRegularActivity(during schedule: ProtectedSchedule) async throws
+    func registerActivity(during schedule: ProtectedSchedule) async throws
     func unregisterActivity(during schedule: ProtectedSchedule) async throws
     func unregisterAll()
 }

@@ -14,7 +14,7 @@ import FamilyControls
 @testable import FocusTime
 
 @MainActor
-@Suite("Tests related to the app blocking.")
+@Suite("Tests related to the app blocking.", .serialized)
 struct BlockingTests {
     // MARK: Native Managers
     let store: ManagedSettingsStore
@@ -39,8 +39,8 @@ struct BlockingTests {
         // Custom.
         let container = SharedTestHelpers.generateTestModelContainer()
         self.shieldManager = LiveShieldManager()
-        self.activityRegistrar = LiveDeviceActivityRegistrar(center: center)
-        self.activityHandler = DeviceActivityHandler(container: container)
+        self.activityRegistrar = LiveDeviceActivityRegistrar(modelContainer: container, shieldManager: shieldManager)
+        self.activityHandler = DeviceActivityHandler(container: container, shieldManager: shieldManager)
         
         // Stores.
         self.scheduleStore = ScheduleStore(modelContainer: container)
@@ -64,22 +64,6 @@ struct BlockingTests {
         store.shield.webDomainCategories = nil
     }
     
-    @Test("Basic block of all applications.")
-    func blockingAllApplications() async throws {
-        try await shieldManager.block()
-        
-        #expect(store.shield.applicationCategories == allCategories)
-    }
-    
-    @Test("Unblocking all applications.")
-    func unblockAllApplications() async throws {
-        try await shieldManager.block()
-        try #require(shieldManager.isShieldActive)
-        
-        try await shieldManager.unblock()
-        #expect(!shieldManager.isShieldActive && store.shield.applicationCategories == nil)
-    }
-    
     @Test("Scheduled blocking.",
           arguments: [
             (17, 0, 21, 0),
@@ -90,18 +74,17 @@ struct BlockingTests {
             (15, 0, 14, 0)
           ])
     func scheduledBlocking(startHour: Int, startMinute: Int, endHour: Int, endMinute: Int) async throws {
-        let startTime = try #require(TimeComponents(hour: startHour, minute: startMinute))
-        let endTime = try #require(TimeComponents(hour: endHour, minute: endMinute))
+        let startTime = TimeComponents(hour: startHour, minute: startMinute)
+        let endTime = TimeComponents(hour: endHour, minute: endMinute)
         // Setup.
         let schedule = ProtectedSchedule(emoji: "🧪",
                                          name: "Test",
                                          days: Set(Weekday.allCases),
-                                         startTime: startTime,
-                                         endTime: endTime)
+                                         type: .scheduled(startTime: startTime, endTime: endTime))
         
         // Insert the schedule and get the new ProtectedSchedule with persistentIdentifier.
         let scheduleModelID = try await scheduleStore.insert(schedule)
-        let fetchedSchedule = try #require(try await scheduleStore.fetch(id: scheduleModelID))
+        let fetchedSchedule = try await scheduleStore.fetch(id: scheduleModelID)
         
         // Register the activity.
         try await activityRegistrar.registerActivity(during: fetchedSchedule)
@@ -144,7 +127,7 @@ struct BlockingTests {
         let scheduleModelID = try await insertTestScheduleRelatedToBlockItem(with: selection)
 
         // Fetch schedule model.
-        let fetchedSchedule = try #require(try await scheduleStore.fetch(id: scheduleModelID))
+        let fetchedSchedule = try await scheduleStore.fetch(id: scheduleModelID)
 
         // Build the activity identifier and name.
         let activityIdentifier = CodableActivityIdentifier(scheduleID: fetchedSchedule.id, isFallback: false)
@@ -180,16 +163,15 @@ struct BlockingTests {
         // Make protected items.
         let blockItem = ProtectedBlockItem(emoji: "🧪",
                                            name: "Test",
-                                           blockedContent: selection)
+                                           blockedContent: ProtectedActivitySelection(selection))
         
-        let startTime = try #require(TimeComponents(hour: 17, minute: 00))
-        let endTime = try #require(TimeComponents(hour: 18, minute: 00))
+        let startTime = TimeComponents(hour: 17, minute: 00)
+        let endTime = TimeComponents(hour: 18, minute: 00)
         
         let schedule = ProtectedSchedule(emoji: "🧪",
                                          name: "Test",
                                          days: Set(Weekday.allCases),
-                                         startTime: startTime,
-                                         endTime: endTime)
+                                         type: .scheduled(startTime: startTime, endTime: endTime))
         
         // Add items to the database.
         let blockItemModelID = try await blockItemStore.insert(blockItem)

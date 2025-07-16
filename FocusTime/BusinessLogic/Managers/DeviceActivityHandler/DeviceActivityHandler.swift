@@ -11,7 +11,7 @@ import DeviceActivity
 import FamilyControls
 import ManagedSettings
 
-struct DeviceActivityHandler {
+struct DeviceActivityHandler: Sendable {
     private let container: ModelContainer
     private let shieldManager: ShieldManager
     
@@ -20,7 +20,7 @@ struct DeviceActivityHandler {
         self.shieldManager = shieldManager
     }
     
-    func handleBlockingStart(for activity: DeviceActivityName) {
+    func handleBlockingStart(for activity: DeviceActivityName) async {
         guard let activityIdentifier = try? CodableActivityIdentifier(from: activity) else { return }
         
         let schedule = fetchSchedule(id: activityIdentifier.scheduleID)
@@ -35,17 +35,15 @@ struct DeviceActivityHandler {
                                   activityIdentifier: activityIdentifier,
                                   endTime: endTime)
         case .oneTime:
-            handleDurationBlocking()
+            await handleDurationBlocking()
             // We don't need to handle the end of the interval anymore.
             DeviceActivityCenter().stopMonitoring([activity])
         }
         
     }
     
-    private func handleDurationBlocking() {
-        Task {
-            try? await shieldManager.unblock()
-        }
+    private func handleDurationBlocking() async {
+        try? await shieldManager.unblock()
     }
     
     private func handleRegularBlocking(
@@ -89,10 +87,8 @@ struct DeviceActivityHandler {
         }
     }
     
-    func handleBlockingEnd(for activity: DeviceActivityName) {
-        Task {
-            try? await shieldManager.unblock()
-        }
+    func handleBlockingEnd(for activity: DeviceActivityName) async {
+        try? await shieldManager.unblock()
     }
     
     private func fetchSchedule(id: UUID) -> Schedule? {

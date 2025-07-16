@@ -14,19 +14,25 @@ import DeviceActivity
 // Make sure that your class name matches the NSExtensionPrincipalClass in your Info.plist.
 final class DeviceActivityMonitorExtension: DeviceActivityMonitor {
     let handler = DeviceActivityHandler(
-        container: container,
+        container: DeviceActivityMonitorExtension.container,
         shieldManager: LiveShieldManager(isRunningInExtension: true)
     )
     
     override func intervalDidStart(for activity: DeviceActivityName) {
         super.intervalDidStart(for: activity)
-        handler.handleBlockingStart(for: activity)
+        // Convert to CodableActivityName and pass as a param to handler.
+        Task {
+            await handler.handleBlockingStart(for: activity)
+        }
     }
     
     
     override func intervalDidEnd(for activity: DeviceActivityName) {
         super.intervalDidEnd(for: activity)
-        handler.handleBlockingEnd(for: activity)
+        let activityRawValue = activity.rawValue
+        Task {
+            await handler.handleBlockingEnd(for: activity)
+        }
     }
     
     static var container: ModelContainer {
