@@ -10,8 +10,7 @@ import FamilyControls
 import DeviceActivity
 import ManagedSettings
 
-#warning("Sync on global actor")
-
+@ShieldActor
 struct LiveShieldManager: ShieldManager, Sendable {
     var isRunningInExtension: Bool = false
     

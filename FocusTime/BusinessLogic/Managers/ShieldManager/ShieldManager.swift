@@ -8,6 +8,12 @@
 import Foundation
 import FamilyControls
 
+@globalActor
+actor ShieldActor: GlobalActor {
+    static let shared = ShieldActor()
+}
+
+@ShieldActor
 protocol ShieldManager: Sendable {
     // MARK: - Properties
     var isShieldActive: Bool { get }
