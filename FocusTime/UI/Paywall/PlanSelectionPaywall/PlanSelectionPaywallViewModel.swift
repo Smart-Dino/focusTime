@@ -17,7 +17,7 @@ final class PlanSelectionPaywallViewModel {
         var superState: SuperPaywallViewModel.State
         
         // MARK: Background Images
-        let backgroudImages: [ImageResource] = [
+        let backgroundImages: [ImageResource] = [
             .debugNightMountain,
             .debugDayMountain
         ]

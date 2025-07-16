@@ -28,8 +28,8 @@ struct PlanSelectionPaywallView: View {
                     HStack(spacing: .zero) {
                         // Could use Array(zip(items.indices, items)
                         // but that is harder to understand...
-                        ForEach(viewModel.state.backgroudImages.indices, id: \.self) { index in
-                            let imageResource = viewModel.state.backgroudImages[index]
+                        ForEach(viewModel.state.backgroundImages.indices, id: \.self) { index in
+                            let imageResource = viewModel.state.backgroundImages[index]
                             Image(imageResource)
                                 .resizable()
                                 .scaledToFit()
@@ -51,7 +51,7 @@ struct PlanSelectionPaywallView: View {
                 Spacer()
                 
                 FTPageControlView(
-                    viewModel.state.backgroudImages,
+                    viewModel.state.backgroundImages,
                     selectedItem: selectedImageIndex
                 )
                 // Should tell the design team to make it brighter?

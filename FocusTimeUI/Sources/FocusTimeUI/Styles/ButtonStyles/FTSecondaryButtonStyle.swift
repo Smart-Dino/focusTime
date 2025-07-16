@@ -1,5 +1,5 @@
 //
-//  FPSecondaryButtonStyle.swift
+//  FTSecondaryButtonStyle.swift
 //  FocusTimeUI
 //
 //  Created by Maksym Horobets on 14.05.2025.
@@ -23,7 +23,7 @@ import SwiftUI
 public struct FTSecondaryButtonStyle: ButtonStyle {
     @Environment(\.isEnabled) private var isEnabled
     
-    /// Initializes the primary button style.
+    /// Initializes the secondary button style.
     public init() { }
     
     /// Builds the button's body.
