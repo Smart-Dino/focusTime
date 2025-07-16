@@ -21,12 +21,12 @@ extension SubscriptionUtilityLinksView {
             // MARK: - UI Strings
             
             // Button titles
-            static let terms = String(localized: "Terms", table: "PaywallLocalizable")
-            static let privacy = String(localized: "Privacy", table: "PaywallLocalizable")
-            static let restorePurchases = String(localized: "Restore purchases", table: "PaywallLocalizable")
+            static let terms = String(localized: "subscription_utility_links_terms", table: "PaywallLocalizable")
+            static let privacy = String(localized: "subscription_utility_links_privacy", table: "PaywallLocalizable")
+            static let restorePurchases = String(localized: "subscription_utility_links_restore_purchases", table: "PaywallLocalizable")
             
             // Alert
-            static let errorHeader = String(localized: "An error occurred", table: "PaywallLocalizable")
+            static let errorHeader = String(localized: "shared_paywall_error_header", table: "PaywallLocalizable")
             
             // Other UI
             static let separatorDot = "•"

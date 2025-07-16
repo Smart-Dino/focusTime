@@ -13,9 +13,7 @@ import FocusTimeUI
 struct SlideOnboardingView: View {
     // MARK: - Properties
     @State private var viewModel = SlideOnboardingViewModel()
-    
-    private let progressItems = SlideOnboardingStep.allCases
-    
+        
     // MARK: - Body
     var body: some View {
         VStack {
@@ -26,16 +24,16 @@ struct SlideOnboardingView: View {
                     .multilineTextAlignment(.center)
                  
                 FTProgressBarView(
-                    items: progressItems,
+                    items: viewModel.state.progressItems,
                     selectedItem: Binding(
-                        get: { progressItems[viewModel.state.currentIndex] },
+                        get: { viewModel.state.currentStep },
                         set: { _ in } ))
                 .padding(.top, Constants.Layout.progressBarTopPadding)
             }
             
             // MARK: - Image Section
             // TODO: - Update image with actual image
-            Image(viewModel.state.currentStep.imageName)
+            Image(viewModel.state.currentStep.image)
                 .resizable()
                 .scaledToFill()
                 .containerRelativeFrame(.vertical, { amount, axis in
@@ -43,9 +41,9 @@ struct SlideOnboardingView: View {
                 })
                 .clipped()
                 .padding(.top, Constants.Layout.topPadding)
-                .id(viewModel.state.currentStep.imageName)
+                .id(viewModel.state.currentStep.image)
                 .transition(.opacity)
-                .animation(.easeInOut, value: viewModel.state.currentStep.imageName)
+                .animation(.easeInOut, value: viewModel.state.currentStep.image)
             
             // MARK: - Subtitle Section
             VStack {

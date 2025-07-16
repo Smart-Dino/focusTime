@@ -26,13 +26,9 @@ extension StoreKitPaymentManager {
         }
     }
     
-    func reloadData() async {
-        do {
-            try await getProducts()
-            await updateCustomerProductStatus()
-        } catch {
-            Self.logger.critical("Could not load products: \(error.localizedDescription)")
-        }
+    func reloadData() async throws {
+        try await getProducts()
+        await updateCustomerProductStatus()
     }
     
     func eligibleForIntro(product: FTProduct) async throws(PaymentError) -> Bool {

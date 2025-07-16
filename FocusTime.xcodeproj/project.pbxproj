@@ -52,13 +52,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		C62AC4CD2E1FDF5A003FCE96 /* Exceptions for "FocusTime" folder in "FocusTime" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Localizations/OnboardingLocalizable.xcstrings,
-			);
-			target = 674FA69F2DB05ACE0002FDC1 /* FocusTime */;
-		};
 		E977C59E2E0B0AF40035A6AF /* Exceptions for "FocusTime" folder in "FocusTimeActivityMonitor" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -88,7 +81,6 @@
 		674FA6A22DB05ACE0002FDC1 /* FocusTime */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				C62AC4CD2E1FDF5A003FCE96 /* Exceptions for "FocusTime" folder in "FocusTime" target */,
 				E977C59E2E0B0AF40035A6AF /* Exceptions for "FocusTime" folder in "FocusTimeActivityMonitor" target */,
 			);
 			path = FocusTime;

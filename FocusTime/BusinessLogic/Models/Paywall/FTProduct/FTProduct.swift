@@ -23,8 +23,9 @@ struct FTProduct: Identifiable, Equatable, Sendable {
     let description: String
     let price: Decimal // Using Decimal to avoid binary rounding
     let priceFormatStyle: Decimal.FormatStyle.Currency
+    /// The subscription period in seconds
     let subscriptionPeriod: Int?
-    /// Declares whether this product has a trial option on it.
+    /// The trial period in seconds. Declares whether this product has a trial option on it.
     let trialPeriod: Int?
     /// Tells if this product is meant to be a subscription.
     
@@ -61,7 +62,7 @@ struct FTProduct: Identifiable, Equatable, Sendable {
             self.periodString = periodStr
             self.priceAndPeriodString = "\(priceString) / \(periodStr)"
             self.subscriptionPeriodDescription = Self.subscriptionDescription(price: price, format: priceFormatStyle, period: periodStr)
-            self.trialOfferSubtitle = "\(price.description) \(priceFormatStyle.currencyCode)/\(periodStr)"
+            self.trialOfferSubtitle = "\(priceString)/\(periodStr)"
         } else {
             self.periodString = nil
             self.priceAndPeriodString = nil
@@ -72,7 +73,9 @@ struct FTProduct: Identifiable, Equatable, Sendable {
         if let trialPeriod {
             let trialStr = Self.periodDescription(from: trialPeriod)
             self.trialPeriodString = trialStr
-            self.trialPeriodDescription = "\(trialStr) free trial, then \(priceString), cancel anytime"
+            self.trialPeriodDescription = String(localized: "\(trialStr) free trial, then \(priceString), cancel anytime",
+                                                 table: "PaywallLocalizable",
+                                                 comment: "Trial period description with price")
         } else {
             self.trialPeriodString = nil
             self.trialPeriodDescription = nil
@@ -86,7 +89,8 @@ struct FTProduct: Identifiable, Equatable, Sendable {
     }
 
     private static func subscriptionDescription(price: Decimal, format: Decimal.FormatStyle.Currency, period: String) -> String {
-        "\(price.description) \(format.currencyCode) / \(period)"
+        let formattedPrice = price.formatted(format)
+        return "\(formattedPrice) / \(period)"
     }
 
 }

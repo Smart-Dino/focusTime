@@ -40,7 +40,7 @@ struct QuizOnboardingView: View {
                     VStack(alignment: .leading, spacing: Constants.Layout.quizSpacing) {
                         ForEach(Constants.QuizOption.allCases) { option in
                             Toggle(option.localizedString, isOn: Binding(
-                                get: { viewModel.isOptionSelected(option) },
+                                get: { viewModel.state.isOptionSelected(option) },
                                 set: { _ in viewModel.toggleSelection(for: option) }
                             ))
                             .toggleStyle(FTCheckboxToggleStyle(color: .blue))

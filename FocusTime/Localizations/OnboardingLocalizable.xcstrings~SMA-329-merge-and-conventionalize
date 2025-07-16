@@ -1,0 +1,251 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "quiz_onboarding_next_button" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next"
+          }
+        }
+      }
+    },
+    "quiz_onboarding_option_lack_of_structure" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "📋 Lack of structure"
+          }
+        }
+      }
+    },
+    "quiz_onboarding_option_mental_fatigue" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🧘 Mental fatigue"
+          }
+        }
+      }
+    },
+    "quiz_onboarding_option_notifications" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "📩 Notifications and messages"
+          }
+        }
+      }
+    },
+    "quiz_onboarding_option_social_media" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "📱 Social media"
+          }
+        }
+      }
+    },
+    "quiz_onboarding_option_work_distractions" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "💻 Work distractions"
+          }
+        }
+      }
+    },
+    "quiz_onboarding_subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add one or more options that work for you."
+          }
+        }
+      }
+    },
+    "quiz_onboarding_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What challenges your focus most often?"
+          }
+        }
+      }
+    },
+    "slide_onboarding_alert_go_back_button" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Go back"
+          }
+        }
+      }
+    },
+    "slide_onboarding_alert_message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to skip the onboarding?"
+          }
+        }
+      }
+    },
+    "slide_onboarding_alert_skip_anyway_button" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skip anyway"
+          }
+        }
+      }
+    },
+    "slide_onboarding_alert_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Before you go..."
+          }
+        }
+      }
+    },
+    "slide_onboarding_main_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RIDE THE WAVES OF PRODUCTIVITY"
+          }
+        }
+      }
+    },
+    "slide_onboarding_next_button" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next"
+          }
+        }
+      }
+    },
+    "slide_onboarding_skip_button" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skip"
+          }
+        }
+      }
+    },
+    "slide_onboarding_start_button" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start Focusing"
+          }
+        }
+      }
+    },
+    "slide_onboarding_step1_description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "25-minute focus sessions followed by 5-minute recovery breaks, modeled after the natural rhythm of ocean waves"
+          }
+        }
+      }
+    },
+    "slide_onboarding_step1_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wave Cycles"
+          }
+        }
+      }
+    },
+    "slide_onboarding_step2_description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatically silences notifications and blocks distracting apps during your focus sessions, keeping your mental waters clear"
+          }
+        }
+      }
+    },
+    "slide_onboarding_step2_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tide Blocker"
+          }
+        }
+      }
+    },
+    "slide_onboarding_step3_description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Visualize your productivity patterns with intuitive analytics that show your focus trends and improvements over time"
+          }
+        }
+      }
+    },
+    "slide_onboarding_step3_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Current Tracker"
+          }
+        }
+      }
+    },
+    "slide_onboarding_step4_description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Collect unique marine-themed awards as you develop stronger focus habits and reach new productivity depths"
+          }
+        }
+      }
+    },
+    "slide_onboarding_step4_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ocean of Achievement"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

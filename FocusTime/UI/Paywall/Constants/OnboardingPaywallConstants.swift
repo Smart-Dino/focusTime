@@ -14,11 +14,11 @@ extension OnboardingPaywallView {
         // MARK: - Feature Items
         /// Main selling points of the app.
         enum FeatureItems: String, CaseIterable, Identifiable {
-            case unlimitedSessions = "Unlimited repeating sessions"
-            case unlimitedApps     = "Unlimited number of blocking apps"
-            case deepFocus         = "Deep Focus mode"
-            case whiteNoise        = "White noise for better concentration"
-            case priorityFeatures  = "Priority updates and new features"
+            case unlimitedSessions = "onboarding_paywall_feature_unlimited_sessions"
+            case unlimitedApps     = "onboarding_paywall_feature_unlimited_apps"
+            case deepFocus         = "onboarding_paywall_feature_deep_focus"
+            case whiteNoise        = "onboarding_paywall_feature_white_noise"
+            case priorityFeatures  = "onboarding_paywall_feature_priority_features"
             
             var id: String { rawValue }
             var title: String {
@@ -68,11 +68,11 @@ extension OnboardingPaywallView {
         // MARK: - Strings
         enum Strings {
             // Purchase button states
-            static let tryButtonTitle = String(localized: "Try Free And Subscribe", table: "PaywallLocalizable")
+            static let tryButtonTitle = String(localized: "onboarding_paywall_try_free_and_subscribe_button", table: "PaywallLocalizable")
             static let pendingTitle = SharedPaywallConstants.Strings.pendingTitle
             static let subscribedTitle = SharedPaywallConstants.Strings.subscribedTitle
             
-            static let featuresTitle = String(localized: "Unlock All Features", table: "PaywallLocalizable")
+            static let featuresTitle = String(localized: "onboarding_paywall_features_title", table: "PaywallLocalizable")
             
             // UI
             static let appName = SharedConstants.Strings.appName

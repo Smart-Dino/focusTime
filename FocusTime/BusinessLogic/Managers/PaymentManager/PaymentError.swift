@@ -25,6 +25,7 @@ enum PaymentError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .pending:
+<<<<<<< HEAD:FocusTime/BusinessLogic/Managers/PaymentManager/PaymentError.swift
             String(localized: "The purchase is pending approval, possibly requiring parental or bank authorization. You'll be notified once it's complete.", table: "ErrorLocalizable")
         case .userCancelled:
             String(localized: "The purchase was cancelled by the user.", table: "ErrorLocalizable")
@@ -38,6 +39,21 @@ enum PaymentError: LocalizedError {
             String(localized: "Could not check whether the user is eligible for trial for the given subscription group.", table: "ErrorLocalizable")
         case .unknown:
             String(localized: "An unknown error occurred during the purchase.", table: "ErrorLocalizable")
+=======
+            String(localized: "payment_error_pending_description", table: "PaywallLocalizable")
+        case .userCancelled:
+            String(localized: "payment_error_user_cancelled_description", table: "PaywallLocalizable")
+        case .failedVerification:
+            String(localized: "payment_error_failed_verification_description", table: "PaywallLocalizable")
+        case .purchaseInProgress:
+            String(localized: "payment_error_purchase_in_progress_description", table: "PaywallLocalizable")
+        case .productNotFound:
+            String(localized: "payment_error_product_not_found_description", table: "PaywallLocalizable")
+        case .eligibilityCheckFail:
+            String(localized: "payment_error_eligibility_check_fail_description", table: "PaywallLocalizable")
+        case .unknown:
+            String(localized: "payment_error_unknown_description", table: "PaywallLocalizable")
+>>>>>>> SMA-329-merge-and-conventionalize:FocusTime/BusinessLogic/Paywall/PaymentManager/PaymentError.swift
         }
     }
 }
