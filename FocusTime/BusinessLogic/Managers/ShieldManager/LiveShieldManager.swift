@@ -31,7 +31,7 @@ struct LiveShieldManager: ShieldManager, Sendable {
     func block(specific selection: ProtectedActivitySelection) async throws {
         try await checkAuthorization()
         let store = ManagedSettingsStore()
-        let selection = selection.nonisolatedSelection
+        let selection = selection.selection
         
         // Block selected applications.
         store.shield.applications = selection.applicationTokens
@@ -43,7 +43,7 @@ struct LiveShieldManager: ShieldManager, Sendable {
     func block(specific selections: [ProtectedActivitySelection]) async throws {
         try await checkAuthorization()
         let store = ManagedSettingsStore()
-        let selections = selections.map(\.nonisolatedSelection)
+        let selections = selections.map(\.selection)
         
         // Add all the items to discourage.
         var applicationsToDiscourage = Set<ApplicationToken>()

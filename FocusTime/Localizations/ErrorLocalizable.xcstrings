@@ -1,38 +1,139 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "shield_error_no_persistent_item_description": {
-      "localizations": { "en": { "stringUnit": { "value": "string", "state": "translated" }, "string": "Selected item does not exist, make sure you saved your changes." } }
+    "Could not find the registered device activity." : {
+
     },
-    "shield_error_no_persistent_item_reason": {
-      "localizations": { "en": { "stringUnit": { "value": "string", "state": "translated" }, "string": "Selected item does not have any persistent item associated with it." } }
+    "Could not generate a codable representation of the identifier." : {
+
     },
-    "shield_error_could_not_set_time_description": {
-      "localizations": { "en": { "stringUnit": { "value": "string", "state": "translated" }, "string": "Unable to set schedule for selected time." } }
+    "Failed to add 15 minutes to the DateComponents." : {
+
     },
-    "shield_error_could_not_set_time_reason": {
-      "localizations": { "en": { "stringUnit": { "value": "string", "state": "translated" }, "string": "Failed to add 15 minutes to the DateComponents." } }
+    "No matching activity was found in DeviceActivityCenter for the provided identifier." : {
+
     },
-    "shield_error_could_not_generate_identifier_description": {
-      "localizations": { "en": { "stringUnit": { "value": "string", "state": "translated" }, "string": "Unable to schedule this item." } }
+    "persistence_error_already_related_description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "string"
+          }
+        }
+      }
     },
-    "shield_error_could_not_generate_identifier_reason": {
-      "localizations": { "en": { "stringUnit": { "value": "string", "state": "translated" }, "string": "Could not generate a codable representation of the identifier." } }
+    "persistence_error_no_identifier_description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "string"
+          }
+        }
+      }
     },
-    "persistence_error_not_found_description": {
-      "localizations": { "en": { "stringUnit": { "value": "string", "state": "translated" }, "string": "We couldn't find what you were looking for." } }
+    "persistence_error_no_identifier_reason" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "string"
+          }
+        }
+      }
     },
-    "persistence_error_not_found_reason": {
-      "localizations": { "en": { "stringUnit": { "value": "string", "state": "translated" }, "string": "Model not found in ModelContext." } }
+    "persistence_error_not_found_description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "string"
+          }
+        }
+      }
     },
-    "persistence_error_no_identifier_description": {
-      "localizations": { "en": { "stringUnit": { "value": "string", "state": "translated" }, "string": "Something went wrong while finding this item." } }
+    "persistence_error_not_found_reason" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "string"
+          }
+        }
+      }
     },
-    "persistence_error_no_identifier_reason": {
-      "localizations": { "en": { "stringUnit": { "value": "string", "state": "translated" }, "string": "No identifier found during conversion; attempted to fetch a model that may not exist with ProtectedModel." } }
+    "Selected item does not exist, make sure you saved your changes." : {
+
     },
-    "persistence_error_already_related_description": {
-      "localizations": { "en": { "stringUnit": { "value": "string", "state": "translated" }, "string": "The two items being added to one another already form a relationship. The action is aborted." } }
+    "Selected item does not have any persistent item associated with it." : {
+
+    },
+    "shield_error_could_not_generate_identifier_description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "string"
+          }
+        }
+      }
+    },
+    "shield_error_could_not_generate_identifier_reason" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "string"
+          }
+        }
+      }
+    },
+    "shield_error_could_not_set_time_description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "string"
+          }
+        }
+      }
+    },
+    "shield_error_could_not_set_time_reason" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "string"
+          }
+        }
+      }
+    },
+    "shield_error_no_persistent_item_description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "string"
+          }
+        }
+      }
+    },
+    "shield_error_no_persistent_item_reason" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "string"
+          }
+        }
+      }
+    },
+    "Unable to schedule this item." : {
+
+    },
+    "Unable to set schedule for selected time." : {
+
     }
   },
   "version" : "1.0"
