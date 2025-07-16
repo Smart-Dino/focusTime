@@ -39,8 +39,8 @@ struct QuizOnboardingView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: Constants.Layout.quizSpacing) {
                         ForEach(Constants.QuizOption.allCases) { option in
-                            Toggle(option.rawValue, isOn: Binding(
-                                get: { viewModel.isOptionSelected(option) },
+                            Toggle(option.localizedString, isOn: Binding(
+                                get: { viewModel.state.isOptionSelected(option) },
                                 set: { _ in viewModel.toggleSelection(for: option) }
                             ))
                             .toggleStyle(FTCheckboxToggleStyle(color: .blue))

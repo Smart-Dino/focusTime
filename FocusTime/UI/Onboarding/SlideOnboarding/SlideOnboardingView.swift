@@ -13,9 +13,7 @@ import FocusTimeUI
 struct SlideOnboardingView: View {
     // MARK: - Properties
     @State private var viewModel = SlideOnboardingViewModel()
-    
-    private let progressItems = SlideOnboardingStep.allCases
-    
+        
     // MARK: - Body
     var body: some View {
         VStack {
@@ -26,16 +24,16 @@ struct SlideOnboardingView: View {
                     .multilineTextAlignment(.center)
                  
                 FTProgressBarView(
-                    items: progressItems,
+                    items: viewModel.state.progressItems,
                     selectedItem: Binding(
-                        get: { progressItems[viewModel.state.currentIndex] },
+                        get: { viewModel.state.currentStep },
                         set: { _ in } ))
                 .padding(.top, Constants.Layout.progressBarTopPadding)
             }
             
             // MARK: - Image Section
             // TODO: - Update image with actual image
-            Image(viewModel.currentStep.imageName)
+            Image(viewModel.state.currentStep.imageName)
                 .resizable()
                 .scaledToFill()
                 .containerRelativeFrame(.vertical, { amount, axis in
@@ -43,15 +41,15 @@ struct SlideOnboardingView: View {
                 })
                 .clipped()
                 .padding(.top, Constants.Layout.topPadding)
-                .id(viewModel.currentStep.imageName)
+                .id(viewModel.state.currentStep.imageName)
                 .transition(.opacity)
-                .animation(.easeInOut, value: viewModel.currentStep.imageName)
+                .animation(.easeInOut, value: viewModel.state.currentStep.imageName)
             
             // MARK: - Subtitle Section
             VStack {
-                Text(viewModel.currentStep.subtitle1)
+                Text(viewModel.state.currentStep.subtitle1)
                     .font(.headline)
-                Text(viewModel.currentStep.subtitle2)
+                Text(viewModel.state.currentStep.subtitle2)
                     .font(.subheadline)
             }
             .frame(height: Constants.Layout.subtitleSectionHeight)
@@ -59,7 +57,7 @@ struct SlideOnboardingView: View {
             
             
             // MARK: - Buttons
-            if !viewModel.currentStep.isLast {
+            if !viewModel.state.currentStep.isLast {
                 VStack(spacing: Constants.Layout.buttonSpacing) {
                     Button(Constants.Strings.nextButton) {
                         viewModel.goToNextStep()
@@ -67,7 +65,7 @@ struct SlideOnboardingView: View {
                     .buttonStyle(FTPrimaryButtonStyle())
                     
                     Button(Constants.Strings.skipButton) {
-                        viewModel.state.showSkipConfirmation = true
+                        viewModel.requestSkipConfirmation()
                     }
                 }
                 .frame(height: Constants.Layout.buttonSectionHeight)
@@ -80,18 +78,20 @@ struct SlideOnboardingView: View {
                 .buttonStyle(FTPrimaryButtonStyle())
             }
         }
-        .animation(.easeInOut, value: viewModel.currentStep)
+        .animation(.easeInOut, value: viewModel.state.currentStep)
         .preferredColorScheme(.dark)
         
         // MARK: - Skip Confirmation Alert
-        .alert(Constants.Strings.alertTitle, isPresented: $viewModel.state.showSkipConfirmation) {
+        .alert(Constants.Strings.alertTitle, isPresented: viewModel.isSkipConfirmationPresented) {
             Button(Constants.Strings.skipAnyway, role: .destructive) {
                 viewModel.skipOnboarding()
             }
-            Button(Constants.Strings.goBack, role: .cancel) {}
-        } message: {
-            Text(Constants.Strings.alertMessage)
-        }
+            Button(Constants.Strings.goBack, role: .cancel) {
+                            viewModel.cancelSkipConfirmation()
+                        }
+                    } message: {
+                        Text(Constants.Strings.alertMessage)
+                    }
     }
 }
 

@@ -33,7 +33,7 @@ actor StoreKitPaymentManager: PaymentManager {
     private var updateListenerTask: Task<Void, Error>? = nil
     var continuation: AsyncStream<Bool>.Continuation?
     
-    init(productIdentifiers: [String] = StoreKitProductIdentifiers.allCases.map { $0.id }) {
+    init(productIdentifiers: [String] = StoreKitProductIdentifiers.allCases.map { $0.id }) async {
         // FTProducts
         self.products = []
         self.purchasedProducts = []
@@ -42,7 +42,7 @@ actor StoreKitPaymentManager: PaymentManager {
         self.skProducts = []
         self.productIdentifiers = productIdentifiers
         
-        setup()
+        await setup()
     }
     
     deinit {
@@ -50,21 +50,15 @@ actor StoreKitPaymentManager: PaymentManager {
         continuation?.finish()
     }
     
-    nonisolated func setup() {
-        Task {
-            await reloadData()
-            let task = await listenForTransactions()
-            await setTask(task)
-        }
+    func setup() async {
+        await reloadData()
+        let task = listenForTransactions()
+        self.updateListenerTask = task
     }
 }
 
 // MARK: - Internal Helpers
 extension StoreKitPaymentManager {
-    func setTask(_ task: Task<Void, Error>) {
-        self.updateListenerTask = task
-    }
-
     // PLEASE DO NOT USE MOCKS WITH THIS METHOD!
     // As they do not have appropriate IDs.
     func skProduct(for ftProduct: FTProduct) -> Product? {
@@ -115,12 +109,12 @@ extension StoreKitPaymentManager {
     }
 
     func listenForTransactions() -> Task<Void, Error> {
-        return Task.detached {
+        return Task {
             //Iterate through any transactions that don't come from a direct call to `purchase()`.
             for await result in Transaction.updates {
                 Self.logger.trace("New incoming transaction update: \(result.jwsRepresentation)")
                 do {
-                    let transaction = try await self.checkVerified(result)
+                    let transaction = try self.checkVerified(result)
                     
                     // Deliver products to the user.
                     await self.updateCustomerProductStatus()
@@ -129,7 +123,7 @@ extension StoreKitPaymentManager {
                     await transaction.finish()
                 } catch {
                     //StoreKit has a transaction that fails verification. Don't deliver content to the user.
-                    Self.logger.critical("StoreKit failed to veriify transaction: \(error.localizedDescription)")
+                    Self.logger.critical("StoreKit failed to verify transaction: \(error.localizedDescription)")
                 }
             }
         }

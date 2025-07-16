@@ -209,17 +209,3 @@ struct PlanSelectionPaywallView: View {
         .preferredColorScheme(.dark)
     }
 }
-
-
-#Preview("StoreKit Manager") {
-    let paymentManager = StoreKitPaymentManager()
-    NavigationStack {
-        PlanSelectionPaywallView(
-            viewModel: .init(
-                superPaywallVM: .init(paymentManager: paymentManager),
-                flowDelegate: nil
-            )
-        )
-        .preferredColorScheme(.dark)
-    }
-}
