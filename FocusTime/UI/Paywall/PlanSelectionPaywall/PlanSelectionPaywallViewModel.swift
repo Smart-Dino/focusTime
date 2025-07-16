@@ -18,9 +18,6 @@ final class PlanSelectionPaywallViewModel {
         
         // MARK: Background Images
         let backgroundImages: [ImageResource] = [
-            .debugNightMountain,
-            .debugDayMountain
-        let backgroundImages: [ImageResource] = [
             ImageResource.DebugImages.debugNightMountain,
             ImageResource.DebugImages.debugDayMountain
         ]

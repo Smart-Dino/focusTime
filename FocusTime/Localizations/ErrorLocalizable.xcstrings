@@ -1,15 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "A purchase is already in progress. Please wait until it completes." : {
-
-    },
-    "An unknown error occurred during the purchase." : {
-
-    },
-    "Could not check whether the user is eligible for trial for the given subscription group." : {
-
-    },
     "Could not generate a codable representation of the identifier." : {
 
     },
@@ -29,18 +20,6 @@
 
     },
     "Something went wrong while finding this item." : {
-
-    },
-    "The purchase could not be verified. Please try again later." : {
-
-    },
-    "The purchase is pending approval, possibly requiring parental or bank authorization. You'll be notified once it's complete." : {
-
-    },
-    "The purchase was cancelled by the user." : {
-
-    },
-    "The requested product could not be found." : {
 
     },
     "The two items being added to one another already form a relationship. The action is aborted." : {
