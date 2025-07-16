@@ -16,7 +16,7 @@ struct FreePlanUpgradeView: View {
     // MARK: - Body
     var body: some View {
         ZStack {
-            Image(.freePlanPaywallBackgound)
+            Image(.freePlanPaywallBackground)
                 .resizable()
                 .scaledToFill()
                 .containerRelativeFrame([.horizontal])

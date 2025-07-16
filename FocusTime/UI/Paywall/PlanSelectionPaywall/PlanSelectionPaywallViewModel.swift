@@ -126,8 +126,9 @@ final class PlanSelectionPaywallViewModel {
     }
     
     func getTrialTerms(for product: FTProduct) -> String {
-        let fallback = String(localized: "0 days", table: "PaywallLocalizable")
-        return "Get \(product.trialPeriodString ?? fallback) for free!"
+        let fallback = String(localized: "common_zero_days", table: "PaywallLocalizable")
+        let formatString = String(localized: "plan_selection_get_trial_for_free", table: "PaywallLocalizable")
+        return String(format: formatString, product.trialPeriodString ?? fallback)
     }
     
     // MARK: Actions

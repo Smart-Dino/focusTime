@@ -33,7 +33,7 @@ struct SlideOnboardingView: View {
             
             // MARK: - Image Section
             // TODO: - Update image with actual image
-            Image(viewModel.state.currentStep.imageName)
+            Image(viewModel.state.currentStep.image)
                 .resizable()
                 .scaledToFill()
                 .containerRelativeFrame(.vertical, { amount, axis in
@@ -41,9 +41,9 @@ struct SlideOnboardingView: View {
                 })
                 .clipped()
                 .padding(.top, Constants.Layout.topPadding)
-                .id(viewModel.state.currentStep.imageName)
+                .id(viewModel.state.currentStep.image)
                 .transition(.opacity)
-                .animation(.easeInOut, value: viewModel.state.currentStep.imageName)
+                .animation(.easeInOut, value: viewModel.state.currentStep.image)
             
             // MARK: - Subtitle Section
             VStack {
