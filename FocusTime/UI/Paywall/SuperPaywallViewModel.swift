@@ -118,9 +118,13 @@ final class SuperPaywallViewModel {
     
     // MARK: - Update state
     func fetchProducts(state: State) async {
-        await paymentManager.reloadData()
-        let products = await paymentManager.products
-        state.allProducts = products
+        do {
+            try await paymentManager.reloadData()
+            let products = await paymentManager.products
+            state.allProducts = products
+        } catch {
+            state.error = error
+        }
     }
     
     func updatePurchaseResultForSelectedProduct(state: State) async {

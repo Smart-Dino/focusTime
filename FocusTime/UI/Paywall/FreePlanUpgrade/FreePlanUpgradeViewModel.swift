@@ -104,7 +104,6 @@ final class FreePlanUpgradeViewModel {
         case .userCancelled:
             state.purchaseButtonTitle = State.stringConstants.tryButtonTitle
             state.superState.isButtonDisabled = false
-            state.superState.error = PaymentError.userCancelled
         }
     }
     

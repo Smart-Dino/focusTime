@@ -15,22 +15,22 @@ enum PersistenceStoreError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .notFound:
-            return String(localized: "We couldn't find what you were looking for.", table: "ErrorLocalizable")
+            String(localized: "persistence_error_not_found_description", table: "ErrorLocalizable")
         case .noIdentifier:
-            return String(localized: "Something went wrong while finding this item.", table: "ErrorLocalizable")
+            String(localized: "persistence_error_no_identifier_description", table: "ErrorLocalizable")
         case .alreadyRelated:
-            return String(localized: "The two items being added to one another already form a relationship. The action is aborted.", table: "ErrorLocalizable")
+            String(localized: "persistence_error_already_related_description", table: "ErrorLocalizable")
         }
     }
     
     var failureReason: String? {
         switch self {
         case .notFound:
-            return String(localized: "Model not found in ModelContext.", table: "ErrorLocalizable")
+            String(localized: "persistence_error_not_found_reason", table: "ErrorLocalizable")
         case .noIdentifier:
-            return String(localized: "No identifier found during conversion; attempted to fetch a model that may not exist with ProtectedModel.", table: "ErrorLocalizable")
+            String(localized: "persistence_error_no_identifier_reason", table: "ErrorLocalizable")
         case .alreadyRelated:
-            return nil
+            nil
         }
     }
 }

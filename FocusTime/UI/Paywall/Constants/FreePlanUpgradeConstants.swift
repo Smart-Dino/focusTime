@@ -17,10 +17,10 @@ extension FreePlanUpgradeView {
         // MARK: - FreeplanUpgrade Strings
         enum Strings {
             /// Body message of the upgrade view.
-            static let upgradeMessage = AttributedString(localized: "Upgrade to have unlimited scheduled sessions with **Pro version**", table: "PaywallLocalizable")
+            static let upgradeMessage = AttributedString(localized: "free_plan_upgrade_message", table: "PaywallLocalizable")
             
             // Title of the view.
-            static let title = String(localized: "You're on a Free Plan", table: "PaywallLocalizable")
+            static let title = String(localized: "free_plan_upgrade_title", table: "PaywallLocalizable")
             
             // Loading state
             static let loadingTitle = SharedConstants.Strings.loadingTitle
@@ -32,7 +32,8 @@ extension FreePlanUpgradeView {
                         .presentation(.narrow)
                         .rounded()
                 )
-                return String(localized: "Try For \(localPrice)", table: "PaywallLocalizable")
+                let formatString = String(localized: "free_plan_upgrade_try_for_price", table: "PaywallLocalizable")
+                return String(format: formatString, localPrice)
             }()
             
             static let pendingTitle = SharedPaywallConstants.Strings.pendingTitle

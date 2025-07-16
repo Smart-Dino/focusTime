@@ -1,11 +1,16 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "0 days" : {
-      "extractionState" : "manual"
-    },
-    "0 seconds" : {
-      "extractionState" : "manual"
+    "%@ free trial, then %@, cancel anytime" : {
+      "comment" : "Trial period description with price",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ free trial, then %2$@, cancel anytime"
+          }
+        }
+      }
     },
     "An error occurred" : {
 
@@ -13,38 +18,400 @@
     "App Name" : {
 
     },
+    "common_zero_days" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "0 days"
+          }
+        }
+      }
+    },
+    "common_zero_seconds_fallback" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "0 seconds"
+          }
+        }
+      }
+    },
     "Dismiss current screen." : {
 
     },
     "Focus within minutes" : {
 
     },
-    "Get DeepWave Pro" : {
-
+    "free_plan_upgrade_message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upgrade to have unlimited scheduled sessions with **Pro version**"
+          }
+        }
+      }
+    },
+    "free_plan_upgrade_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You're on a Free Plan"
+          }
+        }
+      }
+    },
+    "free_plan_upgrade_try_for_price" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Try For %@"
+          }
+        }
+      }
     },
     "Loading..." : {
 
     },
-    "No payment due now!" : {
-
+    "onboarding_paywall_feature_deep_focus" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deep Focus mode"
+          }
+        }
+      }
+    },
+    "onboarding_paywall_feature_priority_features" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Priority updates and new features"
+          }
+        }
+      }
+    },
+    "onboarding_paywall_feature_unlimited_apps" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unlimited number of blocking apps"
+          }
+        }
+      }
+    },
+    "onboarding_paywall_feature_unlimited_sessions" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unlimited repeating sessions"
+          }
+        }
+      }
+    },
+    "onboarding_paywall_feature_white_noise" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "White noise for better concentration"
+          }
+        }
+      }
+    },
+    "onboarding_paywall_features_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unlock All Features"
+          }
+        }
+      }
+    },
+    "onboarding_paywall_try_free_and_subscribe_button" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Try Free And Subscribe"
+          }
+        }
+      }
     },
     "Paid once" : {
 
     },
+    "payment_error_eligibility_check_fail_description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not check whether the user is eligible for trial for the given subscription group."
+          }
+        }
+      }
+    },
+    "payment_error_failed_verification_description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The purchase could not be verified. Please try again later."
+          }
+        }
+      }
+    },
+    "payment_error_pending_description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The purchase is pending approval, possibly requiring parental or bank authorization. You'll be notified once it's complete."
+          }
+        }
+      }
+    },
+    "payment_error_product_not_found_description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The requested product could not be found."
+          }
+        }
+      }
+    },
+    "payment_error_purchase_in_progress_description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A purchase is already in progress. Please wait until it completes."
+          }
+        }
+      }
+    },
+    "payment_error_unknown_description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An unknown error occurred during the purchase."
+          }
+        }
+      }
+    },
+    "payment_error_user_cancelled_description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The purchase was cancelled by the user."
+          }
+        }
+      }
+    },
     "Pending..." : {
 
     },
-    "Privacy" : {
-
+    "plan_selection_get_trial_for_free" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Get %@ for free!"
+          }
+        }
+      }
+    },
+    "plan_selection_paywall_default_trial_error" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unable to load trial information."
+          }
+        }
+      }
+    },
+    "plan_selection_paywall_navigation_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Get DeepWave Pro"
+          }
+        }
+      }
+    },
+    "plan_selection_paywall_no_payment_message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No payment due now!"
+          }
+        }
+      }
+    },
+    "plan_selection_paywall_start_free_trial_button" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start Free Trial"
+          }
+        }
+      }
+    },
+    "plan_selection_paywall_subscription_terms" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subscription automatically renews unless canceled. You can cancel anytime."
+          }
+        }
+      }
+    },
+    "plan_selection_paywall_trial_description_3_days" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Try Free For 3 days"
+          }
+        }
+      }
     },
     "Purchased!" : {
 
     },
-    "Restore purchases" : {
-
+    "shared_paywall_app_name_fallback" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Name"
+          }
+        }
+      }
     },
-    "Start Free Trial" : {
-
+    "shared_paywall_app_slogan" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Focus within minutes"
+          }
+        }
+      }
+    },
+    "shared_paywall_dismiss_button_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dismiss current screen."
+          }
+        }
+      }
+    },
+    "shared_paywall_error_header" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An error occurred"
+          }
+        }
+      }
+    },
+    "shared_paywall_loading_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading..."
+          }
+        }
+      }
+    },
+    "shared_paywall_paid_once" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paid once"
+          }
+        }
+      }
+    },
+    "shared_paywall_pending_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pending..."
+          }
+        }
+      }
+    },
+    "shared_paywall_purchased_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Purchased!"
+          }
+        }
+      }
+    },
+    "shared_paywall_subscribe_button_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subscribe"
+          }
+        }
+      }
+    },
+    "shared_paywall_subscribed_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subscribed!"
+          }
+        }
+      }
+    },
+    "shared_paywall_view_plans_button" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View All Plans"
+          }
+        }
+      }
     },
     "Subscribe" : {
 
@@ -52,34 +419,37 @@
     "Subscribed!" : {
 
     },
-    "Subscription automatically renews unless canceled. You can cancel anytime." : {
-
+    "subscription_utility_links_privacy" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy"
+          }
+        }
+      }
     },
-    "Terms" : {
-
+    "subscription_utility_links_restore_purchases" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restore purchases"
+          }
+        }
+      }
     },
-    "Try For %@" : {
-
-    },
-    "Try Free And Subscribe" : {
-
-    },
-    "Try Free For 3 days" : {
-
-    },
-    "Unable to load trial information." : {
-
-    },
-    "Unlock All Features" : {
-
-    },
-    "Upgrade to have unlimited scheduled sessions with **Pro version**" : {
-
+    "subscription_utility_links_terms" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terms"
+          }
+        }
+      }
     },
     "View All Plans" : {
-
-    },
-    "You're on a Free Plan" : {
 
     }
   },

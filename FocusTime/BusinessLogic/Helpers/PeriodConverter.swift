@@ -66,7 +66,7 @@ enum PeriodConverter: Sendable {
         formatter.calendar = .current
 
         let timeInterval = TimeInterval(seconds)
-        return formatter.string(from: timeInterval) ?? String(localized: "0 seconds",
+        return formatter.string(from: timeInterval) ?? String(localized: "common_zero_seconds_fallback",
                                                               table: "PaywallLocalizable",
                                                               comment: "Fallback for zero duration")
     }
