@@ -13,14 +13,15 @@ import DeviceActivity
 // Optionally override any of the functions below.
 // Make sure that your class name matches the NSExtensionPrincipalClass in your Info.plist.
 final class DeviceActivityMonitorExtension: DeviceActivityMonitor {
+    let handler = DeviceActivityHandler(
+        container: DeviceActivityMonitorExtension.container,
+        shieldManager: LiveShieldManager(isRunningInExtension: true)
+    )
     
     override func intervalDidStart(for activity: DeviceActivityName) {
         super.intervalDidStart(for: activity)
+        let handler = self.handler
         let nameString = activity.rawValue
-        let handler = DeviceActivityHandler(
-            container: DeviceActivityMonitorExtension.container,
-            shieldManager: LiveShieldManager(isRunningInExtension: true)
-        )
         Task {
             await handler.handleBlockingStart(for: DeviceActivityName(nameString))
         }
@@ -29,11 +30,8 @@ final class DeviceActivityMonitorExtension: DeviceActivityMonitor {
     
     override func intervalDidEnd(for activity: DeviceActivityName) {
         super.intervalDidEnd(for: activity)
+        let handler = self.handler
         let nameString = activity.rawValue
-        let handler = DeviceActivityHandler(
-            container: DeviceActivityMonitorExtension.container,
-            shieldManager: LiveShieldManager(isRunningInExtension: true)
-        )
         Task {
             await handler.handleBlockingEnd(for: DeviceActivityName(nameString))
         }

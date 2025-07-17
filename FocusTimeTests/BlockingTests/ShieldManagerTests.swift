@@ -12,7 +12,6 @@ import ManagedSettings
 @testable import FocusTime
 
 @Suite("Tests for the ShieldManager implementations", .serialized)
-@ShieldActor
 struct ShieldManagerTests {
     let store: ManagedSettingsStore
     let shieldManager: ShieldManager
@@ -22,12 +21,10 @@ struct ShieldManagerTests {
     init() {
         self.store = ManagedSettingsStore()
         self.shieldManager = LiveShieldManager()
-        
-        resetManagedSettingsStore()
     }
     
     
-    func resetManagedSettingsStore() {
+    func resetManagedSettingsStore() async {
         store.shield.applications = nil
         store.shield.applicationCategories = nil
         store.shield.webDomains = nil
@@ -44,10 +41,11 @@ struct ShieldManagerTests {
     @Test("Unblocking all applications.")
     func unblockAllApplications() async throws {
         try await shieldManager.block()
-        try #require(shieldManager.isShieldActive)
+        try #require(await shieldManager.isShieldActive)
         
         try await shieldManager.unblock()
-        #expect(!shieldManager.isShieldActive && store.shield.applicationCategories == nil)
+        let isShieldActive = await shieldManager.isShieldActive
+        #expect(!isShieldActive && store.shield.applicationCategories == nil)
     }
     
     @Test("Block a specific ProtectedActivitySelection.")
@@ -89,25 +87,28 @@ struct ShieldManagerTests {
     func unblockIsIdempotent() async throws {
         try await shieldManager.unblock()
         try await shieldManager.unblock()
-        #expect(!shieldManager.isShieldActive)
+        
+        #expect(await !shieldManager.isShieldActive)
         #expect(store.shield.applications == nil && store.shield.applicationCategories == nil)
     }
     
     @Test("Check authorization does not throw.")
     func checkAuthorizationDoesNotThrow() async throws {
         try await shieldManager.checkAuthorization()
-        // If it doesn't throw, the test passes
+        // If it doesn't throw, the test passes.
         #expect(true)
     }
     
     @Test("isShieldActive transitions as expected.")
     func isShieldActiveTransitions() async throws {
         try await shieldManager.unblock()
-        #expect(!shieldManager.isShieldActive)
+        #expect(await !shieldManager.isShieldActive)
+        
         try await shieldManager.block()
-        #expect(shieldManager.isShieldActive)
+        #expect(await shieldManager.isShieldActive)
+        
         try await shieldManager.unblock()
-        #expect(!shieldManager.isShieldActive)
+        #expect(await !shieldManager.isShieldActive)
     }
     
 }

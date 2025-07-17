@@ -29,8 +29,8 @@ struct PersistenceTests {
                                                       blockItemStore: blockItemStore)
         
         // Fetch back items.
-        let scheduleModel = try #require(try await scheduleStore.fetch(id: insertResults.scheduleModelID))
-        let blockItemModel = try #require(try await blockItemStore.fetch(id: insertResults.blockItemModelID))
+        let scheduleModel = try await scheduleStore.fetch(id: insertResults.scheduleModelID)
+        let blockItemModel = try await blockItemStore.fetch(id: insertResults.blockItemModelID)
         
         // Evaluate.
         #expect(insertResults.protectedSchedule.name == scheduleModel.name)
@@ -59,8 +59,8 @@ struct PersistenceTests {
         }
         
         // Fetch back items.
-        let scheduleModel = try #require(try await scheduleStore.fetch(id: insertResults.scheduleModelID))
-        let blockItemModel = try #require(try await blockItemStore.fetch(id: insertResults.blockItemModelID))
+        let scheduleModel = try await scheduleStore.fetch(id: insertResults.scheduleModelID)
+        let blockItemModel = try await blockItemStore.fetch(id: insertResults.blockItemModelID)
         
         // Evaluate name.
         #expect(

@@ -10,26 +10,27 @@ import FamilyControls
 import DeviceActivity
 import ManagedSettings
 
-@ShieldActor
-struct LiveShieldManager: ShieldManager, Sendable {
+actor LiveShieldManager: ShieldManager {
     var isRunningInExtension: Bool = false
+    let store = ManagedSettingsStore()
+    
+    init(isRunningInExtension: Bool = false) {
+        self.isRunningInExtension = isRunningInExtension
+    }
     
     var isShieldActive: Bool {
-        let store = ManagedSettingsStore()
         return store.shield.applications != nil
         || store.shield.applicationCategories != nil
     }
     
     func block() async throws {
         try await checkAuthorization()
-        let store = ManagedSettingsStore()
         
         store.shield.applicationCategories = .all()
     }
     
     func block(specific selection: ProtectedActivitySelection) async throws {
         try await checkAuthorization()
-        let store = ManagedSettingsStore()
         let selection = selection.selection
         
         // Block selected applications.
@@ -41,7 +42,6 @@ struct LiveShieldManager: ShieldManager, Sendable {
     
     func block(specific selections: [ProtectedActivitySelection]) async throws {
         try await checkAuthorization()
-        let store = ManagedSettingsStore()
         let selections = selections.map(\.selection)
         
         // Add all the items to discourage.
@@ -62,7 +62,6 @@ struct LiveShieldManager: ShieldManager, Sendable {
     
     func unblock() async throws {
         try await checkAuthorization()
-        let store = ManagedSettingsStore()
         
         store.shield.applications = nil
         store.shield.applicationCategories = nil
