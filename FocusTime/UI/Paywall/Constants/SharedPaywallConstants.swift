@@ -5,9 +5,15 @@
 //  Created by Maksym Horobets on 26.05.2025.
 //
 
-import Foundation
+import SwiftUI
 
 enum SharedPaywallConstants {
+    
+    // MARK: - Typography
+    enum Fonts {
+        static let navigationTitle = Font.system(size: 34,
+                                                 weight: .bold)
+    }
     
     // MARK: - Strings
     enum Strings {

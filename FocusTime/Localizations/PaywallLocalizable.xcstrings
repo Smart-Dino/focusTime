@@ -12,12 +12,6 @@
         }
       }
     },
-    "An error occurred" : {
-
-    },
-    "App Name" : {
-
-    },
     "common_zero_days" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -39,12 +33,6 @@
           }
         }
       }
-    },
-    "Dismiss current screen." : {
-
-    },
-    "Focus within minutes" : {
-
     },
     "free_plan_upgrade_message" : {
       "localizations" : {
@@ -75,9 +63,6 @@
           }
         }
       }
-    },
-    "Loading..." : {
-
     },
     "onboarding_paywall_feature_deep_focus" : {
       "extractionState" : "stale",
@@ -154,9 +139,6 @@
         }
       }
     },
-    "Paid once" : {
-
-    },
     "payment_error_eligibility_check_fail_description" : {
       "localizations" : {
         "en" : {
@@ -227,9 +209,6 @@
         }
       }
     },
-    "Pending..." : {
-
-    },
     "plan_selection_get_trial_for_free" : {
       "localizations" : {
         "en" : {
@@ -299,9 +278,6 @@
           }
         }
       }
-    },
-    "Purchased!" : {
-
     },
     "shared_paywall_app_name_fallback" : {
       "localizations" : {
@@ -413,12 +389,6 @@
         }
       }
     },
-    "Subscribe" : {
-
-    },
-    "Subscribed!" : {
-
-    },
     "subscription_utility_links_privacy" : {
       "localizations" : {
         "en" : {
@@ -448,9 +418,6 @@
           }
         }
       }
-    },
-    "View All Plans" : {
-
     }
   },
   "version" : "1.0"

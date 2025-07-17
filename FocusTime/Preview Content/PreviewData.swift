@@ -8,7 +8,6 @@
 import SwiftData
 import Foundation
 
-#if DEBUG
 enum PreviewData {
     static let memoryOnlyModelContainer = try! ModelContainer(
         for: .init([BlockItem.self, Schedule.self]),
@@ -18,4 +17,3 @@ enum PreviewData {
     )
     static let relationshipCoordinator = RelationshipCoordinator(modelContainer: Self.memoryOnlyModelContainer)
 }
-#endif
