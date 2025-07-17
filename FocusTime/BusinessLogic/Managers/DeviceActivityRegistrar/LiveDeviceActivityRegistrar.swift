@@ -44,10 +44,14 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
                                             startTime: startTime,
                                             endTime: endTime)
             } catch {
-                // If this fails - error will get thrown from the function.
-                try registerFallbackActivity(for: schedule,
-                                             startTime: startTime,
-                                             endTime: endTime)
+                switch error {
+                case DeviceActivityCenter.MonitoringError.intervalTooShort:
+                    try registerFallbackActivity(for: schedule,
+                                                 startTime: startTime,
+                                                 endTime: endTime)
+                default:
+                    throw error
+                }
             }
         case .oneTime(let duration):
             try registerDurationActivity(for: schedule, duration: duration)

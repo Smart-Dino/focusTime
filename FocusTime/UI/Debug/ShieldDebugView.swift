@@ -180,6 +180,9 @@ struct ShieldDebugView: View {
             message: {
                 if let error = viewModel.state.error {
                     Text(error.localizedDescription)
+                        .onAppear {
+                            print(error)
+                        }
                 }
             }
         )

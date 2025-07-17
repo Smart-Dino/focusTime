@@ -184,8 +184,8 @@ final class ShieldDebugViewModel {
                 throw ShieldDebugError.invalidPersistentIdentifiers
             }
             
-            try await relationshipCoordinator.relate(blockItemID: blockItemModelID,
-                                                     scheduleID: schedulesModelID)
+//            try await relationshipCoordinator.relate(blockItemID: blockItemModelID,
+//                                                     scheduleID: schedulesModelID)
             
             await fetchAllItems()
         } catch {
