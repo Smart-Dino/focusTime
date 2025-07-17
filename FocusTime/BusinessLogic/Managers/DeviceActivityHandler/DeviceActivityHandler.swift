@@ -8,8 +8,6 @@
 import SwiftData
 import Foundation
 import DeviceActivity
-import FamilyControls
-import ManagedSettings
 
 struct DeviceActivityHandler: Sendable {
     private let container: ModelContainer

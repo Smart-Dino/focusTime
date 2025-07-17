@@ -44,7 +44,7 @@ struct ShieldManagerTests {
         try #require(await shieldManager.isShieldActive)
         
         try await shieldManager.unblock()
-        let isShieldActive = await shieldManager.isShieldActive
+        let isShieldActive = try await shieldManager.isShieldActive
         #expect(!isShieldActive && store.shield.applicationCategories == nil)
     }
     
@@ -88,7 +88,7 @@ struct ShieldManagerTests {
         try await shieldManager.unblock()
         try await shieldManager.unblock()
         
-        #expect(await !shieldManager.isShieldActive)
+        #expect(try await !shieldManager.isShieldActive)
         #expect(store.shield.applications == nil && store.shield.applicationCategories == nil)
     }
     
@@ -102,13 +102,13 @@ struct ShieldManagerTests {
     @Test("isShieldActive transitions as expected.")
     func isShieldActiveTransitions() async throws {
         try await shieldManager.unblock()
-        #expect(await !shieldManager.isShieldActive)
+        #expect(try await !shieldManager.isShieldActive)
         
         try await shieldManager.block()
-        #expect(await shieldManager.isShieldActive)
+        #expect(try await shieldManager.isShieldActive)
         
         try await shieldManager.unblock()
-        #expect(await !shieldManager.isShieldActive)
+        #expect(try await !shieldManager.isShieldActive)
     }
     
 }

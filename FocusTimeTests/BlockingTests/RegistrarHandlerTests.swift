@@ -13,8 +13,8 @@ import ManagedSettings
 import FamilyControls
 @testable import FocusTime
 
-@Suite("Tests related to the app blocking.", .serialized)
-struct BlockingTests {
+@Suite("Tests related to the DeviceActivityRegistrar && DeviceActivityHandler.", .serialized)
+struct RegistrarHandlerTests {
     // MARK: Native Managers
     let store: ManagedSettingsStore
     let center: DeviceActivityCenter
@@ -140,7 +140,7 @@ struct BlockingTests {
         // Simulate starting the interval.
         await activityHandler.handleBlockingStart(for: activityName)
         
-        let isShieldActive = await shieldManager.isShieldActive
+        let isShieldActive = try await shieldManager.isShieldActive
         try #require(isShieldActive)
 
         #expect(
@@ -181,6 +181,97 @@ struct BlockingTests {
         try await relationshipCoordinator.relate(blockItemID: blockItemModelID, scheduleID: scheduleModelID)
         
         return scheduleModelID
+    }
+    
+    @Test("Duration-based blocking registration")
+    func durationBasedBlocking() async throws {
+        // Create a one-time schedule (duration in seconds).
+        let duration = 60 // 1 min
+        let schedule = ProtectedSchedule(emoji: "⏱️",
+                                         name: "DurationTest",
+                                         days: Set(Weekday.allCases),
+                                         type: .oneTime(duration: duration))
+        // Insert into the store.
+        let scheduleModelID = try await scheduleStore.insert(schedule)
+        let fetchedSchedule = try await scheduleStore.fetch(id: scheduleModelID)
+
+        // Register duration activity.
+        try await activityRegistrar.registerActivity(during: fetchedSchedule)
+
+        // Fetch the registered schedule.
+        let activities = center.activities
+
+        // Should be a newly scheduled interval for our test schedule.
+        let registeredName = try #require(
+            activities.first(where: { $0.rawValue.contains(fetchedSchedule.id.uuidString) })
+        )
+        let decodedIdentifier = try #require(try CodableActivityIdentifier(from: registeredName))
+        #expect(!decodedIdentifier.isFallback)
+    }
+
+    @Test("Unregistering an individual activity")
+    func unregisterIndividualActivity() async throws {
+        // Setup and register a schedule.
+        let startTime = TimeComponents(hour: 10, minute: 0)
+        let endTime = TimeComponents(hour: 11, minute: 0)
+        
+        let schedule = ProtectedSchedule(emoji: "🗑️",
+                                         name: "UnregisterTest",
+                                         days: Set(Weekday.allCases),
+                                         type: .scheduled(startTime: startTime, endTime: endTime))
+        
+        let scheduleModelID = try await scheduleStore.insert(schedule)
+        let fetchedSchedule = try await scheduleStore.fetch(id: scheduleModelID)
+        
+        try await activityRegistrar.registerActivity(during: fetchedSchedule)
+        
+        // Confirm registration.
+        let preActivities = center.activities
+        #expect(preActivities.contains(where: { $0.rawValue.contains(fetchedSchedule.id.uuidString) }))
+        
+        // Unregister.
+        try await activityRegistrar.unregisterActivity(during: fetchedSchedule)
+        
+        // Confirm removal.
+        let postActivities = center.activities
+        #expect(!postActivities.contains(where: { $0.rawValue.contains(fetchedSchedule.id.uuidString) }))
+    }
+
+    @Test("Unregistering all activities")
+    func unregisterAllActivities() async throws {
+        // Register two schedules.
+        let scheduleA = ProtectedSchedule(
+            emoji: "🅰️",
+            name: "A",
+            days: Set(Weekday.allCases),
+            type: .scheduled(startTime: .init(hour: 8, minute: 0),
+                             endTime: .init(hour: 9, minute: 0)))
+        
+        let scheduleB = ProtectedSchedule(
+            emoji: "🅱️",
+            name: "B",
+            days: Set(Weekday.allCases),
+            type: .scheduled(startTime: .init(hour: 9, minute: 0),
+                             endTime: .init(hour: 10, minute: 0)))
+        
+        let scheduleAID = try await scheduleStore.insert(scheduleA)
+        let scheduleBID = try await scheduleStore.insert(scheduleB)
+        
+        let fetchedA = try await scheduleStore.fetch(id: scheduleAID)
+        let fetchedB = try await scheduleStore.fetch(id: scheduleBID)
+        
+        try await activityRegistrar.registerActivity(during: fetchedA)
+        try await activityRegistrar.registerActivity(during: fetchedB)
+        
+        // Ensure both registered.
+        let preActivities = center.activities
+        #expect(preActivities.contains(where: { $0.rawValue.contains(fetchedA.id.uuidString) }))
+        #expect(preActivities.contains(where: { $0.rawValue.contains(fetchedB.id.uuidString) }))
+        // Unregister all.
+        await activityRegistrar.unregisterAll()
+        // Ensure all removed.
+        let postActivities = center.activities
+        #expect(postActivities.isEmpty)
     }
     
 }

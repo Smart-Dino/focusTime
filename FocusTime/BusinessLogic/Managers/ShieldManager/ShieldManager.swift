@@ -10,7 +10,7 @@ import FamilyControls
 
 protocol ShieldManager: Actor {
     // MARK: - Properties
-    var isShieldActive: Bool { get }
+    var isShieldActive: Bool { get async throws }
     // MARK: - Block
     func block() async throws
     func block(specific selection: ProtectedActivitySelection) async throws

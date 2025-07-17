@@ -19,8 +19,11 @@ actor LiveShieldManager: ShieldManager {
     }
     
     var isShieldActive: Bool {
-        return store.shield.applications != nil
-        || store.shield.applicationCategories != nil
+        get async throws {
+            try await checkAuthorization()
+            return store.shield.applications != nil
+            || store.shield.applicationCategories != nil
+        }
     }
     
     func block() async throws {
