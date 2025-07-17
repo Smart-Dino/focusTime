@@ -23,7 +23,7 @@ extension FreePlanUpgradeView {
             static let title = String(localized: "free_plan_upgrade_title", table: "PaywallLocalizable")
             
             // Loading state
-            static let loadingTitle = SharedConstants.Strings.loadingTitle
+            static let loadingTitle = SharedPaywallConstants.Strings.loadingTitle
             
             // Purchase button states
             static let tryButtonTitle: String = {
@@ -40,11 +40,11 @@ extension FreePlanUpgradeView {
             static let subscribedTitle = SharedPaywallConstants.Strings.subscribedTitle
             
             // Other buttons
-            static let viewPlansButton = SharedConstants.Strings.viewPlansButton
-            static let dismissButtonTitle = SharedConstants.Strings.dismissButtonTitle
+            static let viewPlansButton = SharedPaywallConstants.Strings.viewPlansButton
+            static let dismissButtonTitle = SharedPaywallConstants.Strings.dismissButtonTitle
             
             // Error
-            static let errorHeader = SharedConstants.Strings.errorHeader
+            static let errorHeader = SharedPaywallConstants.Strings.errorHeader
         }
     }
 }

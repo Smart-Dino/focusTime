@@ -34,10 +34,10 @@ extension PlanSelectionPaywallView {
             static let noPaymentMessage = String(localized: "plan_selection_paywall_no_payment_message", table: "PaywallLocalizable")
             
             // Lifetime
-            static let paidOnce = SharedConstants.Strings.paidOnce
+            static let paidOnce = SharedPaywallConstants.Strings.paidOnce
             
             // Title text for the button that dismisses the view.
-            static let dismissButtonTitle = SharedConstants.Strings.dismissButtonTitle
+            static let dismissButtonTitle = SharedPaywallConstants.Strings.dismissButtonTitle
             
             // Error
             static let errorHeader = SharedPaywallConstants.Strings.errorHeader

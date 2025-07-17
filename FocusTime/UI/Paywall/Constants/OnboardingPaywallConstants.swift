@@ -51,7 +51,7 @@ extension OnboardingPaywallView {
         }
         // MARK: - Typography
         enum Fonts {
-            static let navigationTitle = SharedConstants.Fonts.navigationTitle
+            static let navigationTitle = SharedPaywallConstants.Fonts.navigationTitle
         }
         
         // MARK: - Layout
@@ -75,12 +75,12 @@ extension OnboardingPaywallView {
             static let featuresTitle = String(localized: "onboarding_paywall_features_title", table: "PaywallLocalizable")
             
             // UI
-            static let appName = SharedConstants.Strings.appName
-            static let appSlogan = SharedConstants.Strings.appSlogan
-            static let loadingTitle = SharedConstants.Strings.loadingTitle
+            static let appName = SharedPaywallConstants.Strings.appName
+            static let appSlogan = SharedPaywallConstants.Strings.appSlogan
+            static let loadingTitle = SharedPaywallConstants.Strings.loadingTitle
             
             // Error
-            static let errorHeader = SharedConstants.Strings.errorHeader
+            static let errorHeader = SharedPaywallConstants.Strings.errorHeader
         }
         
     }

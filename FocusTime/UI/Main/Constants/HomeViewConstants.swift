@@ -28,7 +28,7 @@ extension HomeView {
 
         // MARK: - Typography
         enum Fonts {
-            static let navigationTitle = SharedConstants.Fonts.navigationTitle
+            static let navigationTitle = SharedPaywallConstants.Fonts.navigationTitle
         }
 
         // MARK: - Layout

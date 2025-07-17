@@ -8,7 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		C66B28102E1825160018E7AC /* FocusTimeActivityMonitor.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E97895A52E0AFCBE00E0AF42 /* FocusTimeActivityMonitor.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		E96207822DD4EF2B002F037F /* FocusTimeUI in Frameworks */ = {isa = PBXBuildFile; productRef = E96207812DD4EF2B002F037F /* FocusTimeUI */; };
+		C66D93522E29108800452D56 /* FocusTimeUI in Frameworks */ = {isa = PBXBuildFile; productRef = 674241722E27EFBA00500101 /* FocusTimeUI */; };
+		E96207822DD4EF2B002F037F /* (null) in Frameworks */ = {isa = PBXBuildFile; };
 		E97895A82E0AFCBF00E0AF42 /* DeviceActivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E97895A72E0AFCBE00E0AF42 /* DeviceActivity.framework */; };
 /* End PBXBuildFile section */
 
@@ -44,7 +45,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		674FA6A02DB05ACE0002FDC1 /* FocusTime.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FocusTime.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		674FA6A02DB05ACE0002FDC1 /* FocusTime.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = FocusTime.app; path = "\"FocusTime\".app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C6FE59E62E156D8B003A2199 /* FocusTimeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FocusTimeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E962077F2DD4D1E5002F037F /* FocusTimeUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = FocusTimeUI; sourceTree = "<group>"; };
 		E97895A52E0AFCBE00E0AF42 /* FocusTimeActivityMonitor.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FocusTimeActivityMonitor.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -106,22 +107,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E96207822DD4EF2B002F037F /* FocusTimeUI in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		C6FE59E32E156D8B003A2199 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		E97895A22E0AFCBE00E0AF42 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				E97895A82E0AFCBF00E0AF42 /* DeviceActivity.framework in Frameworks */,
+				C66D93522E29108800452D56 /* FocusTimeUI in Frameworks */,
+				E96207822DD4EF2B002F037F /* (null) in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -143,13 +130,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		6742416F2E27EED600500101 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		674FA6972DB05ACE0002FDC1 = {
 			isa = PBXGroup;
 			children = (
