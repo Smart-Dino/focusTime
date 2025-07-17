@@ -12,6 +12,8 @@ enum DeviceActivityRegistrarError: LocalizedError {
     case couldNotGenerateIdentifier
     case couldNotSetTime
     case activityNotFound
+    case couldNotCheckOverlap
+    case scheduleOverlap(with: [ProtectedSchedule])
     
     var errorDescription: String? {
         switch self {
@@ -23,6 +25,13 @@ enum DeviceActivityRegistrarError: LocalizedError {
             String(localized: "device_activity_registrar_could_not_set_time_description", table: "ErrorLocalizable")
         case .activityNotFound:
             String(localized: "device_activity_registrar_activity_not_found_description", table: "ErrorLocalizable")
+        case .couldNotCheckOverlap:
+            String(localized: "device_activity_registrar_could_not_check_overlap_description", table: "ErrorLocalizable")
+        case .scheduleOverlap(let schedules):
+            String(
+                format: String(localized: "device_activity_registrar_schedule_overlap_description", table: "ErrorLocalizable"),
+                schedules.map { $0.emoji + " " + $0.name }.joined(separator: ", ")
+            )
         }
     }
     
@@ -36,6 +45,10 @@ enum DeviceActivityRegistrarError: LocalizedError {
             String(localized: "device_activity_registrar_could_not_set_time_reason", table: "ErrorLocalizable")
         case .activityNotFound:
             String(localized: "device_activity_registrar_activity_not_found_reason", table: "ErrorLocalizable")
+        case .couldNotCheckOverlap:
+            String(localized: "device_activity_registrar_could_not_check_overlap_reason", table: "ErrorLocalizable")
+        case .scheduleOverlap:
+            String(localized: "device_activity_registrar_schedule_overlap_reason", table: "ErrorLocalizable")
         }
     }
 }

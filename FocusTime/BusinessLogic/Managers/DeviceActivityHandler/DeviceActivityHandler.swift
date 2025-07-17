@@ -19,7 +19,7 @@ struct DeviceActivityHandler: Sendable {
     }
     
     func handleBlockingStart(for activity: DeviceActivityName) async {
-        guard let activityIdentifier = try? CodableActivityIdentifier(from: activity) else { return }
+        guard let activityIdentifier = CodableActivityIdentifier(from: activity) else { return }
         
         let schedule = fetchSchedule(id: activityIdentifier.scheduleID)
         

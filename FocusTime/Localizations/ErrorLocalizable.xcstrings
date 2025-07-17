@@ -21,6 +21,12 @@
         }
       }
     },
+    "device_activity_registrar_could_not_check_overlap_description" : {
+
+    },
+    "device_activity_registrar_could_not_check_overlap_reason" : {
+
+    },
     "device_activity_registrar_could_not_generate_identifier_description" : {
       "localizations" : {
         "en" : {
@@ -80,6 +86,12 @@
           }
         }
       }
+    },
+    "device_activity_registrar_schedule_overlap_description" : {
+
+    },
+    "device_activity_registrar_schedule_overlap_reason" : {
+
     },
     "persistence_error_already_related_description" : {
       "localizations" : {

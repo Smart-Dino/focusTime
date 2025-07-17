@@ -40,15 +40,15 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         switch schedule.type {
         case .scheduled(let startTime, let endTime):
             do {
-                try registerRegularActivity(for: schedule,
-                                            startTime: startTime,
-                                            endTime: endTime)
+                try await registerRegularActivity(for: schedule,
+                                                  startTime: startTime,
+                                                  endTime: endTime)
             } catch {
                 switch error {
                 case DeviceActivityCenter.MonitoringError.intervalTooShort:
-                    try registerFallbackActivity(for: schedule,
-                                                 startTime: startTime,
-                                                 endTime: endTime)
+                    try await registerFallbackActivity(for: schedule,
+                                                       startTime: startTime,
+                                                       endTime: endTime)
                 default:
                     throw error
                 }
@@ -74,13 +74,11 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         let shieldManager = self.shieldManager
         
         // Block starts from now.
-        Task.detached {
+        Task {
             let scheduleStore = ScheduleStore(modelContainer: modelContainer)
             let protectedBlockItems = try await scheduleStore.fetchRelatedObjects(id: persistentModelID)
             
-            Task { @MainActor in
-                try? await shieldManager.block(specific: protectedBlockItems.map(\.blockedContent))
-            }
+            try? await shieldManager.block(specific: protectedBlockItems.map(\.blockedContent))
         }
         
         let now = Calendar.current.dateComponents([.hour, .minute], from: .now)
@@ -107,7 +105,7 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         for schedule: ProtectedSchedule,
         startTime: TimeComponents,
         endTime: TimeComponents
-    ) throws {
+    ) async throws {
         guard schedule.persistentModelID != nil else { throw DeviceActivityRegistrarError.noPersistentItem }
         
         let intervalStart = startTime.dateComponents
@@ -115,6 +113,11 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         let deviceActivitySchedule = DeviceActivitySchedule(intervalStart: intervalStart,
                                                             intervalEnd: intervalEnd,
                                                             repeats: true)
+        
+        let overlapSchedules = try await overlapsWithAlreadyRegisteredSchedules(deviceActivitySchedule)
+        guard overlapSchedules.isEmpty else {
+            throw DeviceActivityRegistrarError.scheduleOverlap(with: overlapSchedules)
+        }
         
         // Let the DeviceActivityMonitorExtension know that we need a regular scenario.
         guard let activityIdentifier = CodableActivityIdentifier(scheduleID: schedule.id,
@@ -131,7 +134,7 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         for schedule: ProtectedSchedule,
         startTime: TimeComponents,
         endTime: TimeComponents
-    ) throws {
+    ) async throws {
         guard schedule.persistentModelID != nil else { throw DeviceActivityRegistrarError.noPersistentItem }
         
         let intervalStart = startTime.dateComponents
@@ -143,6 +146,11 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
                                                             intervalEnd: intervalEnd,
                                                             repeats: true)
         
+        let overlapSchedules = try await overlapsWithAlreadyRegisteredSchedules(deviceActivitySchedule)
+        guard overlapSchedules.isEmpty else {
+            throw DeviceActivityRegistrarError.scheduleOverlap(with: overlapSchedules)
+        }
+        
         // Let the DeviceActivityMonitorExtension know that we need a fallback scenario.
         guard let activityIdentifier = CodableActivityIdentifier(scheduleID: schedule.id,
                                                                  isFallback: true).jsonString
@@ -151,6 +159,47 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         let activityName = DeviceActivityName(activityIdentifier)
         
         try center.startMonitoring(activityName, during: deviceActivitySchedule)
+    }
+    
+    private func overlapsWithAlreadyRegisteredSchedules(
+        _ newSchedule: DeviceActivitySchedule,
+        on calendar: Calendar = .current
+    ) async throws -> [ProtectedSchedule] {
+        var overlappingSchedules: [ProtectedSchedule] = []
+        let scheduleStore = ScheduleStore(modelContainer: modelContainer)
+        
+        let activities = center.activities
+        
+        for activity in activities {
+            guard
+                let existingSchedule = center.schedule(for: activity),
+                let start1 = calendar.date(from: newSchedule.intervalStart),
+                let end1 = calendar.date(from: newSchedule.intervalEnd),
+                let start2 = calendar.date(from: existingSchedule.intervalStart),
+                let end2 = calendar.date(from: existingSchedule.intervalEnd)
+            else {
+                // Failed to resolve one or more DateComponents.
+                throw DeviceActivityRegistrarError.couldNotCheckOverlap
+            }
+            if start1 < end2 && start2 < end1 {
+                // Overlap detected.
+                // Find schedule related to this activity:
+                
+                // 1. Decode activity name.
+                guard let decoded = CodableActivityIdentifier(from: activity) else {
+                    throw DeviceActivityRegistrarError.couldNotCheckOverlap
+                }
+                // 2. Get the schedule ID from it.
+                let scheduleID = decoded.scheduleID
+                // 3. Fetch schedule.
+                let overlappingSchedule = try await scheduleStore.fetch(
+                    descriptor: .init(predicate: #Predicate { $0.id == scheduleID })
+                ).first
+                // 4. Add schedule to the return list.
+                if let overlappingSchedule { overlappingSchedules.append(overlappingSchedule) }
+            }
+        }
+        return overlappingSchedules
     }
     
     func unregisterActivity(during schedule: ProtectedSchedule) async throws {

@@ -20,7 +20,7 @@ extension CodableActivityIdentifier {
         return String(data: data, encoding: .utf8)
     }
     
-    init?(from name: DeviceActivityName) throws {
+    init?(from name: DeviceActivityName) {
         let decoder = JSONDecoder()
         
         guard let jsonData = name.rawValue.data(using: .utf8),
