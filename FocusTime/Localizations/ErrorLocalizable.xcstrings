@@ -22,10 +22,24 @@
       }
     },
     "device_activity_registrar_could_not_check_overlap_description" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not check whether this schedule overlaps with others, make sure it is saved and try again."
+          }
+        }
+      }
     },
     "device_activity_registrar_could_not_check_overlap_reason" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to resolve one or more DateComponents or decode an Identifier."
+          }
+        }
+      }
     },
     "device_activity_registrar_could_not_generate_identifier_description" : {
       "localizations" : {
@@ -88,10 +102,24 @@
       }
     },
     "device_activity_registrar_schedule_overlap_description" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selected schedule overlaps with others: %@"
+          }
+        }
+      }
     },
     "device_activity_registrar_schedule_overlap_reason" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DeviceActivityCenter has activities that overlap with schedule tried to saved."
+          }
+        }
+      }
     },
     "persistence_error_already_related_description" : {
       "localizations" : {

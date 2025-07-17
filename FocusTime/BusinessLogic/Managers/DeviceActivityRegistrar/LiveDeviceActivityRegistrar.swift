@@ -114,7 +114,10 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
                                                             intervalEnd: intervalEnd,
                                                             repeats: true)
         
-        let overlapSchedules = try await overlapsWithAlreadyRegisteredSchedules(deviceActivitySchedule)
+        let overlapSchedules = try await overlapsWithAlreadyRegisteredSchedules(
+            deviceActivitySchedule,
+            days: schedule.days
+        )
         guard overlapSchedules.isEmpty else {
             throw DeviceActivityRegistrarError.scheduleOverlap(with: overlapSchedules)
         }
@@ -146,7 +149,10 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
                                                             intervalEnd: intervalEnd,
                                                             repeats: true)
         
-        let overlapSchedules = try await overlapsWithAlreadyRegisteredSchedules(deviceActivitySchedule)
+        let overlapSchedules = try await overlapsWithAlreadyRegisteredSchedules(
+            deviceActivitySchedule,
+            days: schedule.days
+        )
         guard overlapSchedules.isEmpty else {
             throw DeviceActivityRegistrarError.scheduleOverlap(with: overlapSchedules)
         }
@@ -163,6 +169,7 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
     
     private func overlapsWithAlreadyRegisteredSchedules(
         _ newSchedule: DeviceActivitySchedule,
+        days: Set<Weekday>,
         on calendar: Calendar = .current
     ) async throws -> [ProtectedSchedule] {
         var overlappingSchedules: [ProtectedSchedule] = []
@@ -195,8 +202,8 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
                 let overlappingSchedule = try await scheduleStore.fetch(
                     descriptor: .init(predicate: #Predicate { $0.id == scheduleID })
                 ).first
-                // 4. Add schedule to the return list.
-                if let overlappingSchedule { overlappingSchedules.append(overlappingSchedule) }
+                // 4. Make sure days overlap too and add schedule to return list.
+                if let overlappingSchedule, !overlappingSchedule.days.contains(days) { overlappingSchedules.append(overlappingSchedule) }
             }
         }
         return overlappingSchedules

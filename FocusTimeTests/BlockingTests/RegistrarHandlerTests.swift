@@ -117,40 +117,40 @@ struct RegistrarHandlerTests {
         // Setup selection.
         let applications = Set<ApplicationToken>()
         let categories = Set<ActivityCategoryToken>()
-
+        
         var selection = FamilyActivitySelection()
         selection.applicationTokens = applications
         selection.categoryTokens = categories
-
+        
         // Create a schedule with selection.
         let scheduleModelID = try await insertTestScheduleRelatedToBlockItem(with: selection)
-
+        
         // Fetch schedule model.
         let fetchedSchedule = try await scheduleStore.fetch(id: scheduleModelID)
-
+        
         // Build the activity identifier and name.
         let activityIdentifier = CodableActivityIdentifier(scheduleID: fetchedSchedule.id, isFallback: false)
         let activityIdentifierJSON = try #require(activityIdentifier.jsonString)
         
         let activityName = DeviceActivityName(activityIdentifierJSON)
-
+        
         // Start schedule in the registrar.
         try await activityRegistrar.registerActivity(during: fetchedSchedule)
-
+        
         // Simulate starting the interval.
         await activityHandler.handleBlockingStart(for: activityName)
         
         let isShieldActive = try await shieldManager.isShieldActive
         try #require(isShieldActive)
-
+        
         #expect(
             store.shield.applications == Set<ApplicationToken>() &&
             store.shield.applicationCategories == .specific(categories)
         )
-
+        
         // Simulate ending the interval.
         await activityHandler.handleBlockingEnd(for: activityName)
-
+        
         #expect(
             store.shield.applications == nil &&
             store.shield.applicationCategories == nil
@@ -194,13 +194,13 @@ struct RegistrarHandlerTests {
         // Insert into the store.
         let scheduleModelID = try await scheduleStore.insert(schedule)
         let fetchedSchedule = try await scheduleStore.fetch(id: scheduleModelID)
-
+        
         // Register duration activity.
         try await activityRegistrar.registerActivity(during: fetchedSchedule)
-
+        
         // Fetch the registered schedule.
         let activities = center.activities
-
+        
         // Should be a newly scheduled interval for our test schedule.
         let registeredName = try #require(
             activities.first(where: { $0.rawValue.contains(fetchedSchedule.id.uuidString) })
@@ -208,7 +208,7 @@ struct RegistrarHandlerTests {
         let decodedIdentifier = try #require(try CodableActivityIdentifier(from: registeredName))
         #expect(!decodedIdentifier.isFallback)
     }
-
+    
     @Test("Unregistering an individual activity")
     func unregisterIndividualActivity() async throws {
         // Setup and register a schedule.
@@ -236,7 +236,7 @@ struct RegistrarHandlerTests {
         let postActivities = center.activities
         #expect(!postActivities.contains(where: { $0.rawValue.contains(fetchedSchedule.id.uuidString) }))
     }
-
+    
     @Test("Unregistering all activities")
     func unregisterAllActivities() async throws {
         // Register two schedules.
@@ -272,6 +272,47 @@ struct RegistrarHandlerTests {
         // Ensure all removed.
         let postActivities = center.activities
         #expect(postActivities.isEmpty)
+    }
+    
+    @Test("Overlapping schedules should throw scheduleOverlap error")
+    func overlappingSchedulesThrowsError() async throws {
+        let startTime1 = TimeComponents(hour: 8, minute: 0)
+        let endTime1 = TimeComponents(hour: 10, minute: 0)
+        let startTime2 = TimeComponents(hour: 9, minute: 0)
+        let endTime2 = TimeComponents(hour: 11, minute: 0) // Overlaps with previous
+        
+        // Register the first schedule
+        let schedule1 = ProtectedSchedule(emoji: "🔥",
+                                          name: "OverlapA",
+                                          days: Set(Weekday.allCases),
+                                          type: .scheduled(startTime: startTime1, endTime: endTime1))
+        let schedule1ID = try await scheduleStore.insert(schedule1)
+        let fetchedSchedule1 = try await scheduleStore.fetch(id: schedule1ID)
+        try await activityRegistrar.registerActivity(during: fetchedSchedule1)
+        
+        // Register the second, overlapping schedule
+        let schedule2 = ProtectedSchedule(emoji: "💧",
+                                          name: "OverlapB",
+                                          days: Set(Weekday.allCases),
+                                          type: .scheduled(startTime: startTime2, endTime: endTime2))
+        let schedule2ID = try await scheduleStore.insert(schedule2)
+        let fetchedSchedule2 = try await scheduleStore.fetch(id: schedule2ID)
+        
+        // Expect scheduleOverlap error
+        await #expect {
+            try await activityRegistrar.registerActivity(during: fetchedSchedule2)
+        } throws: { error in
+            guard let error = error as? DeviceActivityRegistrarError else {
+                return false
+            }
+            
+            print(error.localizedDescription)
+            if case .scheduleOverlap = error {
+                return true
+            } else {
+                return false
+            }
+        }
     }
     
 }
