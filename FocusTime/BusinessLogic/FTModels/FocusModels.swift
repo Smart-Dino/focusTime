@@ -9,12 +9,12 @@ import Foundation
 
 // MARK: - Placeholder models
 
-public enum Weekday: String, CaseIterable, Identifiable, Comparable {
+enum Weekday: String, CaseIterable, Identifiable, Comparable {
     case monday, tuesday, wednesday, thursday, friday, saturday, sunday
 
-    public var id: String { rawValue }
+    var id: String { rawValue }
 
-    public var shortName: String {
+    var shortName: String {
         switch self {
         case .monday: return String(localized: "Mon", comment: "Short name for Monday")
         case .tuesday: return String(localized: "Tue", comment: "Short name for Tuesday")
@@ -26,7 +26,7 @@ public enum Weekday: String, CaseIterable, Identifiable, Comparable {
         }
     }
 
-    public var fullName: String {
+    var fullName: String {
         switch self {
         case .monday: return String(localized: "Monday", comment: "Full name for Monday")
         case .tuesday: return String(localized: "Tuesday", comment: "Full name for Tuesday")
@@ -38,7 +38,7 @@ public enum Weekday: String, CaseIterable, Identifiable, Comparable {
         }
     }
 
-    public static func < (lhs: Weekday, rhs: Weekday) -> Bool {
+    static func < (lhs: Weekday, rhs: Weekday) -> Bool {
         let order: [Weekday] = [.monday, .tuesday, .wednesday, .thursday, .friday, .saturday, .sunday]
         guard let lhsIndex = order.firstIndex(of: lhs),
               let rhsIndex = order.firstIndex(of: rhs) else {
@@ -50,7 +50,7 @@ public enum Weekday: String, CaseIterable, Identifiable, Comparable {
 
 
 // MARK: - FocusPreset Enum
-public enum FocusPreset: String, CaseIterable, Identifiable {
+enum FocusPreset: String, CaseIterable, Identifiable {
     case morningRoutine
     case socialDetox
     case workSprint
@@ -60,9 +60,9 @@ public enum FocusPreset: String, CaseIterable, Identifiable {
     case mindfulness
     case reading
 
-    public var id: String { rawValue }
+    var id: String { rawValue }
 
-    public var name: String {
+    var name: String {
         switch self {
         case .morningRoutine: return String(localized: "Morning\nRoutine", comment: "Focus preset: Morning Routine")
         case .socialDetox: return String(localized: "Social\nDetox", comment: "Focus preset: Social Detox")
@@ -75,7 +75,7 @@ public enum FocusPreset: String, CaseIterable, Identifiable {
         }
     }
 
-    public var iconName: String {
+    var iconName: String {
         switch self {
         case .morningRoutine: return "☀️"
         case .socialDetox: return "📴"
@@ -90,7 +90,7 @@ public enum FocusPreset: String, CaseIterable, Identifiable {
 }
 
 // MARK: - ScheduleConfiguration Struct
-public struct ScheduleConfiguration: Equatable {
+struct ScheduleConfiguration: Equatable {
     var listName: String
     var scheduleForLater: Bool
     var scheduledDays: Set<Weekday>
