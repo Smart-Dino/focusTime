@@ -166,6 +166,8 @@ struct ScheduleConfigurationView: View {
         return formatter.string(from: TimeInterval(configuration.selectedHours * 3600 + configuration.selectedMinutes * 60)) ?? String(localized: "0m", comment: "Fallback zero minutes duration")
     }
     
+    
+    // TODO: No need for short names
     private var formattedScheduledDays: String {
         if configuration.scheduledDays.count == Weekday.allCases.count {
             return String(localized: "Every Day", comment: "Scheduled for every day")
@@ -204,6 +206,7 @@ struct ScheduleConfigurationView: View {
     }
     
     
+    //TODO: remove 24 hours format
     private let twentyFourHourTimeFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm"

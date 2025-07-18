@@ -15,7 +15,7 @@ final class DurationPickerSheetViewModel {
         var minutes: Int
     }
     
-    var state: State
+    private(set) var state: State
     
     var hours: Int {
         get { state.hours }

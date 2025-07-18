@@ -10,13 +10,13 @@ import FocusTimeUI
 
 extension FocusSessionView.Constants {
     // MARK: - Constants for FocusPresetGridView
-    public enum PresetGrid {
+     enum PresetGrid {
         public enum Strings {
             public static let title = "Choose Your Focus Preset"
             public static let subtitle = "Ready-made blocklists to help you stay focused. Choose a preset to quickly block distracting apps."
         }
         
-        public enum Layout {
+         enum Layout {
             public static let mainSpacing: CGFloat = 16
             private static let gridHSpacing: CGFloat = 20
             private static let minimumCellWidth: CGFloat = 80
@@ -26,8 +26,8 @@ extension FocusSessionView.Constants {
     }
     
     // MARK: - Constants for PresetIconView
-    public enum PresetIcon {
-        public enum Layout {
+     enum PresetIcon {
+         enum Layout {
             public static let mainSpacing: CGFloat = 8
             public static let size: CGFloat = 60
             public static let cornerRadius: CGFloat = 20
