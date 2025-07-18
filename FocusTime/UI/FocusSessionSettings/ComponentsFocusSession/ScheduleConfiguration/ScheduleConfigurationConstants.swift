@@ -9,8 +9,8 @@ import SwiftUI
 
 extension FocusSessionView.Constants {
     // MARK: - Constants for ScheduleConfigurationView
-    public enum Configuration {
-        public enum Strings {
+    enum Configuration {
+        enum Strings {
             public static let listName = "List name"
             public static let listNamePlaceholder = "Name"
             public static let scheduleForLater = "Schedule for later"
@@ -24,7 +24,7 @@ extension FocusSessionView.Constants {
             public static let letEndTime = "End time"
         }
         
-        public enum Layout {
+        enum Layout {
             public static let mainSpacing: CGFloat = 16
             public static let scheduleSectionSpacing: CGFloat = 8
             public static let listIconSpacing: CGFloat = 12
@@ -32,7 +32,7 @@ extension FocusSessionView.Constants {
             public static let scheduledDaysTextPadding: CGFloat = 16
         }
         
-        public enum Colors {
+        enum Colors {
             public static let toggleTint = Color.green
         }
     }

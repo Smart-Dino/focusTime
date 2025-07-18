@@ -14,7 +14,7 @@ final class DaysPickerPopupViewModel {
         var scheduledDays: Set<Weekday>
     }
 
-    var state: State
+    private(set) var state: State
     
     init(scheduledDays: Set<Weekday>) {
         self.state = State(scheduledDays: scheduledDays)
