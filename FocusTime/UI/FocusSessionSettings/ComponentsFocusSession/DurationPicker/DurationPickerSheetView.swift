@@ -9,7 +9,8 @@ import SwiftUI
 
 struct DurationPickerSheetView: View {
     // MARK: - Properties
-    @Bindable var viewModel: DurationPickerSheetViewModel
+    @Binding var hours: Int
+    @Binding var minutes: Int
     
     // MARK: - Body
     var body: some View {
@@ -42,7 +43,10 @@ struct DurationPickerSheetView: View {
     // MARK: - Private Views
     private var durationPicker: some View {
         HStack(spacing: 0) {
-            Picker(FocusSessionView.Constants.DurationPicker.Strings.hoursPickerTitle, selection: $viewModel.hours) {
+            Picker(
+                FocusSessionView.Constants.DurationPicker.Strings.hoursPickerTitle,
+                selection: $hours
+            ) {
                 ForEach(0..<FocusSessionView.Constants.DurationPicker.Time.hoursInDay, id: \.self) { hour in
                     Text("\(hour)").tag(hour)
                 }
@@ -51,7 +55,10 @@ struct DurationPickerSheetView: View {
             .frame(width: FocusSessionView.Constants.DurationPicker.Layout.pickerWidth)
             .clipped()
             
-            Picker(FocusSessionView.Constants.DurationPicker.Strings.minutesPickerTitle, selection: $viewModel.minutes) {
+            Picker(
+                FocusSessionView.Constants.DurationPicker.Strings.minutesPickerTitle,
+                selection: $minutes
+            ) {
                 ForEach(0..<FocusSessionView.Constants.DurationPicker.Time.minutesInHour, id: \.self) { minute in
                     Text("\(minute)").tag(minute)
                 }

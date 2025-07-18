@@ -19,41 +19,48 @@ final class FocusSessionViewModel {
 
         var id: Int { self.hashValue }
     }
-
+    
     // MARK: - State
     struct State {
-        var scheduleConfiguration: ScheduleConfiguration = ScheduleConfiguration(
-            listName: FocusSessionView.Constants.DefaultValues.listName,
-            scheduleForLater: false,
-            scheduledDays: [],
-            startTime: FocusSessionView.Constants.DefaultValues.startTime,
-            endTime: FocusSessionView.Constants.DefaultValues.endTime,
-            selectedPreset: nil,
-            selectedHours: FocusSessionView.Constants.DefaultValues.durationHours,
-            selectedMinutes: FocusSessionView.Constants.DefaultValues.durationMinutes
-        )
-
+        let presets: [FocusPreset] = FocusPreset.allCases
+        
+        var scheduleConfiguration: ScheduleConfiguration
+        
         var activeSheet: SheetType?
+        
+        var selectedPresetIconName: String? {
+            scheduleConfiguration.selectedPreset?.iconName
+        }
+        
+        var isStartButtonEnabled: Bool {
+            !scheduleConfiguration.listName.trimmingCharacters(in: .whitespaces).isEmpty
+        }
+        
+        init(
+            presets: [FocusPreset] = FocusPreset.allCases,
+            scheduleConfiguration: ScheduleConfiguration = ScheduleConfiguration(
+                listName: FocusSessionView.Constants.DefaultValues.listName,
+                scheduleForLater: false,
+                scheduledDays: [],
+                startTime: FocusSessionView.Constants.DefaultValues.startTime,
+                endTime: FocusSessionView.Constants.DefaultValues.endTime,
+                selectedPreset: nil,
+                selectedHours: FocusSessionView.Constants.DefaultValues.durationHours,
+                selectedMinutes: FocusSessionView.Constants.DefaultValues.durationMinutes
+            ),
+            activeSheet: SheetType? = nil
+        ) {
+            self.scheduleConfiguration = scheduleConfiguration
+            self.activeSheet = activeSheet
+        }
     }
 
     // MARK: - Properties
-    var state: State
-
-    // MARK: - Static Data
-    let presets: [FocusPreset] = FocusPreset.allCases
-
+   private(set) var state: State
+    
     // MARK: - Initializers
     init(state: State = State()) {
         self.state = state
-    }
-
-    // MARK: - Computed Properties
-    var selectedPresetIconName: String? {
-        state.scheduleConfiguration.selectedPreset?.iconName
-    }
-
-    var isStartButtonEnabled: Bool {
-        !state.scheduleConfiguration.listName.trimmingCharacters(in: .whitespaces).isEmpty
     }
 
     // MARK: - Action Methods (Public API)
@@ -95,5 +102,33 @@ final class FocusSessionViewModel {
         print("End Time: \(state.scheduleConfiguration.endTime)")
         print("Selected Hours: \(state.scheduleConfiguration.selectedHours)")
         print("Selected Minutes: \(state.scheduleConfiguration.selectedMinutes)")
+    }
+    
+    func needToDismissSheet(_ sheet: SheetType?) {
+        state.activeSheet = nil
+    }
+    
+    func setScheduledConfiguration(hours: Int) {
+        state.scheduleConfiguration.selectedHours = hours
+    }
+    
+    func setScheduledConfiguration(minutes: Int) {
+        state.scheduleConfiguration.selectedMinutes = minutes
+    }
+    
+    func setScheduledConfiguration(selectedPreset: FocusPreset?) {
+        state.scheduleConfiguration.selectedPreset = selectedPreset
+    }
+    
+    func set(scheduleConfiguration: ScheduleConfiguration) {
+        state.scheduleConfiguration = scheduleConfiguration
+    }
+    
+    func set(startTime: Date) {
+        state.scheduleConfiguration.startTime = startTime
+    }
+    
+    func set(endTime: Date) {
+        state.scheduleConfiguration.endTime = endTime
     }
 }
