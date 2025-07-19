@@ -63,23 +63,28 @@ final class FocusSessionViewModel {
         self.state = state
     }
 
-    // MARK: - Action Methods (Public API)
+    /// Presents the duration picker sheet by setting the active sheet state.
     func presentDurationPicker() {
         state.activeSheet = .durationPicker
     }
 
+    /// Presents the start time picker sheet by setting the active sheet state.
     func presentStartTimePicker() {
         state.activeSheet = .startTimePicker
     }
 
+    /// Presents the end time picker sheet by setting the active sheet state.
     func presentEndTimePicker() {
         state.activeSheet = .endTimePicker
     }
 
+    /// Presents the app blocker sheet by setting the active sheet state accordingly.
     func presentAppBlockerSheet() {
         state.activeSheet = .appBlockerSheet
     }
 
+    /// Selects or deselects the given focus preset in the schedule configuration.
+    /// - Parameter preset: The focus preset to select or deselect. If the preset is already selected, it will be deselected; otherwise, it will become the selected preset.
     func selectPreset(_ preset: FocusPreset) {
         if state.scheduleConfiguration.selectedPreset == preset {
             state.scheduleConfiguration.selectedPreset = nil
@@ -88,6 +93,7 @@ final class FocusSessionViewModel {
         }
     }
 
+    /// Handles the action when the start button is tapped by printing the current schedule configuration details for debugging purposes.
     func startTapped() {
         print("Start button tapped!")
         print("Current List Name: \(state.scheduleConfiguration.listName)")
@@ -104,30 +110,43 @@ final class FocusSessionViewModel {
         print("Selected Minutes: \(state.scheduleConfiguration.selectedMinutes)")
     }
     
+    /// Dismisses any currently presented sheet by setting the active sheet to nil.
     func needToDismissSheet(_ sheet: SheetType?) {
         state.activeSheet = nil
     }
     
+    /// Updates the selected hours in the schedule configuration.
+    /// - Parameter hours: The number of hours to set for the focus session duration.
     func setScheduledConfiguration(hours: Int) {
         state.scheduleConfiguration.selectedHours = hours
     }
     
+    /// Updates the selected minutes value in the schedule configuration.
+    /// - Parameter minutes: The number of minutes to set for the scheduled duration.
     func setScheduledConfiguration(minutes: Int) {
         state.scheduleConfiguration.selectedMinutes = minutes
     }
     
+    /// Updates the selected focus preset in the schedule configuration.
+    /// - Parameter selectedPreset: The focus preset to select, or nil to clear the selection.
     func setScheduledConfiguration(selectedPreset: FocusPreset?) {
         state.scheduleConfiguration.selectedPreset = selectedPreset
     }
     
+    /// Updates the current schedule configuration with the provided value.
+    /// - Parameter scheduleConfiguration: The new schedule configuration to apply.
     func set(scheduleConfiguration: ScheduleConfiguration) {
         state.scheduleConfiguration = scheduleConfiguration
     }
     
+    /// Updates the start time in the current schedule configuration.
+    /// - Parameter startTime: The new start time to set.
     func set(startTime: Date) {
         state.scheduleConfiguration.startTime = startTime
     }
     
+    /// Updates the end time in the current schedule configuration.
+    /// - Parameter endTime: The new end time to set.
     func set(endTime: Date) {
         state.scheduleConfiguration.endTime = endTime
     }

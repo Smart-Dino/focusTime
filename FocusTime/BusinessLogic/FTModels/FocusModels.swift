@@ -38,6 +38,8 @@ enum Weekday: String, CaseIterable, Identifiable, Comparable {
         }
     }
 
+    /// Compares two `Weekday` values based on their order from Monday to Sunday.
+    /// - Returns: `true` if `lhs` comes before `rhs` in the week; otherwise, `false`.
     static func < (lhs: Weekday, rhs: Weekday) -> Bool {
         let order: [Weekday] = [.monday, .tuesday, .wednesday, .thursday, .friday, .saturday, .sunday]
         guard let lhsIndex = order.firstIndex(of: lhs),
