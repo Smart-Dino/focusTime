@@ -12,7 +12,7 @@ import SwiftData
 
 struct ProtectedBlockItem: ProtectedModel {
     
-    let id: UUID
+    var id: UUID
     let persistentModelID: PersistentIdentifier?
     
     let emoji: String
@@ -29,6 +29,7 @@ struct ProtectedBlockItem: ProtectedModel {
         blockedContent: FamilyActivitySelection,
         schedulesDescription: String = "No schedules"
     ) {
+        self.id = id
         self.id = id
         self.persistentModelID = persistentModelID
         self.emoji = emoji

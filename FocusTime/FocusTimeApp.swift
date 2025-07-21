@@ -8,6 +8,8 @@
 import SwiftUI
 import SwiftData
 
+#warning("When creating a splash screen make sure to handle ModelContainer errors!")
+
 @main
 struct FocusTimeApp: App {
     let modelContainer: ModelContainer

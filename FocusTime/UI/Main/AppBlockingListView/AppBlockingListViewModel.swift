@@ -13,33 +13,46 @@ import FamilyControls
 @Observable
 final class AppBlockingListViewModel {
     struct State {
+        var error: Error? = nil
+        
         var page = 0
         var items = [ProtectedBlockItem]()
     }
     
     private(set) var state: State
-    private let modelContainer: ModelContainer
+    private let blockItemStore: BlockItemStore
     
-    var fetchTask: Task<Void, Never>?
+    private var fetchTask: Task<Void, Never>?
     
-    init(state: State = State(), modelContainer: ModelContainer) {
+    init(
+        state: State = State(),
+        modelContainer: ModelContainer
+    ) {
         self.state = state
-        self.modelContainer = modelContainer
+        self.blockItemStore = BlockItemStore(modelContainer: modelContainer)
     }
     
-    func insertTestItemsIntoDatabase() async throws {
+    func keepShowingError(showError: Bool) {
+        if !showError {
+            state.error = nil
+        }
+    }
+    
+    func insertTestItemsIntoDatabase() async {
         Task.detached(priority: .userInitiated) {
-            let blockItemStore = BlockItemStore(modelContainer: self.modelContainer)
-            let itemsToInsert = Array(
-                repeating: ProtectedBlockItem(emoji: "😜", name: "Block", blockedContent: FamilyActivitySelection()),
-                count: 100000
-            )
-            try await blockItemStore.insertBatch(itemsToInsert)
-//            let insertedItems = try? await blockItemStore.fetch()
-//            await MainActor.run {
-//                self.state.items = insertedItems ?? []
-//            }
-            await self.fetchNextPage()
+            do {
+                let itemsToInsert = Array(
+                    repeating: ProtectedBlockItem(emoji: "😜", name: "Block", blockedContent: FamilyActivitySelection()),
+                    count: 100
+                )
+                try await self.blockItemStore.insertBatch(itemsToInsert)
+                
+                await self.fetchNextPage()
+            } catch {
+                await MainActor.run {
+                    self.state.error = error
+                }
+            }
         }
     }
     
@@ -47,13 +60,21 @@ final class AppBlockingListViewModel {
         guard fetchTask == nil else { return }
         
         self.fetchTask = Task.detached(priority: .userInitiated) {
-            let blockItemStore = BlockItemStore(modelContainer: self.modelContainer)
-            let insertedItems = try? await blockItemStore.fetch(page: self.state.page)
-            await MainActor.run {
-                self.state.items.append(contentsOf: insertedItems ?? [])
-                self.state.page += 1
-                self.fetchTask = nil
-                print("Items on screen: \(self.state.items.count)")
+            do {
+                let insertedItems = try await self.blockItemStore.fetch(page: self.state.page)
+                await MainActor.run {
+                    self.state.items.append(contentsOf: insertedItems)
+                    self.state.page += 1
+                    self.state.error = nil
+                    self.fetchTask = nil
+                    print("Items on screen: \(self.state.items.count)")
+                }
+            } catch {
+                await MainActor.run {
+                    self.state.error = error
+                    self.fetchTask = nil
+                    print("Failed to fetch page \(self.state.page): \(error)")
+                }
             }
         }
     }
