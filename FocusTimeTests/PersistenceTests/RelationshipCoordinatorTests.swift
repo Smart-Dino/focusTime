@@ -122,7 +122,7 @@ extension PersistenceTests {
         let scheduleModelID = resultItems.scheduleModelID
         
         // Remove block item so it does not exist anymore.
-        try await blockItemStore.delete(id: scheduleModelID)
+        try await blockItemStore.delete(id: blockItemModelID)
         
         // Should throw PersistenceStoreError.notFound if item does not exist.
         await #expect(throws: PersistenceStoreError.notFound, performing: {

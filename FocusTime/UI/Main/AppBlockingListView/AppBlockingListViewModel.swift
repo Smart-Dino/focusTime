@@ -22,7 +22,7 @@ final class AppBlockingListViewModel {
     private(set) var state: State
     private let blockItemStore: BlockItemStore
     
-    var fetchTask: Task<Void, Never>?
+    private var fetchTask: Task<Void, Never>?
     
     init(
         state: State = State(),

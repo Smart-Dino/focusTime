@@ -36,6 +36,8 @@ public struct FTScheduledFocusRowView: View {
                     .stroke(gradient, lineWidth: 1.2)
             }
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(emoji), \(title), \(description)")
     }
     
     var gradient: LinearGradient {

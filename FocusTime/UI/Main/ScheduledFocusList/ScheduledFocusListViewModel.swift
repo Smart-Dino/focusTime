@@ -20,7 +20,7 @@ final class ScheduledFocusListViewModel {
     private(set) var state: State
     private let scheduleStore: ScheduleStore
     
-    var fetchTask: Task<Void, Never>?
+    private var fetchTask: Task<Void, Never>?
     
     init(
         state: State = State(),
