@@ -27,10 +27,6 @@ extension CodableActivityIdentifier {
               let decodedActivity = try? decoder.decode(CodableActivityIdentifier.self, from: jsonData)
         else { return nil }
         
-        
-        self.init(
-            scheduleID: decodedActivity.scheduleID,
-            isFallback: decodedActivity.isFallback
-        )
+        self = decodedActivity
     }
 }

@@ -12,12 +12,12 @@ import Foundation
 // https://fatbobman.com/en/posts/considerations-for-using-codable-and-enums-in-swiftdata-models/#:~:text=Such%20errors%20indicate,of%20the%20model.
 /// A simplified alternative to `DateComponents` that works with SwiftData.
 /// Represents a time of day in hours and minutes, stored as seconds since midnight (00:00:00 UTC).
-nonisolated struct TimeComponents: Codable, Hashable, CustomStringConvertible {
-    private let timeSince1970: Int
+struct TimeComponents: Codable, Hashable, CustomStringConvertible {
+    let secondsSinceMidnight: Int
     
     /// Seconds since midnight in the current locale.
     var localizedTimeSince1970: Int {
-        let dateUTC0 = Date(timeIntervalSince1970: TimeInterval(timeSince1970))
+        let dateUTC0 = Date(timeIntervalSince1970: TimeInterval(secondsSinceMidnight))
         let secondsInCurrentLocale = Calendar.current.component(.second, from: dateUTC0)
         
         return secondsInCurrentLocale
@@ -52,7 +52,7 @@ nonisolated struct TimeComponents: Codable, Hashable, CustomStringConvertible {
         var utcCalendar = Calendar.current
         utcCalendar.timeZone = .gmt // We use GMT+0 since timeIntervalSince1970 is initialized relative to 00:00:00 UTC.
         
-        let date = Date(timeIntervalSince1970: TimeInterval(timeSince1970))
+        let date = Date(timeIntervalSince1970: TimeInterval(secondsSinceMidnight))
         
         // Create and return components.
         return utcCalendar.dateComponents([.hour, .minute], from: date)
@@ -65,7 +65,7 @@ nonisolated struct TimeComponents: Codable, Hashable, CustomStringConvertible {
     
     /// Initializes with seconds since midnight (00:00:00 UTC).
     init(secondsSince1970: Int) {
-        self.timeSince1970 = secondsSince1970
+        self.secondsSinceMidnight = secondsSince1970
     }
     
     /// Initializes with hour and minute components.
@@ -76,7 +76,7 @@ nonisolated struct TimeComponents: Codable, Hashable, CustomStringConvertible {
         let hoursAsSeconds = hour * 60 * 60
         let minutesAsSeconds = minute * 60
         let totalSeconds = hoursAsSeconds + minutesAsSeconds
-        self.timeSince1970 = totalSeconds
+        self.secondsSinceMidnight = totalSeconds
     }
     
     /// Initializes from a Date, extracting the hour and minute in GMT timezone.
@@ -89,4 +89,3 @@ nonisolated struct TimeComponents: Codable, Hashable, CustomStringConvertible {
         self.init(hour: hour, minute: minute)
     }
 }
-

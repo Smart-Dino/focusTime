@@ -62,17 +62,11 @@ struct DeviceActivityHandler: Sendable {
         
         if activityIdentifier.isFallback {
             Task {
-                while !Task.isCancelled {
-                    try? await Task.sleep(nanoseconds: 1_000_000_000)
-                    
-                    let currentTimeComponent = TimeComponents(from: .now)
-                    
-                    if currentTimeComponent == endTimeComponent {
-                        Task {
-                            try? await shieldManager.unblock()
-                        }
-                        break
-                    }
+                while TimeComponents(from: .now) != endTimeComponent {
+                    try? await Task.sleep(nanoseconds: 5_000_000_000)
+                }
+                Task {
+                    try? await shieldManager.unblock()
                 }
                 DeviceActivityCenter()
                     .stopMonitoring(

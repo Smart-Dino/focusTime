@@ -11,7 +11,7 @@ import FamilyControls
 
 struct ProtectedBlockItem: ProtectedModel {
     
-    let id: UUID
+    var id: UUID
     let persistentModelID: PersistentIdentifier?
     
     let emoji: String

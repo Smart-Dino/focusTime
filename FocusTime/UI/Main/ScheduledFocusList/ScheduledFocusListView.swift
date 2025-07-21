@@ -40,9 +40,9 @@ struct ScheduledFocusListView: View {
                 Constants.Strings.newSessionButtonTitle,
                 systemImage: Constants.Icons.newSessionSymbol
             ) {
-                #warning("Action is empty")
+                #warning("Placeholder code")
                 Task {
-                    try await viewModel.insertTestItemsIntoDatabase()
+                    await viewModel.insertTestItemsIntoDatabase()
                 }
             }
             .buttonStyle(.ftPrimary)
@@ -52,6 +52,18 @@ struct ScheduledFocusListView: View {
         .navigationBarTitleDisplayMode(.inline)
         .preferredColorScheme(.dark)
         .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+        .alert(
+            SharedConstants.Strings.errorHeader,
+            isPresented: Binding(get: {
+                viewModel.state.error != nil
+            }, set: { showError in
+                viewModel.keepShowingError(showError: showError)
+            }), actions: {
+                // OK dismissal button by default
+            }, message: {
+                Text(viewModel.state.error?.localizedDescription ?? "")
+            }
+        )
     }
     
     var schedulesView: some View {

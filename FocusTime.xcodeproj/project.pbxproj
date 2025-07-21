@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		C66B28102E1825160018E7AC /* FocusTimeActivityMonitor.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E97895A52E0AFCBE00E0AF42 /* FocusTimeActivityMonitor.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C66D93522E29108800452D56 /* FocusTimeUI in Frameworks */ = {isa = PBXBuildFile; productRef = 674241722E27EFBA00500101 /* FocusTimeUI */; };
-		E96207822DD4EF2B002F037F /* (null) in Frameworks */ = {isa = PBXBuildFile; };
 		E97895A82E0AFCBF00E0AF42 /* DeviceActivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E97895A72E0AFCBE00E0AF42 /* DeviceActivity.framework */; };
 /* End PBXBuildFile section */
 
@@ -45,7 +44,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		674FA6A02DB05ACE0002FDC1 /* FocusTime.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = FocusTime.app; path = "FocusTime.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		674FA6A02DB05ACE0002FDC1 /* FocusTime.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FocusTime.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C6FE59E62E156D8B003A2199 /* FocusTimeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FocusTimeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E962077F2DD4D1E5002F037F /* FocusTimeUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = FocusTimeUI; sourceTree = "<group>"; };
 		E97895A52E0AFCBE00E0AF42 /* FocusTimeActivityMonitor.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FocusTimeActivityMonitor.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -113,7 +112,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				C66D93522E29108800452D56 /* FocusTimeUI in Frameworks */,
-				E96207822DD4EF2B002F037F /* (null) in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -397,7 +395,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -456,7 +454,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
