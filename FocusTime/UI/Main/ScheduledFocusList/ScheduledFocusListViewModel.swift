@@ -17,7 +17,7 @@ final class ScheduledFocusListViewModel {
     }
     
     private(set) var state: State
-    private let modelContainer: ModelContainer
+    private let scheduleStore: ScheduleStore
     
     var fetchTask: Task<Void, Never>?
     
@@ -26,12 +26,11 @@ final class ScheduledFocusListViewModel {
         modelContainer: ModelContainer
     ) {
         self.state = state
-        self.modelContainer = modelContainer
+        self.scheduleStore = ScheduleStore(modelContainer: modelContainer)
     }
     
     func insertTestItemsIntoDatabase() async throws {
         Task.detached(priority: .userInitiated) {
-            let scheduleStore = ScheduleStore(modelContainer: self.modelContainer)
             let itemsToInsert = Array(
                 repeating: ProtectedSchedule(
                     emoji: "🏠",
@@ -40,9 +39,10 @@ final class ScheduledFocusListViewModel {
                     startTime: TimeComponents(hour: 17, minute: 00)!,
                     endTime: TimeComponents(hour: 19, minute: 00)!
                 ),
-                count: 100000
+                count: 100
             )
-            try await scheduleStore.insertBatch(itemsToInsert)
+            try await self.scheduleStore.insertBatch(itemsToInsert)
+            
             await self.fetchNextPage()
         }
     }
@@ -50,8 +50,7 @@ final class ScheduledFocusListViewModel {
     private func fetchNextPage() {
         guard fetchTask == nil else { return }
         self.fetchTask = Task.detached(priority: .userInitiated) {
-            let scheduleStore = ScheduleStore(modelContainer: self.modelContainer)
-            let insertedItems = try? await scheduleStore.fetch(page: self.state.page)
+            let insertedItems = try? await self.scheduleStore.fetch(page: self.state.page)
             await MainActor.run {
                 self.state.items.append(contentsOf: insertedItems ?? [])
                 self.state.page += 1
