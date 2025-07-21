@@ -37,10 +37,15 @@ struct TimeComponents<Mode: TimeComponentsMode>: Codable, Hashable {
 extension TimeComponents where Mode == TimeUnit {
     /// Seconds since midnight in the current locale.
     var localizedSecondsSinceMidnight: Int {
-        let dateUTC0 = Date(timeIntervalSince1970: TimeInterval(secondsSinceMidnight))
-        let secondsInCurrentLocale = Calendar.current.component(.second, from: dateUTC0)
+        let utcDate = Date(timeIntervalSince1970: TimeInterval(secondsSinceMidnight))
         
-        return secondsInCurrentLocale
+        var utcCalendar = Calendar.current
+        utcCalendar.timeZone = .gmt // We use GMT+0 since timeIntervalSince1970 is initialized relative to 00:00:00 UTC.
+        
+        let utcStartOfDay = utcCalendar.startOfDay(for: utcDate)
+        let secondsSinceLocalMidnight = Int(utcDate.timeIntervalSince(utcStartOfDay))
+        
+        return secondsSinceLocalMidnight
     }
     
     /// Returns localized time string in the user's current calendar and time zone,

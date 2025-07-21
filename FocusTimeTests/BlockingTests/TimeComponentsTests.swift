@@ -89,22 +89,13 @@ struct TimeComponentsTests {
     
     @Test("localizedTimeSince1970 returns expected seconds in local time",
           arguments: [
-            (0, 0),
-            (12, 34),
-            (23, 59)
+            (0, 0, 0),
+            (12, 34, 45_240),
+            (23, 59, 86_340)
           ]
     )
-    func testLocalizedTimeSince1970(hour: Int, minute: Int) async throws {
+    func testLocalizedTimeSince1970(hour: Int, minute: Int, expectedSeconds: Int) async throws {
         let timeComponents = TimeComponents<TimeUnit>(hour: hour, minute: minute)
-        var utcCalendar = Calendar.current
-        utcCalendar.timeZone = .gmt
-        
-        var components = DateComponents()
-        components.hour = hour
-        components.minute = minute
-        
-        let date = try #require(utcCalendar.date(from: components))
-        let expectedSeconds = utcCalendar.component(.second, from: date)
         #expect(
             timeComponents.localizedSecondsSinceMidnight == expectedSeconds,
             "Expected localizedTimeSince1970 to be \(expectedSeconds), got \(timeComponents.localizedSecondsSinceMidnight)"
