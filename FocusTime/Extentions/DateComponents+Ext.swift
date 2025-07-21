@@ -24,8 +24,8 @@ extension DateComponents {
         guard let hour = self.hour, let minute = self.minute else { return nil }
 
         let totalMinutes = hour * 60 + minute + minutes
-        let newHour = (totalMinutes / 60) % 24
-        let newMinute = totalMinutes % 60
+        let newHour = ((totalMinutes / 60) % 24 + 24) % 24
+        let newMinute = ((totalMinutes % 60) + 60) % 60
 
         return DateComponents(hour: newHour, minute: newMinute)
     }

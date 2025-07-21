@@ -30,7 +30,6 @@ struct ProtectedBlockItem: ProtectedModel {
         schedulesDescription: String = "No schedules"
     ) {
         self.id = id
-        self.id = id
         self.persistentModelID = persistentModelID
         self.emoji = emoji
         self.name = name
