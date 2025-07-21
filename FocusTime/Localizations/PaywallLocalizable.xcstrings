@@ -65,7 +65,7 @@
       }
     },
     "onboarding_paywall_feature_deep_focus" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -76,7 +76,7 @@
       }
     },
     "onboarding_paywall_feature_priority_features" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -87,7 +87,7 @@
       }
     },
     "onboarding_paywall_feature_unlimited_apps" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -98,7 +98,7 @@
       }
     },
     "onboarding_paywall_feature_unlimited_sessions" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -109,7 +109,7 @@
       }
     },
     "onboarding_paywall_feature_white_noise" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -279,112 +279,12 @@
         }
       }
     },
-    "shared_paywall_app_name_fallback" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "App Name"
-          }
-        }
-      }
-    },
-    "shared_paywall_app_slogan" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Focus within minutes"
-          }
-        }
-      }
-    },
-    "shared_paywall_dismiss_button_title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dismiss current screen."
-          }
-        }
-      }
-    },
     "shared_paywall_error_header" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "An error occurred"
-          }
-        }
-      }
-    },
-    "shared_paywall_loading_title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Loading..."
-          }
-        }
-      }
-    },
-    "shared_paywall_paid_once" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Paid once"
-          }
-        }
-      }
-    },
-    "shared_paywall_pending_title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pending..."
-          }
-        }
-      }
-    },
-    "shared_paywall_purchased_title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Purchased!"
-          }
-        }
-      }
-    },
-    "shared_paywall_subscribe_button_title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Subscribe"
-          }
-        }
-      }
-    },
-    "shared_paywall_subscribed_title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Subscribed!"
-          }
-        }
-      }
-    },
-    "shared_paywall_view_plans_button" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "View All Plans"
           }
         }
       }

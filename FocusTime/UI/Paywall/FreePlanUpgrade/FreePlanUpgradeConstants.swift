@@ -36,8 +36,8 @@ extension FreePlanUpgradeView {
                 return String(format: formatString, localPrice)
             }()
             
-            static let pendingTitle = SharedPaywallConstants.Strings.pendingTitle
-            static let subscribedTitle = SharedPaywallConstants.Strings.subscribedTitle
+            static let pendingTitle = SharedConstants.Strings.pendingTitle
+            static let subscribedTitle = SharedConstants.Strings.subscribedTitle
             
             // Other buttons
             static let viewPlansButton = SharedConstants.Strings.viewPlansButton

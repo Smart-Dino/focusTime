@@ -1,7 +1,16 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Add a block" : {
+
+    },
     "Dismiss current screen." : {
+
+    },
+    "pro" : {
+
+    },
+    "Toggle schedule" : {
 
     }
   },

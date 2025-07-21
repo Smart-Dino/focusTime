@@ -1,5 +1,5 @@
 //
-//  SharedPaywallConstants.swift
+//  SharedConstants.swift
 //  FocusTime
 //
 //  Created by Maksym Horobets on 26.05.2025.
@@ -11,21 +11,21 @@ enum SharedConstants {
     
     // MARK: - Strings
     enum Strings {
-        static let appName = SharedAppValues.appName ?? String(localized: "shared_paywall_app_name_fallback", table: "PaywallLocalizable")
-        static let appSlogan = String(localized: "shared_paywall_app_slogan", table: "PaywallLocalizable")
+        static let appName = SharedAppValues.appName ?? String(localized: "shared_app_name_fallback", table: "SharedLocalizable")
+        static let appSlogan = String(localized: "shared_app_slogan", table: "SharedLocalizable")
         
-        static let errorHeader = String(localized: "shared_paywall_error_header", table: "PaywallLocalizable")
-        static let dismissButtonTitle = String(localized: "shared_paywall_dismiss_button_title", table: "PaywallLocalizable")
-        static let viewPlansButton = String(localized: "shared_paywall_view_plans_button", table: "PaywallLocalizable")
-        static let subscribeButtonTitle = String(localized: "shared_paywall_subscribe_button_title", table: "PaywallLocalizable")
+        static let errorHeader = String(localized: "shared_error_header", table: "SharedLocalizable")
+        static let dismissButtonTitle = String(localized: "shared_dismiss_button_title", table: "SharedLocalizable")
+        static let viewPlansButton = String(localized: "shared_view_plans_button", table: "SharedLocalizable")
+        static let subscribeButtonTitle = String(localized: "shared_subscribe_button_title", table: "SharedLocalizable")
         // Lifetime
-        static let paidOnce = String(localized: "shared_paywall_paid_once", table: "PaywallLocalizable")
+        static let paidOnce = String(localized: "shared_paid_once", table: "SharedLocalizable")
         // Button states
-        static let loadingTitle = String(localized: "shared_paywall_loading_title", table: "PaywallLocalizable")
-        static let pendingTitle = String(localized: "shared_paywall_pending_title", table: "PaywallLocalizable")
-        static let subscribeTitle = String(localized: "shared_paywall_subscribe_button_title", table: "PaywallLocalizable")
-        static let subscribedTitle = String(localized: "shared_paywall_subscribed_title", table: "PaywallLocalizable")
-        static let purchasedTitle = String(localized: "shared_paywall_purchased_title", table: "PaywallLocalizable")
+        static let loadingTitle = String(localized: "shared_loading_title", table: "SharedLocalizable")
+        static let pendingTitle = String(localized: "shared_pending_title", table: "SharedLocalizable")
+        static let subscribeTitle = String(localized: "shared_subscribe_button_title", table: "SharedLocalizable")
+        static let subscribedTitle = String(localized: "shared_subscribed_title", table: "SharedLocalizable")
+        static let purchasedTitle = String(localized: "shared_purchased_title", table: "SharedLocalizable")
     }
     
     // MARK: - Typography
