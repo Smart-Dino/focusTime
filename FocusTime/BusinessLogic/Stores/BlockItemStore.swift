@@ -10,7 +10,7 @@ import Foundation
 import FamilyControls
 
 @ModelActor
-actor BlockItemStore: PersistenceStore { 
+actor BlockItemStore: PersistenceStore {
     
     @discardableResult
     func insert(_ item: ProtectedBlockItem) throws -> PersistentIdentifier {
@@ -88,7 +88,8 @@ extension BlockItemStore {
             predicate: #Predicate { $0.id == id }
         )
         
-        guard let model = try? modelContext.fetch(descriptor).first else {
+        let results = try modelContext.fetch(descriptor)
+        guard let model = results.first else {
             throw PersistenceStoreError.notFound
         }
         

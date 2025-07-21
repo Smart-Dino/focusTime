@@ -14,7 +14,3 @@ protocol ProtectedModel: Sendable, Identifiable {
     
     init(from item: Model)
 }
-
-extension ProtectedModel {
-    var id: Int { persistentModelID?.id.hashValue ?? UUID().hashValue }
-}
