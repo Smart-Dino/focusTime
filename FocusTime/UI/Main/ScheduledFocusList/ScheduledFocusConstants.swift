@@ -11,10 +11,10 @@ extension ScheduledFocusListView {
     enum Constants {
         // MARK: - Strings
         enum Strings {
-            static let navTitle = "Scheduled focus"
-            static let noSchedulesTitle = "Create Your First Session 🙌"
-            static let noSchedulesMessage = "Boost your productivity by automatically blocking distracting apps."
-            static let newSessionButtonTitle = "Scheduled Session"
+            static let navTitle = String(localized: "scheduled_focus_list_nav_title", table: "MainLocalizable")
+            static let noSchedulesTitle = String(localized: "scheduled_focus_list_no_schedules_title", table: "MainLocalizable")
+            static let noSchedulesMessage = String(localized: "scheduled_focus_list_no_schedules_message", table: "MainLocalizable")
+            static let newSessionButtonTitle = String(localized: "scheduled_focus_list_new_session_button_title", table: "MainLocalizable")
         }
         // MARK: - Icons
         enum Icons {
