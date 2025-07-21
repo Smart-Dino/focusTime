@@ -9,45 +9,52 @@ import ManagedSettings
 import ManagedSettingsUI
 import UIKit
 
-struct ShieldUIRepo {
-    static let whaleShield = ShieldConfiguration(
-        backgroundBlurStyle: .dark,
-        backgroundColor: .darkBackground,
-        icon: .whale,
-        title: .init(text: "You’re in the zone.", color: .white),
-        subtitle: .init(
-            text: "You’ve already set sail into focus waters. This app can wait. Your goals can't.",
-            color: .secondaryLabel.resolvedColor(with: .init(userInterfaceStyle: .dark))
-        ),
-        primaryButtonLabel: .init(text: "Ignore the noise", color: .white),
-        primaryButtonBackgroundColor: .mainBlue,
-    )
+// The properties of this enum are computed because ShieldConfiguration is not sendable
+// to be stored and then sent to anywhere.
+enum ShieldUIRepo {
+    static var whaleShield: ShieldConfiguration {
+        ShieldConfiguration(
+            backgroundBlurStyle: .dark,
+            backgroundColor: .darkBackground,
+            icon: .whale,
+            title: .init(text: String(localized: "shield_whale_title"), color: .white),
+            subtitle: .init(
+                text: String(localized: "shield_whale_subtitle"),
+                color: .secondaryLabel.resolvedColor(with: .init(userInterfaceStyle: .dark))
+            ),
+            primaryButtonLabel: .init(text: String(localized: "shield_whale_button"), color: .white),
+            primaryButtonBackgroundColor: .mainBlue,
+        )
+    }
     
-    static let waveIconShield = ShieldConfiguration(
-        backgroundBlurStyle: .dark,
-        backgroundColor: .darkBackground,
-        icon: .waveIcon,
-        title: .init(text: "Interrupting the tide?", color: .white),
-        subtitle: .init(
-            text: "This app is off-limits during your DeepWave session. Take a breath, ride it through — the wave will carry you further.",
-            color: .secondaryLabel.resolvedColor(with: .init(userInterfaceStyle: .dark))
-        ),
-        primaryButtonLabel: .init(text: "Stay in flow", color: .white),
-        primaryButtonBackgroundColor: .mainBlue,
-    )
+    static var waveIconShield: ShieldConfiguration {
+        ShieldConfiguration(
+            backgroundBlurStyle: .dark,
+            backgroundColor: .darkBackground,
+            icon: .waveIcon,
+            title: .init(text: String(localized: "shield_wave_title"), color: .white),
+            subtitle: .init(
+                text: String(localized: "shield_wave_subtitle"),
+                color: .secondaryLabel.resolvedColor(with: .init(userInterfaceStyle: .dark))
+            ),
+            primaryButtonLabel: .init(text: String(localized: "shield_wave_button"), color: .white),
+            primaryButtonBackgroundColor: .mainBlue,
+        )
+    }
     
-    static let surferShield = ShieldConfiguration(
-        backgroundBlurStyle: .dark,
-        backgroundColor: .darkBackground,
-        icon: .waveSurfer,
-        title: .init(text: "You're drifting off course...", color: .white),
-        subtitle: .init(
-            text: "This app isn’t part of your current focus. Stay in the deep, ride the wave — and let productivity flow.",
-            color: .secondaryLabel.resolvedColor(with: .init(userInterfaceStyle: .dark))
-        ),
-        primaryButtonLabel: .init(text: "Back to the flow", color: .white),
-        primaryButtonBackgroundColor: .mainBlue,
-    )
-    
-    private init () { }
+    static var surferShield: ShieldConfiguration {
+        ShieldConfiguration(
+            backgroundBlurStyle: .dark,
+            backgroundColor: .darkBackground,
+            icon: .waveSurfer,
+            title: .init(text: String(localized: "shield_surfer_title"), color: .white),
+            subtitle: .init(
+                text: String(localized: "shield_surfer_subtitle"),
+                color: .secondaryLabel.resolvedColor(with: .init(userInterfaceStyle: .dark))
+            ),
+            primaryButtonLabel: .init(text: String(localized: "shield_surfer_button"), color: .white),
+            primaryButtonBackgroundColor: .mainBlue,
+        )
+    }
 }
+
