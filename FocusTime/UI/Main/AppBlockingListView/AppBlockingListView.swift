@@ -49,7 +49,7 @@ struct AppBlockingListView: View {
             Button(Constants.Strings.newBlocklistButtonTitle, systemImage: "plus.circle") {
                 #warning("Placeholder code")
                 Task {
-                    try await viewModel.insertTestItemsIntoDatabase()
+                    await viewModel.insertTestItemsIntoDatabase()
                 }
             }
             .buttonStyle(.ftPrimary)
@@ -62,6 +62,18 @@ struct AppBlockingListView: View {
         }
         .preferredColorScheme(.dark)
         .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+        .alert(
+            SharedConstants.Strings.errorHeader,
+            isPresented: Binding(get: {
+                viewModel.state.error != nil
+            }, set: { showError in
+                viewModel.keepShowingError(showError: showError)
+            }), actions: {
+                // OK dismissal button by default
+            }, message: {
+                Text(viewModel.state.error?.localizedDescription ?? "")
+            }
+        )
     }
     
     var blockListView: some View {
