@@ -21,7 +21,7 @@ protocol PaymentManager: Actor {
     // MARK: - Service
     /// Used to load/reload data into payment manager's public and private properties.
     /// - Important: Recommended to use on every paywall screen launch. Access the needed data after awaiting this method.
-    func reloadData() async
+    func reloadData() async throws
     
     // MARK: - Convenience
     /// Returns the `FTProduct` associated with the given product identifier.
@@ -82,22 +82,26 @@ actor MockPaymentManagerWithPurchaseError: PaymentManager {
     ) {
         self.isPro = isPro
         self.trialUsed = trialUsed
-        self.products = [
-            FTProduct.Mocks.weekly.product,
-            FTProduct.Mocks.monthly.product
-        ]
+        do {
+            self.products = [
+                try FTProduct.Mocks.weekly.product,
+                try FTProduct.Mocks.monthly.product
+            ]
+        } catch {
+            self.products = []
+        }
     }
 
     // MARK: - Methods
     func isProUserChangesStream() -> AsyncStream<Bool> {
         AsyncStream { continuation in
-            continuation.yield(true)
+            continuation.yield(isPro)
         }
     }
 
     func eligibleForIntro(product: FTProduct) async throws(PaymentError) -> Bool {
         if !trialUsed {
-            if products.first(where: { $0.trialPeriod != nil }) != nil {
+            if product.trialPeriod != nil {
                 return true
             }
         }

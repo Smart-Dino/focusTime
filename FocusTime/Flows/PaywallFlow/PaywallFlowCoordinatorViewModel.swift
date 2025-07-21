@@ -32,14 +32,14 @@ final class PaywallFlowCoordinatorViewModel {
     }
     private(set) var flowState: State!
     
-    let tiralProductID: String
-    let superPaywallVM: SuperPaywallViewModel
+    private let trialProductID: String
+    private let superPaywallVM: SuperPaywallViewModel
     
     init(
         trialProductID: StoreKitProductIdentifiers = .trialableWeekly,
         superPaywallVM: SuperPaywallViewModel
     ) {
-        self.tiralProductID = trialProductID.id
+        self.trialProductID = trialProductID.id
         self.superPaywallVM = superPaywallVM
         self.flowState = State(
 //            currentFlow: .freePlan(self.makeFreePlanUpgradeViewModel(requestedProductID: self.tiralProductID))

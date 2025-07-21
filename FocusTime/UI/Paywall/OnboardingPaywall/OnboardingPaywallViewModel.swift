@@ -122,9 +122,7 @@ final class OnboardingPaywallViewModel {
 
 extension OnboardingPaywallViewModel: SuperPaywallViewModelDelegate {
     func didChangeUserEntitlementStatus(isPro: Bool) {
-        Task { [weak self] in
-            guard let self else { return }
-            
+        Task {
             await self.superPaywallVM.updatePurchaseResultForSelectedProduct(
                 state: self.state.superState
             )

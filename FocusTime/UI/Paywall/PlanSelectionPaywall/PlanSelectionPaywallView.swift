@@ -120,8 +120,8 @@ struct PlanSelectionPaywallView: View {
         .task {
             // Do NOT put these in the initializer
             await viewModel.fetchProducts()
-            await viewModel.checkIfUserIsEligibleForFreeTrial()
             viewModel.selectFirstProductIfNeeded()
+            await viewModel.checkIfUserIsEligibleForFreeTrial()
             viewModel.configureBottomSectionForSelectedProduct()
         }
     }
@@ -138,28 +138,7 @@ struct PlanSelectionPaywallView: View {
         ScrollView(.vertical) {
             VStack(spacing: Constants.Padding.featuresSpacing) {
                 ForEach(viewModel.state.superState.allProducts) { product in
-                    let isTrial = (product.trialPeriod != nil)
-                    && (viewModel.state.superState.isEligibleForIntro)
-                    
-                    let subtitle: String? = isTrial
-                    ? product.subscriptionPeriodDescription
-                    : nil
-                    
-                    let descriptionText: String = isTrial
-                    ? viewModel.getTrialTerms(for: product)
-                    : product.priceString
-                    
-                    Button {
-                        viewModel.selectProduct(product)
-                    } label: {
-                        FTProductOptionView(
-                            leadingTitle: product.title,
-                            leadingSubtitle: subtitle,
-                            trailingDescription: descriptionText
-                        )
-                        .selected(viewModel.state.superState.selectedProduct == product)
-                    }
-                    .buttonStyle(.plain)
+                    setupCell(for: product)
                 }
             }
             // Add this padding to make sure the views don't get clipped
@@ -178,6 +157,31 @@ struct PlanSelectionPaywallView: View {
             FTDismissToolbarButtonView(dismissAction: viewModel.dismissView)
         }
     }
+    
+    func setupCell(for product: FTProduct) -> some View {
+        let isTrial = (product.trialPeriod != nil)
+        && (viewModel.state.superState.isEligibleForIntro)
+        
+        let subtitle = isTrial
+        ? product.subscriptionPeriodDescription
+        : nil
+        
+        let descriptionText = isTrial
+        ? viewModel.getTrialTerms(for: product)
+        : product.priceString
+        
+        return Button {
+            viewModel.selectProduct(product)
+        } label: {
+            FTProductOptionView(
+                leadingTitle: product.title,
+                leadingSubtitle: subtitle,
+                trailingDescription: descriptionText
+            )
+            .selected(viewModel.state.superState.selectedProduct == product)
+        }
+        .buttonStyle(.plain)
+    }
 }
 
 #Preview("Trial unused") {
@@ -195,20 +199,6 @@ struct PlanSelectionPaywallView: View {
 
 #Preview("Trial used") {
     let paymentManager = MockPaymentManagerWithPurchaseError(trialUsed: true)
-    NavigationStack {
-        PlanSelectionPaywallView(
-            viewModel: .init(
-                superPaywallVM: .init(paymentManager: paymentManager),
-                flowDelegate: nil
-            )
-        )
-        .preferredColorScheme(.dark)
-    }
-}
-
-
-#Preview("StoreKit Manager") {
-    let paymentManager = StoreKitPaymentManager()
     NavigationStack {
         PlanSelectionPaywallView(
             viewModel: .init(

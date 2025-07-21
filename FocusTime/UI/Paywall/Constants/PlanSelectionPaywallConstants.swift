@@ -21,17 +21,17 @@ extension PlanSelectionPaywallView {
         
         // MARK: - Strings
         enum Strings {
-            static let navigationTitle = "Get DeepWave Pro"
-            static let loadingTitle = SharedConstants.Strings.loadingTitle
+            static let navigationTitle = String(localized: "plan_selection_paywall_navigation_title", table: "PaywallLocalizable")
+            static let loadingTitle = SharedPaywallConstants.Strings.loadingTitle
             // Title text for the subscription trial button.
-            static let startFreeTrial = "Start Free Trial"
-            static let subscribeButtonTitle = SharedConstants.Strings.subscribeButtonTitle
-            static let subscribedTitle = SharedConstants.Strings.subscribedTitle
-            static let purchasedTitle = SharedConstants.Strings.purchasedTitle
+            static let startFreeTrial = String(localized: "plan_selection_paywall_start_free_trial_button", table: "PaywallLocalizable")
+            static let subscribeButtonTitle = SharedPaywallConstants.Strings.subscribeButtonTitle
+            static let subscribedTitle = SharedPaywallConstants.Strings.subscribedTitle
+            static let purchasedTitle = SharedPaywallConstants.Strings.purchasedTitle
             
             // Trial-related
-            static let trialDescription = "Try Free For 3 days"
-            static let noPaymentMessage = "No payment due now!"
+            static let trialDescription = String(localized: "plan_selection_paywall_trial_description_3_days", table: "PaywallLocalizable")
+            static let noPaymentMessage = String(localized: "plan_selection_paywall_no_payment_message", table: "PaywallLocalizable")
             
             // Lifetime
             static let paidOnce = SharedConstants.Strings.paidOnce
@@ -40,9 +40,9 @@ extension PlanSelectionPaywallView {
             static let dismissButtonTitle = SharedConstants.Strings.dismissButtonTitle
             
             // Error
-            static let errorHeader = SharedConstants.Strings.errorHeader
-            static let defaultTrialError = "Unable to load trial information."
-            static let subscribeButtonTerms  = "Subscription automatically renews unless canceled. You can cancel anytime."
+            static let errorHeader = SharedPaywallConstants.Strings.errorHeader
+            static let defaultTrialError = String(localized: "plan_selection_paywall_default_trial_error", table: "PaywallLocalizable")
+            static let subscribeButtonTerms  = String(localized: "plan_selection_paywall_subscription_terms", table: "PaywallLocalizable")
         }
         
     }

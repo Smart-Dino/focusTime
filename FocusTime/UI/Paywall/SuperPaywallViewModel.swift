@@ -27,9 +27,6 @@ final class SuperPaywallViewModel {
         
         // Product
         var allProducts: [FTProduct] = []
-        //        var trialProducts: [FTProduct] {
-        //            allProducts.filter({ $0.trialPeriod != nil })
-        //        }
         
         // Purchase
         var selectedProduct: FTProduct?
@@ -71,7 +68,7 @@ final class SuperPaywallViewModel {
     // A deinitializer is called immediately before a class instance is deallocated
     // - so we should have access to self.state before it deinits?
     deinit {
-        Task { [weak self] in
+        Task { [weak self] in // Capture of 'self' in a closure that outlives deinit.
             await self?.subscriptionTask?.cancel()
         }
     }
@@ -81,8 +78,7 @@ final class SuperPaywallViewModel {
         print(#function)
         subscriptionTask?.cancel()
         
-        subscriptionTask = Task { [weak self] in
-            guard let self else { return }
+        subscriptionTask = Task {
             for await isPro in await self.paymentManager.isProUserChangesStream() {
                 self.delegate?.didChangeUserEntitlementStatus(isPro: isPro)
             }
@@ -122,9 +118,13 @@ final class SuperPaywallViewModel {
     
     // MARK: - Update state
     func fetchProducts(state: State) async {
-        await paymentManager.reloadData()
-        let products = await paymentManager.products
-        state.allProducts = products
+        do {
+            try await paymentManager.reloadData()
+            let products = await paymentManager.products
+            state.allProducts = products
+        } catch {
+            state.error = error
+        }
     }
     
     func updatePurchaseResultForSelectedProduct(state: State) async {

@@ -17,24 +17,27 @@ extension FreePlanUpgradeView {
         // MARK: - FreeplanUpgrade Strings
         enum Strings {
             /// Body message of the upgrade view.
-            static var upgradeMessage: AttributedString {
-                var string = AttributedString("Upgrade to have unlimited scheduled sessions with Pro version")
-                if let range = string.range(of: "Pro version") {
-                    string[range].font = .body.bold()
-                }
-                return string
-            }
+            static let upgradeMessage = AttributedString(localized: "free_plan_upgrade_message", table: "PaywallLocalizable")
             
             // Title of the view.
-            static let title = "You're on a Free Plan"
+            static let title = String(localized: "free_plan_upgrade_title", table: "PaywallLocalizable")
             
             // Loading state
             static let loadingTitle = SharedConstants.Strings.loadingTitle
             
             // Purchase button states
-            static let tryButtonTitle = "Try For $0,00"
-            static let pendingTitle = SharedConstants.Strings.pendingTitle
-            static let subscribedTitle = SharedConstants.Strings.subscribedTitle
+            static let tryButtonTitle: String = {
+                let localPrice = Decimal(0).formatted(
+                    .currency(code: Locale.current.currency?.identifier ?? "USD")
+                        .presentation(.narrow)
+                        .rounded()
+                )
+                let formatString = String(localized: "free_plan_upgrade_try_for_price", table: "PaywallLocalizable")
+                return String(format: formatString, localPrice)
+            }()
+            
+            static let pendingTitle = SharedPaywallConstants.Strings.pendingTitle
+            static let subscribedTitle = SharedPaywallConstants.Strings.subscribedTitle
             
             // Other buttons
             static let viewPlansButton = SharedConstants.Strings.viewPlansButton

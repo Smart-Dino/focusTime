@@ -25,19 +25,19 @@ enum PaymentError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .pending:
-            "The purchase is pending approval, possibly requiring parental or bank authorization. You'll be notified once it's complete."
+            String(localized: "payment_error_pending_description", table: "PaywallLocalizable")
         case .userCancelled:
-            "The purchase was cancelled by the user."
+            String(localized: "payment_error_user_cancelled_description", table: "PaywallLocalizable")
         case .failedVerification:
-            "The purchase could not be verified. Please try again later."
+            String(localized: "payment_error_failed_verification_description", table: "PaywallLocalizable")
         case .purchaseInProgress:
-            "A purchase is already in progress. Please wait until it completes."
+            String(localized: "payment_error_purchase_in_progress_description", table: "PaywallLocalizable")
         case .productNotFound:
-            "The requested product could not be found."
+            String(localized: "payment_error_product_not_found_description", table: "PaywallLocalizable")
         case .eligibilityCheckFail:
-            "Could not check whether the user is eligible for trial for the given subscription group."
+            String(localized: "payment_error_eligibility_check_fail_description", table: "PaywallLocalizable")
         case .unknown:
-            "An unknown error occurred during the purchase."
+            String(localized: "payment_error_unknown_description", table: "PaywallLocalizable")
         }
     }
 }

@@ -26,4 +26,12 @@ struct FocusTimeApp: App {
         
         self.modelContainer = container
     }
+    
+    init() {
+        let schema = Schema([BlockItem.self, Schedule.self])
+        let config = ModelConfiguration(isStoredInMemoryOnly: true, groupContainer: .identifier(AppValues.appGroupIdentifier))
+        let container = try! ModelContainer(for: schema, configurations: config)
+        
+        self.modelContainer = container
+    }
 }

@@ -19,22 +19,40 @@ final class SlideOnboardingViewModel {
     struct State {
         var currentIndex: Int = 0
         var showSkipConfirmation: Bool = false
+        let progressItems: [SlideOnboardingStep] = SlideOnboardingStep.allCases
+        
+        var currentStep: SlideOnboardingStep {
+            SlideOnboardingStep.allCases[currentIndex]
+        }
     }
     
-    var state = State()
+    private(set) var state = State()
+
     
-    var currentStep: SlideOnboardingStep {
-        SlideOnboardingStep.allCases[state.currentIndex]
+    var isSkipConfirmationPresented: Binding<Bool> {
+        Binding {
+            self.state.showSkipConfirmation
+        } set: { newValue in
+            self.state.showSkipConfirmation = newValue
+        }
     }
     
     func goToNextStep() {
-        if state.currentIndex < SlideOnboardingStep.allCases.count - 1 {
+        if state.currentIndex < state.progressItems.count - 1 {
             state.currentIndex += 1
         }
+    }
+    
+    func requestSkipConfirmation() {
+        state.showSkipConfirmation = true
     }
 
     func skipOnboarding() {
         // TODO: - Navigate to main app flow
-        state.currentIndex = SlideOnboardingStep.allCases.count - 1
+        state.currentIndex = state.progressItems.count - 1
     }
+    
+    func cancelSkipConfirmation() {
+         state.showSkipConfirmation = false
+     }
 }

@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		E96207822DD4EF2B002F037F /* FocusTimeUI in Frameworks */ = {isa = PBXBuildFile; productRef = E96207812DD4EF2B002F037F /* FocusTimeUI */; };
+		674241732E27EFBA00500101 /* FocusTimeUI in Frameworks */ = {isa = PBXBuildFile; productRef = 674241722E27EFBA00500101 /* FocusTimeUI */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,7 +44,14 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E96207822DD4EF2B002F037F /* FocusTimeUI in Frameworks */,
+				674241732E27EFBA00500101 /* FocusTimeUI in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C6FE59E32E156D8B003A2199 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -58,11 +65,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		6742416F2E27EED600500101 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		674FA6972DB05ACE0002FDC1 = {
 			isa = PBXGroup;
 			children = (
+				0C60F8872E12BDF000EEA3F3 /* OnboardingLocalizable.xcstrings */,
 				E962077F2DD4D1E5002F037F /* FocusTimeUI */,
 				674FA6A22DB05ACE0002FDC1 /* FocusTime */,
+				6742416F2E27EED600500101 /* Frameworks */,
 				C6FE59E72E156D8B003A2199 /* FocusTimeTests */,
 				674FA6A12DB05ACE0002FDC1 /* Products */,
 			);
@@ -97,10 +113,10 @@
 			);
 			name = FocusTime;
 			packageProductDependencies = (
-				E96207812DD4EF2B002F037F /* FocusTimeUI */,
+				674241722E27EFBA00500101 /* FocusTimeUI */,
 			);
 			productName = FocusTime;
-			productReference = 674FA6A02DB05ACE0002FDC1 /* FocusTime.app */;
+			productReference = 674FA6A02DB05ACE0002FDC1 /* "FocusTime".app */;
 			productType = "com.apple.product-type.application";
 		};
 		C6FE59E52E156D8B003A2199 /* FocusTimeTests */ = {
@@ -132,8 +148,8 @@
 		674FA6982DB05ACE0002FDC1 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 2600;
+				BuildIndependentTargetsInParallel = YES;
+				LastSwiftUpdateCheck = 1620;
 				LastUpgradeCheck = 1620;
 				TargetAttributes = {
 					674FA69F2DB05ACE0002FDC1 = {
@@ -155,7 +171,6 @@
 			mainGroup = 674FA6972DB05ACE0002FDC1;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				E96207802DD4EF2B002F037F /* XCLocalSwiftPackageReference "FocusTimeUI" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 674FA6A12DB05ACE0002FDC1 /* Products */;
@@ -173,6 +188,15 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0C60F8882E12BDF100EEA3F3 /* OnboardingLocalizable.xcstrings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C6FE59E42E156D8B003A2199 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0C60F8882E12BDF100EEA3F3 /* OnboardingLocalizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -270,7 +294,9 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
 			};
 			name = Debug;
 		};
@@ -326,6 +352,8 @@
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -354,9 +382,9 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dino.smart.FocusTime;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "\"$(TARGET_NAME)\"";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = FocusTimeProvisioning;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -376,6 +404,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"FocusTime/Preview Content\"";
 				DEVELOPMENT_TEAM = 242HT6L8AJ;
 				ENABLE_PREVIEWS = YES;
+				GCC_OPTIMIZATION_LEVEL = s;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -387,9 +416,9 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dino.smart.FocusTime;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "\"$(TARGET_NAME)\"";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -468,15 +497,8 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		E96207802DD4EF2B002F037F /* XCLocalSwiftPackageReference "FocusTimeUI" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = FocusTimeUI;
-		};
-/* End XCLocalSwiftPackageReference section */
-
 /* Begin XCSwiftPackageProductDependency section */
-		E96207812DD4EF2B002F037F /* FocusTimeUI */ = {
+		674241722E27EFBA00500101 /* FocusTimeUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = FocusTimeUI;
 		};

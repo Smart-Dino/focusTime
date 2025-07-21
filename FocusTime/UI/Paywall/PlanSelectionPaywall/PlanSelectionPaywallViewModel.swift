@@ -108,11 +108,8 @@ final class PlanSelectionPaywallViewModel {
     
     private func configurePurchaseButtonAvailabilityBasedOnSelectedProduct() {
         guard let product = state.superState.selectedProduct else { return }
-        state.superState.isButtonDisabled = true
         
-        Task { [weak self] in
-            guard let self else { return }
-            
+        Task {
             if await superPaywallVM.isProductPurchased(product) {
                 state.superState.isButtonDisabled = true
                 
@@ -129,7 +126,9 @@ final class PlanSelectionPaywallViewModel {
     }
     
     func getTrialTerms(for product: FTProduct) -> String {
-        "Get \(product.trialPeriodString ?? "0 days") for free!"
+        let fallback = String(localized: "common_zero_days", table: "PaywallLocalizable")
+        let formatString = String(localized: "plan_selection_get_trial_for_free", table: "PaywallLocalizable")
+        return String(format: formatString, product.trialPeriodString ?? fallback)
     }
     
     // MARK: Actions
@@ -146,9 +145,7 @@ final class PlanSelectionPaywallViewModel {
 
 extension PlanSelectionPaywallViewModel: SuperPaywallViewModelDelegate {
     func didChangeUserEntitlementStatus(isPro: Bool) {
-        Task { [weak self] in
-            guard let self else { return }
-            
+        Task {
             await self.superPaywallVM.updatePurchaseResultForSelectedProduct(
                 state: self.state.superState
             )
