@@ -21,7 +21,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		674FA6A02DB05ACE0002FDC1 /* FocusTime.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = FocusTime.app; path = "FocusTime.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		674FA6A02DB05ACE0002FDC1 /* FocusTime.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FocusTime.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C6FE59E62E156D8B003A2199 /* FocusTimeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FocusTimeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E962077F2DD4D1E5002F037F /* FocusTimeUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = FocusTimeUI; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -422,7 +422,7 @@
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FocusTime.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FocusTime";
 			};
@@ -442,7 +442,7 @@
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FocusTime.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FocusTime";
 			};
