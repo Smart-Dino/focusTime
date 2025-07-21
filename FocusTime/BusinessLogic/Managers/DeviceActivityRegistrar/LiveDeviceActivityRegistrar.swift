@@ -11,13 +11,14 @@ import FamilyControls
 
 @MainActor
 final class LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
+    private static let fallbackIntervalMinutes = 15
     
     private let center: DeviceActivityCenter
     
     var monitoredIdentifiers: Set<UUID> {
         Set(center.activities.compactMap {
-            let uuidString = $0.rawValue.components(separatedBy: .whitespaces)[0]
-            return UUID(uuidString: uuidString)
+            guard let identifier = try? CodableActivityIdentifier(from: $0) else { return nil }
+            return identifier.scheduleID
         })
     }
     
@@ -63,7 +64,8 @@ final class LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         
         let intervalStart = schedule.startTime.dateComponents
         // Shift interval end to satisfy DeviceActivityCenter - workaround.
-        guard let intervalEnd = schedule.endTime.dateComponents.adding(minutes: 15) else {
+        guard let intervalEnd = schedule.endTime.dateComponents.adding(minutes: Self.fallbackIntervalMinutes)
+        else {
             throw ShieldManagerError.couldNotSetTime
         }
         let deviceActivitySchedule = DeviceActivitySchedule(intervalStart: intervalStart,

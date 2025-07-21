@@ -13,13 +13,13 @@ import Foundation
 /// A simplified alternative to `DateComponents` that works with SwiftData.
 /// Represents a time of day in hours and minutes, stored as seconds since midnight (00:00:00 UTC).
 struct TimeComponents: Codable, Hashable, CustomStringConvertible {
-    let timeSince1970: Int
+    let secondsSinceMidnight: Int
     
     /// Initializes with seconds since midnight (00:00:00 UTC).
     /// - Parameter secondsSince1970: Number of seconds since midnight; must be in range 0..<86400.
     init?(secondsSince1970: Int) {
         guard (0..<24*60*60).contains(secondsSince1970) else { return nil }
-        self.timeSince1970 = secondsSince1970
+        self.secondsSinceMidnight = secondsSince1970
     }
     
     /// Initializes with hour and minute components.
@@ -31,7 +31,7 @@ struct TimeComponents: Codable, Hashable, CustomStringConvertible {
         let hoursAsSeconds = hour * 60 * 60
         let minutesAsSeconds = minute * 60
         let totalSeconds = hoursAsSeconds + minutesAsSeconds
-        self.timeSince1970 = totalSeconds
+        self.secondsSinceMidnight = totalSeconds
     }
     
     /// Initializes from a Date, extracting the hour and minute in GMT timezone.
@@ -64,7 +64,7 @@ struct TimeComponents: Codable, Hashable, CustomStringConvertible {
         var utcCalendar = Calendar.current
         utcCalendar.timeZone = .gmt // We use GMT+0 since timeIntervalSince1970 is initialized relative to 00:00:00 UTC.
         
-        let date = Date(timeIntervalSince1970: TimeInterval(timeSince1970))
+        let date = Date(timeIntervalSince1970: TimeInterval(secondsSinceMidnight))
         
         // Create and return components.
         return utcCalendar.dateComponents([.hour, .minute], from: date)

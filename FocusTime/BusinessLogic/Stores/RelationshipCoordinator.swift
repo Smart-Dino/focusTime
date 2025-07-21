@@ -26,18 +26,17 @@ actor RelationshipCoordinator {
             throw PersistenceStoreError.notFound
         }
         
-        // Make sure the array exits.
-        if blockItem.schedules == nil {
-            blockItem.schedules = []
-        }
+        // Ensure schedules array exists
+        let schedules = blockItem.schedules ?? []
+        blockItem.schedules = schedules
         
-        // If the relationship between the two objects does not exist.
-        if blockItem.schedules?.contains(where: { $0.persistentModelID == schedule.persistentModelID }) != true {
-            // Add relationship.
-            blockItem.schedules!.append(schedule)
-        } else {
+        // Check if relationship already exists
+        guard !schedules.contains(where: { $0.id == schedule.id }) else {
             throw PersistenceStoreError.alreadyRelated
         }
+        
+        // Add relationship
+        blockItem.schedules?.append(schedule)
         
         // Save changes.
         try modelContext.save()

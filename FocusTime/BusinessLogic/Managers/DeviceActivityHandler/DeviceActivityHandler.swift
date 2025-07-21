@@ -39,16 +39,10 @@ struct DeviceActivityHandler {
         if activityIdentifier.isFallback {
             let endTimeComponent = schedule.endTime
             Task {
-                while !Task.isCancelled {
-                    try? await Task.sleep(nanoseconds: 1_000_000_000)
-                    
-                    let currentTimeComponent = TimeComponents(from: .now)
-                    
-                    if currentTimeComponent == endTimeComponent {
-                        Self.unblockAll()
-                        break
-                    }
+                while TimeComponents(from: .now) != endTimeComponent {
+                    try? await Task.sleep(nanoseconds: 5_000_000_000)
                 }
+                Self.unblockAll()
                 DeviceActivityCenter()
                     .stopMonitoring(
                         [DeviceActivityName(stringActivityName)]

@@ -117,15 +117,6 @@ final class ShieldDebugViewModel {
                 return
             }
             
-            print(startComponent)
-            print(endComponent)
-            
-            print(startComponent.dateComponents)
-            print(endComponent.dateComponents)
-            
-            print(startComponent.timeSince1970)
-            print(endComponent.timeSince1970)
-            
             let schedule = ProtectedSchedule(emoji: "🕑",
                                              name: "Schedule",
                                              days: state.daySelection,

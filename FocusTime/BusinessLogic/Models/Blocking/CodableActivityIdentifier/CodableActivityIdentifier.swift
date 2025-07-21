@@ -20,17 +20,13 @@ extension CodableActivityIdentifier {
         return String(data: data, encoding: .utf8)
     }
     
-    init?(from name: DeviceActivityName) throws {
+    init?(from name: DeviceActivityName) {
         let decoder = JSONDecoder()
         
         guard let jsonData = name.rawValue.data(using: .utf8),
               let decodedActivity = try? decoder.decode(CodableActivityIdentifier.self, from: jsonData)
         else { return nil }
         
-        
-        self.init(
-            scheduleID: decodedActivity.scheduleID,
-            isFallback: decodedActivity.isFallback
-        )
+        self = decodedActivity
     }
 }

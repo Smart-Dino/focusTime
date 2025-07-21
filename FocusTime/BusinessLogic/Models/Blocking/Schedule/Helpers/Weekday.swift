@@ -7,8 +7,6 @@
 
 import Foundation
 
-import Foundation
-
 /// Days of the week, starting with Sunday = 1 to match Calendar.
 enum Weekday: Int, Codable, CaseIterable, Identifiable {
     case sunday = 1, monday, tuesday, wednesday, thursday, friday, saturday
