@@ -33,14 +33,15 @@ struct DeviceActivityHandler: Sendable {
                                   activityIdentifier: activityIdentifier,
                                   endTime: endTime)
         case .oneTime:
-            await handleDurationBlocking()
+            await handleDurationUnblocking()
             // We don't need to handle the end of the interval anymore.
             DeviceActivityCenter().stopMonitoring([activity])
         }
         
     }
     
-    private func handleDurationBlocking() async {
+    /// Called when a one-time blocking interval ends.
+    private func handleDurationUnblocking() async {
         try? await shieldManager.unblock()
     }
     
@@ -48,7 +49,7 @@ struct DeviceActivityHandler: Sendable {
         schedule: Schedule,
         activity: DeviceActivityName,
         activityIdentifier: CodableActivityIdentifier,
-        endTime endTimeComponent: TimeComponents
+        endTime endTimeComponent: TimeComponents<TimeUnit>
     ) async {
         // Make sure the current day is the block day.
         guard let blockItems = schedule.blockItems, schedule.days.contains(Weekday.currentDay) else { return }

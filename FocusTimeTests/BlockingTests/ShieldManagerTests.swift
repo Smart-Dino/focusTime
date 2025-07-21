@@ -18,9 +18,12 @@ struct ShieldManagerTests {
     
     let allCategories = ShieldSettings.ActivityCategoryPolicy<Application>.all()
     
-    init() {
+    init() async {
         self.store = ManagedSettingsStore()
         self.shieldManager = LiveShieldManager()
+        
+        await resetManagedSettingsStore()
+        try? await Task.sleep(for: .seconds(1)) // Wait for ManagedSettingsStore to pick up on changes
     }
     
     
@@ -78,7 +81,7 @@ struct ShieldManagerTests {
         // Union of all tokens.
         let expectedApplications = selection1.applicationTokens.union(selection2.applicationTokens)
         let expectedCategories = selection1.categoryTokens.union(selection2.categoryTokens)
-        
+
         #expect(store.shield.applications == expectedApplications)
         #expect(store.shield.applicationCategories == .specific(expectedCategories))
     }

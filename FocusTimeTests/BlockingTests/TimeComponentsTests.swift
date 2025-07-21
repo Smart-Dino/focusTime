@@ -25,7 +25,7 @@ struct TimeComponentsTests {
         hour: Int,
         minute: Int,
     ) async throws {
-        let timeComponents = TimeComponents(hour: hour, minute: minute)
+        let timeComponents = TimeComponents<TimeUnit>(hour: hour, minute: minute)
         let components = timeComponents.dateComponents
         #expect(
             components.hour == hour,
@@ -49,9 +49,9 @@ struct TimeComponentsTests {
     )
     func testInitSetsSeconds(hour: Int, minute: Int) async throws {
         let expectedSeconds = hour * 3600 + minute * 60
-        let timeComponents = TimeComponents(hour: hour, minute: minute)
+        let timeComponents = TimeComponents<TimeUnit>(hour: hour, minute: minute)
                 
-        let reconstructed = TimeComponents(secondsSince1970: expectedSeconds)
+        let reconstructed = TimeComponents<TimeUnit>(secondsSinceMidnight: expectedSeconds)
         #expect(
             reconstructed == timeComponents,
             "TimeComponents(hour: \(hour), minute: \(minute)) should equal TimeComponents(secondsSince1970: \(expectedSeconds))"
@@ -95,7 +95,7 @@ struct TimeComponentsTests {
           ]
     )
     func testLocalizedTimeSince1970(hour: Int, minute: Int) async throws {
-        let timeComponents = TimeComponents(hour: hour, minute: minute)
+        let timeComponents = TimeComponents<TimeUnit>(hour: hour, minute: minute)
         var utcCalendar = Calendar.current
         utcCalendar.timeZone = .gmt
         
@@ -106,8 +106,8 @@ struct TimeComponentsTests {
         let date = try #require(utcCalendar.date(from: components))
         let expectedSeconds = utcCalendar.component(.second, from: date)
         #expect(
-            timeComponents.localizedTimeSince1970 == expectedSeconds,
-            "Expected localizedTimeSince1970 to be \(expectedSeconds), got \(timeComponents.localizedTimeSince1970)"
+            timeComponents.localizedSecondsSinceMidnight == expectedSeconds,
+            "Expected localizedTimeSince1970 to be \(expectedSeconds), got \(timeComponents.localizedSecondsSinceMidnight)"
         )
     }
 
@@ -119,7 +119,7 @@ struct TimeComponentsTests {
           ]
     )
     func testDescription(hour: Int, minute: Int) async throws {
-        let timeComponents = TimeComponents(hour: hour, minute: minute)
+        let timeComponents = TimeComponents<TimeUnit>(hour: hour, minute: minute)
         
         let formatter = DateFormatter()
         formatter.timeStyle = .short
@@ -143,24 +143,17 @@ struct TimeComponentsTests {
             (12, 0),
             (0, 59),
             (0, 0),
-            (23, 59)
+            (23, 59),
+            (50, 00),
+            (33, 00)
           ]
     )
     func testDurationDescription(hour: Int, minute: Int) async throws {
-        let timeComponents = TimeComponents(hour: hour, minute: minute)
-        
-        let formatter = DateComponentsFormatter()
-        formatter.allowedUnits = [.hour, .minute]
-        formatter.unitsStyle = .abbreviated
-        
-        var components = DateComponents()
-        components.hour = hour
-        components.minute = minute
-        
-        let expected = formatter.string(from: components) ?? "-"
+        let expectedSeconds = hour * 3600 + minute * 60
+        let timeComponents = TimeComponents<TimeDuration>(hour: hour, minute: minute)
         #expect(
-            timeComponents.durationDescription == expected,
-            "durationDescription did not match: got \(timeComponents.durationDescription), expected: \(expected)"
+            timeComponents.durationInSeconds == expectedSeconds,
+            "durationInSeconds did not match: got \(timeComponents.durationInSeconds), expected: \(expectedSeconds)"
         )
     }
 
@@ -172,7 +165,7 @@ struct TimeComponentsTests {
           ]
     )
     func testLocalizedDate(hour: Int, minute: Int) async throws {
-        let timeComponents = TimeComponents(hour: hour, minute: minute)
+        let timeComponents = TimeComponents<TimeUnit>(hour: hour, minute: minute)
         let date = timeComponents.localizedDate
         
         let calendar = Calendar.current

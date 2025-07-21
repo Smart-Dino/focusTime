@@ -73,8 +73,8 @@ struct RegistrarHandlerTests {
             (15, 0, 14, 0)
           ])
     func scheduledBlocking(startHour: Int, startMinute: Int, endHour: Int, endMinute: Int) async throws {
-        let startTime = TimeComponents(hour: startHour, minute: startMinute)
-        let endTime = TimeComponents(hour: endHour, minute: endMinute)
+        let startTime = TimeComponents<TimeUnit>(hour: startHour, minute: startMinute)
+        let endTime = TimeComponents<TimeUnit>(hour: endHour, minute: endMinute)
         // Setup.
         let schedule = ProtectedSchedule(emoji: "🧪",
                                          name: "Test",
@@ -165,8 +165,8 @@ struct RegistrarHandlerTests {
                                            name: "Test",
                                            blockedContent: ProtectedActivitySelection(selection))
         
-        let startTime = TimeComponents(hour: 17, minute: 00)
-        let endTime = TimeComponents(hour: 18, minute: 00)
+        let startTime = TimeComponents<TimeUnit>(hour: 17, minute: 00)
+        let endTime = TimeComponents<TimeUnit>(hour: 18, minute: 00)
         
         let schedule = ProtectedSchedule(emoji: "🧪",
                                          name: "Test",
@@ -190,7 +190,7 @@ struct RegistrarHandlerTests {
         let schedule = ProtectedSchedule(emoji: "⏱️",
                                          name: "DurationTest",
                                          days: Set(Weekday.allCases),
-                                         type: .oneTime(duration: duration))
+                                         type: .oneTime(.init(duration: duration)))
         // Insert into the store.
         let scheduleModelID = try await scheduleStore.insert(schedule)
         let fetchedSchedule = try await scheduleStore.fetch(id: scheduleModelID)
@@ -212,8 +212,8 @@ struct RegistrarHandlerTests {
     @Test("Unregistering an individual activity")
     func unregisterIndividualActivity() async throws {
         // Setup and register a schedule.
-        let startTime = TimeComponents(hour: 10, minute: 0)
-        let endTime = TimeComponents(hour: 11, minute: 0)
+        let startTime = TimeComponents<TimeUnit>(hour: 10, minute: 0)
+        let endTime = TimeComponents<TimeUnit>(hour: 11, minute: 0)
         
         let schedule = ProtectedSchedule(emoji: "🗑️",
                                          name: "UnregisterTest",
@@ -276,10 +276,10 @@ struct RegistrarHandlerTests {
     
     @Test("Overlapping schedules should throw scheduleOverlap error")
     func overlappingSchedulesThrowsError() async throws {
-        let startTime1 = TimeComponents(hour: 8, minute: 0)
-        let endTime1 = TimeComponents(hour: 10, minute: 0)
-        let startTime2 = TimeComponents(hour: 9, minute: 0)
-        let endTime2 = TimeComponents(hour: 11, minute: 0) // Overlaps with previous
+        let startTime1 = TimeComponents<TimeUnit>(hour: 8, minute: 0)
+        let endTime1 = TimeComponents<TimeUnit>(hour: 10, minute: 0)
+        let startTime2 = TimeComponents<TimeUnit>(hour: 9, minute: 0)
+        let endTime2 = TimeComponents<TimeUnit>(hour: 11, minute: 0) // Overlaps with previous
         
         // Register the first schedule
         let schedule1 = ProtectedSchedule(emoji: "🔥",

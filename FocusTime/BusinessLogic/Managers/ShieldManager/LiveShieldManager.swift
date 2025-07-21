@@ -11,7 +11,7 @@ import DeviceActivity
 import ManagedSettings
 
 actor LiveShieldManager: ShieldManager {
-    var isRunningInExtension: Bool = false
+    let isRunningInExtension: Bool
     let store = ManagedSettingsStore()
     
     init(isRunningInExtension: Bool = false) {

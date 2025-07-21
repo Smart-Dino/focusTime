@@ -18,7 +18,7 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
     
     var monitoredIdentifiers: Set<UUID> {
         Set(center.activities.compactMap {
-            guard let identifier = try? CodableActivityIdentifier(from: $0) else { return nil }
+            guard let identifier = CodableActivityIdentifier(from: $0) else { return nil }
             return identifier.scheduleID
         })
     }
@@ -55,7 +55,7 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
                 }
             }
         case .oneTime(let duration):
-            try registerDurationActivity(for: schedule, duration: duration)
+            try registerDurationActivity(for: schedule, duration: duration.durationInSeconds)
         }
     }
     
@@ -79,14 +79,19 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
             let scheduleStore = ScheduleStore(modelContainer: modelContainer)
             let protectedBlockItems = try await scheduleStore.fetchRelatedObjects(id: persistentModelID)
             
-            try? await shieldManager.block(specific: protectedBlockItems.map(\.blockedContent))
+            try await shieldManager.block(specific: protectedBlockItems.map(\.blockedContent))
         }
         
         let now = Calendar.current.dateComponents([.hour, .minute], from: .now)
         
         // Now schedule activity to end blockage.
+        // The DeviceActivitySchedule interval requires the schedule to be 15 or more minutes long
+        // so the intervalEnd is offset by that 15 minutes.
         guard let intervalStart = now.adding(seconds: duration),
-              let intervalEnd = intervalStart.adding(seconds: 15 * 60) else { return }
+              let intervalEnd = intervalStart.adding(seconds: Self.fallbackIntervalSeconds)
+        else {
+            throw DeviceActivityRegistrarError.couldNotSetTime
+        }
         
         let deviceActivitySchedule = DeviceActivitySchedule(intervalStart: intervalStart,
                                                             intervalEnd: intervalEnd,
@@ -104,8 +109,8 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
     
     private func registerRegularActivity(
         for schedule: ProtectedSchedule,
-        startTime: TimeComponents,
-        endTime: TimeComponents
+        startTime: TimeComponents<TimeUnit>,
+        endTime: TimeComponents<TimeUnit>
     ) async throws {
         guard schedule.persistentModelID != nil else { throw DeviceActivityRegistrarError.noPersistentItem }
         
@@ -136,8 +141,8 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
     
     private func registerFallbackActivity(
         for schedule: ProtectedSchedule,
-        startTime: TimeComponents,
-        endTime: TimeComponents
+        startTime: TimeComponents<TimeUnit>,
+        endTime: TimeComponents<TimeUnit>
     ) async throws {
         guard schedule.persistentModelID != nil else { throw DeviceActivityRegistrarError.noPersistentItem }
         
@@ -205,14 +210,19 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
                     descriptor: .init(predicate: #Predicate { $0.id == scheduleID })
                 ).first
                 // 4. Make sure days overlap too and add schedule to return list.
-                if let overlappingSchedule, !overlappingSchedule.days.contains(days) { overlappingSchedules.append(overlappingSchedule) }
+                if let overlappingSchedule, overlappingSchedule.days.isDisjoint(with: days) == false {
+                    overlappingSchedules.append(overlappingSchedule)
+                }
             }
         }
         return overlappingSchedules
     }
     
     func unregisterActivity(during schedule: ProtectedSchedule) async throws {
-        guard let activity = center.activities.first(where: { $0.rawValue.contains(schedule.id.uuidString) }) else {
+        guard let activity = center.activities.first(where: {
+            guard let identifier = CodableActivityIdentifier(from: $0) else { return false }
+            return identifier.scheduleID == schedule.id
+        }) else {
             throw DeviceActivityRegistrarError.activityNotFound
         }
         center.stopMonitoring([activity])
