@@ -7,13 +7,7 @@
 
 import SwiftUI
 
-enum SharedPaywallConstants {
-    
-    // MARK: - Typography
-    enum Fonts {
-        static let navigationTitle = Font.system(size: 34,
-                                                 weight: .bold)
-    }
+enum SharedConstants {
     
     // MARK: - Strings
     enum Strings {
@@ -32,6 +26,12 @@ enum SharedPaywallConstants {
         static let subscribeTitle = String(localized: "shared_subscribe_button_title", table: "SharedLocalizable")
         static let subscribedTitle = String(localized: "shared_subscribed_title", table: "SharedLocalizable")
         static let purchasedTitle = String(localized: "shared_purchased_title", table: "SharedLocalizable")
+    }
+    
+    // MARK: - Typography
+    enum Fonts {
+        static let navigationTitle = Font.system(size: 34,
+                                                 weight: .bold)
     }
     
 }

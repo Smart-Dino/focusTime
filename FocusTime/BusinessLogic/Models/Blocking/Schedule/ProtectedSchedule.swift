@@ -23,7 +23,6 @@ struct ProtectedSchedule: ProtectedModel {
 
     init(
         id: UUID = UUID(),
-        id: UUID = UUID(),
         persistentModelID: PersistentIdentifier? = nil,
         emoji: String,
         name: String,
@@ -32,7 +31,6 @@ struct ProtectedSchedule: ProtectedModel {
         endTime: TimeComponents,
         daysDescription: String = "0 days"
     ) {
-        self.id = id
         self.id = id
         self.persistentModelID = persistentModelID
         self.emoji = emoji
