@@ -68,6 +68,7 @@ struct HomeView: View {
                             Image(systemName: Constants.Icons.chevronRight)
                         }
                         .foregroundStyle(.ftMainBlue)
+                        .contentShape(.rect)
                     }
                     .buttonStyle(.plain)
                     .padding(.horizontal)
