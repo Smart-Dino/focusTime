@@ -1,116 +1,96 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "persistence_error_already_related_description" : {
+    "shield_surfer_button" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "string"
+            "value" : "Back to the flow"
           }
         }
       }
     },
-    "persistence_error_no_identifier_description" : {
+    "shield_surfer_subtitle" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "string"
+            "value" : "This app isn’t part of your current focus. Stay in the deep, ride the wave — and let productivity flow."
           }
         }
       }
     },
-    "persistence_error_no_identifier_reason" : {
+    "shield_surfer_title" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "string"
+            "value" : "You're drifting off course..."
           }
         }
       }
     },
-    "persistence_error_not_found_description" : {
+    "shield_wave_button" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "string"
+            "value" : "Stay in flow"
           }
         }
       }
     },
-    "persistence_error_not_found_reason" : {
+    "shield_wave_subtitle" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "string"
+            "value" : "This app is off-limits during your DeepWave session. Take a breath, ride it through — the wave will carry you further."
           }
         }
       }
     },
-    "shield_error_could_not_generate_identifier_description" : {
+    "shield_wave_title" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "string"
+            "value" : "Interrupting the tide?"
           }
         }
       }
     },
-    "shield_error_could_not_generate_identifier_reason" : {
+    "shield_whale_button" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "string"
+            "value" : "Ignore the noise"
           }
         }
       }
     },
-    "shield_error_could_not_set_time_description" : {
+    "shield_whale_subtitle" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "string"
+            "value" : "You’ve already set sail into focus waters. This app can wait. Your goals can't."
           }
         }
       }
     },
-    "shield_error_could_not_set_time_reason" : {
+    "shield_whale_title" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "string"
-          }
-        }
-      }
-    },
-    "shield_error_no_persistent_item_description" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "string"
-          }
-        }
-      }
-    },
-    "shield_error_no_persistent_item_reason" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "string"
+            "value" : "You’re in the zone."
           }
         }
       }
     }
   },
-  "version" : "1.0"
+  "version" : "1.1"
 }
