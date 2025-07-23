@@ -25,8 +25,8 @@ extension PersistenceTests {
                 emoji: "🏠",
                 name: "Spend time with family",
                 days: [.saturday, .sunday],
-                startTime: TimeComponents(hour: 17, minute: 00)!,
-                endTime: TimeComponents(hour: 19, minute: 00)!
+                type: .scheduled(startTime: .init(hour: 17, minute: 00),
+                                 endTime: .init(hour: 19, minute: 00))
             ),
             count: eachItemCount
         )
@@ -35,7 +35,7 @@ extension PersistenceTests {
             repeating: ProtectedBlockItem(
                 emoji: "😜",
                 name: "Block",
-                blockedContent: FamilyActivitySelection()
+                blockedContent: ProtectedActivitySelection(FamilyActivitySelection())
             ),
             count: eachItemCount
         )

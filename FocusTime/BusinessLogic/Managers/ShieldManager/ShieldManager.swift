@@ -8,14 +8,13 @@
 import Foundation
 import FamilyControls
 
-@MainActor
-protocol ShieldManager {
+protocol ShieldManager: Actor {
     // MARK: - Properties
-    var isShieldActive: Bool { get }
+    var isShieldActive: Bool { get async throws }
     // MARK: - Block
     func block() async throws
-    func block(specific selection: FamilyActivitySelection) async throws
-    func block(specific selections: [FamilyActivitySelection]) async throws
+    func block(specific selection: ProtectedActivitySelection) async throws
+    func block(specific selections: [ProtectedActivitySelection]) async throws
     // MARK: - Unblock
     func unblock() async throws
     func checkAuthorization() async throws 

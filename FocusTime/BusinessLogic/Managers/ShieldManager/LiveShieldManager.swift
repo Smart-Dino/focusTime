@@ -10,19 +10,20 @@ import FamilyControls
 import DeviceActivity
 import ManagedSettings
 
-@MainActor
-@Observable
-final class LiveShieldManager: ShieldManager {
-    private let store: ManagedSettingsStore
+actor LiveShieldManager: ShieldManager {
+    let isRunningInExtension: Bool
+    let store = ManagedSettingsStore()
     
-    var isShieldActive: Bool {
-        store.shield.applications != nil
-        || store.shield.applicationCategories != nil
+    init(isRunningInExtension: Bool = false) {
+        self.isRunningInExtension = isRunningInExtension
     }
     
-    init() {
-        let store = ManagedSettingsStore()
-        self.store = store
+    var isShieldActive: Bool {
+        get async throws {
+            try await checkAuthorization()
+            return store.shield.applications != nil
+            || store.shield.applicationCategories != nil
+        }
     }
     
     func block() async throws {
@@ -31,30 +32,20 @@ final class LiveShieldManager: ShieldManager {
         store.shield.applicationCategories = .all()
     }
     
-    func block(specific selection: FamilyActivitySelection) async throws {
+    func block(specific selection: ProtectedActivitySelection) async throws {
         try await checkAuthorization()
-        
-        let applicationsToDiscourage = selection.applicationTokens
+        let selection = selection.selection
         
         // Block selected applications.
-        if applicationsToDiscourage.isEmpty {
-            store.shield.applications = nil
-        } else {
-            store.shield.applications = applicationsToDiscourage
-        }
-        
-        let applicationCategoriesToDiscourage = selection.categoryTokens
+        store.shield.applications = selection.applicationTokens
         
         // Block selected categories.
-        if applicationCategoriesToDiscourage.isEmpty {
-            store.shield.applicationCategories = nil
-        } else {
-            store.shield.applicationCategories = .specific(applicationCategoriesToDiscourage)
-        }
+        store.shield.applicationCategories = .specific(selection.categoryTokens)
     }
     
-    func block(specific selections: [FamilyActivitySelection]) async throws {
+    func block(specific selections: [ProtectedActivitySelection]) async throws {
         try await checkAuthorization()
+        let selections = selections.map(\.selection)
         
         // Add all the items to discourage.
         var applicationsToDiscourage = Set<ApplicationToken>()
@@ -66,18 +57,10 @@ final class LiveShieldManager: ShieldManager {
         }
         
         // Block selected applications.
-        if applicationsToDiscourage.isEmpty {
-            store.shield.applications = nil
-        } else {
-            store.shield.applications = applicationsToDiscourage
-        }
+        store.shield.applications = applicationsToDiscourage
         
         // Block selected categories.
-        if applicationCategoriesToDiscourage.isEmpty {
-            store.shield.applicationCategories = nil
-        } else {
-            store.shield.applicationCategories = .specific(applicationCategoriesToDiscourage)
-        }
+        store.shield.applicationCategories = .specific(applicationCategoriesToDiscourage)
     }
     
     func unblock() async throws {
@@ -88,6 +71,8 @@ final class LiveShieldManager: ShieldManager {
     }
     
     func checkAuthorization() async throws {
-        try await AuthorizationCenter.shared.requestAuthorization(for: .individual)
+        if !isRunningInExtension {
+            try await AuthorizationCenter.shared.requestAuthorization(for: .individual)
+        }
     }
 }

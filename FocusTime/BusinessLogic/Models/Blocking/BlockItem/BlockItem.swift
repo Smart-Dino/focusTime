@@ -15,7 +15,7 @@ final class BlockItem {
     var id: UUID
     var name: String
     var emoji: String
-    var blockedContent: FamilyActivitySelection
+    var blockedContent: ProtectedActivitySelection
     
     // MARK: Relationship
     var schedules: [Schedule]?
@@ -26,7 +26,7 @@ final class BlockItem {
         
         if schedules.count == 1 {
             guard let first = schedules.first else { return "No schedules" }
-            return "\(first.daysDescription), \(first.startTime.description) – \(first.endTime.description)"
+            return "\(first.days.description), \(first.type.description)"
         } else {
             return "\(schedules.count) schedules"
         }
@@ -37,7 +37,7 @@ final class BlockItem {
         id: UUID = UUID(),
         name: String,
         emoji: String,
-        blockedContent: FamilyActivitySelection,
+        blockedContent: ProtectedActivitySelection,
         schedules: [Schedule]? = nil
     ) {
         self.id = id

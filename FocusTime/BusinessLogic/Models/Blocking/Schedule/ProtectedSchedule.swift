@@ -13,13 +13,10 @@ struct ProtectedSchedule: ProtectedModel {
     let id: UUID
     let persistentModelID: PersistentIdentifier?
     
-    let emoji: String
-    let name: String
-    let days: Set<Weekday>
-    let startTime: TimeComponents
-    let endTime: TimeComponents
-    
-    var daysDescription: String
+    var emoji: String
+    var name: String
+    var days: Set<Weekday>
+    var type: ScheduleType
 
     init(
         id: UUID = UUID(),
@@ -27,18 +24,14 @@ struct ProtectedSchedule: ProtectedModel {
         emoji: String,
         name: String,
         days: Set<Weekday>,
-        startTime: TimeComponents,
-        endTime: TimeComponents,
-        daysDescription: String = "0 days"
+        type: ScheduleType,
     ) {
         self.id = id
         self.persistentModelID = persistentModelID
         self.emoji = emoji
         self.name = name
         self.days = days
-        self.startTime = startTime
-        self.endTime = endTime
-        self.daysDescription = daysDescription
+        self.type = type
     }
     
     init(from item: Schedule) {
@@ -47,8 +40,6 @@ struct ProtectedSchedule: ProtectedModel {
                   emoji: item.emoji,
                   name: item.name,
                   days: item.days,
-                  startTime: item.startTime,
-                  endTime: item.endTime
-        )
+                  type: item.type)
     }
 }

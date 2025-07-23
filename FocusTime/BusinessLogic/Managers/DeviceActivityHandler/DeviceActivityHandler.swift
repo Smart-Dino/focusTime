@@ -8,41 +8,67 @@
 import SwiftData
 import Foundation
 import DeviceActivity
-import FamilyControls
-import ManagedSettings
 
-struct DeviceActivityHandler {
+struct DeviceActivityHandler: Sendable {
     private let container: ModelContainer
+    private let shieldManager: ShieldManager
     
-    init(container: ModelContainer) {
+    init(container: ModelContainer, shieldManager: ShieldManager) {
         self.container = container
+        self.shieldManager = shieldManager
     }
     
-    func handleBlockingStart(for activity: DeviceActivityName) {
-        guard let activityIdentifier = try? CodableActivityIdentifier(from: activity) else { return }
+    func handleBlockingStart(for activity: DeviceActivityName) async {
+        guard let activityIdentifier = CodableActivityIdentifier(from: activity) else { return }
         
         let schedule = fetchSchedule(id: activityIdentifier.scheduleID)
         
         // Make sure we have our schedule.
-        guard let schedule, let blockItems = schedule.blockItems else { return }
+        guard let schedule else { return }
+
+        switch schedule.type {
+        case .scheduled(_, let endTime):
+            await handleRegularBlocking(schedule: schedule,
+                                  activity: activity,
+                                  activityIdentifier: activityIdentifier,
+                                  endTime: endTime)
+        case .oneTime:
+            await handleDurationUnblocking()
+            // We don't need to handle the end of the interval anymore.
+            DeviceActivityCenter().stopMonitoring([activity])
+        }
         
+    }
+    
+    /// Called when a one-time blocking interval ends.
+    private func handleDurationUnblocking() async {
+        try? await shieldManager.unblock()
+    }
+    
+    private func handleRegularBlocking(
+        schedule: Schedule,
+        activity: DeviceActivityName,
+        activityIdentifier: CodableActivityIdentifier,
+        endTime endTimeComponent: TimeComponents<TimeUnit>
+    ) async {
         // Make sure the current day is the block day.
-        guard schedule.days.contains(Weekday.currentDay) else { return }
+        guard let blockItems = schedule.blockItems, schedule.days.contains(Weekday.currentDay) else { return }
         
         // Block user's selections.
         let selections = blockItems.map(\.blockedContent)
-        Self.blockSelections(selections: selections)
+        try? await shieldManager.block(specific: selections)
         
         // Sendability workaround since DeviceActivityName is not sendable.
         let stringActivityName = activity.rawValue
         
         if activityIdentifier.isFallback {
-            let endTimeComponent = schedule.endTime
             Task {
                 while TimeComponents(from: .now) != endTimeComponent {
                     try? await Task.sleep(nanoseconds: 5_000_000_000)
                 }
-                Self.unblockAll()
+                Task {
+                    try? await shieldManager.unblock()
+                }
                 DeviceActivityCenter()
                     .stopMonitoring(
                         [DeviceActivityName(stringActivityName)]
@@ -50,12 +76,10 @@ struct DeviceActivityHandler {
             }
             
         }
-        
-        
     }
     
-    func handleBlockingEnd(for activity: DeviceActivityName) {
-        Self.unblockAll()
+    func handleBlockingEnd(for activity: DeviceActivityName) async {
+        try? await shieldManager.unblock()
     }
     
     private func fetchSchedule(id: UUID) -> Schedule? {
@@ -69,27 +93,5 @@ struct DeviceActivityHandler {
         )
         
         return try? context.fetch(fetchDescriptor).first
-    }
-    
-    // MARK: - Helpers
-    static private func blockSelections(selections: [FamilyActivitySelection]) {
-        let store = ManagedSettingsStore()
-        // Add all the items to discourage.
-        var applicationsToDiscourage = Set<ApplicationToken>()
-        var applicationCategoriesToDiscourage = Set<ActivityCategoryToken>()
-        
-        for selection in selections {
-            applicationsToDiscourage.formUnion(selection.applicationTokens)
-            applicationCategoriesToDiscourage.formUnion(selection.categoryTokens)
-        }
-        
-        store.shield.applications = applicationsToDiscourage
-        store.shield.applicationCategories = .specific(applicationCategoriesToDiscourage)
-    }
-    
-    static private func unblockAll() {
-        let store = ManagedSettingsStore()
-        store.shield.applications = nil
-        store.shield.applicationCategories = nil
     }
 }
