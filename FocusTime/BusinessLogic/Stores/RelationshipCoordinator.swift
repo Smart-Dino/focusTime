@@ -12,10 +12,10 @@ import Foundation
 actor RelationshipCoordinator {
     func relate(blockItemID: PersistentIdentifier, scheduleID: PersistentIdentifier) throws {
         let blockItemDescriptor = FetchDescriptor<BlockItem>(
-            predicate: #Predicate { $0.id == blockItemID }
+            predicate: #Predicate { $0.persistentModelID == blockItemID }
         )
         let scheduleDescriptor = FetchDescriptor<Schedule>(
-            predicate: #Predicate { $0.id == scheduleID }
+            predicate: #Predicate { $0.persistentModelID == scheduleID }
         )
         
         // Fetch items.
@@ -44,10 +44,10 @@ actor RelationshipCoordinator {
     
     func breakRelationship(blockItemID: PersistentIdentifier, scheduleID: PersistentIdentifier) throws {
         let blockItemDescriptor = FetchDescriptor<BlockItem>(
-            predicate: #Predicate { $0.id == blockItemID }
+            predicate: #Predicate { $0.persistentModelID == blockItemID }
         )
         let scheduleDescriptor = FetchDescriptor<Schedule>(
-            predicate: #Predicate { $0.id == scheduleID }
+            predicate: #Predicate { $0.persistentModelID == scheduleID }
         )
         
         // Fetch items.
@@ -59,7 +59,7 @@ actor RelationshipCoordinator {
         }
         
         // Remove the schedule if it exists.
-        if let index = blockItem.schedules?.firstIndex(where: { $0.id == schedule.id }) {
+        if let index = blockItem.schedules?.firstIndex(where: { $0.persistentModelID == schedule.persistentModelID }) {
             blockItem.schedules?.remove(at: index)
         }
         

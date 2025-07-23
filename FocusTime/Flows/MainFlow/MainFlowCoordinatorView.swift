@@ -90,8 +90,6 @@ struct MainFlowCoordinatorView: View {
     }
 }
 
-#warning("No preview.")
-//#Preview {
-//    let viewModel = MainFlowCoordinatorViewModel(flowState: <#T##State#>, modelContainer: <#T##ModelContainer#>)
-//    MainFlowCoordinatorView(viewModel: viewModel)
-//}
+#Preview {
+    MainFlowCoordinatorView(viewModel: .init(modelContainer: PreviewData.memoryOnlyModelContainer))
+}

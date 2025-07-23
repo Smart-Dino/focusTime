@@ -1,0 +1,236 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "device_activity_registrar_activity_not_found_description": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not find the registered device activity."
+          }
+        }
+      }
+    },
+    "device_activity_registrar_activity_not_found_reason": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No matching activity was found in DeviceActivityCenter for the provided identifier."
+          }
+        }
+      }
+    },
+    "device_activity_registrar_could_not_check_overlap_description": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not check whether this schedule overlaps with others, make sure it is saved and try again."
+          }
+        }
+      }
+    },
+    "device_activity_registrar_could_not_check_overlap_reason": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Failed to resolve one or more DateComponents or decode an Identifier."
+          }
+        }
+      }
+    },
+    "device_activity_registrar_could_not_generate_identifier_description": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unable to schedule this item."
+          }
+        }
+      }
+    },
+    "device_activity_registrar_could_not_generate_identifier_reason": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not generate a codable representation of the identifier."
+          }
+        }
+      }
+    },
+    "device_activity_registrar_could_not_set_time_description": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unable to set schedule for selected time."
+          }
+        }
+      }
+    },
+    "device_activity_registrar_could_not_set_time_reason": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Failed to add 15 minutes to the DateComponents."
+          }
+        }
+      }
+    },
+    "device_activity_registrar_no_persistent_item_description": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Selected item does not exist, make sure you saved your changes."
+          }
+        }
+      }
+    },
+    "device_activity_registrar_no_persistent_item_reason": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Selected item does not have any persistent item associated with it."
+          }
+        }
+      }
+    },
+    "device_activity_registrar_schedule_overlap_description": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Selected schedule overlaps with others: %@"
+          }
+        }
+      }
+    },
+    "device_activity_registrar_schedule_overlap_reason": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DeviceActivityCenter has activities that overlap with schedule tried to saved."
+          }
+        }
+      }
+    },
+    "persistence_error_already_related_description": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "These objects are already related with each other."
+          }
+        }
+      }
+    },
+    "persistence_error_no_identifier_description": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Something went wrong while finding this item."
+          }
+        }
+      }
+    },
+    "persistence_error_no_identifier_reason": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No identifier found during conversion; attempted to fetch a model that may not exist with ProtectedModel."
+          }
+        }
+      }
+    },
+    "persistence_error_not_found_description": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "We couldn't find what you were looking for."
+          }
+        }
+      }
+    },
+    "persistence_error_not_found_reason": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Model not found in ModelContext."
+          }
+        }
+      }
+    },
+    "shield_error_could_not_generate_identifier_description": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unable to schedule this item."
+          }
+        }
+      }
+    },
+    "shield_error_could_not_generate_identifier_reason": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not generate a codable representation of the identifier."
+          }
+        }
+      }
+    },
+    "shield_error_could_not_set_time_description": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unable to set schedule for selected time."
+          }
+        }
+      }
+    },
+    "shield_error_could_not_set_time_reason": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Failed to add 15 minutes to the DateComponents."
+          }
+        }
+      }
+    },
+    "shield_error_no_persistent_item_description": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Selected item does not exist, make sure you saved your changes."
+          }
+        }
+      }
+    },
+    "shield_error_no_persistent_item_reason": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Selected item does not have any persistent item associated with it."
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

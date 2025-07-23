@@ -58,7 +58,7 @@ actor BlockItemStore: PersistenceStore {
         }
     }
     
-    func fetch(id: PersistentIdentifier) throws -> ProtectedBlockItem? {
+    func fetch(id: PersistentIdentifier) throws -> ProtectedBlockItem {
         let model = try fetchForID(id)
         
         return ProtectedBlockItem(from: model)
@@ -66,6 +66,13 @@ actor BlockItemStore: PersistenceStore {
     
     func fetch(descriptor: FetchDescriptor<BlockItem>) throws -> [ProtectedBlockItem] {
         try modelContext.fetch(descriptor).map{ ProtectedBlockItem(from: $0) }
+    }
+    
+    func fetchRelatedObjects(id: PersistentIdentifier) throws -> [ProtectedSchedule] {
+        let model = try fetchForID(id)
+        let schedules = model.schedules ?? []
+        
+        return schedules.compactMap { ProtectedSchedule(from: $0) }
     }
     
     func updateFields(id: PersistentIdentifier, using updates: (BlockItem) -> Void) throws {
@@ -85,7 +92,7 @@ actor BlockItemStore: PersistenceStore {
 extension BlockItemStore {
     func fetchForID(_ id: PersistentIdentifier) throws -> BlockItem {
         let descriptor = FetchDescriptor<BlockItem>(
-            predicate: #Predicate { $0.id == id }
+            predicate: #Predicate { $0.persistentModelID == id }
         )
         
         let results = try modelContext.fetch(descriptor)

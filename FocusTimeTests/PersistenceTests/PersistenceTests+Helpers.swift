@@ -18,21 +18,19 @@ extension PersistenceTests {
         return ProtectedBlockItem(
             emoji: "🔒",
             name: name,
-            blockedContent: selection,
+            blockedContent: ProtectedActivitySelection(selection),
             schedulesDescription: "No schedules"
         )
     }
     func makeProtectedTestSchedule(name: String = UUID().uuidString) -> ProtectedSchedule {
         let weekdays: Set<Weekday> = Weekday.weekdays
-        let start = TimeComponents(hour: 9, minute: 0)!
-        let end = TimeComponents(hour: 17, minute: 0)!
+        let start = TimeComponents<TimeUnit>(hour: 9, minute: 0)
+        let end = TimeComponents<TimeUnit>(hour: 17, minute: 0)
         return ProtectedSchedule(
             emoji: "📅",
             name: name,
             days: weekdays,
-            startTime: start,
-            endTime: end,
-            daysDescription: "Weekdays"
+            type: .scheduled(startTime: start, endTime: end)
         )
     }
     
@@ -47,8 +45,8 @@ extension PersistenceTests {
         scheduleStore: ScheduleStore,
         blockItemStore: BlockItemStore
     ) async throws -> (
-        scheduleModelID: Schedule.ID,
-        blockItemModelID: BlockItem.ID,
+        scheduleModelID: PersistentIdentifier,
+        blockItemModelID: PersistentIdentifier,
         protectedSchedule: ProtectedSchedule,
         protectedBlockItem: ProtectedBlockItem
     ) {

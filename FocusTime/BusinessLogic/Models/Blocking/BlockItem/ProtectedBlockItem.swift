@@ -7,8 +7,7 @@
 
 import Foundation
 import SwiftData
-#warning("@preconcurrency import")
-@preconcurrency import FamilyControls
+import FamilyControls
 
 struct ProtectedBlockItem: ProtectedModel {
     
@@ -17,7 +16,7 @@ struct ProtectedBlockItem: ProtectedModel {
     
     let emoji: String
     let name: String
-    let blockedContent: FamilyActivitySelection
+    let blockedContent: ProtectedActivitySelection
     
     let schedulesDescription: String
 
@@ -26,7 +25,7 @@ struct ProtectedBlockItem: ProtectedModel {
         persistentModelID: PersistentIdentifier? = nil,
         emoji: String,
         name: String,
-        blockedContent: FamilyActivitySelection,
+        blockedContent: ProtectedActivitySelection,
         schedulesDescription: String = "No schedules"
     ) {
         self.id = id
@@ -38,7 +37,8 @@ struct ProtectedBlockItem: ProtectedModel {
     }
     
     init(from item: BlockItem) {
-        self.init(persistentModelID: item.persistentModelID,
+        self.init(id: item.id,
+                  persistentModelID: item.persistentModelID,
                   emoji: item.emoji,
                   name: item.name,
                   blockedContent: item.blockedContent,

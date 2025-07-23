@@ -17,29 +17,27 @@ struct PersistenceTests {
     
     // MARK: - Initializer
     init() {
-        let schema = Schema([BlockItem.self, Schedule.self])
-        let config = ModelConfiguration(isStoredInMemoryOnly: true, groupContainer: .identifier(AppValues.appGroupIdentifier))
-        let container = try! ModelContainer(for: schema, configurations: config)
+        let container = SharedTestHelpers.generateTestModelContainer()
         self.modelContainer = container
         self.coordinator = RelationshipCoordinator(modelContainer: container)
     }
 
-    @Test("Test adding to the database.")
+    @Test("Test adding to the database.", .tags(.persistenceStore))
     func createAndRead() async throws {
         let (scheduleStore, blockItemStore) = makeStores()
         let insertResults = try await insertTestItems(scheduleStore: scheduleStore,
                                                       blockItemStore: blockItemStore)
         
         // Fetch back items.
-        let scheduleModel = try #require(try await scheduleStore.fetch(id: insertResults.scheduleModelID))
-        let blockItemModel = try #require(try await blockItemStore.fetch(id: insertResults.blockItemModelID))
+        let scheduleModel = try await scheduleStore.fetch(id: insertResults.scheduleModelID)
+        let blockItemModel = try await blockItemStore.fetch(id: insertResults.blockItemModelID)
         
         // Evaluate.
         #expect(insertResults.protectedSchedule.name == scheduleModel.name)
         #expect(insertResults.protectedBlockItem.name == blockItemModel.name)
     }
     
-    @Test("Test editing items in the database.")
+    @Test("Test editing items in the database.", .tags(.persistenceStore))
     func update() async throws {
         // New data to edit.
         let newName = "Test name"
@@ -61,8 +59,8 @@ struct PersistenceTests {
         }
         
         // Fetch back items.
-        let scheduleModel = try #require(try await scheduleStore.fetch(id: insertResults.scheduleModelID))
-        let blockItemModel = try #require(try await blockItemStore.fetch(id: insertResults.blockItemModelID))
+        let scheduleModel = try await scheduleStore.fetch(id: insertResults.scheduleModelID)
+        let blockItemModel = try await blockItemStore.fetch(id: insertResults.blockItemModelID)
         
         // Evaluate name.
         #expect(
@@ -76,7 +74,7 @@ struct PersistenceTests {
         )
     }
     
-    @Test("Test removing items from the database.")
+    @Test("Test removing items from the database.", .tags(.persistenceStore))
     func delete() async throws {
         let (scheduleStore, blockItemStore) = makeStores()
         
@@ -95,3 +93,4 @@ struct PersistenceTests {
         })
     }
 }
+

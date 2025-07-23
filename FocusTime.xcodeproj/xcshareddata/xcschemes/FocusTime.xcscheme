@@ -21,6 +21,20 @@
                ReferencedContainer = "container:FocusTime.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "E97895A42E0AFCBE00E0AF42"
+               BuildableName = "FocusTimeActivityMonitor.appex"
+               BlueprintName = "FocusTimeActivityMonitor"
+               ReferencedContainer = "container:FocusTime.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction

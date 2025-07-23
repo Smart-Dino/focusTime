@@ -10,7 +10,7 @@ import Foundation
 /// Days of the week, starting with Sunday = 1 to match Calendar.
 enum Weekday: Int, Codable, CaseIterable, Identifiable {
     case sunday = 1, monday, tuesday, wednesday, thursday, friday, saturday
-
+    
     var id: Int { rawValue }
     
     var isWorkDay: Bool {
@@ -26,6 +26,15 @@ enum Weekday: Int, Codable, CaseIterable, Identifiable {
     
     static var weekends: Set<Weekday> {
         Set(Weekday.allCases.filter({ !$0.isWorkDay }))
+    }
+    
+    static var currentDay: Weekday {
+        let weekday = Calendar
+            .current
+            .dateComponents([.weekday], from: Date())
+            .weekday
+        
+        return Weekday(rawValue: weekday ?? 1) ?? .sunday
     }
     
     /// Returns the days of the week reordered to start with the user's locale preference.

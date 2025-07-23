@@ -17,13 +17,16 @@ struct FocusTimeApp: App {
     var body: some Scene {
         WindowGroup {
 //            Text("No entry flow.")
-            MainFlowCoordinatorView(viewModel: .init(modelContainer: modelContainer))
+//            MainFlowCoordinatorView(viewModel: .init(modelContainer: modelContainer))
+            ShieldDebugView(
+                viewModel: .init(modelContainer: modelContainer)
+            )
         }
     }
     
     init() {
         let schema = Schema([BlockItem.self, Schedule.self])
-        let config = ModelConfiguration(isStoredInMemoryOnly: true, groupContainer: .identifier(AppValues.appGroupIdentifier))
+        let config = ModelConfiguration(groupContainer: .identifier(AppValues.appGroupIdentifier))
         let container = try! ModelContainer(for: schema, configurations: config)
         
         self.modelContainer = container

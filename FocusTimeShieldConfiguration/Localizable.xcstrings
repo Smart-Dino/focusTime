@@ -1,0 +1,96 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "shield_surfer_button" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Back to the flow"
+          }
+        }
+      }
+    },
+    "shield_surfer_subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This app isn’t part of your current focus. Stay in the deep, ride the wave — and let productivity flow."
+          }
+        }
+      }
+    },
+    "shield_surfer_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You're drifting off course..."
+          }
+        }
+      }
+    },
+    "shield_wave_button" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stay in flow"
+          }
+        }
+      }
+    },
+    "shield_wave_subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This app is off-limits during your DeepWave session. Take a breath, ride it through — the wave will carry you further."
+          }
+        }
+      }
+    },
+    "shield_wave_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Interrupting the tide?"
+          }
+        }
+      }
+    },
+    "shield_whale_button" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ignore the noise"
+          }
+        }
+      }
+    },
+    "shield_whale_subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You’ve already set sail into focus waters. This app can wait. Your goals can't."
+          }
+        }
+      }
+    },
+    "shield_whale_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You’re in the zone."
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.1"
+}
