@@ -25,9 +25,7 @@ struct FocusPresetGridView: View {
             LazyVGrid(columns: FocusSessionView.Constants.PresetGrid.Layout.gridColumns, spacing: FocusSessionView.Constants.PresetGrid.Layout.gridVSpacing) {
                 ForEach(presets) { preset in
                     Button {
-                        if selectedPreset == preset {
-                            selectedPreset = nil
-                        } else {
+                        if selectedPreset != preset {
                             selectedPreset = preset
                         }
                     } label: {

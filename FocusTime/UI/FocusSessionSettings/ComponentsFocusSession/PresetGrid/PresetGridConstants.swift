@@ -6,31 +6,39 @@
 //
 
 import SwiftUI
-import FocusTimeUI 
+import FocusTimeUI
 
 extension FocusSessionView.Constants {
     // MARK: - Constants for FocusPresetGridView
-     enum PresetGrid {
-        public enum Strings {
-            public static let title = "Choose Your Focus Preset"
-            public static let subtitle = "Ready-made blocklists to help you stay focused. Choose a preset to quickly block distracting apps."
+    enum PresetGrid {
+        enum Strings {
+            static let title = String(
+                localized: "Choose Your Focus Preset",
+                table: "SessionLocalizable",
+                comment: "Title for the focus preset selection grid"
+            )
+            static let subtitle = String(
+                localized: "Ready-made blocklists to help you stay focused. Choose a preset to quickly block distracting apps.",
+                table: "SessionLocalizable",
+                comment: "Subtitle explaining preset blocklists"
+            )
         }
         
-         enum Layout {
-            public static let mainSpacing: CGFloat = 16
-            private static let gridHSpacing: CGFloat = 20
-            private static let minimumCellWidth: CGFloat = 80
-            public static let gridVSpacing: CGFloat = 20
-            public static var gridColumns: [GridItem] { [GridItem(.adaptive(minimum: minimumCellWidth), spacing: gridHSpacing)] }
+        enum Layout {
+            static let mainSpacing: CGFloat = 16
+            static let gridHSpacing: CGFloat = 20
+            static let minimumCellWidth: CGFloat = 80
+            static let gridVSpacing: CGFloat = 20
+            static var gridColumns: [GridItem] { [GridItem(.adaptive(minimum: minimumCellWidth), spacing: gridHSpacing)] }
         }
     }
     
     // MARK: - Constants for PresetIconView
      enum PresetIcon {
          enum Layout {
-            public static let mainSpacing: CGFloat = 8
-            public static let size: CGFloat = 60
-            public static let cornerRadius: CGFloat = 20
+            static let mainSpacing: CGFloat = 8
+            static let size: CGFloat = 60
+            static let cornerRadius: CGFloat = 20
         }
     }
 }

@@ -10,18 +10,20 @@ import SwiftUI
 import FocusTimeUI
 
 struct ScheduleConfigurationView: View {
-    
-    public struct Actions {
+    struct Actions {
         let onDurationTap: () -> Void
         let onStartTimeTap: () -> Void
         let onEndTimeTap: () -> Void
         let onAppsBlockedTap: () -> Void
         let onScheduledDaysTap: () -> Void
+        let onEmojiTapped: (_ focusedState: FocusState<Bool>.Binding) -> Void
+        
     }
     
     // MARK: - Properties
     @Binding var configuration: ScheduleConfiguration
     let actions: Actions
+    @FocusState var isEmojiTextFieldFocused: Bool
     
     // MARK: - Body
     var body: some View {
@@ -30,9 +32,12 @@ struct ScheduleConfigurationView: View {
                 HStack {
                     Text(FocusSessionView.Constants.Configuration.Strings.listName)
                     Spacer()
-                    TextField(FocusSessionView.Constants.Configuration.Strings.listNamePlaceholder, text: $configuration.listName)
-                        .multilineTextAlignment(.trailing)
-                        .foregroundStyle(.white)
+                    TextField(
+                        FocusSessionView.Constants.Configuration.Strings.listNamePlaceholder,
+                        text: $configuration.listName
+                    )
+                    .multilineTextAlignment(.trailing)
+                    .foregroundStyle(.white)
                 }
                 .rowStyle()
                 
@@ -40,8 +45,25 @@ struct ScheduleConfigurationView: View {
                     if let selectedPreset = configuration.selectedPreset {
                         Text(selectedPreset.iconName)
                             .font(.title)
+                            .onTapGesture {
+                                actions.onEmojiTapped($isEmojiTextFieldFocused)
+                            }
                     } else {
-                        EmptyView()
+                        TextField("", text: Binding(
+                            get: { configuration.customPresetEmoji },
+                            set: { newValue in
+                                configuration.customPresetEmoji = String(newValue.prefix(1))
+                            }
+                        ))
+                        .font(.title)
+                        .multilineTextAlignment(.center)
+                        .focused($isEmojiTextFieldFocused)
+                        .submitLabel(.done)
+                        .onAppear {
+                            if configuration.customPresetEmoji.isEmpty {
+                                isEmojiTextFieldFocused = true
+                            }
+                        }
                     }
                 }
                 .frame(width: FocusSessionView.Constants.Row.height, height: FocusSessionView.Constants.Row.height)
@@ -53,9 +75,12 @@ struct ScheduleConfigurationView: View {
                 HStack {
                     Text(FocusSessionView.Constants.Configuration.Strings.scheduleForLater)
                     Spacer()
-                    Toggle(FocusSessionView.Constants.Configuration.Strings.scheduleForLater, isOn: $configuration.scheduleForLater)
-                        .labelsHidden()
-                        .tint(FocusSessionView.Constants.Configuration.Colors.toggleTint)
+                    Toggle(
+                        FocusSessionView.Constants.Configuration.Strings.scheduleForLater,
+                        isOn: $configuration.scheduleForLater
+                    )
+                    .labelsHidden()
+                    .tint(FocusSessionView.Constants.Configuration.Colors.toggleTint)
                 }
                 .rowStyle()
                 
@@ -86,6 +111,7 @@ struct ScheduleConfigurationView: View {
                             .foregroundStyle(FocusSessionView.Constants.Colors.chevronColor)
                     }
                 }
+                .menuActionDismissBehavior(.disabled)
                 .rowStyle()
                 
                 if !configuration.scheduledDays.isEmpty {
@@ -112,7 +138,7 @@ struct ScheduleConfigurationView: View {
                     actions.onEndTimeTap()
                 } label: {
                     HStack {
-                        Text(FocusSessionView.Constants.Configuration.Strings.letEndTime)
+                        Text(FocusSessionView.Constants.Configuration.Strings.endTime)
                         Spacer()
                         Text(formattedEndTime)
                             .foregroundStyle(.white)
@@ -160,65 +186,39 @@ struct ScheduleConfigurationView: View {
         formatter.zeroFormattingBehavior = .dropAll
         
         if configuration.selectedHours == 0 && configuration.selectedMinutes == 0 {
-            return String(localized: "0m", comment: "Zero minutes duration")
+            return String(localized: "0m", table: "SessionLocalizable", comment: "Zero minutes duration")
         }
         
-        return formatter.string(from: TimeInterval(configuration.selectedHours * 3600 + configuration.selectedMinutes * 60)) ?? String(localized: "0m", comment: "Fallback zero minutes duration")
-    }
-    
-    
-    // TODO: No need for short names
-    private var formattedScheduledDays: String {
-        if configuration.scheduledDays.count == Weekday.allCases.count {
-            return String(localized: "Every Day", comment: "Scheduled for every day")
-        }
-        if configuration.scheduledDays == Set([.saturday, .sunday]) {
-            return String(localized: "Weekends", comment: "Scheduled for weekends")
-        }
-        if configuration.scheduledDays == Set([.monday, .tuesday, .wednesday, .thursday, .friday]) {
-            return String(localized: "Weekdays", comment: "Scheduled for weekdays")
-        }
-        
-        let sortedDays = configuration.scheduledDays.sorted()
-        if sortedDays.count <= 3 {
-            return sortedDays.map { $0.shortName }.joined(separator: String(localized: ", ", comment: "Separator for list of days"))
-        } else {
-            return String(localized: "\(sortedDays.count) days", comment: "Number of days scheduled")
-        }
+        return formatter.string(from: TimeInterval(configuration.selectedHours * 3600 + configuration.selectedMinutes * 60)) ?? String(localized: "0m", table: "SessionLocalizable", comment: "Fallback zero minutes duration")
     }
     
     private var formattedFullScheduledDays: String {
-        if configuration.scheduledDays.isEmpty {
-            return String(localized: "Never", comment: "No scheduled days")
-        }
         if configuration.scheduledDays.count == Weekday.allCases.count {
-            return String(localized: "Every Day", comment: "Scheduled for every day")
+            return String(localized: "Every Day", table: "SessionLocalizable", comment: "Scheduled for every day")
         }
         if configuration.scheduledDays == Set([.saturday, .sunday]) {
-            return String(localized: "Weekends", comment: "Scheduled for weekends")
+            return String(localized: "Weekends", table: "SessionLocalizable", comment: "Scheduled for weekends")
         }
         if configuration.scheduledDays == Set([.monday, .tuesday, .wednesday, .thursday, .friday]) {
-            return String(localized: "Weekdays", comment: "Scheduled for weekdays")
+            return String(localized: "Weekdays", table: "SessionLocalizable", comment: "Scheduled for weekdays")
         }
         
         let sortedDays = configuration.scheduledDays.sorted()
-        return sortedDays.map { $0.fullName }.joined(separator: String(localized: ", ", comment: "Separator for list of days"))
+        return sortedDays.map { $0.fullName }.joined(separator: ", ")
     }
     
-    
-    //TODO: remove 24 hours format
-    private let twentyFourHourTimeFormatter: DateFormatter = {
+    private let timeFormatter: DateFormatter = {
         let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm"
-        formatter.locale = Locale(identifier: "en_GB")
+        formatter.dateFormat = .none
+        formatter.timeStyle = .short
         return formatter
     }()
     
     private var formattedStartTime: String {
-        twentyFourHourTimeFormatter.string(from: configuration.startTime)
+        timeFormatter.string(from: configuration.startTime)
     }
     
     private var formattedEndTime: String {
-        twentyFourHourTimeFormatter.string(from: configuration.endTime)
+        timeFormatter.string(from: configuration.endTime)
     }
 }

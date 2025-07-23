@@ -10,22 +10,20 @@ import SwiftUI
 @Observable
 @MainActor
 final class FocusSessionViewModel {
-
+    
     enum SheetType: Identifiable {
         case durationPicker
         case startTimePicker
         case endTimePicker
         case appBlockerSheet
-
+        
         var id: Int { self.hashValue }
     }
     
     // MARK: - State
     struct State {
         let presets: [FocusPreset] = FocusPreset.allCases
-        
         var scheduleConfiguration: ScheduleConfiguration
-        
         var activeSheet: SheetType?
         
         var selectedPresetIconName: String? {
@@ -44,50 +42,54 @@ final class FocusSessionViewModel {
                 scheduledDays: [],
                 startTime: FocusSessionView.Constants.DefaultValues.startTime,
                 endTime: FocusSessionView.Constants.DefaultValues.endTime,
-                selectedPreset: nil,
+                selectedPreset: FocusPreset.allCases.randomElement(),
                 selectedHours: FocusSessionView.Constants.DefaultValues.durationHours,
-                selectedMinutes: FocusSessionView.Constants.DefaultValues.durationMinutes
+                selectedMinutes: FocusSessionView.Constants.DefaultValues.durationMinutes,
+                customPresetEmoji: ""
             ),
             activeSheet: SheetType? = nil
         ) {
-            self.scheduleConfiguration = scheduleConfiguration
+            var initialConfig = scheduleConfiguration
+            if initialConfig.selectedPreset == nil {
+                initialConfig.selectedPreset = FocusPreset.allCases.randomElement()
+            }
+            self.scheduleConfiguration = initialConfig
             self.activeSheet = activeSheet
         }
     }
-
+    
     // MARK: - Properties
-   private(set) var state: State
+    private(set) var state: State
     
     // MARK: - Initializers
     init(state: State = State()) {
         self.state = state
     }
-
+    
     // MARK: - Action Methods (Public API)
     func presentDurationPicker() {
         state.activeSheet = .durationPicker
     }
-
+    
     func presentStartTimePicker() {
         state.activeSheet = .startTimePicker
     }
-
+    
     func presentEndTimePicker() {
         state.activeSheet = .endTimePicker
     }
-
+    
     func presentAppBlockerSheet() {
         state.activeSheet = .appBlockerSheet
     }
-
+    
     func selectPreset(_ preset: FocusPreset) {
-        if state.scheduleConfiguration.selectedPreset == preset {
-            state.scheduleConfiguration.selectedPreset = nil
-        } else {
+        if state.scheduleConfiguration.selectedPreset != preset {
             state.scheduleConfiguration.selectedPreset = preset
+            state.scheduleConfiguration.customPresetEmoji = ""
         }
     }
-
+    
     func startTapped() {
         print("Start button tapped!")
         print("Current List Name: \(state.scheduleConfiguration.listName)")
@@ -102,6 +104,7 @@ final class FocusSessionViewModel {
         print("End Time: \(state.scheduleConfiguration.endTime)")
         print("Selected Hours: \(state.scheduleConfiguration.selectedHours)")
         print("Selected Minutes: \(state.scheduleConfiguration.selectedMinutes)")
+        print("Custom Preset Emoji: \(state.scheduleConfiguration.customPresetEmoji)")
     }
     
     func needToDismissSheet(_ sheet: SheetType?) {
@@ -117,9 +120,16 @@ final class FocusSessionViewModel {
     }
     
     func setScheduledConfiguration(selectedPreset: FocusPreset?) {
-        state.scheduleConfiguration.selectedPreset = selectedPreset
+        if let preset = selectedPreset {
+            state.scheduleConfiguration.selectedPreset = preset
+            state.scheduleConfiguration.listName = preset.name
+            state.scheduleConfiguration.customPresetEmoji = ""
+        } else if state.scheduleConfiguration.selectedPreset == nil {
+            state.scheduleConfiguration.selectedPreset = FocusPreset.allCases.randomElement()
+            state.scheduleConfiguration.listName = FocusSessionView.Constants.DefaultValues.listName
+            state.scheduleConfiguration.customPresetEmoji = ""
+        }
     }
-    
     func set(scheduleConfiguration: ScheduleConfiguration) {
         state.scheduleConfiguration = scheduleConfiguration
     }
@@ -131,4 +141,14 @@ final class FocusSessionViewModel {
     func set(endTime: Date) {
         state.scheduleConfiguration.endTime = endTime
     }
+    
+    func setCustomPresetEmoji(_ emoji: String) {
+        state.scheduleConfiguration.customPresetEmoji = emoji
+        state.scheduleConfiguration.selectedPreset = nil
+    }
+    
+    func handlePresetIconTap(isEmojiTextFieldFocused: FocusState<Bool>.Binding) {
+        state.scheduleConfiguration.selectedPreset = nil
+    }
 }
+

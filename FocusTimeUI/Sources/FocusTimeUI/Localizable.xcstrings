@@ -4,8 +4,20 @@
     "" : {
 
     },
+    "Choose when the session ends" : {
+      "comment" : "Title for end session subtitle"
+    },
+    "Choose when the session starts" : {
+      "comment" : "Title for start session subtitle"
+    },
     "Dismiss current screen." : {
 
+    },
+    "End Time" : {
+      "comment" : "Title for end time"
+    },
+    "Start Time" : {
+      "comment" : "Title for start time"
     }
   },
   "version" : "1.1"

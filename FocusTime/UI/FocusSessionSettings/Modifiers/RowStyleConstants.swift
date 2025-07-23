@@ -10,8 +10,8 @@ import FocusTimeUI
 
 extension FocusSessionView.Constants {
     // MARK: - Constants for RowStyle
-    public enum Row {
-        public static let height: CGFloat = 64
-        public static let cornerRadius: CGFloat = 12
+    enum Row {
+        static let height: CGFloat = 64
+        static let cornerRadius: CGFloat = 12
     }
 }

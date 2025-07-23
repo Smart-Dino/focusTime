@@ -19,11 +19,8 @@ public struct TimePickerSheetView: View {
     }
 
     public var body: some View {
-        ZStack {
-            Color.ftPresetBackgroundColor
-                .ignoresSafeArea()
-
-            VStack(spacing: TimePickerConstants.Layout.mainSpacing) {
+  
+            VStack() {
                 Text(title)
                     .font(.headline)
                     .foregroundStyle(.blue)
@@ -35,13 +32,13 @@ public struct TimePickerSheetView: View {
 
                 timePicker
                     .padding(.bottom)
-                    .frame(width: TimePickerConstants.Layout.containerWidth, height: TimePickerConstants.Layout.containerHeight)
+                    .frame(height: TimePickerConstants.Layout.containerHeight)
                     .background {
-                        Color.ftTimePickerBackgroundColor
+                        Color.ftWheelTimePickerBackgroundColor
                             .cornerRadius(TimePickerConstants.Layout.containerCornerRadius)
                     }
             }
-        }
+        
         .presentationDragIndicator(.visible)
     }
 
@@ -52,9 +49,17 @@ public struct TimePickerSheetView: View {
             displayedComponents: .hourAndMinute
         )
         .datePickerStyle(.wheel)
-        .labelsHidden()
         .frame(width: TimePickerConstants.Layout.pickerWidth)
         .clipped()
-        .environment(\.locale, Locale(identifier: "en_CH"))
     }
 }
+
+extension UIDatePicker {
+    open override var intrinsicContentSize: CGSize {
+        CGSize(
+            width: UIView.noIntrinsicMetric,
+            height: super.intrinsicContentSize.height
+        )
+    }
+}
+

@@ -13,27 +13,45 @@ extension FocusSessionView.Constants {
     enum DurationPicker {
         
         enum Time {
-            public static let hoursInDay = 24
-            public static let minutesInHour = 60
+            static let hoursInDay = 24
+            static let minutesInHour = 60
         }
         
         enum Strings {
-            public static let durationPickerTitle = "Session Length"
-            public static let durationPickerSubtitle = "Choose how long you want to stay focused"
-            public static let hoursPickerTitle = "Hours"
-            public static let minutesPickerTitle = "Minutes"
+            static let durationPickerTitle = String(
+                localized: "Session Length",
+                table: "SessionLocalizable",
+                comment: "Title for the duration picker sheet"
+            )
+            static let durationPickerSubtitle = String(
+                localized: "Choose how long you want to stay focused",
+                table: "SessionLocalizable",
+                comment: "Subtitle for the duration picker sheet"
+            )
+            static let hoursPickerTitle = String(
+                localized: "Hours",
+                table: "SessionLocalizable",
+                comment: "Label for hours picker in duration sheet"
+            )
+            static let minutesPickerTitle = String(
+                localized: "Minutes",
+                table: "SessionLocalizable",
+                comment: "Label for minutes picker in duration sheet"
+            )
         }
         
         enum Layout {
-            public static let mainSpacing: CGFloat = 16
-            public static let containerWidth: CGFloat = 139
-            public static let containerHeight: CGFloat = 213
-            public static let containerCornerRadius: CGFloat = 13
-            public static let pickerWidth: CGFloat = 70
+            static let containerWidth: CGFloat = 139
+            static let containerHeight: CGFloat = 213
+            static let containerCornerRadius: CGFloat = 13
+            static let pickerWidth: CGFloat = 70
+            static let activePickerWidth: CGFloat = 134
+            static let activePickerHeight: CGFloat = 35
+            static let activePickerCornerRadius: CGFloat = 7
         }
         
         enum Colors {
-            public static let pickerBackground = Color(.darkGray).opacity(0.1)
+            static let pickerBackground = Color(.darkGray).opacity(0.1)
         }
     }
 }

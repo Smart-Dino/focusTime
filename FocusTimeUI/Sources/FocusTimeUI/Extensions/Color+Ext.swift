@@ -32,7 +32,7 @@ public extension Color {
     static var ftGradientBottomColor: Color { Color( "GradientBottomColor", bundle: .module) }
     static var ftPresetBackgroundColor: Color { Color( "PresetBackgroundColor", bundle: .module) }
     static var ftPresetSelectedBackgroundColor: Color { Color( "PresetSelectedBackgroundColor", bundle: .module) }
-    static var ftTimePickerBackgroundColor: Color { Color( "TimePickerBackgroundColor", bundle: .module) }
-    
+    static var ftWheelTimePickerBackgroundColor: Color { Color( "WheelTimePickerBackgroundColor", bundle: .module) }
+    static var ftTimePickerActiveColor: Color { Color( "TimePickerActiveColor", bundle: .module) }
 }
 

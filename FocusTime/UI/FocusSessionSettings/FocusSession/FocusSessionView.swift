@@ -11,13 +11,13 @@ import FocusTimeUI
 struct FocusSessionView: View {
     
     @State private var viewModel: FocusSessionViewModel
+    @FocusState private var isEmojiTextFieldFocused: Bool
     
     init(viewModel: FocusSessionViewModel = FocusSessionViewModel()) {
         self.viewModel = viewModel
     }
     
     var body: some View {
-        
         NavigationStack {
             ZStack {
                 ScrollView {
@@ -32,8 +32,10 @@ struct FocusSessionView: View {
                                 onStartTimeTap: viewModel.presentStartTimePicker,
                                 onEndTimeTap: viewModel.presentEndTimePicker,
                                 onAppsBlockedTap: viewModel.presentAppBlockerSheet,
-                                onScheduledDaysTap: {}
-                            )
+                                onScheduledDaysTap: {},
+                                onEmojiTapped: viewModel.handlePresetIconTap 
+                            ),
+                            isEmojiTextFieldFocused: _isEmojiTextFieldFocused,
                         )
                         
                         FocusPresetGridView(
