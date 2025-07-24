@@ -9,7 +9,7 @@ import Foundation
 
 enum ScheduleType: Codable, Hashable {
     case scheduled(startTime: TimeComponents, endTime: TimeComponents)
-    case oneTime(_ duration: DurationComponents) // Duration, expressed in seconds.
+    case oneTime(_ duration: DurationComponents)
     
     var description: String {
         switch self {
