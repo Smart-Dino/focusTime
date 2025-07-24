@@ -7,6 +7,7 @@
 
 import SwiftUI
 import FocusTimeUI
+import DeviceActivity
 
 struct HomeView: View {
     @State var viewModel: HomeViewModel
@@ -37,15 +38,13 @@ struct HomeView: View {
                 
                 // Timer
                 VStack {
-                    Text(Constants.Strings.timerValue)
-                        .font(.largeTitle).bold()
-                        .foregroundStyle(
-                            LinearGradient(
-                                colors: [.ftMainBlue, .ftBackgroundBlue],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
+                    DeviceActivityReport(
+                        .totalActivity,
+                        filter: DeviceActivityFilter(
+                            users: .all, devices: .init([.iPhone])
                         )
+                    )
+                    .border(.red, width: 2)
                     Text(Constants.Strings.timerSubtitle)
                         .font(.callout)
                         .foregroundStyle(.ftGray3)
@@ -104,13 +103,8 @@ struct HomeView: View {
     }
 }
 
-#warning("No preview.")
-//#Preview {
-//    NavigationStack {
-//        if let scheduleStore = ScheduleStore(isStoredInMemoryOnly: true) {
-//            HomeView(viewModel: .init(scheduleStore: scheduleStore))
-//        } else {
-//            Text("Could not initialize ScheduleStore.")
-//        }
-//    }
-//}
+#Preview {
+    NavigationStack {
+        HomeView(viewModel: .init(modelContainer: PreviewData.memoryOnlyModelContainer))
+    }
+}
