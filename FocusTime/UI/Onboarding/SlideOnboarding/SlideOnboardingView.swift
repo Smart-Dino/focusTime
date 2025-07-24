@@ -25,7 +25,9 @@ struct SlideOnboardingView: View {
                 .setStartAppButtonConfiguration(ButtonUIConfiguration(
                     title: String(localized: "Start Focusing", table: "OnboardingLocalizable"),
                     buttonStyle: PrimaryButtonStyle(
-                        backgroundColor: .ftMainBlue),
+                        backgroundColor: .ftMainBlue,
+                        verticalPadding: 14
+                    ),
                     {
                         // TODO: - Replace with actual navigation logic
                     }
@@ -34,9 +36,7 @@ struct SlideOnboardingView: View {
                     activeColor: .blue,
                     inactiveColor: Color.gray.opacity(SlideOnboardingConstants.Layout.progressBarInactiveColorOpacity)
                 ))
-                .setSizeUIConfiguration(SizeUIConfiguration(
-                    textContainerHeight: SlideOnboardingConstants.Layout.textContainerHeight
-                ))
+                .setSizeUIConfiguration(SizeUIConfiguration())
                 .setThemeStyle(OnboardingThemeStyle(
                     skipButtonTextColor: .blue,
                     backgroundView: AnyView(
@@ -44,7 +44,7 @@ struct SlideOnboardingView: View {
                             Image("OnboardingSlideQuizBackground")
                                 .resizable()
                             
-                            Color(.FTQuizSlideOnboardingMaskColour)
+                            Color(.ftQuizSlideOnboardingMaskColor)
                                 .opacity(SlideOnboardingConstants.Layout.OnboardingMaskOpacity)
                         }
                     )

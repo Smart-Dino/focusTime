@@ -14,7 +14,7 @@ public extension ShapeStyle where Self == Color {
     static var ftBackground: Color { Color("BackgroundColor", bundle: .module) }
     static var ftBackgroundBlueColor: Color { Color("BackgroundBlueColor", bundle: .module) }
     #warning("Move to extension color")
-    static var FTQuizSlideOnboardingMaskColour: Color { Color("QuizOnboardingMaskColour", bundle: .module) }
+    static var ftQuizSlideOnboardingMaskColor: Color { Color("QuizOnboardingMaskColour", bundle: .module) }
     // MARK: - Blue
     static var ftDarkBlue: Color { Color("DarkBlueColor", bundle: .module) }
     static var ftMainBlue: Color { Color("MainBlueColor", bundle: .module) }
