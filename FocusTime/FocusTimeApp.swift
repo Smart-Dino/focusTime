@@ -16,10 +16,10 @@ struct FocusTimeApp: App {
     
     var body: some Scene {
         WindowGroup {
-//            MainFlowCoordinatorView(viewModel: .init(modelContainer: modelContainer))
-            ShieldDebugView(
-                viewModel: .init(modelContainer: modelContainer)
-            )
+            MainFlowCoordinatorView(viewModel: .init(modelContainer: modelContainer))
+//            ShieldDebugView(
+//                viewModel: .init(modelContainer: modelContainer)
+//            )
         }
     }
     

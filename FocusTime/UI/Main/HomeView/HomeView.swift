@@ -39,12 +39,10 @@ struct HomeView: View {
                 // Timer
                 VStack {
                     DeviceActivityReport(
-                        .totalActivity,
-                        filter: DeviceActivityFilter(
-                            users: .all, devices: .init([.iPhone])
-                        )
+                        Constants.ActivityConfiguration.context,
+                        filter: Constants.ActivityConfiguration.filter
                     )
-                    .border(.red, width: 2)
+                    .frame(height: Constants.Layout.activityReportSceneHeight)
                     Text(Constants.Strings.timerSubtitle)
                         .font(.callout)
                         .foregroundStyle(.ftGray3)
@@ -72,7 +70,7 @@ struct HomeView: View {
                     .buttonStyle(.plain)
                     .padding(.horizontal)
                     // MARK: - Schedule
-                    #warning("Placeholder")
+#warning("Placeholder")
                     if true {
                         FTHomeSessionCardView(
                             title: "Work time",
@@ -88,7 +86,7 @@ struct HomeView: View {
         // MARK: - Bottom floating button
         .safeAreaInset(edge: .bottom) {
             Button(Constants.Strings.bottomButtonTitle, systemImage: Constants.Icons.hourglass) {
-                #warning("Action is empty")
+#warning("Action is empty")
             }
             .buttonStyle(.ftPrimary)
             .padding()
