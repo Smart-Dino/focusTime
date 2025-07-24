@@ -44,8 +44,8 @@ final class ScheduledFocusListViewModel {
                         emoji: "🏠",
                         name: "Schedule - \(number)",
                         days: [.saturday, .sunday],
-                        type: .scheduled(startTime: TimeComponents(hour: 17, minute: 00),
-                                         endTime: TimeComponents(hour: 19, minute: 00))
+                        type: .scheduled(startTime: TimeComponents(hour: 17, minute: 00)!,
+                                         endTime: TimeComponents(hour: 19, minute: 00)!)
                     )
                 }
                 try await self.scheduleStore.insertBatch(itemsToInsert)

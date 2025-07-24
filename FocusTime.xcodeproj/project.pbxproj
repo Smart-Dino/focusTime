@@ -84,6 +84,7 @@
 				BusinessLogic/Models/Blocking/BlockItem/Helpers/ProtectedActivitySelection.swift,
 				BusinessLogic/Models/Blocking/BlockItem/ProtectedBlockItem.swift,
 				BusinessLogic/Models/Blocking/CodableActivityIdentifier/CodableActivityIdentifier.swift,
+				BusinessLogic/Models/Blocking/Schedule/Helpers/DurationComponents.swift,
 				BusinessLogic/Models/Blocking/Schedule/Helpers/ScheduleType.swift,
 				BusinessLogic/Models/Blocking/Schedule/Helpers/TimeComponents.swift,
 				BusinessLogic/Models/Blocking/Schedule/Helpers/Weekday.swift,

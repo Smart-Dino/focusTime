@@ -55,7 +55,7 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
                 }
             }
         case .oneTime(let duration):
-            try registerDurationActivity(for: schedule, duration: duration.durationInSeconds)
+            try registerDurationActivity(for: schedule, duration: duration.rawValue)
         }
     }
     
@@ -109,8 +109,8 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
     
     private func registerRegularActivity(
         for schedule: ProtectedSchedule,
-        startTime: TimeComponents<TimeUnit>,
-        endTime: TimeComponents<TimeUnit>
+        startTime: TimeComponents,
+        endTime: TimeComponents
     ) async throws {
         guard schedule.persistentModelID != nil else { throw DeviceActivityRegistrarError.noPersistentItem }
         
@@ -141,8 +141,8 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
     
     private func registerFallbackActivity(
         for schedule: ProtectedSchedule,
-        startTime: TimeComponents<TimeUnit>,
-        endTime: TimeComponents<TimeUnit>
+        startTime: TimeComponents,
+        endTime: TimeComponents
     ) async throws {
         guard schedule.persistentModelID != nil else { throw DeviceActivityRegistrarError.noPersistentItem }
         
