@@ -24,8 +24,8 @@ extension PersistenceTests {
     }
     func makeProtectedTestSchedule(name: String = UUID().uuidString) -> ProtectedSchedule {
         let weekdays: Set<Weekday> = Weekday.weekdays
-        let start = TimeComponents<TimeUnit>(hour: 9, minute: 0)
-        let end = TimeComponents<TimeUnit>(hour: 17, minute: 0)
+        let start = TimeComponents(hour: 9, minute: 0)!
+        let end = TimeComponents(hour: 17, minute: 0)!
         return ProtectedSchedule(
             emoji: "📅",
             name: name,

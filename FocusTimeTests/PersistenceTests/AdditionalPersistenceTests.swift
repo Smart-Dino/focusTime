@@ -25,8 +25,8 @@ extension PersistenceTests {
                 emoji: "🏠",
                 name: "Spend time with family",
                 days: [.saturday, .sunday],
-                type: .scheduled(startTime: .init(hour: 17, minute: 00),
-                                 endTime: .init(hour: 19, minute: 00))
+                type: .scheduled(startTime: .init(hour: 17, minute: 00)!,
+                                 endTime: .init(hour: 19, minute: 00)!)
             ),
             count: eachItemCount
         )

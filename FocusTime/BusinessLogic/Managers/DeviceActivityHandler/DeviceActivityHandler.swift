@@ -49,7 +49,7 @@ struct DeviceActivityHandler: Sendable {
         schedule: Schedule,
         activity: DeviceActivityName,
         activityIdentifier: CodableActivityIdentifier,
-        endTime endTimeComponent: TimeComponents<TimeUnit>
+        endTime endTimeComponent: TimeComponents
     ) async {
         // Make sure the current day is the block day.
         guard let blockItems = schedule.blockItems, schedule.days.contains(Weekday.currentDay) else { return }

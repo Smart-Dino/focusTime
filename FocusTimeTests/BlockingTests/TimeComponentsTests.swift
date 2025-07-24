@@ -25,7 +25,7 @@ struct TimeComponentsTests {
         hour: Int,
         minute: Int,
     ) async throws {
-        let timeComponents = TimeComponents<TimeUnit>(hour: hour, minute: minute)
+        let timeComponents = try #require(TimeComponents(hour: hour, minute: minute))
         let components = timeComponents.dateComponents
         #expect(
             components.hour == hour,
@@ -47,11 +47,11 @@ struct TimeComponentsTests {
             (23, 59)
         ]
     )
-    func testInitSetsSeconds(hour: Int, minute: Int) async throws {
+    func testInitSetsSeconds(hour: Int, minute: Int) {
         let expectedSeconds = hour * 3600 + minute * 60
-        let timeComponents = TimeComponents<TimeUnit>(hour: hour, minute: minute)
+        let timeComponents = TimeComponents(hour: hour, minute: minute)
                 
-        let reconstructed = TimeComponents<TimeUnit>(secondsSinceMidnight: expectedSeconds)
+        let reconstructed = TimeComponents(secondsSinceMidnight: expectedSeconds)
         #expect(
             reconstructed == timeComponents,
             "TimeComponents(hour: \(hour), minute: \(minute)) should equal TimeComponents(secondsSince1970: \(expectedSeconds))"
@@ -68,7 +68,7 @@ struct TimeComponentsTests {
             (17, 45)
         ]
     )
-    func testInitFromDate(hour: Int, minute: Int) async throws {
+    func testInitFromDate(hour: Int, minute: Int) throws {
         var components = DateComponents()
         components.hour = hour
         components.minute = minute
@@ -94,8 +94,8 @@ struct TimeComponentsTests {
             (23, 59, 86_340)
           ]
     )
-    func testLocalizedTimeSince1970(hour: Int, minute: Int, expectedSeconds: Int) async throws {
-        let timeComponents = TimeComponents<TimeUnit>(hour: hour, minute: minute)
+    func testLocalizedTimeSince1970(hour: Int, minute: Int, expectedSeconds: Int) throws {
+        let timeComponents = try #require(TimeComponents(hour: hour, minute: minute))
         #expect(
             timeComponents.localizedSecondsSinceMidnight == expectedSeconds,
             "Expected localizedTimeSince1970 to be \(expectedSeconds), got \(timeComponents.localizedSecondsSinceMidnight)"
@@ -109,8 +109,8 @@ struct TimeComponentsTests {
             (23, 45)
           ]
     )
-    func testDescription(hour: Int, minute: Int) async throws {
-        let timeComponents = TimeComponents<TimeUnit>(hour: hour, minute: minute)
+    func testDescription(hour: Int, minute: Int) throws {
+        let timeComponents = try #require(TimeComponents(hour: hour, minute: minute))
         
         let formatter = DateFormatter()
         formatter.timeStyle = .short
@@ -128,26 +128,6 @@ struct TimeComponentsTests {
         )
     }
 
-    @Test("durationDescription returns correct format",
-          arguments: [
-            (1, 30),
-            (12, 0),
-            (0, 59),
-            (0, 0),
-            (23, 59),
-            (50, 00),
-            (33, 00)
-          ]
-    )
-    func testDurationDescription(hour: Int, minute: Int) async throws {
-        let expectedSeconds = hour * 3600 + minute * 60
-        let timeComponents = TimeComponents<TimeDuration>(hour: hour, minute: minute)
-        #expect(
-            timeComponents.durationInSeconds == expectedSeconds,
-            "durationInSeconds did not match: got \(timeComponents.durationInSeconds), expected: \(expectedSeconds)"
-        )
-    }
-
     @Test("localizedDate returns date with correct hour and minute",
           arguments: [
             (0, 0),
@@ -155,8 +135,8 @@ struct TimeComponentsTests {
             (23, 59)
           ]
     )
-    func testLocalizedDate(hour: Int, minute: Int) async throws {
-        let timeComponents = TimeComponents<TimeUnit>(hour: hour, minute: minute)
+    func testLocalizedDate(hour: Int, minute: Int) throws {
+        let timeComponents = try #require(TimeComponents(hour: hour, minute: minute))
         let date = timeComponents.localizedDate
         
         let calendar = Calendar.current

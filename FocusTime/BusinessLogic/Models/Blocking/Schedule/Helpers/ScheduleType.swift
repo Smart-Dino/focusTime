@@ -8,15 +8,15 @@
 import Foundation
 
 enum ScheduleType: Codable, Hashable {
-    case scheduled(startTime: TimeComponents<TimeUnit>, endTime: TimeComponents<TimeUnit>)
-    case oneTime(_ duration: TimeComponents<TimeDuration>) // Duration, expressed in seconds.
+    case scheduled(startTime: TimeComponents, endTime: TimeComponents)
+    case oneTime(_ duration: DurationComponents) // Duration, expressed in seconds.
     
     var description: String {
         switch self {
         case .scheduled(let startTime, let endTime):
             startTime.description + " " + endTime.description
         case .oneTime(let duration):
-            PeriodConverter.localizedConciseTimeString(from: duration.durationInSeconds)
+            PeriodConverter.localizedConciseTimeString(from: duration.rawValue)
         }
     }
 }
