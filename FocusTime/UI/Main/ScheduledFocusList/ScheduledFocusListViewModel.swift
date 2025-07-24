@@ -39,16 +39,15 @@ final class ScheduledFocusListViewModel {
     func insertTestItemsIntoDatabase() async {
         Task.detached(priority: .userInitiated) {
             do {
-                let itemsToInsert = Array(
-                    repeating: ProtectedSchedule(
+                let itemsToInsert = (0..<100).map { number in
+                    ProtectedSchedule(
                         emoji: "🏠",
-                        name: "Spend time with family",
+                        name: "Schedule - \(number)",
                         days: [.saturday, .sunday],
                         type: .scheduled(startTime: TimeComponents(hour: 17, minute: 00),
                                          endTime: TimeComponents(hour: 19, minute: 00))
-                    ),
-                    count: 100
-                )
+                    )
+                }
                 try await self.scheduleStore.insertBatch(itemsToInsert)
                 await self.fetchNextPage()
                 await MainActor.run {

@@ -41,13 +41,13 @@ final class AppBlockingListViewModel {
     func insertTestItemsIntoDatabase() async {
         Task.detached(priority: .userInitiated) {
             do {
-                let itemsToInsert = Array(
-                    repeating: ProtectedBlockItem(
+                let itemsToInsert = (0..<100).map { number in
+                    ProtectedBlockItem(
                         emoji: "😜",
-                        name: "Block",
-                        blockedContent: ProtectedActivitySelection(FamilyActivitySelection())),
-                    count: 100
-                )
+                        name: "Block - \(number)",
+                        blockedContent: ProtectedActivitySelection(FamilyActivitySelection())
+                    )
+                }
                 try await self.blockItemStore.insertBatch(itemsToInsert)
                 
                 await self.fetchNextPage()
