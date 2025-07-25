@@ -20,9 +20,14 @@ public extension ShapeStyle where Self == Color {
     static var onboardingPaywallContentPad: Color { Color("OnboardingPaywallContentPadColor", bundle: .module) }
     // MARK: - UIKit Adapted
     // https://stackoverflow.com/questions/65493461/get-dark-style-of-uicolor
-    static var ftGray3: Color {
+    static var ftGray3Light: Color {
         Color(
             uiColor: UIColor.systemGray3.resolvedColor(with: .init(userInterfaceStyle: .light))
+        )
+    }
+    static var ftGray5Dark: Color {
+        Color(
+            uiColor: UIColor.systemGray5.resolvedColor(with: .init(userInterfaceStyle: .dark))
         )
     }
 }

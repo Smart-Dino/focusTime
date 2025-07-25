@@ -46,7 +46,7 @@ struct OnboardingPaywallView: View {
                         .font(Constants.Fonts.navigationTitle)
                     Text(Constants.Strings.appSlogan)
                         .font(.subheadline)
-                        .foregroundStyle(.ftGray3)
+                        .foregroundStyle(.ftGray3Light)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal)
@@ -133,7 +133,7 @@ struct OnboardingPaywallView: View {
                     .padding(.vertical, Constants.Padding.featureList)
             }
         }
-        .foregroundStyle(.ftGray3)
+        .foregroundStyle(.ftGray3Light)
     }
     
     /// Toolbar items.
