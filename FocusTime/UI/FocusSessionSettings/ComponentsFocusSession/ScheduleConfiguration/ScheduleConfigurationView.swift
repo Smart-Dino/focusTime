@@ -118,8 +118,7 @@ struct ScheduleConfigurationView: View {
                     Text(formattedFullScheduledDays)
                         .font(.caption)
                 }
-                
-                
+       
                 Button {
                     actions.onStartTimeTap()
                 } label: {

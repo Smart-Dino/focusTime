@@ -31,7 +31,14 @@ struct FocusPresetGridView: View {
                     } label: {
                         PresetIconView(
                             preset: preset,
-                            isSelected: selectedPreset == preset
+                            isSelected: Binding(
+                                get: { selectedPreset == preset },
+                                set: { newValue in
+                                    if newValue {
+                                        selectedPreset = preset
+                                    }
+                                }
+                            )
                         )
                     }
                 }

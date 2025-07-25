@@ -10,7 +10,7 @@ import FocusTimeUI
 
 struct PresetIconView: View {
     let preset: FocusPreset
-    let isSelected: Bool
+    @Binding var isSelected: Bool
     
     var body: some View {
         VStack(spacing: FocusSessionView.Constants.PresetIcon.Layout.mainSpacing) {
@@ -30,5 +30,5 @@ struct PresetIconView: View {
 
 
 #Preview {
-    PresetIconView(preset: .morningRoutine, isSelected: true)
+    PresetIconView(preset: .morningRoutine, isSelected: .constant(true))
 }
