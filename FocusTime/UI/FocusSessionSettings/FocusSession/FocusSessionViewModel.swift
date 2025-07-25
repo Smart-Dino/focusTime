@@ -34,6 +34,8 @@ final class FocusSessionViewModel {
             !scheduleConfiguration.listName.trimmingCharacters(in: .whitespaces).isEmpty
         }
         
+        var isEmojiTextFieldFocused: FocusState<Bool>
+        
         init(
             presets: [FocusPreset] = FocusPreset.allCases,
             scheduleConfiguration: ScheduleConfiguration = ScheduleConfiguration(
@@ -55,6 +57,7 @@ final class FocusSessionViewModel {
             }
             self.scheduleConfiguration = initialConfig
             self.activeSheet = activeSheet
+            self.isEmojiTextFieldFocused = .init()
         }
     }
     

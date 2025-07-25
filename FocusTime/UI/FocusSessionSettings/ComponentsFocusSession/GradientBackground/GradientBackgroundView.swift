@@ -54,11 +54,10 @@ struct GradientBackgroundModifier: ViewModifier {
     /// - Parameter content: The view content to display above the gradient background.
     /// - Returns: A view with the gradient background layered beneath the content.
     func body(content: Content) -> some View {
-        ZStack {
-            GradientBackgroundView()
-                .ignoresSafeArea()
-            content
-        }
+        content
+            .background {
+                GradientBackgroundView()
+            }
     }
 }
 
