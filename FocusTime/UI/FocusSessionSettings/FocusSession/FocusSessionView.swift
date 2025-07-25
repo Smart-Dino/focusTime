@@ -17,6 +17,7 @@ struct FocusSessionView: View {
     }
     
     var body: some View {
+
         ScrollView {
             VStack(spacing: Constants.Layout.mainVStackSpacing) {
                 ScheduleConfigurationView(
@@ -33,6 +34,7 @@ struct FocusSessionView: View {
                         onEmojiTapped: viewModel.handlePresetIconTap
                     ),
                     isEmojiTextFieldFocused: viewModel.state.isEmojiTextFieldFocused,
+
                 )
                 
                 FocusPresetGridView(
