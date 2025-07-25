@@ -10,11 +10,11 @@ import SwiftUI
 public struct FTHomeSessionCardView: View {
     public enum CardMode {
         case scheduled(timeRange: String)
-        case countdown(timeLeft: Int, isPaused: Binding<Bool>)
+        case countdown(viewModel: FocusSessionTimerModel)
     }
     
     private let title: String
-    private let mode: CardMode
+    @State private var mode: CardMode
     
     public var body: some View {
         HStack(spacing: 15) {
@@ -26,17 +26,19 @@ public struct FTHomeSessionCardView: View {
                         .foregroundStyle(.ftGray3Light)
                 }
                 Spacer()
-            case .countdown(let timeLeft, let isPaused):
+            case .countdown(let viewModel):
                 VStack(alignment: .leading) {
                     Text(title)
-                    Text(formatTime(seconds: timeLeft))
+                    Text(viewModel.state.formattedTime)
                         .foregroundStyle(.ftGray3Light)
                 }
                 Spacer()
                 Button {
-                    isPaused.wrappedValue.toggle()
+                    viewModel.setIsPaused(
+                        !viewModel.state.isPaused.wrappedValue
+                    )
                 } label: {
-                    isPaused.wrappedValue
+                    viewModel.state.isPaused.wrappedValue
                     ? Image(systemName: "play.circle").foregroundStyle(.blue)
                     : Image(systemName: "pause.circle").foregroundStyle(.red)
                 }
@@ -66,35 +68,33 @@ public struct FTHomeSessionCardView: View {
     
     public init(
         title: String,
-        mode: CardMode
+        mode: CardMode,
     ) {
         self.title = title
         self.mode = mode
     }
     
-    func formatTime(seconds: Int) -> String {
-        let hrs = seconds / 3600
-        let mins = (seconds % 3600) / 60
-        let secs = seconds % 60
-        return String(format: "%02d:%02d:%02d", hrs, mins, secs)
-    }
-
-    
 }
 
-#Preview(traits: .sizeThatFitsLayout) {
-    @Previewable let timer = Timer.publish(every: 1, on: .current, in: .default).autoconnect()
-    
-    @Previewable @State var isPaused = false
-    @Previewable @State var timeLeft = 100
-    Text("Is paused: " + isPaused.description)
+#Preview("Scheduled", traits: .sizeThatFitsLayout) {
     FTHomeSessionCardView(
         title: "Work time",
-        mode: .countdown(timeLeft: timeLeft, isPaused: $isPaused)
+        mode: .scheduled(timeRange: "8:00 - 16:00"),
     )
-    .padding()
     .preferredColorScheme(.dark)
-    .onReceive(timer) { _ in
-        timeLeft -= 1
-    }
+}
+
+
+#Preview("Countdown", traits: .sizeThatFitsLayout) {
+    @Previewable @State var isPaused = false
+    FTHomeSessionCardView(
+        title: "Work time",
+        mode: .countdown(
+            viewModel: FocusSessionTimerModel(
+                state: .init(isPaused: $isPaused),
+                deadline: .now.addingTimeInterval(70)
+            )
+        ),
+    )
+    .preferredColorScheme(.dark)
 }
