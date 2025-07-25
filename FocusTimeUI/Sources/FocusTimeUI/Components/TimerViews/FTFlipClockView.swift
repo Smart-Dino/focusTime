@@ -10,7 +10,7 @@ import SwiftUI
 public struct FTFlipClockView: View {
     let configuration: FTFlipClockConfiguration
     
-    @State private var viewModel: FocusSessionTimerModel
+    private let viewModel: FocusSessionTimerModel // Indeed does work with no @State.
     
     public var body: some View {
         HStack {

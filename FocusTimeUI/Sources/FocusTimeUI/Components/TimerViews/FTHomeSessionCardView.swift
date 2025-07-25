@@ -14,7 +14,7 @@ public struct FTHomeSessionCardView: View {
     }
     
     private let title: String
-    @State private var mode: CardMode
+    @State private var mode: CardMode // Does not work without @State.
     
     public var body: some View {
         HStack(spacing: 15) {
@@ -34,11 +34,9 @@ public struct FTHomeSessionCardView: View {
                 }
                 Spacer()
                 Button {
-                    viewModel.setIsPaused(
-                        !viewModel.state.isPaused.wrappedValue
-                    )
+                    viewModel.togglePause()
                 } label: {
-                    viewModel.state.isPaused.wrappedValue
+                    viewModel.state.observableIsPaused
                     ? Image(systemName: "play.circle").foregroundStyle(.blue)
                     : Image(systemName: "pause.circle").foregroundStyle(.red)
                 }
