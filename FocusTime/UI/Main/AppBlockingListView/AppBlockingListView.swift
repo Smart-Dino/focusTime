@@ -31,7 +31,7 @@ struct AppBlockingListView: View {
                         .font(Constants.Fonts.navigationTitle)
                     Text(Constants.Strings.navSubtitle)
                         .font(.subheadline)
-                        .foregroundStyle(.ftGray3)
+                        .foregroundStyle(.ftGray3Light)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 
@@ -100,7 +100,7 @@ struct AppBlockingListView: View {
                 .bold()
             Text(Constants.Strings.noBlocklistsMessage)
                 .multilineTextAlignment(.center)
-                .foregroundStyle(.ftGray3)
+                .foregroundStyle(.ftGray3Light)
             Spacer()
         }
     }

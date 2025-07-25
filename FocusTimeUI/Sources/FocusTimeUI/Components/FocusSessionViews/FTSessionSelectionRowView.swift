@@ -25,7 +25,7 @@ public struct FTSessionSelectionRowView: View {
                 VStack(alignment: .leading) {
                     Text(title)
                     Text(description)
-                        .foregroundStyle(.ftGray3)
+                        .foregroundStyle(.ftGray3Light)
                 }
                 Spacer()
                 Image(systemName: "chevron.right")

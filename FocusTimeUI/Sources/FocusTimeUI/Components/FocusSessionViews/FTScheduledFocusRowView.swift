@@ -19,7 +19,7 @@ public struct FTScheduledFocusRowView: View {
             VStack(alignment: .leading) {
                 Text(title)
                 Text(description)
-                    .foregroundStyle(.ftGray3)
+                    .foregroundStyle(.ftGray3Light)
             }
             Spacer()
             Image(systemName: "hourglass.bottomhalf.filled")

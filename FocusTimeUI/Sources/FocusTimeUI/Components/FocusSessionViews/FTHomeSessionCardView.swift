@@ -23,14 +23,14 @@ public struct FTHomeSessionCardView: View {
                 VStack(alignment: .leading) {
                     Text(title)
                     Text(timeRange)
-                        .foregroundStyle(.ftGray3)
+                        .foregroundStyle(.ftGray3Light)
                 }
                 Spacer()
             case .countdown(let timeLeft, let isPaused):
                 VStack(alignment: .leading) {
                     Text(title)
                     Text(formatTime(seconds: timeLeft))
-                        .foregroundStyle(.ftGray3)
+                        .foregroundStyle(.ftGray3Light)
                 }
                 Spacer()
                 Button {

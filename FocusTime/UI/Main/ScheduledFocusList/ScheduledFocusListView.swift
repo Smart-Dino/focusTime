@@ -90,19 +90,14 @@ struct ScheduledFocusListView: View {
                 .bold()
             Text(Constants.Strings.noSchedulesMessage)
                 .multilineTextAlignment(.center)
-                .foregroundStyle(.ftGray3)
+                .foregroundStyle(.ftGray3Light)
             Spacer()
         }
     }
 }
 
-#warning("No preview.")
-//#Preview {
-//    NavigationStack {
-//        if let scheduleStore = ScheduleStore(isStoredInMemoryOnly: true) {
-//            ScheduledFocusListView(viewModel: .init(scheduleStore: scheduleStore))
-//        } else {
-//            Text("Could not initialize ScheduleStore.")
-//        }
-//    }
-//}
+#Preview {
+    NavigationStack {
+        ScheduledFocusListView(viewModel: .init(modelContainer: PreviewData.memoryOnlyModelContainer))
+    }
+}

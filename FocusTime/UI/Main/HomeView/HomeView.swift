@@ -48,7 +48,7 @@ struct HomeView: View {
                         )
                     Text(Constants.Strings.timerSubtitle)
                         .font(.callout)
-                        .foregroundStyle(.ftGray3)
+                        .foregroundStyle(.ftGray3Light)
                 }
                 VStack(spacing: .zero) {
                     // MARK: - Scheduled focus button
@@ -62,7 +62,7 @@ struct HomeView: View {
                                     .bold()
                                 Text(Constants.Strings.scheduledFocusSubtitle)
                                     .font(.subheadline)
-                                    .foregroundStyle(.ftGray3)
+                                    .foregroundStyle(.ftGray3Light)
                             }
                             Spacer()
                             Image(systemName: Constants.Icons.chevronRight)
