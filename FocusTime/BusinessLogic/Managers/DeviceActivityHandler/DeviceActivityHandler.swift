@@ -46,14 +46,12 @@ struct DeviceActivityHandler: Sendable {
         try? await shieldManager.unblock()
         // Reset duration values.
         guard case .oneTime(let duration, _, _, _) = schedule.type else { return }
-        if case .oneTime = schedule.type {
-            schedule.type = .oneTime(
-                duration,
-                startedAt: nil,
-                suspendedAt: nil,
-                timeLeft: duration
-            )
-        }
+        schedule.type = .oneTime(
+            duration,
+            startedAt: nil,
+            suspendedAt: nil,
+            timeLeft: duration
+        )
     }
     
     private func handleRegularBlocking(

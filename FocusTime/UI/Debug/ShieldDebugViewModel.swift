@@ -232,8 +232,9 @@ final class ShieldDebugViewModel {
     }
     
     func suspendSession() async {
-        guard let schedule = try? await scheduleStore.fetch().first else { return }
         do {
+            let schedules = try await scheduleStore.fetch()
+            guard let schedule = schedules.first else { return }
             try await activityRegistrar.suspendActivity(for: schedule)
         } catch {
             state.error = error
@@ -241,8 +242,9 @@ final class ShieldDebugViewModel {
     }
     
     func resumeSession() async {
-        guard let schedule = try? await scheduleStore.fetch().first else { return }
         do {
+            let schedules = try await scheduleStore.fetch()
+            guard let schedule = schedules.first else { return }
             try await activityRegistrar.resumeActivity(for: schedule)
         } catch {
             state.error = error
