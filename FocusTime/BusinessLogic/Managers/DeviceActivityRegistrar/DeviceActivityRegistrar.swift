@@ -13,5 +13,10 @@ protocol DeviceActivityRegistrar: Actor {
     // MARK: - Methods
     func registerActivity(during schedule: ProtectedSchedule) async throws
     func unregisterActivity(during schedule: ProtectedSchedule) async throws
+    
+    func suspendActivity(for schedule: ProtectedSchedule) async throws
+    func resumeActivity(for schedule: ProtectedSchedule) async throws
+    func isActivityRegistered(for schedule: ProtectedSchedule) throws -> Bool
+    
     func unregisterAll()
 }

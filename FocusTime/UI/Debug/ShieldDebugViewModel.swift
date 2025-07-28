@@ -57,10 +57,10 @@ final class ShieldDebugViewModel {
     ) {
         self.state = state
         self.shieldManager = shieldManager
-        self.activityRegistrar = LiveDeviceActivityRegistrar(modelContainer: modelContainer, shieldManager: shieldManager)
         self.scheduleStore = ScheduleStore(modelContainer: modelContainer)
         self.blockItemStore = BlockItemStore(modelContainer: modelContainer)
         self.relationshipCoordinator = RelationshipCoordinator(modelContainer: modelContainer)
+        self.activityRegistrar = LiveDeviceActivityRegistrar(scheduleStore: scheduleStore, shieldManager: shieldManager)
         
         Task {
             await activityRegistrar.unregisterAll()
@@ -111,6 +111,7 @@ final class ShieldDebugViewModel {
         do {
             try await blockItemStore.eraseAllData()
             try await scheduleStore.eraseAllData()
+            await activityRegistrar.unregisterAll()
             await fetchAllItems()
         } catch {
             state.error = error
@@ -132,7 +133,7 @@ final class ShieldDebugViewModel {
             
             switch state.scheduleType {
             case .oneTime:
-                type = .oneTime(.init(duration: state.duration * 60)) // Minutes to seconds.
+                type = .oneTime(DurationComponents(duration: state.duration * 60)) // Minutes to seconds.
             case .scheduled:
                 guard let startComponent = TimeComponents(from: state.startTime),
                       let endComponent = TimeComponents(from: state.endTime) else {
@@ -229,5 +230,24 @@ final class ShieldDebugViewModel {
             state.error = error
         }
     }
+    
+    func suspendSession() async {
+        guard let schedule = try? await scheduleStore.fetch().first else { return }
+        do {
+            try await activityRegistrar.suspendActivity(for: schedule)
+        } catch {
+            state.error = error
+        }
+    }
+    
+    func resumeSession() async {
+        guard let schedule = try? await scheduleStore.fetch().first else { return }
+        do {
+            try await activityRegistrar.resumeActivity(for: schedule)
+        } catch {
+            state.error = error
+        }
+    }
+    
 }
 

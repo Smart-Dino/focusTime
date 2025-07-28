@@ -137,6 +137,19 @@ struct ShieldDebugView: View {
                 }
             }
             
+            HStack {
+                Button("Suspend") {
+                    Task {
+                        await viewModel.suspendSession()
+                    }
+                }
+                Button("Resume") {
+                    Task {
+                        await viewModel.resumeSession()
+                    }
+                }
+            }
+            
             // MARK: - Controls
             sectionSeparator(sectionName: "Controls")
             VStack {
