@@ -51,7 +51,7 @@ struct DeviceActivityHandler: Sendable {
                 duration,
                 startedAt: nil,
                 suspendedAt: nil,
-                timeLeftSinceStartOrLastResumption: duration
+                timeLeft: duration
             )
         }
     }

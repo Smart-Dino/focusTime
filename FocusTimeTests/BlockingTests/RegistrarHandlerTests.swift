@@ -38,7 +38,6 @@ struct RegistrarHandlerTests {
         // Custom.
         let container = SharedTestHelpers.generateTestModelContainer()
         self.shieldManager = LiveShieldManager()
-        self.activityRegistrar = LiveDeviceActivityRegistrar(modelContainer: container, shieldManager: shieldManager)
         self.activityHandler = DeviceActivityHandler(container: container, shieldManager: shieldManager)
         
         // Stores.
@@ -46,6 +45,8 @@ struct RegistrarHandlerTests {
         self.blockItemStore = BlockItemStore(modelContainer: container)
         // Relationship manager.
         self.relationshipCoordinator = RelationshipCoordinator(modelContainer: container)
+        
+        self.activityRegistrar = LiveDeviceActivityRegistrar(scheduleStore: scheduleStore, shieldManager: shieldManager)
         
         // Reset.
         resetDeviceActivityCenter()
@@ -312,6 +313,116 @@ struct RegistrarHandlerTests {
             } else {
                 return false
             }
+        }
+    }
+    
+    @Test("Suspending an activity")
+    func suspendActivityTest() async throws {
+        // Setup: Register a duration-based schedule.
+        let duration = 90 // seconds
+        let schedule = ProtectedSchedule(
+            emoji: "⏸️",
+            name: "SuspendTest",
+            days: Set(Weekday.allCases),
+            type: .oneTime(.init(duration: duration))
+        )
+        let scheduleModelID = try await scheduleStore.insert(schedule)
+        let fetchedSchedule = try await scheduleStore.fetch(id: scheduleModelID)
+        try await activityRegistrar.registerActivity(during: fetchedSchedule)
+
+        // Confirm the activity is registered.
+        #expect(try await activityRegistrar.isActivityRegistered(for: fetchedSchedule))
+
+        // Suspend the activity.
+        try await activityRegistrar.suspendActivity(for: fetchedSchedule)
+        // After suspension, it should not be registered.
+        #expect(try await !activityRegistrar.isActivityRegistered(for: fetchedSchedule))
+    }
+
+    @Test("Resuming a suspended activity")
+    func resumeActivityTest() async throws {
+        // Setup: Register, then suspend a schedule.
+        let duration = 120 // seconds
+        let schedule = ProtectedSchedule(
+            emoji: "▶️",
+            name: "ResumeTest",
+            days: Set(Weekday.allCases),
+            type: .oneTime(.init(duration: duration))
+        )
+        let scheduleModelID = try await scheduleStore.insert(schedule)
+        let fetchedSchedule = try await scheduleStore.fetch(id: scheduleModelID)
+        try await activityRegistrar.registerActivity(during: fetchedSchedule)
+        try await activityRegistrar.suspendActivity(for: fetchedSchedule)
+
+        // Resume the activity.
+        try await activityRegistrar.resumeActivity(for: fetchedSchedule)
+        // After resumption, should be registered again.
+        #expect(try await activityRegistrar.isActivityRegistered(for: fetchedSchedule))
+    }
+
+    @Test("isActivityRegistered returns correct value after registration and unregistration")
+    func isActivityRegisteredTest() async throws {
+        // Register a schedule.
+        let duration = 60 // seconds
+        let schedule = ProtectedSchedule(
+            emoji: "🔍",
+            name: "RegisteredCheck",
+            days: Set(Weekday.allCases),
+            type: .oneTime(.init(duration: duration))
+        )
+        let scheduleModelID = try await scheduleStore.insert(schedule)
+        let fetchedSchedule = try await scheduleStore.fetch(id: scheduleModelID)
+        try await activityRegistrar.registerActivity(during: fetchedSchedule)
+
+        // Should be registered now.
+        #expect(try await activityRegistrar.isActivityRegistered(for: fetchedSchedule))
+
+        // Unregister.
+        try await activityRegistrar.unregisterActivity(during: fetchedSchedule)
+
+        // Should not be registered anymore.
+        #expect(try await !activityRegistrar.isActivityRegistered(for: fetchedSchedule))
+    }
+    
+    @Test("Correct time left after 4 minutes of suspension")
+    func suspensionTimeAccounting() async throws {
+        let testClock = TestClock(startingAt: Date())
+        let registrar = LiveDeviceActivityRegistrar(
+            center: DeviceActivityCenter(),
+            clock: testClock,
+            scheduleStore: scheduleStore,
+            shieldManager: shieldManager
+        )
+
+        let duration = 600 // 10 minutes
+        let schedule = ProtectedSchedule(
+            emoji: "⏳",
+            name: "TimeTravelTest",
+            days: Set(Weekday.allCases),
+            type: .oneTime(.init(duration: duration))
+        )
+        let scheduleModelID = try await scheduleStore.insert(schedule)
+        let fetchedSchedule = try await scheduleStore.fetch(id: scheduleModelID)
+        try await registrar.registerActivity(during: fetchedSchedule)
+        
+        // Simulate 4 minutes passing.
+        await testClock.advance(by: 4 * 60)
+        try await registrar.suspendActivity(for: fetchedSchedule)
+        
+        // Simulate 4 minutes passing.
+        await testClock.advance(by: 4 * 60)
+        try await registrar.resumeActivity(for: fetchedSchedule)
+        
+        // Fetch the schedule from your store and check the updated state.
+        let resumedSchedule = try await scheduleStore.fetch(id: scheduleModelID)
+        if case let .oneTime(_, _, _, timeLeft) = resumedSchedule.type {
+            // The time left should be 10 minutes - 4 minutes = 6 minutes (360 seconds).
+            #expect(
+                timeLeft.rawValue == 360,
+                "Should have 6 minutes left since 4 minutes elapsed and 4 minutes suspension after do not count against timeLeft"
+            )
+        } else {
+            #expect(Bool(false), "Schedule type mismatch")
         }
     }
     

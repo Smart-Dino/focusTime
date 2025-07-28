@@ -13,7 +13,7 @@ enum ScheduleType: Codable, Hashable {
                  // Suspension helper properties.
                  startedAt: Date?,
                  suspendedAt: Date?,
-                 timeLeftSinceStartOrLastResumption: DurationComponents)
+                 timeLeft: DurationComponents)
     
     static func oneTime(_ duration: DurationComponents,
                         startedAt: Date? = nil,
@@ -22,7 +22,7 @@ enum ScheduleType: Codable, Hashable {
         return .oneTime(duration,
                         startedAt: startedAt,
                         suspendedAt: suspendedAt,
-                        timeLeftSinceStartOrLastResumption: timeLeft ?? duration)
+                        timeLeft: timeLeft ?? duration)
     }
     
     var description: String {

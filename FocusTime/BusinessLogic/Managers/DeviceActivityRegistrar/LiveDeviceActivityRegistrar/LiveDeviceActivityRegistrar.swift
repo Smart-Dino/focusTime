@@ -12,6 +12,7 @@ import FamilyControls
 
 actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
     private static let fallbackIntervalSeconds = 15 * 60
+    private let clock: Clock
     let center: DeviceActivityCenter
     private let shieldManager: ShieldManager
     private let scheduleStore: ScheduleStore
@@ -25,10 +26,12 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
     
     init(
         center: DeviceActivityCenter = DeviceActivityCenter(),
+        clock: Clock = SystemClock(),
         scheduleStore: ScheduleStore,
         shieldManager: ShieldManager
     ) {
         self.center = center
+        self.clock = clock
         self.scheduleStore = scheduleStore
         self.shieldManager = shieldManager
     }
@@ -77,7 +80,7 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         let protectedBlockItems = try await scheduleStore.fetchRelatedObjects(id: persistentModelID)
         try await shieldManager.block(specific: protectedBlockItems.map(\.blockedContent))
         
-        let now = Calendar.current.dateComponents([.hour, .minute], from: .now)
+        let now = Calendar.current.dateComponents([.hour, .minute], from: await clock.now)
         
         // Now schedule activity to end blockage.
         // The DeviceActivitySchedule interval requires the schedule to be 15 or more minutes long
@@ -102,14 +105,15 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         try center.startMonitoring(activityName, during: deviceActivitySchedule)
         
         // Log when the activity was started for proper suspension handling.
+        let startTime = await clock.now
         try await scheduleStore.updateFields(id: persistentModelID) { schedule in
             switch schedule.type {
-            case .oneTime(let duration, _, _, _):
+            case .oneTime(let originalDuration, _, _, _):
                 schedule.type = .oneTime(
-                    duration,
-                    startedAt: .now,
+                    originalDuration, // Make sure this is the original value!
+                    startedAt: startTime,
                     suspendedAt: nil,
-                    timeLeftSinceStartOrLastResumption: duration
+                    timeLeft: DurationComponents(duration: duration) // And make sure this is the actual intended duration!
                 )
             default:
                 break
@@ -234,7 +238,7 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
     }
     
     func suspendActivity(for schedule: ProtectedSchedule) async throws {
-        let suspensionDate = Date.now
+        let suspensionDate = await clock.now
         guard let persistentModelID = schedule.persistentModelID else {
             throw DeviceActivityRegistrarError.activityNotFound
         }
@@ -246,15 +250,22 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         switch schedule.type {
         case .scheduled:
             try await shieldManager.unblock()
-        case .oneTime(let duration, let startedAt, _, let timeLeftSinceStartORLastResumption):
+        case .oneTime(let duration, let startedAt, _, let timeLeft):
+            guard let startedAt else {
+                throw DeviceActivityRegistrarError.couldNotExtractDatePoints
+            }
             
-            // Set suspension point.
+            // Calculate how much time was left before unblock.
+            let elapsedTime = suspensionDate.timeIntervalSince(startedAt)
+            let updatedTimeLeft = timeLeft.rawValue - Int(elapsedTime)
+            
+            // Set suspension point and timeLeft.
             try await scheduleStore.updateFields(id: persistentModelID) { editedSchedule in
                 editedSchedule.type = .oneTime(
                     duration,
                     startedAt: startedAt,
                     suspendedAt: suspensionDate,
-                    timeLeftSinceStartOrLastResumption: timeLeftSinceStartORLastResumption
+                    timeLeft: DurationComponents(duration: updatedTimeLeft)
                 )
             }
             
@@ -268,7 +279,7 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
     
     // The activity isn't always 100% accurate since DeviceActivitySchedule does not account for seconds.
     func resumeActivity(for schedule: ProtectedSchedule) async throws {
-        let resumptionDate = Date.now
+        let resumptionDate = await clock.now
         guard let persistentModelID = schedule.persistentModelID else {
             throw DeviceActivityRegistrarError.activityNotFound
         }
@@ -280,14 +291,7 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         case .scheduled:
             let protectedBlockItems = try await scheduleStore.fetchRelatedObjects(id: persistentModelID)
             try await shieldManager.block(specific: protectedBlockItems.map(\.blockedContent))
-        case .oneTime(let duration, let startedAt, let suspendedAt, let timeLeftSinceStartOrLastResumption):
-            guard let startedAt, let suspendedAt else {
-                throw DeviceActivityRegistrarError.couldNotExtractDatePoints
-            }
-            
-            // Calculate how much time was left before unblock.
-            let elapsedTime = suspendedAt.timeIntervalSince(startedAt)
-            let blockTimeLeft = timeLeftSinceStartOrLastResumption.rawValue - Int(elapsedTime)
+        case .oneTime(let duration, _, _, let timeLeft):
             
             // Set that the schedule is no longer suspended and log the new time left.
             try await scheduleStore.updateFields(id: persistentModelID) { editedSchedule in
@@ -295,10 +299,10 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
                     duration,
                     startedAt: resumptionDate,
                     suspendedAt: nil,
-                    timeLeftSinceStartOrLastResumption: DurationComponents(duration: blockTimeLeft)
+                    timeLeft: timeLeft
                 )
             }
-            try await registerDurationActivity(for: schedule, duration: blockTimeLeft)
+            try await registerDurationActivity(for: schedule, duration: timeLeft.rawValue)
         }
     }
     
