@@ -25,15 +25,15 @@ struct DeviceActivityHandler: Sendable {
         
         // Make sure we have our schedule.
         guard let schedule else { return }
-
+        
         switch schedule.type {
         case .scheduled(_, let endTime):
             await handleRegularBlocking(schedule: schedule,
-                                  activity: activity,
-                                  activityIdentifier: activityIdentifier,
-                                  endTime: endTime)
+                                        activity: activity,
+                                        activityIdentifier: activityIdentifier,
+                                        endTime: endTime)
         case .oneTime:
-            await handleDurationUnblocking()
+            await handleDurationUnblocking(for: schedule)
             // We don't need to handle the end of the interval anymore.
             DeviceActivityCenter().stopMonitoring([activity])
         }
@@ -41,8 +41,17 @@ struct DeviceActivityHandler: Sendable {
     }
     
     /// Called when a one-time blocking interval ends.
-    private func handleDurationUnblocking() async {
+    private func handleDurationUnblocking(for schedule: Schedule) async {
+        // Unblock.
         try? await shieldManager.unblock()
+        // Reset duration values.
+        guard case .oneTime(let duration, _, _, _) = schedule.type else { return }
+        schedule.type = .oneTime(
+            duration,
+            startedAt: nil,
+            suspendedAt: nil,
+            timeLeft: duration
+        )
     }
     
     private func handleRegularBlocking(

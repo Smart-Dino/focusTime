@@ -15,6 +15,10 @@ enum DeviceActivityRegistrarError: LocalizedError {
     case couldNotCheckOverlap
     case scheduleOverlap(with: [ProtectedSchedule])
     
+    case activityAlreadySuspended
+    case activityAlreadyRunning
+    case couldNotExtractDatePoints
+    
     var errorDescription: String? {
         switch self {
         case .noPersistentItem:
@@ -32,6 +36,12 @@ enum DeviceActivityRegistrarError: LocalizedError {
                 format: String(localized: "device_activity_registrar_schedule_overlap_description", table: "ErrorLocalizable"),
                 schedules.map { $0.emoji + " " + $0.name }.joined(separator: ", ")
             )
+        case .activityAlreadyRunning:
+            String(localized: "device_activity_registrar_activity_already_running_description", table: "ErrorLocalizable")
+        case .activityAlreadySuspended:
+            String(localized: "device_activity_registrar_activity_already_suspended_description", table: "ErrorLocalizable")
+        case .couldNotExtractDatePoints:
+            String(localized: "device_activity_registrar_could_not_extract_date_points_description", table: "ErrorLocalizable")
         }
     }
     
@@ -49,6 +59,12 @@ enum DeviceActivityRegistrarError: LocalizedError {
             String(localized: "device_activity_registrar_could_not_check_overlap_reason", table: "ErrorLocalizable")
         case .scheduleOverlap:
             String(localized: "device_activity_registrar_schedule_overlap_reason", table: "ErrorLocalizable")
+        case .activityAlreadyRunning:
+            String(localized: "device_activity_registrar_activity_already_running_reason", table: "ErrorLocalizable")
+        case .activityAlreadySuspended:
+            String(localized: "device_activity_registrar_activity_already_suspended_reason", table: "ErrorLocalizable")
+        case .couldNotExtractDatePoints:
+            String(localized: "device_activity_registrar_could_not_extract_date_points_reason", table: "ErrorLocalizable")
         }
     }
 }
