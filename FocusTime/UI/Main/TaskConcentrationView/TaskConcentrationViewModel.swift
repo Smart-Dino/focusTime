@@ -29,7 +29,11 @@ final class TaskConcentrationViewModel {
     }
     
     func toggleSession() {
-        state.timerIsPaused ? resumeSession() : pauseSession()
+        if state.timerIsPaused {
+            resumeSession()
+        } else {
+            pauseSession()
+        }
     }
     
     func pauseSession() {

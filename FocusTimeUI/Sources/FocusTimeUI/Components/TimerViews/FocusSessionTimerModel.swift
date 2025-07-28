@@ -9,7 +9,7 @@ import Combine
 import SwiftUI
 
 @MainActor
-public protocol FocusSessionTimerModelDelegate {
+public protocol FocusSessionTimerModelDelegate: AnyObject {
     func didUpdateIsPaused(_: Bool)
 }
 
@@ -46,7 +46,7 @@ public final class FocusSessionTimerModel {
     // MARK: - Internal
     private(set) var state: State
     @ObservationIgnored private var timer: AnyCancellable?
-    @ObservationIgnored public var delegate: FocusSessionTimerModelDelegate?
+    @ObservationIgnored public weak var delegate: FocusSessionTimerModelDelegate?
     
     // MARK: - Init
     public init(
@@ -94,7 +94,7 @@ public final class FocusSessionTimerModel {
     }
     
     func setHours(_ hours: Int) {
-        state.hours = hours
+        state.hours = max(0, hours)
     }
     
     func setMinutes(_ minutes: Int) {
