@@ -36,7 +36,7 @@ public struct FTHomeSessionCardView: View {
                 Button {
                     viewModel.togglePause()
                 } label: {
-                    viewModel.state.observableIsPaused
+                    viewModel.state.isPaused
                     ? Image(systemName: "play.circle").foregroundStyle(.blue)
                     : Image(systemName: "pause.circle").foregroundStyle(.red)
                 }
@@ -84,15 +84,21 @@ public struct FTHomeSessionCardView: View {
 
 
 #Preview("Countdown", traits: .sizeThatFitsLayout) {
-    @Previewable @State var isPaused = false
-    FTHomeSessionCardView(
-        title: "Work time",
-        mode: .countdown(
-            viewModel: FocusSessionTimerModel(
-                state: .init(isPaused: $isPaused),
-                deadline: .now.addingTimeInterval(70)
-            )
-        ),
+    let viewModel = FocusSessionTimerModel(
+        state: .init(isPaused: true),
+        deadline: .now.addingTimeInterval(70)
     )
-    .preferredColorScheme(.dark)
+    
+    VStack {
+        FTHomeSessionCardView(
+            title: "Work time",
+            mode: .countdown(
+                viewModel: viewModel
+            ),
+        )
+        .preferredColorScheme(.dark)
+        Button("Toggle pause") {
+            viewModel.togglePause()
+        }
+    }
 }

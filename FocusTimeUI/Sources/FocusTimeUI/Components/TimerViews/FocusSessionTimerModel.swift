@@ -9,6 +9,11 @@ import Combine
 import SwiftUI
 
 @MainActor
+public protocol FocusSessionTimerModelDelegate {
+    func didUpdateIsPaused(_: Bool)
+}
+
+@MainActor
 @Observable
 public final class FocusSessionTimerModel {
     public struct State {
@@ -17,14 +22,13 @@ public final class FocusSessionTimerModel {
         var seconds: Int
         var formattedTime: String
         
-        var observableIsPaused: Bool
-        var bindableIsPaused: Binding<Bool>
+        var isPaused: Bool
         
         public init(
             hours: Int = 0,
             minutes: Int = 0,
             seconds: Int = 0,
-            isPaused: Binding<Bool>
+            isPaused: Bool
         ) {
             self.hours = hours
             self.minutes = minutes
@@ -32,8 +36,7 @@ public final class FocusSessionTimerModel {
             self.formattedTime = FocusSessionTimerModel.formattedTime(hours: hours,
                                                                       minutes: minutes,
                                                                       seconds: seconds)
-            self.bindableIsPaused = isPaused
-            self.observableIsPaused = isPaused.wrappedValue
+            self.isPaused = isPaused
         }
     }
     
@@ -43,14 +46,17 @@ public final class FocusSessionTimerModel {
     // MARK: - Internal
     private(set) var state: State
     @ObservationIgnored private var timer: AnyCancellable?
+    @ObservationIgnored public var delegate: FocusSessionTimerModelDelegate?
     
     // MARK: - Init
     public init(
         state: State,
-        deadline: Date
+        deadline: Date,
+        delegate: FocusSessionTimerModelDelegate? = nil
     ) {
         self.deadline = deadline
         self.state = state
+        self.delegate = delegate
         updateTimeLeft()
         startTimer()
     }
@@ -60,7 +66,7 @@ public final class FocusSessionTimerModel {
         timer = Timer.publish(every: 1, on: .main, in: .common)
             .autoconnect()
             .sink { [weak self] _ in
-                guard self?.state.observableIsPaused == false else { return }
+                guard self?.state.isPaused == false else { return }
                 self?.updateTimeLeft()
             }
     }
@@ -78,30 +84,32 @@ public final class FocusSessionTimerModel {
     // MARK: - Controls
     func togglePause() {
         setIsPaused(
-            !state.observableIsPaused
+            !state.isPaused
         )
     }
 
-    func stop() {
+    public func stop() {
         timer?.cancel()
         timer = nil
     }
     
-    public func setHours(_ hours: Int) {
+    func setHours(_ hours: Int) {
         state.hours = hours
     }
     
-    public func setMinutes(_ minutes: Int) {
+    func setMinutes(_ minutes: Int) {
         state.minutes = max(0, min(59, minutes))
     }
     
-    public func setSeconds(_ seconds: Int) {
-        state.minutes = max(0, min(59, seconds))
+    func setSeconds(_ seconds: Int) {
+        state.seconds = max(0, min(59, seconds))
     }
     
+    // Set this property from the parent view and then wait for delegate method
+    // to fire and set your parent view's property through that.
     public func setIsPaused(_ isPaused: Bool) {
-        state.bindableIsPaused.wrappedValue = isPaused
-        state.observableIsPaused = isPaused
+        state.isPaused = isPaused
+        delegate?.didUpdateIsPaused(isPaused)
     }
 
     // MARK: - Convenience

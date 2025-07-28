@@ -17,8 +17,8 @@ public struct FTFlipClockView: View {
             FTFlipClockComponentView(
                 value: Binding {
                     viewModel.state.hours
-                } set: { hour in
-                    viewModel.setHours(hour)
+                } set: { hours in
+                    viewModel.setHours(hours)
                 },
                 configuration: configuration
             )
@@ -43,11 +43,14 @@ public struct FTFlipClockView: View {
 }
 
 #Preview {
+    let viewModel = FocusSessionTimerModel(
+        state: .init(isPaused: false),
+        deadline: .now.addingTimeInterval(70)
+    )
+    
     FTFlipClockView(
         configuration: .init(),
-        viewModel: FocusSessionTimerModel(
-            state: .init(isPaused: .constant(false)),
-            deadline: Date.now.addingTimeInterval(70)
-        )
+        viewModel: viewModel
     )
+    .preferredColorScheme(.dark)
 }
