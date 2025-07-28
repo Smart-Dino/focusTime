@@ -26,11 +26,12 @@ struct DurationPickerSheetView: View {
             
             durationPicker
                 .padding(.bottom)
-                .frame(width: FocusSessionView.Constants.DurationPicker.Layout.containerWidth, height: FocusSessionView.Constants.DurationPicker.Layout.containerHeight)
+                .frame(height: FocusSessionView.Constants.DurationPicker.Layout.containerHeight)
                 .background {
                     Color.ftWheelTimePickerBackgroundColor
                         .cornerRadius(FocusSessionView.Constants.DurationPicker.Layout.containerCornerRadius)
                 }
+                .padding(.horizontal, FocusSessionView.Constants.DurationPicker.Layout.containerWidthPadding)
         }
         .presentationDragIndicator(.visible)
     }

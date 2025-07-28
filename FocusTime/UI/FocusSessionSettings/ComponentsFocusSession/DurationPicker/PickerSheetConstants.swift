@@ -41,13 +41,9 @@ extension FocusSessionView.Constants {
         }
         
         enum Layout {
-            static let containerWidth: CGFloat = 139
+            static let containerWidthPadding: CGFloat = 140
             static let containerHeight: CGFloat = 213
             static let containerCornerRadius: CGFloat = 13
-            static let pickerWidth: CGFloat = 70
-            static let activePickerWidth: CGFloat = 134
-            static let activePickerHeight: CGFloat = 35
-            static let activePickerCornerRadius: CGFloat = 7
         }
         
         enum Colors {

@@ -19,7 +19,6 @@ public struct TimePickerSheetView: View {
     }
 
     public var body: some View {
-  
             VStack() {
                 Text(title)
                     .font(.headline)
@@ -37,19 +36,18 @@ public struct TimePickerSheetView: View {
                         Color.ftWheelTimePickerBackgroundColor
                             .cornerRadius(TimePickerConstants.Layout.containerCornerRadius)
                     }
+                    .padding(.horizontal, TimePickerConstants.Layout.pickerWidthPadding)
             }
-        
         .presentationDragIndicator(.visible)
     }
 
     private var timePicker: some View {
         DatePicker(
-            "",
+            String(),
             selection: $selectedDate,
             displayedComponents: .hourAndMinute
         )
         .datePickerStyle(.wheel)
-        .frame(width: TimePickerConstants.Layout.pickerWidth)
         .clipped()
     }
 }

@@ -60,6 +60,7 @@ extension FocusSessionView {
             static let durationMinutes = 30
             static let startTime: Date = Calendar.current.date(from: DateComponents(hour: 9, minute: 0))!
             static let endTime: Date = Calendar.current.date(from: DateComponents(hour: 17, minute: 0))!
+            static let initialFocusPreset: FocusPreset? = FocusPreset.allCases.randomElement()
         }
     }
 }

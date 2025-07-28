@@ -13,21 +13,20 @@ struct FocusTimeApp: App {
     
     var body: some Scene {
         WindowGroup {
-            FocusSessionView()
-//            Group {
-//                if let paymentManager {
-//                    PlanSelectionPaywallView(
-//                        viewModel: .init(superPaywallVM: .init(paymentManager: paymentManager),
-//                                         flowDelegate: nil)
-//                    )
-//                } else {
-//                    ProgressView()
-//                        .task {
-//                            self.paymentManager = await StoreKitPaymentManager()
-//                        }
-//                }
-//            }
-//            .preferredColorScheme(.dark)
+            Group {
+                if let paymentManager {
+                    PlanSelectionPaywallView(
+                        viewModel: .init(superPaywallVM: .init(paymentManager: paymentManager),
+                                         flowDelegate: nil)
+                    )
+                } else {
+                    ProgressView()
+                        .task {
+                            self.paymentManager = await StoreKitPaymentManager()
+                        }
+                }
+            }
+            .preferredColorScheme(.dark)
         }
     }
 }

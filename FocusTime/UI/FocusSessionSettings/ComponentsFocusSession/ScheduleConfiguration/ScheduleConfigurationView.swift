@@ -10,20 +10,8 @@ import SwiftUI
 import FocusTimeUI
 
 struct ScheduleConfigurationView: View {
-    struct Actions {
-        let onDurationTap: () -> Void
-        let onStartTimeTap: () -> Void
-        let onEndTimeTap: () -> Void
-        let onAppsBlockedTap: () -> Void
-        let onScheduledDaysTap: () -> Void
-        let onEmojiTapped: (_ focusedState: FocusState<Bool>.Binding) -> Void
-        
-    }
-    
     // MARK: - Properties
-    @Binding var configuration: ScheduleConfiguration
-    let actions: Actions
-    @FocusState var isEmojiTextFieldFocused: Bool
+    @State var viewModel: ScheduleConfigurationViewModel
     
     // MARK: - Body
     var body: some View {
@@ -34,7 +22,10 @@ struct ScheduleConfigurationView: View {
                     Spacer()
                     TextField(
                         FocusSessionView.Constants.Configuration.Strings.listNamePlaceholder,
-                        text: $configuration.listName
+                        text: .binding(
+                            get: viewModel.state.scheduleConfiguration.listName,
+                            set: viewModel.setListName(listName:)
+                        )
                     )
                     .multilineTextAlignment(.trailing)
                     .foregroundStyle(.white)
@@ -42,26 +33,24 @@ struct ScheduleConfigurationView: View {
                 .rowStyle()
                 
                 Group {
-                    if let selectedPreset = configuration.selectedPreset {
+                    if let selectedPreset = viewModel.state.scheduleConfiguration.selectedPreset {
                         Text(selectedPreset.iconName)
                             .font(.title)
                             .onTapGesture {
-                                actions.onEmojiTapped($isEmojiTextFieldFocused)
+                                viewModel.handlePresetIconTap()
                             }
                     } else {
-                        TextField("", text: Binding(
-                            get: { configuration.customPresetEmoji },
-                            set: { newValue in
-                                configuration.customPresetEmoji = String(newValue.prefix(1))
-                            }
+                        TextField("", text: .binding(
+                            get: viewModel.state.scheduleConfiguration.customPresetEmoji,
+                            set: viewModel.setCustomPresetEmoji(emoji:)
                         ))
                         .font(.title)
                         .multilineTextAlignment(.center)
-                        .focused($isEmojiTextFieldFocused)
+                        .focused(viewModel.state.$isEmojiTextFieldFocused)
                         .submitLabel(.done)
                         .onAppear {
-                            if configuration.customPresetEmoji.isEmpty {
-                                isEmojiTextFieldFocused = true
+                            if viewModel.state.scheduleConfiguration.customPresetEmoji.isEmpty && !viewModel.state.isEmojiTextFieldFocused {
+                                viewModel.state.isEmojiTextFieldFocused = true
                             }
                         }
                     }
@@ -77,7 +66,10 @@ struct ScheduleConfigurationView: View {
                     Spacer()
                     Toggle(
                         FocusSessionView.Constants.Configuration.Strings.scheduleForLater,
-                        isOn: $configuration.scheduleForLater
+                        isOn: .binding(
+                            get: viewModel.state.scheduleConfiguration.scheduleForLater,
+                            set: viewModel.setScheduleForLater(isOn:)
+                        )
                     )
                     .labelsHidden()
                     .tint(FocusSessionView.Constants.Configuration.Colors.toggleTint)
@@ -89,17 +81,13 @@ struct ScheduleConfigurationView: View {
                     .multilineTextAlignment(.leading)
             }
             
-            if configuration.scheduleForLater {
+            if viewModel.state.scheduleConfiguration.scheduleForLater {
                 Menu {
                     ForEach(Weekday.allCases.sorted()) { day in
-                        Toggle(LocalizedStringKey(day.rawValue.capitalized), isOn: Binding(
-                            get: { self.configuration.scheduledDays.contains(day) },
+                        Toggle(LocalizedStringKey(day.rawValue.capitalized), isOn: .binding(
+                            get: viewModel.state.scheduleConfiguration.scheduledDays.contains(day),
                             set: { isSelected in
-                                if isSelected {
-                                    self.configuration.scheduledDays.insert(day)
-                                } else {
-                                    self.configuration.scheduledDays.remove(day)
-                                }
+                                viewModel.setScheduledDay(day, isSelected: isSelected)
                             }
                         ))
                     }
@@ -114,18 +102,18 @@ struct ScheduleConfigurationView: View {
                 .menuActionDismissBehavior(.disabled)
                 .rowStyle()
                 
-                if !configuration.scheduledDays.isEmpty {
-                    Text(formattedFullScheduledDays)
+                if !viewModel.state.scheduleConfiguration.scheduledDays.isEmpty {
+                    Text(viewModel.state.formattedFullScheduledDays)
                         .font(.caption)
                 }
-       
+                
                 Button {
-                    actions.onStartTimeTap()
+                    viewModel.presentStartTimePicker()
                 } label: {
                     HStack {
                         Text(FocusSessionView.Constants.Configuration.Strings.startTime)
                         Spacer()
-                        Text(formattedStartTime)
+                        Text(viewModel.state.formattedStartTime)
                             .foregroundStyle(.white)
                         Image(systemName: FocusSessionView.Constants.Symbols.navigationChevron)
                             .foregroundStyle(FocusSessionView.Constants.Colors.chevronColor)
@@ -134,12 +122,12 @@ struct ScheduleConfigurationView: View {
                 .rowStyle()
                 
                 Button {
-                    actions.onEndTimeTap()
+                    viewModel.presentEndTimePicker()
                 } label: {
                     HStack {
                         Text(FocusSessionView.Constants.Configuration.Strings.endTime)
                         Spacer()
-                        Text(formattedEndTime)
+                        Text(viewModel.state.formattedEndTime)
                             .foregroundStyle(.white)
                         Image(systemName: FocusSessionView.Constants.Symbols.navigationChevron)
                             .foregroundStyle(FocusSessionView.Constants.Colors.chevronColor)
@@ -148,12 +136,12 @@ struct ScheduleConfigurationView: View {
                 .rowStyle()
             } else {
                 Button {
-                    actions.onDurationTap()
+                    viewModel.presentDurationPicker()
                 } label: {
                     HStack {
                         Text(FocusSessionView.Constants.Configuration.Strings.duration)
                         Spacer()
-                        Text(formattedDuration)
+                        Text(viewModel.state.formattedDuration)
                             .foregroundStyle(.white)
                         Image(systemName: FocusSessionView.Constants.Symbols.navigationChevron)
                             .foregroundStyle(FocusSessionView.Constants.Colors.chevronColor)
@@ -163,7 +151,7 @@ struct ScheduleConfigurationView: View {
             }
             
             Button {
-                actions.onAppsBlockedTap()
+                viewModel.presentAppBlockerSheet()
             } label: {
                 HStack {
                     Text(FocusSessionView.Constants.Configuration.Strings.appsBlocked)
@@ -176,48 +164,60 @@ struct ScheduleConfigurationView: View {
             .rowStyle()
         }
         .padding(.horizontal)
-    }
-    
-    private var formattedDuration: String {
-        let formatter = DateComponentsFormatter()
-        formatter.unitsStyle = .abbreviated
-        formatter.allowedUnits = [.hour, .minute]
-        formatter.zeroFormattingBehavior = .dropAll
-        
-        if configuration.selectedHours == 0 && configuration.selectedMinutes == 0 {
-            return String(localized: "0m", table: "SessionLocalizable", comment: "Zero minutes duration")
+        .onChange(of: viewModel.state.isEmojiTextFieldFocused) { oldValue, newValue in
+            viewModel.setEmojiTextFieldFocus(to: newValue)
         }
-        
-        return formatter.string(from: TimeInterval(configuration.selectedHours * 3600 + configuration.selectedMinutes * 60)) ?? String(localized: "0m", table: "SessionLocalizable", comment: "Fallback zero minutes duration")
-    }
-    
-    private var formattedFullScheduledDays: String {
-        if configuration.scheduledDays.count == Weekday.allCases.count {
-            return String(localized: "Every Day", table: "SessionLocalizable", comment: "Scheduled for every day")
+        .onChange(of: viewModel.state.isEmojiTextFieldFocused) { oldValue, newValue in
+            viewModel.state.isEmojiTextFieldFocused = newValue
         }
-        if configuration.scheduledDays == Set([.saturday, .sunday]) {
-            return String(localized: "Weekends", table: "SessionLocalizable", comment: "Scheduled for weekends")
+        // MARK: - Sheet Presentation (Moved Here)
+        .sheet(
+            item: .binding(
+                get: viewModel.state.activeSheet,
+                set: viewModel.dismissSheet
+            )
+        ) { sheetType in
+            switch sheetType {
+            case .durationPicker:
+                DurationPickerSheetView(
+                    hours: .binding(
+                        get: viewModel.state.scheduleConfiguration.selectedHours,
+                        set: viewModel.setHours(hours:)
+                    ),
+                    minutes: .binding(
+                        get: viewModel.state.scheduleConfiguration.selectedMinutes,
+                        set: viewModel.setMinutes(minutes:)
+                    )
+                )
+                .presentationDetents([.height(FocusSessionView.Constants.Layout.sheetHeight)])
+                
+            case .startTimePicker:
+                TimePickerSheetView(
+                    selectedDate: .binding(
+                        get: viewModel.state.scheduleConfiguration.startTime,
+                        set: viewModel.setStartTime(startTime:)
+                    ),
+                    title: TimePickerConstants.Strings.startTimeTitle,
+                    subtitle: TimePickerConstants.Strings.startTimeSubtitle
+                )
+                .presentationDetents([.height(FocusSessionView.Constants.Layout.sheetHeight)])
+                
+            case .endTimePicker:
+                TimePickerSheetView(
+                    selectedDate: .binding(
+                        get: viewModel.state.scheduleConfiguration.endTime,
+                        set: viewModel.setEndTime(endTime:)
+                    ),
+                    title: TimePickerConstants.Strings.endTimeTitle,
+                    subtitle: TimePickerConstants.Strings.endTimeSubtitle
+                )
+                .presentationDetents([.height(FocusSessionView.Constants.Layout.sheetHeight)])
+                
+            case .appBlockerSheet:
+#warning("Change ContentView with actual view")
+                Text("App Blocker List View Placeholder")
+                    .presentationDetents([.medium, .large])
+            }
         }
-        if configuration.scheduledDays == Set([.monday, .tuesday, .wednesday, .thursday, .friday]) {
-            return String(localized: "Weekdays", table: "SessionLocalizable", comment: "Scheduled for weekdays")
-        }
-        
-        let sortedDays = configuration.scheduledDays.sorted()
-        return sortedDays.map { $0.fullName }.joined(separator: ", ")
-    }
-    
-    private let timeFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = .none
-        formatter.timeStyle = .short
-        return formatter
-    }()
-    
-    private var formattedStartTime: String {
-        timeFormatter.string(from: configuration.startTime)
-    }
-    
-    private var formattedEndTime: String {
-        timeFormatter.string(from: configuration.endTime)
     }
 }

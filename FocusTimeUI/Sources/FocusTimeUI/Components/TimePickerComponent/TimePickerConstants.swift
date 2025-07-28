@@ -36,6 +36,6 @@ public enum TimePickerConstants {
     public enum Layout {
         public static let containerHeight: CGFloat = 213
         public static let containerCornerRadius: CGFloat = 13
-        public static let pickerWidth: CGFloat = 220
+        public static let pickerWidthPadding: CGFloat = 100
     }
 }

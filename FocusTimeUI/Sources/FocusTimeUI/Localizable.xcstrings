@@ -1,9 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "" : {
-
-    },
     "Choose when the session ends" : {
       "comment" : "Title for end session subtitle"
     },
