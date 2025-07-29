@@ -7,6 +7,7 @@
 
 import SwiftUI
 import FocusTimeUI
+import DeviceActivity
 
 struct HomeView: View {
     @State var viewModel: HomeViewModel
@@ -37,15 +38,11 @@ struct HomeView: View {
                 
                 // Timer
                 VStack {
-                    Text(Constants.Strings.timerValue)
-                        .font(.largeTitle).bold()
-                        .foregroundStyle(
-                            LinearGradient(
-                                colors: [.ftMainBlue, .ftBackgroundBlue],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
+                    DeviceActivityReport(
+                        Constants.ActivityConfiguration.context,
+                        filter: Constants.ActivityConfiguration.filter
+                    )
+                    .frame(height: Constants.Layout.activityReportSceneHeight)
                     Text(Constants.Strings.timerSubtitle)
                         .font(.callout)
                         .foregroundStyle(.ftGray3Light)
@@ -73,7 +70,7 @@ struct HomeView: View {
                     .buttonStyle(.plain)
                     .padding(.horizontal)
                     // MARK: - Schedule
-                    #warning("Placeholder")
+#warning("Placeholder")
                     if true {
                         FTHomeSessionCardView(
                             title: "Work time",
@@ -89,7 +86,7 @@ struct HomeView: View {
         // MARK: - Bottom floating button
         .safeAreaInset(edge: .bottom) {
             Button(Constants.Strings.bottomButtonTitle, systemImage: Constants.Icons.hourglass) {
-                #warning("Action is empty")
+#warning("Action is empty")
             }
             .buttonStyle(.ftPrimary)
             .padding()
@@ -104,13 +101,8 @@ struct HomeView: View {
     }
 }
 
-#warning("No preview.")
-//#Preview {
-//    NavigationStack {
-//        if let scheduleStore = ScheduleStore(isStoredInMemoryOnly: true) {
-//            HomeView(viewModel: .init(scheduleStore: scheduleStore))
-//        } else {
-//            Text("Could not initialize ScheduleStore.")
-//        }
-//    }
-//}
+#Preview {
+    NavigationStack {
+        HomeView(viewModel: .init(modelContainer: PreviewData.memoryOnlyModelContainer))
+    }
+}

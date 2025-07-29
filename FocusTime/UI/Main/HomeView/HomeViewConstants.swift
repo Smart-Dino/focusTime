@@ -6,9 +6,18 @@
 //
 
 import SwiftUI
+import DeviceActivity
 
 extension HomeView {
     enum Constants {
+        // MARK: - DeviceActivityReport
+        @MainActor
+        enum ActivityConfiguration {
+            static let context: DeviceActivityReport.Context = .totalActivity
+            static let filter: DeviceActivityFilter = .init(
+                users: .all, devices: .init([.iPhone])
+            )
+        }
         // MARK: - Strings
         enum Strings {
             static let navigationTitle = String(localized: "home_view_navigation_title", table: "MainLocalizable")
@@ -34,6 +43,7 @@ extension HomeView {
         // MARK: - Layout
         enum Layout {
             static let mainSpacing: CGFloat = 70
+            static let activityReportSceneHeight: CGFloat = 50
         }
     }
 }
