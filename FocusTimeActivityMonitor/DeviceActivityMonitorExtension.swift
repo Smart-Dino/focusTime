@@ -51,8 +51,6 @@ final class DeviceActivityMonitorExtension: DeviceActivityMonitor {
             )
         ]
         
-        // Force try because there is no reason to handle errors in an extension.
-        // TODO: Perhaps we could have a logger here.
         do {
             return try ModelContainer(
                 for: schema,
