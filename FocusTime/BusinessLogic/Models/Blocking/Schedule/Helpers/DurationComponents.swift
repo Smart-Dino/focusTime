@@ -37,8 +37,8 @@ struct DurationComponents: Equatable, Codable, Hashable {
     
     /// Initializes with hour and minute components.
     /// - Parameters:
-    ///   - hour: Hour value in 0..<24.
-    ///   - minute: Minute value in 0..<60.
+    ///   - hour: Hour value.
+    ///   - minute: Minute value.
     init(hour: Int, minute: Int) {
         let hoursAsSeconds = hour * 60 * 60
         let minutesAsSeconds = minute * 60

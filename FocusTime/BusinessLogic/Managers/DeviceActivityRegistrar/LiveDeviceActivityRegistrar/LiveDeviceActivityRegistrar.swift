@@ -85,11 +85,8 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         // Now schedule activity to end blockage.
         // The DeviceActivitySchedule interval requires the schedule to be 15 or more minutes long
         // so the intervalEnd is offset by that 15 minutes.
-        guard let intervalStart = now.adding(seconds: duration),
-              let intervalEnd = intervalStart.adding(seconds: Self.fallbackIntervalSeconds)
-        else {
-            throw DeviceActivityRegistrarError.couldNotSetTime
-        }
+        let intervalStart = now.adding(seconds: duration)
+        let intervalEnd = intervalStart.adding(seconds: Self.fallbackIntervalSeconds)
         
         let deviceActivitySchedule = DeviceActivitySchedule(intervalStart: intervalStart,
                                                             intervalEnd: intervalEnd,
@@ -163,10 +160,8 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         
         let intervalStart = startTime.dateComponents
         // Shift interval end to satisfy DeviceActivityCenter - workaround.
-        guard let intervalEnd = endTime.dateComponents.adding(seconds: Self.fallbackIntervalSeconds)
-        else {
-            throw DeviceActivityRegistrarError.couldNotSetTime
-        }
+        let intervalEnd = endTime.dateComponents.adding(seconds: Self.fallbackIntervalSeconds)
+
         let deviceActivitySchedule = DeviceActivitySchedule(intervalStart: intervalStart,
                                                             intervalEnd: intervalEnd,
                                                             repeats: true)
@@ -257,7 +252,7 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
             
             // Calculate how much time was left before unblock.
             let elapsedTime = suspensionDate.timeIntervalSince(startedAt)
-            let updatedTimeLeft = timeLeft.rawValue - Int(elapsedTime)
+            let updatedTimeLeft = max(0, timeLeft.rawValue - Int(elapsedTime))
             
             // Set suspension point and timeLeft.
             try await scheduleStore.updateFields(id: persistentModelID) { editedSchedule in

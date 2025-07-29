@@ -20,7 +20,7 @@ extension DateComponents {
     /// let updated = components.adding(seconds: 15)
     /// // updated.hour == 0, updated.minute == 0, updated.second == 5
     /// ```
-    func adding(seconds: Int) -> DateComponents? {
+    func adding(seconds: Int) -> DateComponents {
         let hour = self.hour ?? 0
         let minute = self.minute ?? 0
         let second = self.second ?? 0

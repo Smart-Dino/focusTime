@@ -94,7 +94,8 @@ extension ScheduleStore {
             predicate: #Predicate { $0.persistentModelID == id }
         )
         
-        guard let model = try? modelContext.fetch(descriptor).first else {
+        let results = try modelContext.fetch(descriptor)
+        guard let model = results.first else {
             throw PersistenceStoreError.notFound
         }
         
