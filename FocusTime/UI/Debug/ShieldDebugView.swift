@@ -26,27 +26,6 @@ struct ShieldDebugView: View {
 //                    devices: .init([.iPhone])
 //                )
 //            )
-            // MARK: - Schedule list
-            VStack {
-                ScrollView(.vertical) {
-                    ForEach(viewModel.state.schedules) { schedule in
-                        HStack {
-                            Text(schedule.emoji)
-                            VStack(alignment: .leading) {
-                                HStack {
-                                    Text(schedule.name)
-                                    Text(schedule.type.description)
-                                        .font(.footnote)
-                                }
-                                Text("Id: " + schedule.id.uuidString)
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
-                    }
-                }
-            }
-//            )
-            
             // MARK: - BlockItem list
             VStack {
                 ScrollView(.vertical) {
