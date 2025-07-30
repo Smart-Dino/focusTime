@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-extension ScheduledFocusListView {
+extension ScheduledBlockItemsView {
     enum Constants {
         // MARK: - Strings
         enum Strings {

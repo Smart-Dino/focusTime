@@ -31,7 +31,7 @@ struct MainFlowCoordinatorView: View {
                             }
                         }
                         .tag(MainTabScreens.home)
-                    AppBlockingListView(viewModel: viewModel.makeAppBlockListViewModel())
+                    DraftsBlockItemListView(viewModel: viewModel.makeDraftsBlockItemListViewModel())
                         .tabItem {
                             Label("Blocks", systemImage: "hand.raised")
                             // Prevent system from filling system icons.
@@ -81,7 +81,7 @@ struct MainFlowCoordinatorView: View {
             .navigationDestination(for: MainScreens.self) { screen in
                 switch screen {
                 case .scheduledFocusList(let scheduledFocusViewModel):
-                    ScheduledFocusListView(viewModel: scheduledFocusViewModel)
+                    ScheduledBlockItemsView(viewModel: scheduledFocusViewModel)
                 }
             }
         }

@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-extension AppBlockingListView {
+extension DraftsBlockItemListView {
     enum Constants {
         // MARK: - Typography
         enum Fonts {

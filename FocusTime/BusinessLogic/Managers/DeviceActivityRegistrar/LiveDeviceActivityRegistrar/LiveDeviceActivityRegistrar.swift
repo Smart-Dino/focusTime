@@ -15,42 +15,42 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
     private let clock: Clock
     let center: DeviceActivityCenter
     private let shieldManager: ShieldManager
-    private let scheduleStore: ScheduleStore
+    private let blockItemStore: BlockItemStore
     
     var monitoredIdentifiers: Set<UUID> {
         Set(center.activities.compactMap {
             guard let identifier = CodableActivityIdentifier(from: $0) else { return nil }
-            return identifier.scheduleID
+            return identifier.blockItemID
         })
     }
     
     init(
         center: DeviceActivityCenter = DeviceActivityCenter(),
         clock: Clock = SystemClock(),
-        scheduleStore: ScheduleStore,
+        blockItemStore: BlockItemStore,
         shieldManager: ShieldManager
     ) {
         self.center = center
         self.clock = clock
-        self.scheduleStore = scheduleStore
+        self.blockItemStore = blockItemStore
         self.shieldManager = shieldManager
     }
     
     // Try to schedule event.
     // If schedule fails - use fallback method.
-    func registerActivity(during schedule: ProtectedSchedule) async throws {
+    func registerActivity(during blockItem: ProtectedBlockItem) async throws {
         try await AuthorizationCenter.shared.requestAuthorization(for: .individual)
         
-        switch schedule.type {
+        switch blockItem.type {
         case .scheduled(let startTime, let endTime):
             do {
-                try await registerRegularActivity(for: schedule,
+                try await registerRegularActivity(for: blockItem,
                                                   startTime: startTime,
                                                   endTime: endTime)
             } catch {
                 switch error {
                 case DeviceActivityCenter.MonitoringError.intervalTooShort:
-                    try await registerFallbackActivity(for: schedule,
+                    try await registerFallbackActivity(for: blockItem,
                                                        startTime: startTime,
                                                        endTime: endTime)
                 default:
@@ -58,7 +58,7 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
                 }
             }
         case .oneTime(let duration, _, _, _):
-            try await registerDurationActivity(for: schedule, duration: duration.rawValue)
+            try await registerDurationActivity(for: blockItem, duration: duration.rawValue)
         }
     }
     
@@ -66,10 +66,10 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
     // The startTime will be triggered with user's duration.
     // So if user sets duration of 1800 - 30 mins - then our startTime will be now + 30 mins.
     func registerDurationActivity(
-        for schedule: ProtectedSchedule,
+        for blockItem: ProtectedBlockItem,
         duration: Int
     ) async throws {
-        guard let persistentModelID = schedule.persistentModelID else {
+        guard let persistentModelID = blockItem.persistentModelID else {
             throw DeviceActivityRegistrarError.noPersistentItem
         }
         
@@ -77,8 +77,7 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         let shieldManager = self.shieldManager
         
         // Block starts from now.
-        let protectedBlockItems = try await scheduleStore.fetchRelatedObjects(id: persistentModelID)
-        try await shieldManager.block(specific: protectedBlockItems.map(\.blockedContent))
+        try await shieldManager.block(specific: blockItem.blockedContent)
         
         let now = Calendar.current.dateComponents([.hour, .minute], from: await clock.now)
         
@@ -93,7 +92,7 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
                                                             repeats: true)
         
         // Let the DeviceActivityMonitorExtension know that we need a regular scenario.
-        guard let activityIdentifier = CodableActivityIdentifier(scheduleID: schedule.id,
+        guard let activityIdentifier = CodableActivityIdentifier(blockItemID: blockItem.id,
                                                                  isFallback: false).jsonString
         else { throw DeviceActivityRegistrarError.couldNotGenerateIdentifier }
         
@@ -103,10 +102,10 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         
         // Log when the activity was started for proper suspension handling.
         let startTime = await clock.now
-        try await scheduleStore.updateFields(id: persistentModelID) { schedule in
-            switch schedule.type {
+        try await blockItemStore.updateFields(id: persistentModelID) { blockItem in
+            switch blockItem.type {
             case .oneTime(let originalDuration, _, _, _):
-                schedule.type = .oneTime(
+                blockItem.type = .oneTime(
                     originalDuration, // Make sure this is the original value!
                     startedAt: startTime,
                     suspendedAt: nil,
@@ -119,11 +118,11 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
     }
     
     private func registerRegularActivity(
-        for schedule: ProtectedSchedule,
+        for blockItem: ProtectedBlockItem,
         startTime: TimeComponents,
         endTime: TimeComponents
     ) async throws {
-        guard schedule.persistentModelID != nil else {
+        guard blockItem.persistentModelID != nil else {
             throw DeviceActivityRegistrarError.noPersistentItem
         }
         
@@ -135,14 +134,14 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         
         let overlapSchedules = try await overlapsWithAlreadyRegisteredSchedules(
             deviceActivitySchedule,
-            days: schedule.days
+            days: blockItem.days
         )
         guard overlapSchedules.isEmpty else {
             throw DeviceActivityRegistrarError.scheduleOverlap(with: overlapSchedules)
         }
         
         // Let the DeviceActivityMonitorExtension know that we need a regular scenario.
-        guard let activityIdentifier = CodableActivityIdentifier(scheduleID: schedule.id,
+        guard let activityIdentifier = CodableActivityIdentifier(blockItemID: blockItem.id,
                                                                  isFallback: false).jsonString
         else { throw DeviceActivityRegistrarError.couldNotGenerateIdentifier }
         
@@ -152,11 +151,11 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
     }
     
     private func registerFallbackActivity(
-        for schedule: ProtectedSchedule,
+        for blockItem: ProtectedBlockItem,
         startTime: TimeComponents,
         endTime: TimeComponents
     ) async throws {
-        guard schedule.persistentModelID != nil else { throw DeviceActivityRegistrarError.noPersistentItem }
+        guard blockItem.persistentModelID != nil else { throw DeviceActivityRegistrarError.noPersistentItem }
         
         let intervalStart = startTime.dateComponents
         // Shift interval end to satisfy DeviceActivityCenter - workaround.
@@ -168,14 +167,14 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         
         let overlapSchedules = try await overlapsWithAlreadyRegisteredSchedules(
             deviceActivitySchedule,
-            days: schedule.days
+            days: blockItem.days
         )
         guard overlapSchedules.isEmpty else {
             throw DeviceActivityRegistrarError.scheduleOverlap(with: overlapSchedules)
         }
         
         // Let the DeviceActivityMonitorExtension know that we need a fallback scenario.
-        guard let activityIdentifier = CodableActivityIdentifier(scheduleID: schedule.id,
+        guard let activityIdentifier = CodableActivityIdentifier(blockItemID: blockItem.id,
                                                                  isFallback: true).jsonString
         else { throw DeviceActivityRegistrarError.couldNotGenerateIdentifier }
         
@@ -188,8 +187,8 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         _ newSchedule: DeviceActivitySchedule,
         days: Set<Weekday>,
         on calendar: Calendar = .current
-    ) async throws -> [ProtectedSchedule] {
-        var overlappingSchedules: [ProtectedSchedule] = []
+    ) async throws -> [ProtectedBlockItem] {
+        var overlappingSchedules: [ProtectedBlockItem] = []
         
         let activities = center.activities
         
@@ -213,10 +212,10 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
                     throw DeviceActivityRegistrarError.couldNotCheckOverlap
                 }
                 // 2. Get the schedule ID from it.
-                let scheduleID = decoded.scheduleID
+                let blockItemID = decoded.blockItemID
                 // 3. Fetch schedule.
-                let overlappingSchedule = try await scheduleStore.fetch(
-                    descriptor: .init(predicate: #Predicate { $0.id == scheduleID })
+                let overlappingSchedule = try await blockItemStore.fetch(
+                    descriptor: .init(predicate: #Predicate { $0.id == blockItemID })
                 ).first
                 // 4. Make sure days overlap too and add schedule to return list.
                 if let overlappingSchedule, overlappingSchedule.days.isDisjoint(with: days) == false {
@@ -227,20 +226,20 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         return overlappingSchedules
     }
     
-    func unregisterActivity(during schedule: ProtectedSchedule) async throws {
-        let activity = try getActivityForSchedule(schedule)
+    func unregisterActivity(during blockItem: ProtectedBlockItem) async throws {
+        let activity = try getActivityForSchedule(blockItem)
         center.stopMonitoring([activity])
     }
     
-    func suspendActivity(for schedule: ProtectedSchedule) async throws {
+    func suspendActivity(for blockItem: ProtectedBlockItem) async throws {
         let suspensionDate = await clock.now
-        guard let persistentModelID = schedule.persistentModelID else {
+        guard let persistentModelID = blockItem.persistentModelID else {
             throw DeviceActivityRegistrarError.activityNotFound
         }
-        let activity = try getActivityForSchedule(schedule)
+        let activity = try getActivityForSchedule(blockItem)
         
         // Make sure we have the latest schedule.
-        let schedule = try await scheduleStore.fetch(id: persistentModelID)
+        let schedule = try await blockItemStore.fetch(id: persistentModelID)
         
         switch schedule.type {
         case .scheduled:
@@ -255,8 +254,8 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
             let updatedTimeLeft = max(0, timeLeft.rawValue - Int(elapsedTime))
             
             // Set suspension point and timeLeft.
-            try await scheduleStore.updateFields(id: persistentModelID) { editedSchedule in
-                editedSchedule.type = .oneTime(
+            try await blockItemStore.updateFields(id: persistentModelID) { editedBlockItem in
+                editedBlockItem.type = .oneTime(
                     duration,
                     startedAt: startedAt,
                     suspendedAt: suspensionDate,
@@ -273,40 +272,39 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
     }
     
     // The activity isn't always 100% accurate since DeviceActivitySchedule does not account for seconds.
-    func resumeActivity(for schedule: ProtectedSchedule) async throws {
+    func resumeActivity(for blockItem: ProtectedBlockItem) async throws {
         let resumptionDate = await clock.now
-        guard let persistentModelID = schedule.persistentModelID else {
+        guard let persistentModelID = blockItem.persistentModelID else {
             throw DeviceActivityRegistrarError.activityNotFound
         }
         
         // Make sure we have the latest schedule.
-        let schedule = try await scheduleStore.fetch(id: persistentModelID)
+        let blockItem = try await blockItemStore.fetch(id: persistentModelID)
         
-        switch schedule.type {
+        switch blockItem.type {
         case .scheduled:
-            let protectedBlockItems = try await scheduleStore.fetchRelatedObjects(id: persistentModelID)
-            try await shieldManager.block(specific: protectedBlockItems.map(\.blockedContent))
+            try await shieldManager.block(specific: blockItem.blockedContent)
         case .oneTime(let duration, _, _, let timeLeft):
             
             // Set that the schedule is no longer suspended and log the new time left.
-            try await scheduleStore.updateFields(id: persistentModelID) { editedSchedule in
-                editedSchedule.type = .oneTime(
+            try await blockItemStore.updateFields(id: persistentModelID) { editedBlockItem in
+                editedBlockItem.type = .oneTime(
                     duration,
                     startedAt: resumptionDate,
                     suspendedAt: nil,
                     timeLeft: timeLeft
                 )
             }
-            try await registerDurationActivity(for: schedule, duration: timeLeft.rawValue)
+            try await registerDurationActivity(for: blockItem, duration: timeLeft.rawValue)
         }
     }
     
-    func isActivityRegistered(for schedule: ProtectedSchedule) throws -> Bool {
-        guard schedule.persistentModelID != nil else {
+    func isActivityRegistered(for blockItem: ProtectedBlockItem) throws -> Bool {
+        guard blockItem.persistentModelID != nil else {
             throw DeviceActivityRegistrarError.activityNotFound
         }
         
-        if (try? getActivityForSchedule(schedule)) != nil {
+        if (try? getActivityForSchedule(blockItem)) != nil {
             return true
         } else {
             return false

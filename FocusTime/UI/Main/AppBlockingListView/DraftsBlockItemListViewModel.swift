@@ -11,7 +11,7 @@ import FamilyControls
 
 @MainActor
 @Observable
-final class AppBlockingListViewModel {
+final class DraftsBlockItemListViewModel {
     struct State {
         var error: Error? = nil
         
@@ -45,6 +45,9 @@ final class AppBlockingListViewModel {
                     ProtectedBlockItem(
                         emoji: "😜",
                         name: "Block - \(number)",
+                        days: [.saturday, .sunday],
+                        type: .scheduled(startTime: TimeComponents(hour: 17, minute: 00)!,
+                                         endTime: TimeComponents(hour: 19, minute: 00)!),
                         blockedContent: ProtectedActivitySelection(FamilyActivitySelection())
                     )
                 }

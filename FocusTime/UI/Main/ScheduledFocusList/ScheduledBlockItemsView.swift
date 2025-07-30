@@ -8,8 +8,8 @@
 import SwiftUI
 import FocusTimeUI
 
-struct ScheduledFocusListView: View {
-    @State var viewModel: ScheduledFocusListViewModel
+struct ScheduledBlockItemsView: View {
+    @State var viewModel: ScheduledBlockItemsViewModel
     
     var body: some View {
         ZStack {
@@ -76,7 +76,7 @@ struct ScheduledFocusListView: View {
                         description: schedule.days.description
                     )
                     .padding(1)
-                    .onAppear { viewModel.hasReachEndOfList(schedule: schedule) }
+                    .onAppear { viewModel.hasReachEndOfList(blockItem: schedule) }
                 }
             }
         }
@@ -96,8 +96,10 @@ struct ScheduledFocusListView: View {
     }
 }
 
-#Preview {
-    NavigationStack {
-        ScheduledFocusListView(viewModel: .init(modelContainer: PreviewData.memoryOnlyModelContainer))
-    }
-}
+//#Preview {
+//    NavigationStack {
+//        ScheduledBlockItemsView(
+//            viewModel: .init(blockItemStore: BlockItemStore(modelContainer: PreviewData.memoryOnlyModelContainer))
+//        )
+//    }
+//}

@@ -17,17 +17,17 @@ final class HomeViewModel {
     }
     
     private(set) var state: State
-    private let modelContainer: ModelContainer
+    private let blockItemStore: BlockItemStore
     
     init(
         state: State = State(),
         modelContainer: ModelContainer
     ) {
         self.state = state
-        self.modelContainer = modelContainer
+        self.blockItemStore = BlockItemStore(modelContainer: modelContainer)
     }
     
-    func makeScheduledFocusViewModel() -> ScheduledFocusListViewModel {
-        ScheduledFocusListViewModel(modelContainer: modelContainer)
+    func makeScheduledFocusViewModel() -> ScheduledBlockItemsViewModel {
+        ScheduledBlockItemsViewModel(blockItemStore: blockItemStore)
     }
 }

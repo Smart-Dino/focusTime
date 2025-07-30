@@ -43,7 +43,7 @@ final class DeviceActivityMonitorExtension: DeviceActivityMonitor {
     }
     
     static var container: ModelContainer {
-        let schema = Schema([Schedule.self, BlockItem.self])
+        let schema = Schema([BlockItem.self])
         let configurations = [
             ModelConfiguration(
                 allowsSave: false,

@@ -30,7 +30,6 @@ final class ShieldDebugViewModel {
         var endTime: Date = .now
         var duration: Int = 1 // Minutes
         
-        var schedules: [ProtectedSchedule] = .init()
         var blockItems: [ProtectedBlockItem] = .init()
         
         var isAppSelectionPresented = false
@@ -42,9 +41,7 @@ final class ShieldDebugViewModel {
     private let shieldManager: ShieldManager
     private let activityRegistrar: DeviceActivityRegistrar
     // Model-related.
-    private let scheduleStore: ScheduleStore
     private let blockItemStore: BlockItemStore
-    private let relationshipCoordinator: RelationshipCoordinator
     
     // Prepare for future async fetching tasks.
     private var fetchTask: Task<Void, Never>? = nil
@@ -57,10 +54,8 @@ final class ShieldDebugViewModel {
     ) {
         self.state = state
         self.shieldManager = shieldManager
-        self.scheduleStore = ScheduleStore(modelContainer: modelContainer)
         self.blockItemStore = BlockItemStore(modelContainer: modelContainer)
-        self.relationshipCoordinator = RelationshipCoordinator(modelContainer: modelContainer)
-        self.activityRegistrar = LiveDeviceActivityRegistrar(scheduleStore: scheduleStore, shieldManager: shieldManager)
+        self.activityRegistrar = LiveDeviceActivityRegistrar(blockItemStore: blockItemStore, shieldManager: shieldManager)
         
         Task {
             await activityRegistrar.unregisterAll()
@@ -110,7 +105,6 @@ final class ShieldDebugViewModel {
     func eraseAllData() async {
         do {
             try await blockItemStore.eraseAllData()
-            try await scheduleStore.eraseAllData()
             await activityRegistrar.unregisterAll()
             await fetchAllItems()
         } catch {
@@ -121,13 +115,9 @@ final class ShieldDebugViewModel {
     func addScheduleToDB() async {
         do {
             let blockItems = try await blockItemStore.fetch()
-            let scheduleItems = try await scheduleStore.fetch()
             
             // Ensure we only add if both stores are empty
-            guard blockItems.isEmpty && scheduleItems.isEmpty else { return }
-            
-            let blockItem = ProtectedBlockItem(emoji: "❌", name: "Block",
-                                               blockedContent: ProtectedActivitySelection(state.selection))
+            guard blockItems.isEmpty else { return }
             
             var type: ScheduleType!
             
@@ -143,14 +133,15 @@ final class ShieldDebugViewModel {
                 type = .scheduled(startTime: startComponent, endTime: endComponent)
             }
             
-            let schedule = ProtectedSchedule(emoji: "🕑",
-                                             name: "Schedule",
-                                             days: state.daySelection,
-                                             type: type)
+            let blockItem = ProtectedBlockItem(emoji: "❌",
+                                               name: "Block",
+                                               days: state.daySelection,
+                                               type: type,
+                                               blockedContent: ProtectedActivitySelection(state.selection))
+            
             
             do {
                 try await blockItemStore.insert(blockItem)
-                try await scheduleStore.insert(schedule)
             } catch {
                 state.error = error
             }
@@ -163,32 +154,7 @@ final class ShieldDebugViewModel {
     
     func fetchAllItems() async {
         do {
-            state.schedules = try await scheduleStore.fetch()
             state.blockItems = try await blockItemStore.fetch()
-        } catch {
-            state.error = error
-        }
-    }
-    
-    func appendBlockItemToSchedule() async {
-        do {
-            guard let blockItem = try await blockItemStore.fetch(descriptor: .init()).first else {
-                return
-            }
-            guard let schedule = try await scheduleStore.fetch(descriptor: .init()).first else {
-                return
-            }
-            
-            guard let blockItemModelID = blockItem.persistentModelID,
-                  let schedulesModelID = schedule.persistentModelID
-            else {
-                throw ShieldDebugError.invalidPersistentIdentifiers
-            }
-            
-            try await relationshipCoordinator.relate(blockItemID: blockItemModelID,
-                                                     scheduleID: schedulesModelID)
-            
-            await fetchAllItems()
         } catch {
             state.error = error
         }
@@ -196,11 +162,11 @@ final class ShieldDebugViewModel {
     
     func blockSelectionDuringSchedule() async {
         do {
-            guard let schedule = try await scheduleStore.fetch(descriptor: .init()).first else {
+            guard let blockItem = try await blockItemStore.fetch(descriptor: .init()).first else {
                 return
             }
             
-            try await activityRegistrar.registerActivity(during: schedule)
+            try await activityRegistrar.registerActivity(during: blockItem)
         } catch {
             state.error = error
         }
@@ -233,9 +199,9 @@ final class ShieldDebugViewModel {
     
     func suspendSession() async {
         do {
-            let schedules = try await scheduleStore.fetch()
-            guard let schedule = schedules.first else { return }
-            try await activityRegistrar.suspendActivity(for: schedule)
+            let blockItems = try await blockItemStore.fetch()
+            guard let blockItem = blockItems.first else { return }
+            try await activityRegistrar.suspendActivity(for: blockItem)
         } catch {
             state.error = error
         }
@@ -243,9 +209,9 @@ final class ShieldDebugViewModel {
     
     func resumeSession() async {
         do {
-            let schedules = try await scheduleStore.fetch()
-            guard let schedule = schedules.first else { return }
-            try await activityRegistrar.resumeActivity(for: schedule)
+            let blockItems = try await blockItemStore.fetch()
+            guard let blockItem = blockItems.first else { return }
+            try await activityRegistrar.resumeActivity(for: blockItem)
         } catch {
             state.error = error
         }

@@ -16,32 +16,37 @@ struct ProtectedBlockItem: ProtectedModel {
     
     let emoji: String
     let name: String
+    let days: Set<Weekday>
+    let type: ScheduleType
     let blockedContent: ProtectedActivitySelection
     
-    let schedulesDescription: String
-
     init(
         id: UUID = UUID(),
         persistentModelID: PersistentIdentifier? = nil,
         emoji: String,
         name: String,
-        blockedContent: ProtectedActivitySelection,
-        schedulesDescription: String = "No schedules"
+        days: Set<Weekday>,
+        type: ScheduleType,
+        blockedContent: ProtectedActivitySelection
     ) {
         self.id = id
         self.persistentModelID = persistentModelID
         self.emoji = emoji
         self.name = name
+        self.days = days
+        self.type = type
         self.blockedContent = blockedContent
-        self.schedulesDescription = schedulesDescription
     }
     
     init(from item: BlockItem) {
-        self.init(id: item.id,
-                  persistentModelID: item.persistentModelID,
-                  emoji: item.emoji,
-                  name: item.name,
-                  blockedContent: item.blockedContent,
-                  schedulesDescription: item.schedulesDescription)
+        self.init(
+            id: item.id,
+            persistentModelID: item.persistentModelID,
+            emoji: item.emoji,
+            name: item.name,
+            days: item.days,
+            type: item.type,
+            blockedContent: item.blockedContent
+        )
     }
 }

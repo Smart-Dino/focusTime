@@ -25,19 +25,19 @@ struct DeviceActivityHandler: Sendable {
     func handleBlockingStart(for activity: DeviceActivityName) async {
         guard let activityIdentifier = CodableActivityIdentifier(from: activity) else { return }
         
-        let schedule = fetchSchedule(id: activityIdentifier.scheduleID)
+        let blockItem = fetchBlockItem(id: activityIdentifier.blockItemID)
         
         // Make sure we have our schedule.
-        guard let schedule else { return }
+        guard let blockItem else { return }
         
-        switch schedule.type {
+        switch blockItem.type {
         case .scheduled(_, let endTime):
-            await handleRegularBlocking(schedule: schedule,
+            await handleRegularBlocking(blockItem: blockItem,
                                         activity: activity,
                                         activityIdentifier: activityIdentifier,
                                         endTime: endTime)
         case .oneTime:
-            await handleDurationUnblocking(for: schedule)
+            await handleDurationUnblocking(for: blockItem)
             // We don't need to handle the end of the interval anymore.
             DeviceActivityCenter().stopMonitoring([activity])
         }
@@ -45,13 +45,13 @@ struct DeviceActivityHandler: Sendable {
     }
     
     /// Called when a one-time blocking interval ends.
-    private func handleDurationUnblocking(for schedule: Schedule) async {
+    private func handleDurationUnblocking(for blockItem: BlockItem) async {
         // Unblock.
         try? await shieldManager.unblock()
         
         // Reset duration values.
-        guard case .oneTime(let duration, _, _, _) = schedule.type else { return }
-        schedule.type = .oneTime(
+        guard case .oneTime(let duration, _, _, _) = blockItem.type else { return }
+        blockItem.type = .oneTime(
             duration,
             startedAt: nil,
             suspendedAt: nil,
@@ -63,17 +63,17 @@ struct DeviceActivityHandler: Sendable {
     }
     
     private func handleRegularBlocking(
-        schedule: Schedule,
+        blockItem: BlockItem,
         activity: DeviceActivityName,
         activityIdentifier: CodableActivityIdentifier,
         endTime endTimeComponent: TimeComponents
     ) async {
         // Make sure the current day is the block day.
-        guard let blockItems = schedule.blockItems, schedule.days.contains(Weekday.currentDay) else { return }
+        guard blockItem.days.contains(Weekday.currentDay) else { return }
         
         // Block user's selections.
-        let selections = blockItems.map(\.blockedContent)
-        try? await shieldManager.block(specific: selections)
+        let selection = blockItem.blockedContent
+        try? await shieldManager.block(specific: selection)
         
         // Sendability workaround since DeviceActivityName is not sendable.
         let stringActivityName = activity.rawValue
@@ -101,14 +101,14 @@ struct DeviceActivityHandler: Sendable {
         try? await shieldManager.unblock()
     }
     
-    private func fetchSchedule(id: UUID) -> Schedule? {
+    private func fetchBlockItem(id: UUID) -> BlockItem? {
         // Create context from scratch because using mainContext in a
         // non-isolated to MainActor environment is not allowed.
         let context = ModelContext(container)
         
         // Fetch the schedule.
-        let fetchDescriptor = FetchDescriptor<Schedule>(
-            predicate: #Predicate<Schedule> { $0.id == id }
+        let fetchDescriptor = FetchDescriptor<BlockItem>(
+            predicate: #Predicate<BlockItem> { $0.id == id }
         )
         
         return try? context.fetch(fetchDescriptor).first
