@@ -61,7 +61,7 @@ final class ScheduleConfigurationViewModel {
         /// DateFormatter for displaying time.
         private let timeFormatter: DateFormatter = {
             let formatter = DateFormatter()
-            formatter.dateFormat = .none
+            formatter.dateFormat = nil
             formatter.timeStyle = .short
             return formatter
         }()
@@ -166,7 +166,7 @@ final class ScheduleConfigurationViewModel {
     /// Updates the selected focus preset in the schedule configuration.
     /// This method is called by the FocusSessionViewModel
     /// to update the child's state based on preset grid selection.
-    /// - Parameter selectedPreset: The focus preset to select, or nil to clear the selection.
+    /// - Parameter selectedPreset: The focus preset to select, or nil triggers a random preset selection.
     func setSelectedPreset(selectedPreset: FocusPreset?) {
         state.scheduleConfiguration.selectedPreset = selectedPreset ?? FocusPreset.allCases.randomElement()
         state.scheduleConfiguration.listName = selectedPreset?.name ?? FocusSessionView.Constants.DefaultValues.listName
