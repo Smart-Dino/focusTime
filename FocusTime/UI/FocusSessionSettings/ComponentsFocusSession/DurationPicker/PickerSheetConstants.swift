@@ -11,7 +11,6 @@ extension FocusSessionView.Constants {
     
     // MARK: - Constants for DurationPickerSheetView
     enum DurationPicker {
-        
         enum Time {
             static let hoursInDay = 24
             static let minutesInHour = 60

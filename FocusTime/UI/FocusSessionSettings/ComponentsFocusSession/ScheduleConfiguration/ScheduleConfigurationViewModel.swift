@@ -28,7 +28,6 @@ final class ScheduleConfigurationViewModel {
         @FocusState var isEmojiTextFieldFocused: Bool
         
         // MARK: - Computed Properties
-        
         /// Formatted string representing the selected duration (hours and minutes).
         var formattedDuration: String {
             let formatter = DateComponentsFormatter()

@@ -35,7 +35,6 @@ struct ScheduleConfiguration: Equatable {
     }
 }
 
-
 /// Days Picker enum
 enum Weekday: String, CaseIterable, Identifiable, Comparable {
     case monday, tuesday, wednesday, thursday, friday, saturday, sunday

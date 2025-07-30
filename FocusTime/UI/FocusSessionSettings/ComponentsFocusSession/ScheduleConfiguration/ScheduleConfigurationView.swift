@@ -164,13 +164,11 @@ struct ScheduleConfigurationView: View {
             .rowStyle()
         }
         .padding(.horizontal)
-        .onChange(of: viewModel.state.isEmojiTextFieldFocused) { oldValue, newValue in
+        .onChange(of: viewModel.state.isEmojiTextFieldFocused) { _, newValue in
             viewModel.setEmojiTextFieldFocus(to: newValue)
         }
-        .onChange(of: viewModel.state.isEmojiTextFieldFocused) { oldValue, newValue in
-            viewModel.state.isEmojiTextFieldFocused = newValue
-        }
-        // MARK: - Sheet Presentation (Moved Here)
+        
+        // MARK: - Sheet Presentation
         .sheet(
             item: .binding(
                 get: viewModel.state.activeSheet,
