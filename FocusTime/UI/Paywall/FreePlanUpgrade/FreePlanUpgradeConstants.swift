@@ -41,7 +41,6 @@ extension FreePlanUpgradeView {
             
             // Other buttons
             static let viewPlansButton = SharedConstants.Strings.viewPlansButton
-            static let dismissButtonTitle = SharedConstants.Strings.dismissButtonTitle
             
             // Error
             static let errorHeader = SharedConstants.Strings.errorHeader

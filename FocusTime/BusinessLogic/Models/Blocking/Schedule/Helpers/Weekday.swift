@@ -11,6 +11,12 @@ import Foundation
 enum Weekday: Int, Codable, CaseIterable, Identifiable {
     case sunday = 1, monday, tuesday, wednesday, thursday, friday, saturday
     
+    private static let formatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = .current
+        return formatter
+    }()
+    
     var id: Int { rawValue }
     
     var isWorkDay: Bool {
@@ -49,14 +55,6 @@ enum Weekday: Int, Codable, CaseIterable, Identifiable {
     
     /// Human-readable name of the weekday.
     var description: String {
-        switch self {
-        case .sunday:    "Sunday"
-        case .monday:    "Monday"
-        case .tuesday:   "Tuesday"
-        case .wednesday: "Wednesday"
-        case .thursday:  "Thursday"
-        case .friday:    "Friday"
-        case .saturday:  "Saturday"
-        }
+        Weekday.formatter.weekdaySymbols[rawValue - 1]
     }
 }

@@ -1,5 +1,5 @@
 //
-//  SharedConstants.swift
+//  AppValues.swift
 //  FocusTime
 //
 //  Created by Maksym Horobets on 24.06.2025.

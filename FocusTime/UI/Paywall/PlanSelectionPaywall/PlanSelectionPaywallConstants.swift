@@ -10,9 +10,6 @@ import Foundation
 extension PlanSelectionPaywallView {
     /// Organized and sorted ``PlanSelectionPaywallView`` constants.
     enum Constants {
-        // MARK: - Typography
-        enum FontSize { }
-        
         // MARK: - Layout
         enum Padding {
             /// Spacing between the subscription list's offerings.
@@ -29,20 +26,13 @@ extension PlanSelectionPaywallView {
             static let subscribedTitle = SharedConstants.Strings.subscribedTitle
             static let purchasedTitle = SharedConstants.Strings.purchasedTitle
             
-            // Trial-related
-            static let trialDescription = String(localized: "plan_selection_paywall_trial_description_3_days", table: "PaywallLocalizable")
             static let noPaymentMessage = String(localized: "plan_selection_paywall_no_payment_message", table: "PaywallLocalizable")
             
             // Lifetime
             static let paidOnce = SharedConstants.Strings.paidOnce
             
-            // Title text for the button that dismisses the view.
-            static let dismissButtonTitle = SharedConstants.Strings.dismissButtonTitle
-            
             // Error
             static let errorHeader = SharedConstants.Strings.errorHeader
-            static let defaultTrialError = String(localized: "plan_selection_paywall_default_trial_error", table: "PaywallLocalizable")
-            static let subscribeButtonTerms  = String(localized: "plan_selection_paywall_subscription_terms", table: "PaywallLocalizable")
         }
         
     }
