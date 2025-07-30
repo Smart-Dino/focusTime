@@ -25,7 +25,7 @@ internal extension View {
     }
 }
 
-internal struct RotatingNumberOverlayModifier: ViewModifier, @MainActor Animatable {
+nonisolated internal struct RotatingNumberOverlayModifier: ViewModifier, Animatable {
     private var configuration: FTFlipClockConfiguration
     
     private var rotation: CGFloat
