@@ -102,7 +102,7 @@ struct DeviceActivityHandler: Sendable {
         }
     }
     
-    func handleBlockingEnd(for activity: DeviceActivityName) async {
+    func handleBlockingEnd() async {
         try? await shieldManager.unblock()
     }
     

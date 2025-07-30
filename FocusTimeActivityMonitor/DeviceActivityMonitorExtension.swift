@@ -37,9 +37,8 @@ final class DeviceActivityMonitorExtension: DeviceActivityMonitor {
     override func intervalDidEnd(for activity: DeviceActivityName) {
         super.intervalDidEnd(for: activity)
         let handler = self.handler
-        let nameString = activity.rawValue
         Task {
-            await handler.handleBlockingEnd(for: DeviceActivityName(nameString))
+            await handler.handleBlockingEnd()
         }
     }
     

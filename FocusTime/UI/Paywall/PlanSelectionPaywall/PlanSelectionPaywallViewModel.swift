@@ -42,7 +42,6 @@ final class PlanSelectionPaywallViewModel {
     // MARK: - Initializers
     init(
         state: State = State(),
-        superState: SuperPaywallViewModel.State = .init(),
         superPaywallVM: SuperPaywallViewModel,
         flowDelegate: PaywallNavigationDelegate?
     ) {

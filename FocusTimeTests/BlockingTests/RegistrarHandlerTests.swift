@@ -1,5 +1,5 @@
 //
-//  FocusTimeTests.swift
+//  RegistrarHandlerTests.swift
 //  FocusTimeTests
 //
 //  Created by Maksym Horobets on 01.07.2025.
@@ -27,8 +27,6 @@ struct RegistrarHandlerTests {
     let blockItemStore: BlockItemStore
     // Relationship manager.
     let relationshipCoordinator: RelationshipCoordinator
-    // MARK: Reused declarations
-    let allCategories = ShieldSettings.ActivityCategoryPolicy<Application>.all()
     
     init() async {
         // Native managers.

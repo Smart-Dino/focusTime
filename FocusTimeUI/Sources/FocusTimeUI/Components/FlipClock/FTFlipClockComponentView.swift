@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public struct FTFlipClockComponentView: View {
+internal struct FTFlipClockComponentView: View {
     // MARK: - Config
     @Binding private var value: Int
     private let configuration: FTFlipClockConfiguration
@@ -15,7 +15,7 @@ public struct FTFlipClockComponentView: View {
     @State private var nextValue: Int = .zero
     @State private var currentValue: Int = .zero
     @State private var rotation: CGFloat = .zero
-    public var body: some View {
+    internal var body: some View {
         let halfHeightWithSpacing = configuration.size.height * 0.5 - 1
         
         ZStack {
@@ -93,7 +93,7 @@ public struct FTFlipClockComponentView: View {
         .drawingGroup() // Fixes number tearing.
     }
     
-    public init(
+    internal init(
         value: Binding<Int>,
         configuration: FTFlipClockConfiguration,
     ) {

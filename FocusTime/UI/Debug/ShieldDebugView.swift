@@ -15,16 +15,37 @@ struct ShieldDebugView: View {
     
     var body: some View {
         VStack {
-            DeviceActivityReport(
-                .totalActivity,
-                filter: DeviceActivityFilter(
-                    segment: .daily(during: DateInterval(
-                        start: Calendar.current.startOfDay(for: .now),
-                        duration: 86400)),
-                    users: .all,
-                    devices: .init([.iPhone])
-                )
-            )
+            // This view causes DeviceActivityMonitorExtension unblock to fail.
+//            DeviceActivityReport(
+//                .totalActivity,
+//                filter: DeviceActivityFilter(
+//                    segment: .daily(during: DateInterval(
+//                                    start: Calendar.current.startOfDay(for: .now),
+//                                    duration: 86400)),
+//                    users: .all,
+//                    devices: .init([.iPhone])
+//                )
+//            )
+            // MARK: - Schedule list
+            VStack {
+                ScrollView(.vertical) {
+                    ForEach(viewModel.state.schedules) { schedule in
+                        HStack {
+                            Text(schedule.emoji)
+                            VStack(alignment: .leading) {
+                                HStack {
+                                    Text(schedule.name)
+                                    Text(schedule.type.description)
+                                        .font(.footnote)
+                                }
+                                Text("Id: " + schedule.id.uuidString)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                }
+            }
+//            )
             
             // MARK: - BlockItem list
             VStack {

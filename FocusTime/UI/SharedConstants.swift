@@ -15,7 +15,6 @@ enum SharedConstants {
         static let appSlogan = String(localized: "shared_app_slogan", table: "SharedLocalizable")
         
         static let errorHeader = String(localized: "shared_error_header", table: "SharedLocalizable")
-        static let dismissButtonTitle = String(localized: "shared_dismiss_button_title", table: "SharedLocalizable")
         static let viewPlansButton = String(localized: "shared_view_plans_button", table: "SharedLocalizable")
         static let subscribeButtonTitle = String(localized: "shared_subscribe_button_title", table: "SharedLocalizable")
         // Lifetime
@@ -23,7 +22,6 @@ enum SharedConstants {
         // Button states
         static let loadingTitle = String(localized: "shared_loading_title", table: "SharedLocalizable")
         static let pendingTitle = String(localized: "shared_pending_title", table: "SharedLocalizable")
-        static let subscribeTitle = String(localized: "shared_subscribe_button_title", table: "SharedLocalizable")
         static let subscribedTitle = String(localized: "shared_subscribed_title", table: "SharedLocalizable")
         static let purchasedTitle = String(localized: "shared_purchased_title", table: "SharedLocalizable")
     }
