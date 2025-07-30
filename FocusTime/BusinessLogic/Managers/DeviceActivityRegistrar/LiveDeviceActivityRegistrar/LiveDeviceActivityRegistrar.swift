@@ -27,12 +27,12 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
     init(
         center: DeviceActivityCenter = DeviceActivityCenter(),
         clock: Clock = SystemClock(),
-        blockItemStore: BlockItemStore,
+        modelContainer: ModelContainer,
         shieldManager: ShieldManager
     ) {
         self.center = center
         self.clock = clock
-        self.blockItemStore = blockItemStore
+        self.blockItemStore = BlockItemStore(modelContainer: modelContainer)
         self.shieldManager = shieldManager
     }
     

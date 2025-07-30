@@ -19,6 +19,7 @@ final class DeviceActivityMonitorExtension: DeviceActivityMonitor {
         category: String(describing: DeviceActivityMonitorExtension.self)
     )
     let handler = DeviceActivityHandler(
+        logger: DeviceActivityMonitorExtension.logger,
         container: DeviceActivityMonitorExtension.container,
         shieldManager: LiveShieldManager(isRunningInExtension: true)
     )

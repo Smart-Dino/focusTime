@@ -5,6 +5,7 @@
 //  Created by Maksym Horobets on 04.07.2025.
 //
 
+import os.log
 import SwiftData
 import Foundation
 import DeviceActivity
@@ -14,10 +15,16 @@ import DeviceActivity
 // It has to inherit the caller's execution context - hence why it is not an actor.
 // But it cannot be a class due to Task sendability issues.
 struct DeviceActivityHandler: Sendable {
+    private let logger: Logger
     private let container: ModelContainer
     private let shieldManager: ShieldManager
     
-    init(container: ModelContainer, shieldManager: ShieldManager) {
+    init(
+        logger: Logger,
+        container: ModelContainer,
+        shieldManager: ShieldManager
+    ) {
+        self.logger = logger
         self.container = container
         self.shieldManager = shieldManager
     }
@@ -79,20 +86,18 @@ struct DeviceActivityHandler: Sendable {
         let stringActivityName = activity.rawValue
         
         if activityIdentifier.isFallback {
-            Task {
-                // TimeComponents has an accuraccy of a minute.
-                // Hence why we are comparing it direclty - we have a whole minute to detect the match.
-                while TimeComponents(from: .now) != endTimeComponent {
-                    try? await Task.sleep(nanoseconds: 5_000_000_000)
-                } // Unfortunately sleeping task for a long time causes extension to close before unblock.
-                
-                try? await shieldManager.unblock()
-                
-                DeviceActivityCenter()
-                    .stopMonitoring(
-                        [DeviceActivityName(stringActivityName)]
-                    )
-            }
+            // TimeComponents has an accuraccy of a minute.
+            // Hence why we are comparing it direclty - we have a whole minute to detect the match.
+            while TimeComponents(from: .now) != endTimeComponent {
+                try? await Task.sleep(nanoseconds: 5_000_000_000)
+            } // Unfortunately sleeping task for a long time causes extension to close before unblock.
+            
+            try? await shieldManager.unblock()
+            
+            DeviceActivityCenter()
+                .stopMonitoring(
+                    [DeviceActivityName(stringActivityName)]
+                )
             
         }
     }

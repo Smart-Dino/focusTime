@@ -39,7 +39,7 @@ actor BlockItemStore: PersistenceStore {
     }
     
     func fetch() throws -> [ProtectedBlockItem] {
-        try modelContext
+        return try modelContext
             .fetch(FetchDescriptor<BlockItem>())
             .map { ProtectedBlockItem(from: $0) }
     }

@@ -19,8 +19,8 @@ struct ShieldDebugView: View {
                 .totalActivity,
                 filter: DeviceActivityFilter(
                     segment: .daily(during: DateInterval(
-                                    start: Calendar.current.startOfDay(for: .now),
-                                    duration: 86400)),
+                        start: Calendar.current.startOfDay(for: .now),
+                        duration: 86400)),
                     users: .all,
                     devices: .init([.iPhone])
                 )
@@ -43,9 +43,7 @@ struct ShieldDebugView: View {
             }
             
             Button("Erase all data", role: .destructive) {
-                Task {
-                    await viewModel.eraseAllData()
-                }
+                viewModel.eraseAllData()
             }
             .buttonBorderShape(.capsule)
             .buttonStyle(.borderedProminent)
@@ -116,27 +114,19 @@ struct ShieldDebugView: View {
             }
             
             Button("Create schedule") {
-                Task {
-                    await viewModel.addScheduleToDB()
-                }
+                viewModel.addScheduleToDB()
             }
             
             Button(viewModel.state.scheduleType == .scheduled ? "Start schedule" : "Start one-time block") {
-                Task {
-                    await viewModel.blockSelectionDuringSchedule()
-                }
+                    viewModel.blockSelectionDuringSchedule()
             }
             
             HStack {
                 Button("Suspend") {
-                    Task {
-                        await viewModel.suspendSession()
-                    }
+                    viewModel.suspendSession()
                 }
                 Button("Resume") {
-                    Task {
-                        await viewModel.resumeSession()
-                    }
+                    viewModel.resumeSession()
                 }
             }
             
@@ -189,11 +179,14 @@ struct ShieldDebugView: View {
                 }
             }
         )
-        .task {
-            await viewModel.fetchAllItems()
-        }
         .onAppear {
-            print(DeviceActivityCenter().activities)
+            viewModel.fetchAllItems()
+//            print({
+//                let center = viewModel.center
+//                return center.activities
+//                    .compactMap({ center.schedule(for: $0) })
+//                    .compactMap { $0.intervalStart.description + " | " + $0.intervalEnd.description }
+//            }())
         }
     }
     
@@ -218,3 +211,4 @@ struct ShieldDebugView: View {
         )
     )
 }
+
