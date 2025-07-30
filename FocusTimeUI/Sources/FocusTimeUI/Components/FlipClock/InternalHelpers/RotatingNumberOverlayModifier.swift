@@ -25,14 +25,15 @@ internal extension View {
     }
 }
 
-nonisolated internal struct RotatingNumberOverlayModifier: ViewModifier, Animatable {
+@MainActor
+internal struct RotatingNumberOverlayModifier: ViewModifier, Animatable {
     private var configuration: FTFlipClockConfiguration
     
     private var rotation: CGFloat
     private var currentValue: Int
     private var nextValue: Int
     
-    internal var animatableData: CGFloat {
+    internal nonisolated var animatableData: CGFloat {
         get { rotation }
         set { rotation = newValue }
     }
