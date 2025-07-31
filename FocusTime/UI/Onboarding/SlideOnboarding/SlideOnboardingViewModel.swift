@@ -15,7 +15,6 @@ import Observation
 @MainActor
 @Observable
 final class SlideOnboardingViewModel {
-    
     struct State {
         var currentIndex: Int = 0
         var showSkipConfirmation: Bool = false
@@ -26,8 +25,16 @@ final class SlideOnboardingViewModel {
         }
     }
     
-    private(set) var state = State()
+    private(set) var state: State
+    weak var delegate: SlideOnboardingDelegate?
 
+    init(
+        state: State = State(),
+        delegate: SlideOnboardingDelegate?
+    ) {
+        self.state = state
+        self.delegate = delegate
+    }
     
     var isSkipConfirmationPresented: Binding<Bool> {
         Binding {
@@ -40,6 +47,8 @@ final class SlideOnboardingViewModel {
     func goToNextStep() {
         if state.currentIndex < state.progressItems.count - 1 {
             state.currentIndex += 1
+        } else {
+            delegate?.didFinisOnboardingSlides(skipped: false)
         }
     }
     
@@ -48,7 +57,7 @@ final class SlideOnboardingViewModel {
     }
 
     func skipOnboarding() {
-        // TODO: - Navigate to main app flow
+        delegate?.didFinisOnboardingSlides(skipped: true)
         state.currentIndex = state.progressItems.count - 1
     }
     

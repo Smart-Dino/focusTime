@@ -13,7 +13,7 @@ import FocusTimeUI
 
 struct QuizOnboardingView: View {
     // MARK: - Properties
-    @State private var viewModel = QuizOnboardingViewModel()
+    @State var viewModel: QuizOnboardingViewModel
     
     // MARK: - Body
     var body: some View {
@@ -54,7 +54,7 @@ struct QuizOnboardingView: View {
             // MARK: - "Next" Button
             /// Button to proceed after selecting options
             Button(Constants.Strings.nextButton) {
-                // TODO: - Add navigation action
+                viewModel.finishQuiz()
             }
             .buttonStyle(FTPrimaryButtonStyle())
             .padding()
@@ -66,5 +66,5 @@ struct QuizOnboardingView: View {
 
 
 #Preview {
-    QuizOnboardingView()
+    QuizOnboardingView(viewModel: .init(delegate: nil))
 }

@@ -12,8 +12,6 @@ enum MainTabScreens: Equatable, Hashable {
     case home
     case blocks
     case profile
-    
-    var id: Self { self }
 }
 
 enum MainScreens: Equatable, Hashable {

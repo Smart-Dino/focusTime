@@ -13,21 +13,22 @@ import SwiftData
 @main
 struct FocusTimeApp: App {
     let modelContainer: ModelContainer
+    let defaultsManager: DefaultsManager
     
     var body: some Scene {
         WindowGroup {
-//            MainFlowCoordinatorView(viewModel: .init(modelContainer: modelContainer))
-            ShieldDebugView(
-                viewModel: .init(modelContainer: modelContainer)
+            AppFlowCoordinatorView(
+                viewModel: .init(defaultsManager: defaultsManager, modelContainer: modelContainer)
             )
         }
     }
     
     init() {
         let schema = Schema([BlockItem.self])
-        let config = ModelConfiguration(groupContainer: .identifier(AppValues.appGroupIdentifier))
+        let config = ModelConfiguration(groupContainer: .identifier(SharedAppValues.appGroupIdentifier))
         let container = try! ModelContainer(for: schema, configurations: config)
         
         self.modelContainer = container
+        self.defaultsManager = LiveDefaultsManager()
     }
 }

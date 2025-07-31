@@ -123,7 +123,7 @@
 				BusinessLogic/Models/Blocking/BlockItem/ProtectedBlockItem.swift,
 				BusinessLogic/Models/Blocking/CodableActivityIdentifier/CodableActivityIdentifier.swift,
 				BusinessLogic/Stores/Protocols/ProtectedModel.swift,
-				Shared/AppValues.swift,
+				Shared/SharedAppValues.swift,
 			);
 			target = E97895A42E0AFCBE00E0AF42 /* FocusTimeActivityMonitor */;
 		};

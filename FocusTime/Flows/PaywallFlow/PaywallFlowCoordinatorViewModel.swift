@@ -7,14 +7,14 @@
 
 import Foundation
 
-enum PaywallScreens: Equatable {
+enum PaywallScreen: Equatable {
     case freePlan(_ viewModel: FreePlanUpgradeViewModel)
     case onboarding(_ viewModel: OnboardingPaywallViewModel)
     case planSelection(_ viewModel: PlanSelectionPaywallViewModel)
     
     var id: Self { self }
     
-    static func == (lhs: PaywallScreens, rhs: PaywallScreens) -> Bool {
+    static func == (lhs: PaywallScreen, rhs: PaywallScreen) -> Bool {
         switch (lhs, rhs) {
         case (.freePlan, .freePlan): true
         case (.onboarding, .onboarding): true
@@ -28,7 +28,7 @@ enum PaywallScreens: Equatable {
 @Observable
 final class PaywallFlowCoordinatorViewModel {
     struct State {
-        var currentFlow: PaywallScreens
+        var currentFlow: PaywallScreen
     }
     private(set) var flowState: State!
     

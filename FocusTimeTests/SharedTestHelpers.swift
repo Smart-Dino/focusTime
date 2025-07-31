@@ -12,7 +12,7 @@ import Foundation
 enum SharedTestHelpers {
     static func generateTestModelContainer() -> ModelContainer {
         let schema = Schema([BlockItem.self])
-        let config = ModelConfiguration(isStoredInMemoryOnly: true, groupContainer: .identifier(AppValues.appGroupIdentifier))
+        let config = ModelConfiguration(isStoredInMemoryOnly: true, groupContainer: .identifier(SharedAppValues.appGroupIdentifier))
         do {
             let container = try ModelContainer(for: schema, configurations: config)
             return container

@@ -47,7 +47,7 @@ final class DeviceActivityMonitorExtension: DeviceActivityMonitor {
         let configurations = [
             ModelConfiguration(
                 allowsSave: false,
-                groupContainer: .identifier(AppValues.appGroupIdentifier)
+                groupContainer: .identifier(SharedAppValues.appGroupIdentifier)
             )
         ]
         
