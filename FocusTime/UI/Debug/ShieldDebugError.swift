@@ -9,14 +9,11 @@ import Foundation
 
 enum ShieldDebugError: LocalizedError {
     case timeComponent
-    case invalidPersistentIdentifiers
     
     var errorDescription: String {
         switch self {
         case .timeComponent:
             "Invalid time components."
-        case .invalidPersistentIdentifiers:
-            "Provided persistence identifiers do not exist."
         }
     }
 }

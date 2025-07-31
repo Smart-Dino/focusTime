@@ -39,7 +39,6 @@ final class ShieldDebugViewModel {
     // MARK: - Properties
     private(set) var state: State
     // Shield-related.
-    let center: DeviceActivityCenter
     private let shieldManager: ShieldManager
     private let activityRegistrar: DeviceActivityRegistrar
     // Model-related.
@@ -56,7 +55,6 @@ final class ShieldDebugViewModel {
         modelContainer: ModelContainer,
     ) {
         self.state = state
-        self.center = center
         self.shieldManager = shieldManager
         self.modelContainer = modelContainer
         self.activityRegistrar = LiveDeviceActivityRegistrar(modelContainer: modelContainer, shieldManager: shieldManager)
