@@ -148,7 +148,7 @@ struct RegistrarHandlerTests {
         )
         
         // Simulate ending the interval.
-        await activityHandler.handleBlockingEnd(for: activityName)
+        await activityHandler.handleBlockingEnd()
         
         #expect(
             store.shield.applications == nil &&
