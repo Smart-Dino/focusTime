@@ -15,12 +15,12 @@ import DeviceActivity
 // It has to inherit the caller's execution context - hence why it is not an actor.
 // But it cannot be a class due to Task sendability issues.
 struct DeviceActivityHandler: Sendable {
-    private let logger: Logger
+    private let logger: Logger?
     private let container: ModelContainer
     private let shieldManager: ShieldManager
     
     init(
-        logger: Logger,
+        logger: Logger?,
         container: ModelContainer,
         shieldManager: ShieldManager
     ) {
@@ -54,7 +54,11 @@ struct DeviceActivityHandler: Sendable {
     /// Called when a one-time blocking interval ends.
     private func handleDurationUnblocking(for blockItem: BlockItem) async {
         // Unblock.
-        try? await shieldManager.unblock()
+        do {
+            try await shieldManager.unblock()
+        } catch {
+            logger?.error("Failed to unblock in handleDurationUnblocking: \(error.localizedDescription)")
+        }
         
         // Reset duration values.
         guard case .oneTime(let duration, _, _, _) = blockItem.type else { return }
@@ -66,7 +70,11 @@ struct DeviceActivityHandler: Sendable {
         )
         
         // Save changes.
-        try? ModelContext(container).save()
+        do {
+            try ModelContext(container).save()
+        } catch {
+            logger?.error("Failed to save ModelContext in handleDurationUnblocking: \(error.localizedDescription)")
+        }
     }
     
     private func handleRegularBlocking(
@@ -80,7 +88,11 @@ struct DeviceActivityHandler: Sendable {
         
         // Block user's selections.
         let selection = blockItem.blockedContent
-        try? await shieldManager.block(specific: selection)
+        do {
+            try await shieldManager.block(specific: selection)
+        } catch {
+            logger?.error("Failed to block in handleRegularBlocking: \(error.localizedDescription)")
+        }
         
         // Sendability workaround since DeviceActivityName is not sendable.
         let stringActivityName = activity.rawValue
@@ -92,7 +104,11 @@ struct DeviceActivityHandler: Sendable {
                 try? await Task.sleep(nanoseconds: 5_000_000_000)
             } // Unfortunately sleeping task for a long time causes extension to close before unblock.
             
-            try? await shieldManager.unblock()
+            do {
+                try await shieldManager.unblock()
+            } catch {
+                logger?.error("Failed to unblock in handleRegularBlocking fallback handling: \(error.localizedDescription)")
+            }
             
             DeviceActivityCenter()
                 .stopMonitoring(
@@ -103,7 +119,11 @@ struct DeviceActivityHandler: Sendable {
     }
     
     func handleBlockingEnd() async {
-        try? await shieldManager.unblock()
+        do {
+            try await shieldManager.unblock()
+        } catch {
+            logger?.error("Failed to unblock in handleBlockingEnd: \(error.localizedDescription)")
+        }
     }
     
     private func fetchBlockItem(id: UUID) -> BlockItem? {
@@ -116,6 +136,12 @@ struct DeviceActivityHandler: Sendable {
             predicate: #Predicate<BlockItem> { $0.id == id }
         )
         
-        return try? context.fetch(fetchDescriptor).first
+        do {
+            return try context.fetch(fetchDescriptor).first
+        } catch {
+            logger?.error("Failed to fetch BlockItem in fetchBlockItem: \(error.localizedDescription)")
+            return nil
+        }
     }
 }
+
