@@ -15,11 +15,19 @@ struct FocusTimeApp: App {
     let modelContainer: ModelContainer
     let defaultsManager: DefaultsManager
     
+    @State var appFlowCoordinatorViewModel: AppFlowCoordinatorViewModel?
+    
     var body: some Scene {
         WindowGroup {
-            AppFlowCoordinatorView(
-                viewModel: .init(defaultsManager: defaultsManager, modelContainer: modelContainer)
-            )
+            if let appFlowCoordinatorViewModel {
+                AppFlowCoordinatorView(
+                    viewModel: appFlowCoordinatorViewModel
+                )
+            } else {
+                ProgressView()
+                Text("Hang on...")
+                    .task { await setupAppFlowViewModel() }
+            }
         }
     }
     
@@ -30,5 +38,17 @@ struct FocusTimeApp: App {
         
         self.modelContainer = container
         self.defaultsManager = LiveDefaultsManager()
+    }
+    
+    func setupAppFlowViewModel() async {
+        if appFlowCoordinatorViewModel == nil {
+            let paymentManager = await StoreKitPaymentManager()
+            
+            self.appFlowCoordinatorViewModel = .init(
+                defaultsManager: defaultsManager,
+                modelContainer: modelContainer,
+                paymentManager: paymentManager
+            )
+        }
     }
 }

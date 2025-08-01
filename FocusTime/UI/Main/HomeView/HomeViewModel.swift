@@ -18,13 +18,16 @@ final class HomeViewModel {
     
     private(set) var state: State
     private let blockItemStore: BlockItemStore
+    weak var delegate: HomeViewDelegate?
     
     init(
         state: State = State(),
-        modelContainer: ModelContainer
+        modelContainer: ModelContainer,
+        delegate: HomeViewDelegate?
     ) {
         self.state = state
         self.blockItemStore = BlockItemStore(modelContainer: modelContainer)
+        self.delegate = delegate
     }
     
     func makeScheduledFocusViewModel() -> ScheduledBlockItemsViewModel {

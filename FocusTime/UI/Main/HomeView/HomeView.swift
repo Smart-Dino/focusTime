@@ -103,6 +103,11 @@ struct HomeView: View {
 
 #Preview {
     NavigationStack {
-        HomeView(viewModel: .init(modelContainer: PreviewData.memoryOnlyModelContainer))
+        HomeView(
+            viewModel: .init(
+                modelContainer: PreviewData.memoryOnlyModelContainer,
+                delegate: nil
+            )
+        )
     }
 }

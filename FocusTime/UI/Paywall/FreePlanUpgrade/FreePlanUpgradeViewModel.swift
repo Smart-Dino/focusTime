@@ -48,6 +48,16 @@ final class FreePlanUpgradeViewModel {
         self.superPaywallVM = superPaywallVM
         self.flowDelegate = flowDelegate
         superPaywallVM.delegate = self
+        
+        setupView()
+    }
+    
+    func setupView() {
+        Task {
+            await fetchProducts()
+            selectRequestedProduct()
+            setupProductInfo()
+        }
     }
     
     

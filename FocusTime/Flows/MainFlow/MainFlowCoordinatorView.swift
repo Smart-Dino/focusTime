@@ -59,7 +59,7 @@ struct MainFlowCoordinatorView: View {
                 if viewModel.flowState.currentTabScreen == .home {
                     ToolbarItem {
                         FTProUpgradeButtonView {
-#warning("Action is empty")
+                            viewModel.requestPaywall()
                         }
                     }
                 }
@@ -91,5 +91,10 @@ struct MainFlowCoordinatorView: View {
 }
 
 #Preview {
-    MainFlowCoordinatorView(viewModel: .init(modelContainer: PreviewData.memoryOnlyModelContainer))
+    MainFlowCoordinatorView(
+        viewModel: .init(
+            modelContainer: PreviewData.memoryOnlyModelContainer,
+            appFlowDelegate: nil
+        )
+    )
 }

@@ -46,8 +46,17 @@ final class OnboardingPaywallViewModel {
         self.superPaywallVM = superPaywallVM
         self.flowDelegate = flowDelegate
         superPaywallVM.delegate = self
+        
+        setupView()
     }
     
+    private func setupView() {
+        Task {
+            await fetchProducts()
+            selectRequestedProduct()
+            setupProductInfo()
+        }
+    }
     
     // MARK: - Methods
     // MARK: State setter methods

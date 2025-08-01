@@ -49,6 +49,17 @@ final class PlanSelectionPaywallViewModel {
         self.superPaywallVM = superPaywallVM
         self.flowDelegate = flowDelegate
         superPaywallVM.delegate = self
+        
+        setupView()
+    }
+    
+    func setupView() {
+        Task {
+            await fetchProducts()
+            selectFirstProductIfNeeded()
+            await checkIfUserIsEligibleForFreeTrial()
+            configureBottomSectionForSelectedProduct()
+        }
     }
     
     // MARK: - Get/Set methods
@@ -149,8 +160,6 @@ extension PlanSelectionPaywallViewModel: SuperPaywallViewModelDelegate {
                 state: self.state.superState
             )
             configurePurchaseButtonAvailabilityBasedOnSelectedProduct()
-            
-            if isPro { flowDelegate?.paywallDidRequestDismissal() }
         }
     }
 }

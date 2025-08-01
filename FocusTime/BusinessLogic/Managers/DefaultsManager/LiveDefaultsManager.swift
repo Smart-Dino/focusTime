@@ -14,7 +14,7 @@ struct LiveDefaultsManager: DefaultsManager {
         self.defaults = defaults
     }
     
-    func setValue(for key: SharedAppValues.DefaultsKeys, value: Any) {
+    func setValue(for key: SharedAppValues.DefaultsKeys, to value: Any) {
         defaults.set(value, forKey: key.rawValue)
     }
     

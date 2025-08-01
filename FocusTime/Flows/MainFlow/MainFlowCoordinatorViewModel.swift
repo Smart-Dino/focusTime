@@ -42,15 +42,18 @@ final class MainFlowCoordinatorViewModel {
     }
     private(set) var flowState: State!
     private let modelContainer: ModelContainer
+    weak var appFlowDelegate: MainFlowDelegate?
     
     #warning("Find out how we would wire up the isPro property to here")
     
     init(
         flowState: State = State(currentTabScreen: .home),
-        modelContainer: ModelContainer
+        modelContainer: ModelContainer,
+        appFlowDelegate: MainFlowDelegate?
     ) {
         self.flowState = flowState
         self.modelContainer = modelContainer
+        self.appFlowDelegate = appFlowDelegate
     }
     
     func setScreens(_ screens: [MainScreens]) {
@@ -62,11 +65,21 @@ final class MainFlowCoordinatorViewModel {
     }
     
     func makeHomeViewModel() -> HomeViewModel {
-        HomeViewModel(modelContainer: modelContainer)
+        HomeViewModel(modelContainer: modelContainer, delegate: self)
     }
     
     func makeDraftsBlockItemListViewModel() -> DraftsBlockItemListViewModel {
         DraftsBlockItemListViewModel(modelContainer: modelContainer)
     }
     
+    func requestPaywall() {
+        appFlowDelegate?.didRequestPaywallPlanSeleciton()
+    }
+    
+}
+
+extension MainFlowCoordinatorViewModel: HomeViewDelegate {
+    func didRequestPaywall() {
+        appFlowDelegate?.didRequestPaywallPlanSeleciton()
+    }
 }

@@ -66,12 +66,6 @@ struct FreePlanUpgradeView: View {
                 Text(viewModel.state.superState.error?.localizedDescription ?? "")
             }
         )
-        .task {
-            // Do NOT put these in the initializer
-            await viewModel.fetchProducts()
-            viewModel.selectRequestedProduct()
-            viewModel.setupProductInfo()
-        }
     }
     
     /// Text to upsell the user.

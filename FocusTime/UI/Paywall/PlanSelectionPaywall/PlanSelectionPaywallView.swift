@@ -117,13 +117,6 @@ struct PlanSelectionPaywallView: View {
                 Text(viewModel.state.superState.error?.localizedDescription ?? "")
             }
         )
-        .task {
-            // Do NOT put these in the initializer
-            await viewModel.fetchProducts()
-            viewModel.selectFirstProductIfNeeded()
-            await viewModel.checkIfUserIsEligibleForFreeTrial()
-            viewModel.configureBottomSectionForSelectedProduct()
-        }
     }
     
     // MARK: - Computed properties

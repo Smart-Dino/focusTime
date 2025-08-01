@@ -7,8 +7,10 @@
 
 import Foundation
 
-protocol AppFlowNavigationDelegate {
+@MainActor
+protocol MainFlowDelegate: AnyObject {
     func didRequestOnboarding()
-    func didRequestPaywallScreen(with: PaywallScreen)
+    func didRequestPaywallPlanSeleciton()
+    func didRequestPaywallFreePlan()
     func didRequestMainFlow()
 }
