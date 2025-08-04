@@ -28,8 +28,8 @@ final class LaunchFlowCoordinatorViewModel {
         setupAppFlowViewModel()
     }
     
-    func keepShowingError(showError: Bool) {
-        if !showError {
+    func setErrorVisibility(_ isVisible: Bool) {
+        if !isVisible {
             state.error = nil
         }
     }
@@ -48,6 +48,9 @@ final class LaunchFlowCoordinatorViewModel {
     
     func setupAppFlowViewModel() {
         Task {
+            guard state.error == nil else { return }
+            
+            // Make sure we have modelContainer and our ViewModel has not yet bee initialized.
             if let modelContainer, state.appFlowCoordinatorViewModel == nil {
                 let paymentManager = await StoreKitPaymentManager()
                 

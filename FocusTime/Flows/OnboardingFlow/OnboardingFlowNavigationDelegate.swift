@@ -1,5 +1,5 @@
 //
-//  PaywallFlowNavigationDelegate.swift
+//  OnboardingFlowNavigationDelegate.swift
 //  FocusTime
 //
 //  Created by Maksym Horobets on 31.07.2025.
@@ -19,5 +19,5 @@ protocol QuizOnboardingDelegate: AnyObject {
 
 @MainActor
 protocol SlideOnboardingDelegate: AnyObject {
-    func didFinisOnboardingSlides(skipped: Bool)
+    func didFinishOnboardingSlides(skipped: Bool)
 }

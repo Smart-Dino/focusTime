@@ -31,8 +31,8 @@ final class ScheduledBlockItemsViewModel {
         self.modelContainer = modelContainer
     }
     
-    func keepShowingError(showError: Bool) {
-        if !showError {
+    func setErrorVisibility(_ isVisible: Bool) {
+        if !isVisible {
             state.error = nil
         }
     }

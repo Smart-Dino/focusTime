@@ -79,7 +79,7 @@ extension OnboardingFlowCoordinatorViewModel: QuizOnboardingDelegate {
 }
 
 extension OnboardingFlowCoordinatorViewModel: SlideOnboardingDelegate {
-    func didFinisOnboardingSlides(skipped: Bool) {
+    func didFinishOnboardingSlides(skipped: Bool) {
         #warning("Log results?")
         delegate?.didFinishOnboarding()
     }

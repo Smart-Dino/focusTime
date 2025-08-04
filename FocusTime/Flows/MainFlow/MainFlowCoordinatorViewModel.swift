@@ -95,13 +95,13 @@ final class MainFlowCoordinatorViewModel {
     }
     
     func requestPaywall() {
-        appFlowDelegate?.didRequestPaywallPlanSeleciton()
+        appFlowDelegate?.didRequestPaywallPlanSelection()
     }
     
 }
 
 extension MainFlowCoordinatorViewModel: HomeViewDelegate {
     func didRequestPaywall() {
-        appFlowDelegate?.didRequestPaywallPlanSeleciton()
+        appFlowDelegate?.didRequestPaywallPlanSelection()
     }
 }

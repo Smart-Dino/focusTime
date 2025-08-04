@@ -48,7 +48,7 @@ final class SlideOnboardingViewModel {
         if state.currentIndex < state.progressItems.count - 1 {
             state.currentIndex += 1
         } else {
-            delegate?.didFinisOnboardingSlides(skipped: false)
+            delegate?.didFinishOnboardingSlides(skipped: false)
         }
     }
     
@@ -57,7 +57,7 @@ final class SlideOnboardingViewModel {
     }
 
     func skipOnboarding() {
-        delegate?.didFinisOnboardingSlides(skipped: true)
+        delegate?.didFinishOnboardingSlides(skipped: true)
         state.currentIndex = state.progressItems.count - 1
     }
     

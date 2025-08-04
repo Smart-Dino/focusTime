@@ -75,11 +75,13 @@ final class SuperPaywallViewModel {
     
     // MARK: - Stream
     private func startListeningToSubscriptionUpdates() {
+        #if DEBUG
         // Very important debug info.
         // Make sure this ViewModel does not get created multiple times,
         // or esle it will lead to some very messy results.
         print(#function)
         print(ObjectIdentifier(self))
+        #endif
         subscriptionTask?.cancel()
         
         subscriptionTask = Task {

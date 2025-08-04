@@ -60,8 +60,8 @@ final class OnboardingPaywallViewModel {
     
     // MARK: - Methods
     // MARK: State setter methods
-    func keepShowingError(showError: Bool) {
-        if !showError {
+    func setErrorVisibility(_ isVisible: Bool) {
+        if !isVisible {
             state.superState.error = nil
         }
     }

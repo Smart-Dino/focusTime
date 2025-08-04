@@ -10,7 +10,7 @@ import Foundation
 @MainActor
 protocol MainFlowDelegate: AnyObject {
     func didRequestOnboarding()
-    func didRequestPaywallPlanSeleciton()
+    func didRequestPaywallPlanSelection()
     func didRequestPaywallFreePlan()
     func didRequestMainFlow()
 }

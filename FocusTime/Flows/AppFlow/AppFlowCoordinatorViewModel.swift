@@ -125,15 +125,6 @@ final class AppFlowCoordinatorViewModel {
         }
     }
     
-    private func setupFlow() {
-        let isOnboardingFinished = defaultsManager.getValue(for: .isOnboardingFinished) as? Bool ?? false
-        
-        if isOnboardingFinished {
-            let mainVM = makeMainFlowCoordinatorViewModel()
-            setStateFlow(to: .main(viewModel: mainVM))
-        }
-    }
-    
     func makeOnboardingFlowCoordinatorViewModel() -> OnboardingFlowCoordinatorViewModel {
         OnboardingFlowCoordinatorViewModel(delegate: self)
     }
@@ -172,7 +163,7 @@ final class AppFlowCoordinatorViewModel {
 // MARK: - MainFlowNavigationDelegate
 extension AppFlowCoordinatorViewModel: MainFlowDelegate {
     // MARK: Paywall
-    func didRequestPaywallPlanSeleciton() {
+    func didRequestPaywallPlanSelection() {
         setScreenCover(to: .planSelectionPaywall(viewModel: makePlanSelectionPaywallViewModel()))
     }
     

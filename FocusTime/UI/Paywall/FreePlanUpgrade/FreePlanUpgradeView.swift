@@ -58,8 +58,8 @@ struct FreePlanUpgradeView: View {
             Constants.Strings.errorHeader,
             isPresented: Binding(get: {
                 viewModel.state.superState.error != nil
-            }, set: { showError in
-                viewModel.keepShowingError(showError: showError)
+            }, set: { isVisible in
+                viewModel.setErrorVisibility(isVisible)
             }), actions: {
                 // OK dismissal button by default
             }, message: {
