@@ -14,30 +14,72 @@ enum MainTabScreens: Equatable, Hashable {
     case profile
 }
 
+enum MainFlowNavigationRoute: Equatable, Hashable {
+    case shieldDebug(_ viewModel: ShieldDebugViewModel)
+    
+    var id: Self { self }
+    
+    static func == (lhs: MainFlowNavigationRoute, rhs: MainFlowNavigationRoute) -> Bool {
+        switch (lhs, rhs) {
+        case (.shieldDebug, .shieldDebug): true
+        }
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        switch self {
+        case .shieldDebug:
+            hasher.combine(0)
+        }
+    }
+}
+
 @MainActor
 @Observable
 final class MainFlowCoordinatorViewModel {
     struct State {
         var currentTabScreen: MainTabScreens
+        
+        let debugViewCountGoal: Int = 5
+        var debugViewCount: Int = 0
+        var nextNavigationScreen: MainFlowNavigationRoute?
     }
-    private(set) var flowState: State!
+    private(set) var state: State!
     private let modelContainer: ModelContainer
     weak var appFlowDelegate: MainFlowDelegate?
     
     #warning("Find out how we would wire up the isPro property to here")
     
     init(
-        flowState: State = State(currentTabScreen: .home),
+        state: State = State(currentTabScreen: .home),
         modelContainer: ModelContainer,
         appFlowDelegate: MainFlowDelegate?
     ) {
-        self.flowState = flowState
+        self.state = state
         self.modelContainer = modelContainer
         self.appFlowDelegate = appFlowDelegate
     }
     
+    func setNextNavigationScreen(_ showing: Bool) {
+        if !showing {
+            state.nextNavigationScreen = nil
+        }
+    }
+    
+    func showDebugView() {
+        state.nextNavigationScreen = .shieldDebug(makeShieldDebugViewModel())
+    }
+    
     func setTabScreen(_ screen: MainTabScreens) {
-        flowState.currentTabScreen = screen
+        if state.currentTabScreen == screen {
+            state.debugViewCount += 1
+        }
+        
+        if state.debugViewCount >= state.debugViewCountGoal {
+            showDebugView()
+            state.debugViewCount = .zero
+        }
+        
+        state.currentTabScreen = screen
     }
     
     func makeHomeViewModel() -> HomeViewModel {
@@ -46,6 +88,10 @@ final class MainFlowCoordinatorViewModel {
     
     func makeDraftsBlockItemListViewModel() -> DraftsBlockItemListViewModel {
         DraftsBlockItemListViewModel(modelContainer: modelContainer)
+    }
+    
+    func makeShieldDebugViewModel() -> ShieldDebugViewModel {
+        ShieldDebugViewModel(modelContainer: modelContainer)
     }
     
     func requestPaywall() {

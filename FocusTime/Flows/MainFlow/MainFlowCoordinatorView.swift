@@ -14,7 +14,7 @@ struct MainFlowCoordinatorView: View {
     var body: some View {
         NavigationStack {
             TabView(selection: Binding(get: {
-                viewModel.flowState.currentTabScreen
+                viewModel.state.currentTabScreen
             }, set: { screen in
                 viewModel.setTabScreen(screen)
             })) {
@@ -32,7 +32,6 @@ struct MainFlowCoordinatorView: View {
                             Label("Blocks", systemImage: "hand.raised")
                             // Prevent system from filling system icons.
                                 .environment(\.symbolVariants, .none)
-                            
                         }
                         .tag(MainTabScreens.blocks)
                     Text("Empty for now")
@@ -52,7 +51,7 @@ struct MainFlowCoordinatorView: View {
             }
             .toolbar(.visible)
             .toolbar {
-                if viewModel.flowState.currentTabScreen == .home {
+                if viewModel.state.currentTabScreen == .home {
                     ToolbarItem {
                         FTProUpgradeButtonView {
                             viewModel.requestPaywall()
@@ -61,7 +60,7 @@ struct MainFlowCoordinatorView: View {
                 }
                 // In future SDKs of iOS we would have to put a spacer here.
                 ToolbarItemGroup {
-                    switch viewModel.flowState.currentTabScreen {
+                    switch viewModel.state.currentTabScreen {
                     case .home:
                         FTPlusToolbarButtonView {
 #warning("Action is empty")
@@ -71,15 +70,17 @@ struct MainFlowCoordinatorView: View {
                     }
                 }
             }
-            // Navigation has to be managed here
-            // since declaring navDest in the views nested in the tabbar
-            // makes them load lazily which will cause navigation bugs.
-//            .navigationDestination(for: MainScreens.self) { screen in
-//                switch screen {
-//                case .scheduledFocusList(let scheduledFocusViewModel):
-//                    ScheduledBlockItemsView(viewModel: scheduledFocusViewModel)
-//                }
-//            }
+            .navigationDestination(isPresented: .init(
+                get: { viewModel.state.nextNavigationScreen != nil },
+                set: { viewModel.setNextNavigationScreen($0) }
+            )) {
+                switch viewModel.state.nextNavigationScreen {
+                case .shieldDebug(let viewModel):
+                    ShieldDebugView(viewModel: viewModel)
+                case .none:
+                    Text("No view")
+                }
+            }
         }
         .preferredColorScheme(.dark)
         .dynamicTypeSize(...DynamicTypeSize.accessibility2)
