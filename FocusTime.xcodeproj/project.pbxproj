@@ -89,7 +89,10 @@
 		C64C07892E329BEF00350A45 /* Exceptions for "FocusTimeActivityReport" folder in "FocusTime" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Colors.xcassets,
 				"DeviceActivityReportContext+Ext.swift",
+				TotalActivityReport.swift,
+				TotalActivityView.swift,
 			);
 			target = 674FA69F2DB05ACE0002FDC1 /* FocusTime */;
 		};

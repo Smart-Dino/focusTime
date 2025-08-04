@@ -20,13 +20,15 @@ extension PersistenceTests {
         let (scheduleStore, blockItemStore) = makeStores()
         
         // Generate schedules.
+        let startTime = try TimeComponents(hour: 17, minute: 00)
+        let endTime = try TimeComponents(hour: 19, minute: 00)
         let schedulesToInsert = Array(
             repeating: ProtectedSchedule(
                 emoji: "🏠",
                 name: "Spend time with family",
                 days: [.saturday, .sunday],
-                type: .scheduled(startTime: .init(hour: 17, minute: 00)!,
-                                 endTime: .init(hour: 19, minute: 00)!)
+                type: .scheduled(startTime: startTime,
+                                 endTime: endTime)
             ),
             count: eachItemCount
         )
@@ -86,7 +88,7 @@ extension PersistenceTests {
         let customName = "Custom Test Name"
         
         // Generate test items.
-        let schedule = makeProtectedTestSchedule(name: customName)
+        let schedule = try makeProtectedTestSchedule(name: customName)
         let blockItem = makeProtectedTestBlockItem(name: customName)
         
         // Insert items to the database and get back their IDs.
@@ -117,8 +119,8 @@ extension PersistenceTests {
         let pageSize = 10
 
         // Insert schedules.
-        let schedulesToInsert = (0..<totalCount).map { i in
-            makeProtectedTestSchedule(name: "Schedule_\(i)")
+        let schedulesToInsert = try (0..<totalCount).map { i in
+            try makeProtectedTestSchedule(name: "Schedule_\(i)")
         }
         try await scheduleStore.insertBatch(schedulesToInsert)
 

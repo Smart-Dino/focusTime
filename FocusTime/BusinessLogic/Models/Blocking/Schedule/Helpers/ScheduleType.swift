@@ -15,6 +15,15 @@ enum ScheduleType: Codable, Hashable {
                  suspendedAt: Date?,
                  timeLeft: DurationComponents)
     
+    var description: String {
+        switch self {
+        case .scheduled(let startTime, let endTime):
+            startTime.description + " " + endTime.description
+        case .oneTime(let duration, _, _, _):
+            PeriodConverter.localizedConciseTimeString(from: duration.rawValue)
+        }
+    }
+    
     static func oneTime(_ duration: DurationComponents,
                         startedAt: Date? = nil,
                         suspendedAt: Date? = nil,
@@ -23,14 +32,5 @@ enum ScheduleType: Codable, Hashable {
                         startedAt: startedAt,
                         suspendedAt: suspendedAt,
                         timeLeft: timeLeft ?? duration)
-    }
-    
-    var description: String {
-        switch self {
-        case .scheduled(let startTime, let endTime):
-            startTime.description + " " + endTime.description
-        case .oneTime(let duration, _, _, _):
-            PeriodConverter.localizedConciseTimeString(from: duration.rawValue)
-        }
     }
 }

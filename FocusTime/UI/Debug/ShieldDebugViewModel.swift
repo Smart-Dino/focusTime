@@ -17,7 +17,16 @@ final class ShieldDebugViewModel {
     struct State {
         enum ScheduleType {
             case scheduled
-            case oneTime
+            case duration
+            
+            var buttonTitle: String {
+                switch self {
+                case .scheduled:
+                    "Activate scheduled block"
+                case .duration:
+                    "Start duration block"
+                }
+            }
         }
         
         var error: Error? = nil
@@ -132,14 +141,12 @@ final class ShieldDebugViewModel {
             var type: ScheduleType!
             
             switch state.scheduleType {
-            case .oneTime:
+            case .duration:
                 type = .oneTime(DurationComponents(duration: state.duration * 60)) // Minutes to seconds.
             case .scheduled:
-                guard let startComponent = TimeComponents(from: state.startTime),
-                      let endComponent = TimeComponents(from: state.endTime) else {
-                    state.error = ShieldDebugError.timeComponent
-                    return
-                }
+                let startComponent = try TimeComponents(from: state.startTime)
+                let endComponent = try TimeComponents(from: state.endTime)
+                        
                 type = .scheduled(startTime: startComponent, endTime: endComponent)
             }
             
@@ -182,7 +189,7 @@ final class ShieldDebugViewModel {
             guard let blockItemModelID = blockItem.persistentModelID,
                   let schedulesModelID = schedule.persistentModelID
             else {
-                throw ShieldDebugError.invalidPersistentIdentifiers
+                return
             }
             
             try await relationshipCoordinator.relate(blockItemID: blockItemModelID,

@@ -22,10 +22,10 @@ extension PersistenceTests {
             schedulesDescription: "No schedules"
         )
     }
-    func makeProtectedTestSchedule(name: String = UUID().uuidString) -> ProtectedSchedule {
+    func makeProtectedTestSchedule(name: String = UUID().uuidString) throws -> ProtectedSchedule {
         let weekdays: Set<Weekday> = Weekday.weekdays
-        let start = TimeComponents(hour: 9, minute: 0)!
-        let end = TimeComponents(hour: 17, minute: 0)!
+        let start = try TimeComponents(hour: 9, minute: 0)
+        let end = try TimeComponents(hour: 17, minute: 0)
         return ProtectedSchedule(
             emoji: "📅",
             name: name,
@@ -51,7 +51,7 @@ extension PersistenceTests {
         protectedBlockItem: ProtectedBlockItem
     ) {
         // Generate test items.
-        let schedule = makeProtectedTestSchedule()
+        let schedule = try makeProtectedTestSchedule()
         let blockItem = makeProtectedTestBlockItem()
         
         // Insert items to the database and get back their IDs.

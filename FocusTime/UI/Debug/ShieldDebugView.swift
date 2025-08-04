@@ -87,46 +87,14 @@ struct ShieldDebugView: View {
                 })
             ) {
                 Text("Scheduled").tag(ShieldDebugViewModel.State.ScheduleType.scheduled)
-                Text("One-time").tag(ShieldDebugViewModel.State.ScheduleType.oneTime)
+                Text("One-time").tag(ShieldDebugViewModel.State.ScheduleType.duration)
             }
             .pickerStyle(.segmented)
             
-            if viewModel.state.scheduleType == .scheduled {
-                HStack {
-                    DatePicker(
-                        "Select start time",
-                        selection:
-                            Binding(get: {
-                                viewModel.state.startTime
-                            }, set: { date in
-                                viewModel.setStartTime(date)
-                            }),
-                        displayedComponents: [.hourAndMinute]
-                    )
-                    .datePickerStyle(.compact)
-                    DatePicker(
-                        "Select end time",
-                        selection:
-                            Binding(get: {
-                                viewModel.state.endTime
-                            }, set: { date in
-                                viewModel.setEndTime(date)
-                            }),
-                        displayedComponents: [.hourAndMinute]
-                    )
-                }
-            } else if viewModel.state.scheduleType == .oneTime {
-                VStack(alignment: .leading) {
-                    Text("Block duration (minutes)")
-                    Stepper(value: Binding(
-                        get: { viewModel.state.duration },
-                        set: { newValue in
-                            viewModel.setDuration(newValue)
-                        }
-                    ), in: 1...240) {
-                        Text("\(viewModel.state.duration) minutes")
-                    }
-                }
+            // MARK: - Time pickers
+            switch viewModel.state.scheduleType {
+            case .scheduled: scheduleTimePicker
+            case .duration: durationTimePicker
             }
             
             Button("Toggle selection sheet") {
@@ -141,7 +109,7 @@ struct ShieldDebugView: View {
                 }
             }
             
-            Button(viewModel.state.scheduleType == .scheduled ? "Start schedule" : "Start one-time block") {
+            Button(viewModel.state.scheduleType.buttonTitle) {
                 Task {
                     await viewModel.appendBlockItemToSchedule()
                     await viewModel.blockSelectionDuringSchedule()
@@ -215,6 +183,46 @@ struct ShieldDebugView: View {
         }
         .onAppear {
             print(DeviceActivityCenter().activities)
+        }
+    }
+    
+    var scheduleTimePicker: some View {
+        HStack {
+            DatePicker(
+                "Select start time",
+                selection:
+                    Binding(get: {
+                        viewModel.state.startTime
+                    }, set: { date in
+                        viewModel.setStartTime(date)
+                    }),
+                displayedComponents: [.hourAndMinute]
+            )
+            .datePickerStyle(.compact)
+            DatePicker(
+                "Select end time",
+                selection:
+                    Binding(get: {
+                        viewModel.state.endTime
+                    }, set: { date in
+                        viewModel.setEndTime(date)
+                    }),
+                displayedComponents: [.hourAndMinute]
+            )
+        }
+    }
+    
+    var durationTimePicker: some View {
+        VStack(alignment: .leading) {
+            Text("Block duration (minutes)")
+            Stepper(value: Binding(
+                get: { viewModel.state.duration },
+                set: { newValue in
+                    viewModel.setDuration(newValue)
+                }
+            ), in: 1...240) {
+                Text("\(viewModel.state.duration) minutes")
+            }
         }
     }
     

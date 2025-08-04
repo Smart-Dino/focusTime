@@ -82,11 +82,11 @@ struct DeviceActivityHandler: Sendable {
             Task {
                 // TimeComponents has an accuraccy of a minute.
                 // Hence why we are comparing it direclty - we have a whole minute to detect the match.
-                while TimeComponents(from: .now) != endTimeComponent {
-                    try? await Task.sleep(nanoseconds: 5_000_000_000)
+                while try TimeComponents(from: .now) != endTimeComponent {
+                    try await Task.sleep(nanoseconds: 5_000_000_000)
                 } // Unfortunately sleeping task for a long time causes extension to close before unblock.
                 
-                try? await shieldManager.unblock()
+                try await shieldManager.unblock()
                 
                 DeviceActivityCenter()
                     .stopMonitoring(

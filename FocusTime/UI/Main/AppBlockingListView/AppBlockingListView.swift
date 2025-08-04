@@ -13,8 +13,6 @@ struct AppBlockingListView: View {
     
     var body: some View {
         ZStack {
-            // MARK: - Gradient
-            MainBackgroundGradientView()
             // MARK: - Wave image
             VStack {
                 Image(Constants.Icons.waveImage)
@@ -44,6 +42,7 @@ struct AppBlockingListView: View {
             }
             .padding(.horizontal)
         }
+        .background { MainBackgroundGradientView() }
         // MARK: - Bottom floating button
         .safeAreaInset(edge: .bottom) {
             Button(Constants.Strings.newBlocklistButtonTitle, systemImage: "plus.circle") {
