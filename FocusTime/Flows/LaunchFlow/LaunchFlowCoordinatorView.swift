@@ -8,21 +8,33 @@
 import SwiftUI
 import SwiftData
 
-#warning("When creating a splash screen make sure to handle ModelContainer errors!")
-
 struct LaunchFlowView: View {
     @State private var viewModel: LaunchFlowCoordinatorViewModel = LaunchFlowCoordinatorViewModel()
     
     var body: some View {
-        if let appFlowCoordinatorViewModel = viewModel.state.appFlowCoordinatorViewModel {
-            AppFlowCoordinatorView(
-                viewModel: appFlowCoordinatorViewModel
-            )
-        } else {
-            #warning("Implement splash screen")
-            ProgressView()
-            Text("Hang on...")
+        Group {
+            if let appFlowCoordinatorViewModel = viewModel.state.appFlowCoordinatorViewModel {
+                AppFlowCoordinatorView(
+                    viewModel: appFlowCoordinatorViewModel
+                )
+            } else {
+                #warning("Implement splash screen")
+                ProgressView()
+                Text("Hang on...")
+            }
         }
+        .alert(
+            SharedConstants.Strings.errorHeader,
+            isPresented: Binding(get: {
+                viewModel.state.error != nil
+            }, set: { showError in
+                viewModel.keepShowingError(showError: showError)
+            }), actions: {
+                // OK dismissal button by default
+            }, message: {
+                Text(viewModel.state.error?.localizedDescription ?? "")
+            }
+        )
     }
 }
 

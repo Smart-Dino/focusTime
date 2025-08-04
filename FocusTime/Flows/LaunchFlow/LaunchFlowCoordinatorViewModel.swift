@@ -17,24 +17,38 @@ final class LaunchFlowCoordinatorViewModel {
     }
     
     private(set) var state: State
-    let modelContainer: ModelContainer
-    let defaultsManager: DefaultsManager
+    private let defaultsManager: DefaultsManager
+    private var modelContainer: ModelContainer?
     
     init() {
-        let schema = Schema([BlockItem.self])
-        let config = ModelConfiguration(groupContainer: .identifier(SharedAppValues.appGroupIdentifier))
-        let container = try! ModelContainer(for: schema, configurations: config)
-        
         self.state = State()
-        self.modelContainer = container
         self.defaultsManager = LiveDefaultsManager()
         
+        setupModelContainer()
         setupAppFlowViewModel()
+    }
+    
+    func keepShowingError(showError: Bool) {
+        if !showError {
+            state.error = nil
+        }
+    }
+    
+    func setupModelContainer() {
+        do {
+            let schema = Schema([BlockItem.self])
+            let config = ModelConfiguration(groupContainer: .identifier(SharedAppValues.appGroupIdentifier))
+            let container = try ModelContainer(for: schema, configurations: config)
+            
+            self.modelContainer = container
+        } catch {
+            state.error = error
+        }
     }
     
     func setupAppFlowViewModel() {
         Task {
-            if state.appFlowCoordinatorViewModel == nil {
+            if let modelContainer, state.appFlowCoordinatorViewModel == nil {
                 let paymentManager = await StoreKitPaymentManager()
                 
                 self.state.appFlowCoordinatorViewModel = .init(
