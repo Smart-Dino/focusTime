@@ -49,9 +49,9 @@ struct HomeView: View {
                 }
                 VStack(spacing: .zero) {
                     // MARK: - Scheduled focus button
-                    NavigationLink(
-                        value: MainScreens.scheduledFocusList(viewModel.makeScheduledFocusViewModel())
-                    ) {
+                    Button {
+                        viewModel.showScheduledFocusView()
+                    } label: {
                         HStack {
                             VStack(alignment: .leading) {
                                 Text(Constants.Strings.scheduledFocusTitle)
@@ -81,6 +81,16 @@ struct HomeView: View {
                     }
                 }
                 .frame(minHeight: 130) // Used so that the screen time value stays in the same place
+            }
+        }
+        .navigationDestination(isPresented: .init(
+            get: { viewModel.state.nextNavigationScreen != nil },
+            set: { viewModel.setNextNavigationScreen($0) }
+        )) {
+            switch viewModel.state.nextNavigationScreen {
+            case .scheduledFocusList(let viewModel):
+                ScheduledBlockItemsView(viewModel: viewModel)
+            case .none: Text("No view")
             }
         }
         // MARK: - Bottom floating button

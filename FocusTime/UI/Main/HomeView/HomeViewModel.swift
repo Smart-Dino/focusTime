@@ -13,7 +13,7 @@ import Foundation
 @Observable
 final class HomeViewModel {
     struct State {
-        
+        var nextNavigationScreen: MainScreens?
     }
     
     private(set) var state: State
@@ -30,7 +30,17 @@ final class HomeViewModel {
         self.delegate = delegate
     }
     
-    func makeScheduledFocusViewModel() -> ScheduledBlockItemsViewModel {
+    func setNextNavigationScreen(_ showing: Bool) {
+        if !showing {
+            state.nextNavigationScreen = nil
+        }
+    }
+    
+    func showScheduledFocusView() {
+        state.nextNavigationScreen = .scheduledFocusList(makeScheduledFocusViewModel())
+    }
+    
+    private func makeScheduledFocusViewModel() -> ScheduledBlockItemsViewModel {
         ScheduledBlockItemsViewModel(blockItemStore: blockItemStore)
     }
 }

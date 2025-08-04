@@ -38,7 +38,7 @@ enum MainScreens: Equatable, Hashable {
 final class MainFlowCoordinatorViewModel {
     struct State {
         var currentTabScreen: MainTabScreens
-        var currentPath: [MainScreens] = []
+        var nextNavigationScreen: MainScreens?
     }
     private(set) var flowState: State!
     private let modelContainer: ModelContainer
@@ -54,10 +54,6 @@ final class MainFlowCoordinatorViewModel {
         self.flowState = flowState
         self.modelContainer = modelContainer
         self.appFlowDelegate = appFlowDelegate
-    }
-    
-    func setScreens(_ screens: [MainScreens]) {
-        flowState.currentPath = screens
     }
     
     func setTabScreen(_ screen: MainTabScreens) {

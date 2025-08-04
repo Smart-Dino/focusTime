@@ -12,11 +12,7 @@ struct MainFlowCoordinatorView: View {
     @State var viewModel: MainFlowCoordinatorViewModel
     
     var body: some View {
-        NavigationStack(path: Binding(get: {
-            viewModel.flowState.currentPath
-        }, set: { screens in
-            viewModel.setScreens(screens)
-        })) {
+        NavigationStack {
             TabView(selection: Binding(get: {
                 viewModel.flowState.currentTabScreen
             }, set: { screen in
@@ -78,12 +74,12 @@ struct MainFlowCoordinatorView: View {
             // Navigation has to be managed here
             // since declaring navDest in the views nested in the tabbar
             // makes them load lazily which will cause navigation bugs.
-            .navigationDestination(for: MainScreens.self) { screen in
-                switch screen {
-                case .scheduledFocusList(let scheduledFocusViewModel):
-                    ScheduledBlockItemsView(viewModel: scheduledFocusViewModel)
-                }
-            }
+//            .navigationDestination(for: MainScreens.self) { screen in
+//                switch screen {
+//                case .scheduledFocusList(let scheduledFocusViewModel):
+//                    ScheduledBlockItemsView(viewModel: scheduledFocusViewModel)
+//                }
+//            }
         }
         .preferredColorScheme(.dark)
         .dynamicTypeSize(...DynamicTypeSize.accessibility2)
