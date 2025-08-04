@@ -9,11 +9,30 @@ import SwiftUI
 import SwiftData
 import Foundation
 
+enum HomeViewNavigationRoute: Equatable, Hashable {
+    case scheduledFocusList(_ viewModel: ScheduledBlockItemsViewModel)
+    
+    var id: Self { self }
+    
+    static func == (lhs: HomeViewNavigationRoute, rhs: HomeViewNavigationRoute) -> Bool {
+        switch (lhs, rhs) {
+        case (.scheduledFocusList, .scheduledFocusList): true
+        }
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        switch self {
+        case .scheduledFocusList:
+            hasher.combine(0)
+        }
+    }
+}
+
 @MainActor
 @Observable
 final class HomeViewModel {
     struct State {
-        var nextNavigationScreen: MainScreens?
+        var nextNavigationScreen: HomeViewNavigationRoute?
     }
     
     private(set) var state: State

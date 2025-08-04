@@ -14,31 +14,11 @@ enum MainTabScreens: Equatable, Hashable {
     case profile
 }
 
-enum MainScreens: Equatable, Hashable {
-    case scheduledFocusList(_ viewModel: ScheduledBlockItemsViewModel)
-    
-    var id: Self { self }
-    
-    static func == (lhs: MainScreens, rhs: MainScreens) -> Bool {
-        switch (lhs, rhs) {
-        case (.scheduledFocusList, .scheduledFocusList): true
-        }
-    }
-    
-    func hash(into hasher: inout Hasher) {
-        switch self {
-        case .scheduledFocusList:
-            hasher.combine(0)
-        }
-    }
-}
-
 @MainActor
 @Observable
 final class MainFlowCoordinatorViewModel {
     struct State {
         var currentTabScreen: MainTabScreens
-        var nextNavigationScreen: MainScreens?
     }
     private(set) var flowState: State!
     private let modelContainer: ModelContainer

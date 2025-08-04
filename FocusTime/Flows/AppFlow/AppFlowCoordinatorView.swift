@@ -11,7 +11,6 @@ struct AppFlowCoordinatorView: View {
     @State var viewModel: AppFlowCoordinatorViewModel
     
     var body: some View {
-        let _ = Self._printChanges()
         Group {
             switch viewModel.state.currentFlow {
             case .onboarding(let onboardingFlowViewModel):
