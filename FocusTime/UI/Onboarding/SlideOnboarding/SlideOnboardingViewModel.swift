@@ -15,6 +15,7 @@ final class SlideOnboardingViewModel {
     // MARK: - State Struct
     @MainActor
     struct State {
+<<<<<<< HEAD
         let onboardingSlides: [OnboardingSlide]
 
         let nextButtonTitle: String
@@ -25,6 +26,11 @@ final class SlideOnboardingViewModel {
         let onboardingMaskOpacity: CGFloat
         let skipButtonTextColor: Color
         let onboardingBackgroundImageName: String
+=======
+        var currentIndex: Int = 0
+        var showSkipConfirmation: Bool = false
+        let progressItems: [SlideOnboardingStep] = SlideOnboardingStep.allCases
+>>>>>>> main
         
         // MARK: - Computed Properties for Builder Configurations (referencing `state`)
         var nextButtonConfig: ButtonUIConfiguration {
@@ -72,6 +78,7 @@ final class SlideOnboardingViewModel {
     // MARK: - ViewModel Properties
     private(set) var state = State()
 
+<<<<<<< HEAD
     // MARK: - Lifecycle
     init(state: State = State()) {
         self.state = state
@@ -81,6 +88,30 @@ final class SlideOnboardingViewModel {
     func didTapStartFocusing() {
         // TODO: Implement actual navigation logic after onboarding
         print("Start Focusing button tapped from ViewModel!")
+=======
+    
+    var isSkipConfirmationPresented: Binding<Bool> {
+        Binding {
+            self.state.showSkipConfirmation
+        } set: { newValue in
+            self.state.showSkipConfirmation = newValue
+        }
+    }
+    
+    func goToNextStep() {
+        if state.currentIndex < state.progressItems.count - 1 {
+            state.currentIndex += 1
+        }
+    }
+    
+    func requestSkipConfirmation() {
+        state.showSkipConfirmation = true
+    }
+
+    func skipOnboarding() {
+        // TODO: - Navigate to main app flow
+        state.currentIndex = state.progressItems.count - 1
+>>>>>>> main
     }
     
     var startAppButtonConfig: ButtonUIConfiguration {

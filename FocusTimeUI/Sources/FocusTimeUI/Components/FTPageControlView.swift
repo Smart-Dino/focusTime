@@ -41,10 +41,10 @@ public struct FTPageControlView<Items: Collection>: View {
                 }
             }
             // On each addition of a dot - set the new width to fit it
-            .onGeometryChange(for: CGRect.self) { proxy in
-                proxy.frame(in: .global)
+            .onGeometryChange(for: CGFloat.self) { proxy in
+                proxy.frame(in: .global).width
             } action: { newValue in
-                maxWidth = newValue.width
+                maxWidth = newValue
             }
         }
         // Dynamically adjust frame based on its contents

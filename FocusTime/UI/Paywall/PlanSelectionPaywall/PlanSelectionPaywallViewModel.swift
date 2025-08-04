@@ -17,9 +17,9 @@ final class PlanSelectionPaywallViewModel {
         var superState: SuperPaywallViewModel.State
         
         // MARK: Background Images
-        let backgroudImages: [ImageResource] = [
-            .debugNightMountain,
-            .debugDayMountain
+        let backgroundImages: [ImageResource] = [
+            ImageResource.DebugImages.debugNightMountain,
+            ImageResource.DebugImages.debugDayMountain
         ]
         var selectedImageIndex: Int? = .zero
         
@@ -42,7 +42,6 @@ final class PlanSelectionPaywallViewModel {
     // MARK: - Initializers
     init(
         state: State = State(),
-        superState: SuperPaywallViewModel.State = .init(),
         superPaywallVM: SuperPaywallViewModel,
         flowDelegate: PaywallNavigationDelegate?
     ) {
@@ -126,8 +125,9 @@ final class PlanSelectionPaywallViewModel {
     }
     
     func getTrialTerms(for product: FTProduct) -> String {
-        let fallback = String(localized: "0 days", table: "PaywallLocalizable")
-        return "Get \(product.trialPeriodString ?? fallback) for free!"
+        let fallback = String(localized: "common_zero_days", table: "PaywallLocalizable")
+        let formatString = String(localized: "plan_selection_get_trial_for_free", table: "PaywallLocalizable")
+        return String(format: formatString, product.trialPeriodString ?? fallback)
     }
     
     // MARK: Actions
