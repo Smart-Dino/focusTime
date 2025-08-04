@@ -14,6 +14,20 @@ import Foundation
 /// A simplified alternative to `DateComponents` that works with SwiftData.
 /// Represents a time of day in hours and minutes, stored as seconds since midnight (00:00:00 UTC).
 struct TimeComponents: Equatable, Codable, Hashable {
+    enum Error: LocalizedError {
+        case invalidTime
+        case invalidDate
+        
+        var errorDescription: String {
+            switch self {
+            case .invalidTime:
+                String(localized: "timecomponents_error_invalid_time_description", table: "ErrorLocalizable")
+            case .invalidDate:
+                String(localized: "timecomponents_error_invalid_date_description", table: "ErrorLocalizable")
+            }
+        }
+    }
+    
     private let secondsSinceMidnight: Int
     
     /// Provides the hour and minute components for the stored time.
@@ -67,8 +81,8 @@ struct TimeComponents: Equatable, Codable, Hashable {
     /// - Parameters:
     ///   - hour: Hour value in 0..<24.
     ///   - minute: Minute value in 0..<60.
-    init?(hour: Int, minute: Int) {
-        guard (0..<24).contains(hour), (0..<60).contains(minute) else { return nil }
+    init(hour: Int, minute: Int) throws(TimeComponents.Error) {
+        guard (0..<24).contains(hour), (0..<60).contains(minute) else { throw .invalidTime }
         let hoursAsSeconds = hour * 60 * 60
         let minutesAsSeconds = minute * 60
         let totalSeconds = hoursAsSeconds + minutesAsSeconds
@@ -77,11 +91,12 @@ struct TimeComponents: Equatable, Codable, Hashable {
     
     /// Initializes from a Date, extracting the hour and minute in GMT timezone.
     /// - Parameter date: The Date to extract time components from.
-    init?(from date: Date) {
+    init(from date: Date) throws(TimeComponents.Error) {
         let components = Calendar.current.dateComponents([.hour, .minute], from: date)
         guard let hour = components.hour,
-              let minute = components.minute else { return nil }
-        self.init(hour: hour, minute: minute)
+              let minute = components.minute else { throw .invalidDate }
+        
+        try self.init(hour: hour, minute: minute)
     }
     
     /// Initializes with raw seconds since midnight.

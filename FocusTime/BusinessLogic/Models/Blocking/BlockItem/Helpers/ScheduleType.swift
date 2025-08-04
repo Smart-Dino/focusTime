@@ -9,28 +9,28 @@ import Foundation
 
 enum ScheduleType: Codable, Hashable {
     case scheduled(startTime: TimeComponents, endTime: TimeComponents)
-    case oneTime(_ duration: DurationComponents,
+    case duration(_ duration: DurationComponents,
                  // Suspension helper properties.
                  startedAt: Date?,
                  suspendedAt: Date?,
                  timeLeft: DurationComponents)
     
-    static func oneTime(_ duration: DurationComponents,
-                        startedAt: Date? = nil,
-                        suspendedAt: Date? = nil,
-                        timeLeft: DurationComponents? = nil) -> ScheduleType {
-        return .oneTime(duration,
-                        startedAt: startedAt,
-                        suspendedAt: suspendedAt,
-                        timeLeft: timeLeft ?? duration)
-    }
-    
     var description: String {
         switch self {
         case .scheduled(let startTime, let endTime):
             startTime.description + " " + endTime.description
-        case .oneTime(let duration, _, _, _):
+        case .duration(let duration, _, _, _):
             PeriodConverter.localizedConciseTimeString(from: duration.rawValue)
         }
+    }
+    
+    static func duration(_ duration: DurationComponents,
+                        startedAt: Date? = nil,
+                        suspendedAt: Date? = nil,
+                        timeLeft: DurationComponents? = nil) -> ScheduleType {
+        return .duration(duration,
+                        startedAt: startedAt,
+                        suspendedAt: suspendedAt,
+                        timeLeft: timeLeft ?? duration)
     }
 }

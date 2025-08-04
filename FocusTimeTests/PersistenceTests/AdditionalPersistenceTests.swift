@@ -19,13 +19,15 @@ extension PersistenceTests {
         let eachItemCount = 1000
         let blockItemStore = makeStore()
         // Generate block items.
+        let startTime = try TimeComponents(hour: 17, minute: 00)
+        let endTime = try TimeComponents(hour: 19, minute: 00)
         let blockItemsToInsert = Array(
             repeating: ProtectedBlockItem(
                 emoji: "😜",
                 name: "Block",
                 days: [.saturday, .sunday],
-                type: .scheduled(startTime: .init(hour: 17, minute: 00)!,
-                                 endTime: .init(hour: 19, minute: 00)!),
+                type: .scheduled(startTime: startTime,
+                                 endTime: endTime),
                 blockedContent: ProtectedActivitySelection(FamilyActivitySelection())
             ),
             count: eachItemCount
@@ -69,7 +71,7 @@ extension PersistenceTests {
         let customName = "Custom Test Name"
         
         // Generate test items.
-        let blockItem = makeProtectedTestBlockItem(name: customName)
+        let blockItem = try makeProtectedTestBlockItem(name: customName)
         
         // Insert items to the database and get back their IDs.
         try await blockItemStore.insert(blockItem)
@@ -90,10 +92,10 @@ extension PersistenceTests {
         let blockItemStore = makeStore()
         let totalCount = 25
         let pageSize = 10
-
+        
         // Insert block items.
-        let blockItemsToInsert = (0..<totalCount).map { i in
-            makeProtectedTestBlockItem(name: "BlockItem_\(i)")
+        let blockItemsToInsert = try (0..<totalCount).map { i in
+            try makeProtectedTestBlockItem(name: "BlockItem_\(i)")
         }
         try await blockItemStore.insertBatch(blockItemsToInsert)
 

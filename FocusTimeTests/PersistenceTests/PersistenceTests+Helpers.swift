@@ -13,10 +13,10 @@ import FamilyControls
 
 // MARK: - Helpers
 extension PersistenceTests {
-    func makeProtectedTestBlockItem(name: String = UUID().uuidString) -> ProtectedBlockItem {
+    func makeProtectedTestBlockItem(name: String = UUID().uuidString) throws -> ProtectedBlockItem {
         let weekdays: Set<Weekday> = Weekday.weekdays
-        let start = TimeComponents(hour: 9, minute: 0)!
-        let end = TimeComponents(hour: 17, minute: 0)!
+        let start = try TimeComponents(hour: 9, minute: 0)
+        let end = try TimeComponents(hour: 17, minute: 0)
         let selection = FamilyActivitySelection()
         return ProtectedBlockItem(
             emoji: "🔒",
@@ -38,7 +38,7 @@ extension PersistenceTests {
         protectedBlockItem: ProtectedBlockItem
     ) {
         // Generate test items.
-        let blockItem = makeProtectedTestBlockItem()
+        let blockItem = try makeProtectedTestBlockItem()
         
         // Insert items to the database and get back their IDs.
         let blockItemID = try await blockItemStore.insert(blockItem)

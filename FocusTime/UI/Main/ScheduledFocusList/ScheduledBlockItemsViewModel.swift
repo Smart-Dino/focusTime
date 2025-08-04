@@ -37,16 +37,19 @@ final class ScheduledBlockItemsViewModel {
         }
     }
     
+    #warning("Unfinished ViewModel")
     func insertTestItemsIntoDatabase() async {
         Task.detached(priority: .userInitiated) {
             do {
-                let itemsToInsert = (0..<100).map { number in
+                let startTime = try TimeComponents(hour: 17, minute: 00)
+                let endTime = try TimeComponents(hour: 19, minute: 00)
+                let itemsToInsert = try (0..<100).map { number in
                     ProtectedBlockItem(
                         emoji: "😜",
                         name: "Block - \(number)",
                         days: [.saturday, .sunday],
-                        type: .scheduled(startTime: TimeComponents(hour: 17, minute: 00)!,
-                                         endTime: TimeComponents(hour: 19, minute: 00)!),
+                        type: .scheduled(startTime: startTime,
+                                         endTime: endTime),
                         blockedContent: ProtectedActivitySelection(FamilyActivitySelection())
                     )
                 }

@@ -14,8 +14,6 @@ struct HomeView: View {
     
     var body: some View {
         ZStack {
-            MainBackgroundGradientView()
-            
             // MARK: - Nav title and an image below it.
             VStack {
                 VStack(alignment: .leading) {
@@ -83,6 +81,7 @@ struct HomeView: View {
                 .frame(minHeight: 130) // Used so that the screen time value stays in the same place
             }
         }
+        .background { MainBackgroundGradientView() }
         .navigationDestination(isPresented: .init(
             get: { viewModel.state.nextNavigationScreen != nil },
             set: { viewModel.setNextNavigationScreen($0) }

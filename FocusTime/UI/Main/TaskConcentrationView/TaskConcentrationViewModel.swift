@@ -13,6 +13,9 @@ import FocusTimeUI
 final class TaskConcentrationViewModel {
     struct State {
         var timerIsPaused: Bool = true
+        
+        var timerControlButtonIcon = TaskConcentrationView.Constants.Icons.pause
+        var timerControlButtonTitle = TaskConcentrationView.Constants.Strings.resumeButtonTitle
     }
     
     private(set) var state: State
@@ -28,12 +31,24 @@ final class TaskConcentrationViewModel {
         timerModel.delegate = self
     }
     
+    func updateUIBasedOnTimerState() {
+        if state.timerIsPaused {
+            state.timerControlButtonIcon = TaskConcentrationView.Constants.Icons.pause
+            state.timerControlButtonTitle = TaskConcentrationView.Constants.Strings.resumeButtonTitle
+        } else {
+            state.timerControlButtonIcon = TaskConcentrationView.Constants.Icons.play
+            state.timerControlButtonTitle = TaskConcentrationView.Constants.Strings.pauseButtonTitle
+        }
+    }
+    
     func toggleSession() {
         if state.timerIsPaused {
             resumeSession()
         } else {
             pauseSession()
         }
+        
+        updateUIBasedOnTimerState()
     }
     
     func pauseSession() {
@@ -57,5 +72,6 @@ final class TaskConcentrationViewModel {
 extension TaskConcentrationViewModel: FocusSessionTimerModelDelegate {
     func didUpdateIsPaused(_ timerIsPaused: Bool) {
         state.timerIsPaused = timerIsPaused
+        updateUIBasedOnTimerState()
     }
 }
