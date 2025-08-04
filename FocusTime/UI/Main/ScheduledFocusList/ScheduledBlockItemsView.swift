@@ -95,10 +95,10 @@ struct ScheduledBlockItemsView: View {
     }
 }
 
-//#Preview {
-//    NavigationStack {
-//        ScheduledBlockItemsView(
-//            viewModel: .init(blockItemStore: BlockItemStore(modelContainer: PreviewData.memoryOnlyModelContainer))
-//        )
-//    }
-//}
+#Preview {
+    NavigationStack {
+        ScheduledBlockItemsView(
+            viewModel: .init(modelContainer: PreviewData.memoryOnlyModelContainer)
+        )
+    }
+}

@@ -36,7 +36,7 @@ final class HomeViewModel {
     }
     
     private(set) var state: State
-    private let blockItemStore: BlockItemStore
+    private let modelContainer: ModelContainer
     weak var delegate: HomeViewDelegate?
     
     init(
@@ -45,7 +45,7 @@ final class HomeViewModel {
         delegate: HomeViewDelegate?
     ) {
         self.state = state
-        self.blockItemStore = BlockItemStore(modelContainer: modelContainer)
+        self.modelContainer = modelContainer
         self.delegate = delegate
     }
     
@@ -60,6 +60,6 @@ final class HomeViewModel {
     }
     
     private func makeScheduledFocusViewModel() -> ScheduledBlockItemsViewModel {
-        ScheduledBlockItemsViewModel(blockItemStore: blockItemStore)
+        ScheduledBlockItemsViewModel(modelContainer: modelContainer)
     }
 }

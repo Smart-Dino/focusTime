@@ -19,16 +19,16 @@ final class ScheduledBlockItemsViewModel {
     }
     
     private(set) var state: State
-    private let blockItemStore: BlockItemStore
+    private let modelContainer: ModelContainer
     
     private var fetchTask: Task<Void, Never>?
     
     init(
         state: State = State(),
-        blockItemStore: BlockItemStore
+        modelContainer: ModelContainer
     ) {
         self.state = state
-        self.blockItemStore = blockItemStore
+        self.modelContainer = modelContainer
     }
     
     func keepShowingError(showError: Bool) {
@@ -41,9 +41,11 @@ final class ScheduledBlockItemsViewModel {
     func insertTestItemsIntoDatabase() async {
         Task.detached(priority: .userInitiated) {
             do {
+                let blockItemStore = BlockItemStore(modelContainer: self.modelContainer)
+                
                 let startTime = try TimeComponents(hour: 17, minute: 00)
                 let endTime = try TimeComponents(hour: 19, minute: 00)
-                let itemsToInsert = try (0..<100).map { number in
+                let itemsToInsert = (0..<100).map { number in
                     ProtectedBlockItem(
                         emoji: "😜",
                         name: "Block - \(number)",
@@ -53,7 +55,7 @@ final class ScheduledBlockItemsViewModel {
                         blockedContent: ProtectedActivitySelection(FamilyActivitySelection())
                     )
                 }
-                try await self.blockItemStore.insertBatch(itemsToInsert)
+                try await blockItemStore.insertBatch(itemsToInsert)
                 
                 await self.fetchNextPage()
             } catch {
@@ -69,19 +71,19 @@ final class ScheduledBlockItemsViewModel {
         
         self.fetchTask = Task.detached(priority: .userInitiated) {
             do {
-                let insertedItems = try await self.blockItemStore.fetch(page: self.state.page)
+                let blockItemStore = BlockItemStore(modelContainer: self.modelContainer)
+                
+                let insertedItems = try await blockItemStore.fetch(page: self.state.page)
                 await MainActor.run {
                     self.state.items.append(contentsOf: insertedItems)
                     self.state.page += 1
                     self.state.error = nil
                     self.fetchTask = nil
-                    print("Items on screen: \(self.state.items.count)")
                 }
             } catch {
                 await MainActor.run {
                     self.state.error = error
                     self.fetchTask = nil
-                    print("Failed to fetch page \(self.state.page): \(error)")
                 }
             }
         }

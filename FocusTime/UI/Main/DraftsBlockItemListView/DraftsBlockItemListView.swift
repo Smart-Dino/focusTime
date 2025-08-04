@@ -105,9 +105,6 @@ struct DraftsBlockItemListView: View {
     }
 }
 
-#warning("No preview.")
-//#Preview {
-//    if let blockItemStore = BlockItemStore(isStoredInMemoryOnly: true) {
-//        AppBlockingListView(viewModel: .init(blockItemStore: blockItemStore))
-//    }
-//}
+#Preview {
+    DraftsBlockItemListView(viewModel: .init(modelContainer: PreviewData.memoryOnlyModelContainer))
+}
