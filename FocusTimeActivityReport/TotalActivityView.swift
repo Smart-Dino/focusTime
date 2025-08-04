@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import FocusTimeUI
 
 struct TotalActivityView: View {
     let totalActivity: String

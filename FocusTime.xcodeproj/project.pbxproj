@@ -686,7 +686,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = org.dino.smart.FocusTime;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = FocusTimeUpdatedProvisioning;
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = FTApp;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -732,9 +732,11 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = FocusTimeShieldConfiguration/FocusTimeShieldConfiguration.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 242HT6L8AJ;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FocusTimeShieldConfiguration/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = FocusTimeShieldConfiguration;
@@ -749,6 +751,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = org.dino.smart.FocusTime.FocusTimeShieldConfiguration;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = FTShieldProfile;
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -793,9 +796,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = FocusTimeActivityReport/FocusTimeActivityReport.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 242HT6L8AJ;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FocusTimeActivityReport/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = FocusTimeActivityReport;
@@ -810,6 +815,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = org.dino.smart.FocusTime.FocusTimeActivityReport;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = FTActivityMonitor;
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -913,7 +919,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = org.dino.smart.FocusTime.FocusTimeActivityMonitor;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = FocusTimeActivityMonitorUpdated;
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = FTActivityMonitor2;
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -946,7 +952,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = org.dino.smart.FocusTime.FocusTimeActivityMonitor;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = FocusTimeActivityMonitorUpdated;
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = FTActivityMonitor2;
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
