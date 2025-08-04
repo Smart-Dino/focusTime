@@ -18,7 +18,16 @@ final class ShieldDebugViewModel {
     struct State {
         enum ScheduleType {
             case scheduled
-            case oneTime
+            case duration
+            
+            var buttonTitle: String {
+                switch self {
+                case .scheduled:
+                    "Activate scheduled block"
+                case .duration:
+                    "Start duration block"
+                }
+            }
         }
         
         var error: Error? = nil
@@ -131,11 +140,10 @@ final class ShieldDebugViewModel {
                 switch state.scheduleType {
                 case .oneTime:
                     type = .oneTime(DurationComponents(duration: state.duration * 60)) // Minutes to seconds.
-                case .scheduled:
-                    guard let startComponent = TimeComponents(from: state.startTime),
-                          let endComponent = TimeComponents(from: state.endTime) else {
-                        throw ShieldDebugError.timeComponent
-                    }
+                case .duration:
+                    let startComponent = try TimeComponents(from: state.startTime)
+                    let endComponent = try TimeComponents(from: state.endTime)
+                        
                     type = .scheduled(startTime: startComponent, endTime: endComponent)
                 }
                 

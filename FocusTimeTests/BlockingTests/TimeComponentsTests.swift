@@ -25,7 +25,7 @@ struct TimeComponentsTests {
         hour: Int,
         minute: Int,
     ) async throws {
-        let timeComponents = try #require(TimeComponents(hour: hour, minute: minute))
+        let timeComponents = try TimeComponents(hour: hour, minute: minute)
         let components = timeComponents.dateComponents
         #expect(
             components.hour == hour,
@@ -47,9 +47,9 @@ struct TimeComponentsTests {
             (23, 59)
         ]
     )
-    func testInitSetsSeconds(hour: Int, minute: Int) {
+    func testInitSetsSeconds(hour: Int, minute: Int) throws {
         let expectedSeconds = hour * 3600 + minute * 60
-        let timeComponents = TimeComponents(hour: hour, minute: minute)
+        let timeComponents = try TimeComponents(hour: hour, minute: minute)
                 
         let reconstructed = TimeComponents(secondsSinceMidnight: expectedSeconds)
         #expect(
@@ -76,7 +76,7 @@ struct TimeComponentsTests {
         let calendar = Calendar.current
         let date = try #require(calendar.date(from: components))
         
-        let timeComponents = try #require(TimeComponents(from: date))
+        let timeComponents = try TimeComponents(from: date)
         #expect(
             timeComponents.dateComponents.hour == hour,
             "Expected hour to be \(hour), got \(String(describing: timeComponents.dateComponents.hour))"
@@ -95,7 +95,7 @@ struct TimeComponentsTests {
           ]
     )
     func testLocalizedTimeSince1970(hour: Int, minute: Int, expectedSeconds: Int) throws {
-        let timeComponents = try #require(TimeComponents(hour: hour, minute: minute))
+        let timeComponents = try TimeComponents(hour: hour, minute: minute)
         #expect(
             timeComponents.localizedSecondsSinceMidnight == expectedSeconds,
             "Expected localizedTimeSince1970 to be \(expectedSeconds), got \(timeComponents.localizedSecondsSinceMidnight)"
@@ -110,7 +110,7 @@ struct TimeComponentsTests {
           ]
     )
     func testDescription(hour: Int, minute: Int) throws {
-        let timeComponents = try #require(TimeComponents(hour: hour, minute: minute))
+        let timeComponents = try TimeComponents(hour: hour, minute: minute)
         
         let formatter = DateFormatter()
         formatter.timeStyle = .short
@@ -136,7 +136,7 @@ struct TimeComponentsTests {
           ]
     )
     func testLocalizedDate(hour: Int, minute: Int) throws {
-        let timeComponents = try #require(TimeComponents(hour: hour, minute: minute))
+        let timeComponents = try TimeComponents(hour: hour, minute: minute)
         let date = timeComponents.localizedDate
         
         let calendar = Calendar.current

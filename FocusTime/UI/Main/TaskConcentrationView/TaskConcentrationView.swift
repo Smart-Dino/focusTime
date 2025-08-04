@@ -13,13 +13,10 @@ struct TaskConcentrationView: View {
     
     var body: some View {
         ZStack {
-            // Background gradient.
-            MainBackgroundGradientView()
-            
             // Background image.
             VStack {
                 Spacer()
-                Image(ImageResource.MainImages.taskConcentrationBackground)
+                Image(Constants.Icons.background)
                     .resizable()
                     .scaledToFit()
             }
@@ -28,7 +25,7 @@ struct TaskConcentrationView: View {
             // Content.
             VStack {
                 // Subtitle.
-                Text("Concentrate on your task")
+                Text(Constants.Strings.subtitle)
                     .foregroundStyle(.ftGray3Light)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 
@@ -38,19 +35,19 @@ struct TaskConcentrationView: View {
                     viewModel: viewModel.timerModel
                 )
                 .padding([.top, .horizontal])
-                Text("Focus time")
+                Text(Constants.Strings.timerTitle)
                     .foregroundStyle(.ftGray3Light)
                 Spacer()
                 
                 // Buttons.
                 Button(
-                    viewModel.state.timerIsPaused ? "Resume" : "Pause",
-                    systemImage: viewModel.state.timerIsPaused ? "play.fill" : "pause"
+                    viewModel.state.timerControlButtonTitle,
+                    systemImage: viewModel.state.timerControlButtonIcon
                 ){
                     viewModel.toggleSession()
                 }
                 .buttonStyle(.ftPrimary)
-                Button("End session"){
+                Button(Constants.Strings.endSessionButtonTitle){
                     viewModel.endSession()
                     #warning("Dismiss view")
                 }
@@ -59,7 +56,8 @@ struct TaskConcentrationView: View {
             }
             .padding(.horizontal)
         }
-        .navigationTitle("Focus Session")
+        .background { MainBackgroundGradientView() }
+        .navigationTitle(Constants.Strings.navigationTitle)
         .navigationBarTitleDisplayMode(.large)
     }
 }
@@ -75,3 +73,4 @@ struct TaskConcentrationView: View {
             .preferredColorScheme(.dark)
     }
 }
+

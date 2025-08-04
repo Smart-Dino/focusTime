@@ -98,22 +98,24 @@ struct DeviceActivityHandler: Sendable {
         let stringActivityName = activity.rawValue
         
         if activityIdentifier.isFallback {
-            // TimeComponents has an accuraccy of a minute.
-            // Hence why we are comparing it direclty - we have a whole minute to detect the match.
-            while TimeComponents(from: .now) != endTimeComponent {
-                try? await Task.sleep(nanoseconds: 5_000_000_000)
-            } // Unfortunately sleeping task for a long time causes extension to close before unblock.
-            
-            do {
+            Task {
+                // TimeComponents has an accuraccy of a minute.
+                // Hence why we are comparing it direclty - we have a whole minute to detect the match.
+                do {
+                while try TimeComponents(from: .now) != endTimeComponent {
+                    try await Task.sleep(nanoseconds: 5_000_000_000)
+                } // Unfortunately sleeping task for a long time causes extension to close before unblock.
+                
                 try await shieldManager.unblock()
-            } catch {
-                logger?.error("Failed to unblock in handleRegularBlocking fallback handling: \(error.localizedDescription)")
+                
+                DeviceActivityCenter()
+                    .stopMonitoring(
+                        [DeviceActivityName(stringActivityName)]
+                    )
+                } catch {
+                    logger?.error("Failed to unblock in handleRegularBlocking fallback handling: \(error.localizedDescription)")
+                }
             }
-            
-            DeviceActivityCenter()
-                .stopMonitoring(
-                    [DeviceActivityName(stringActivityName)]
-                )
             
         }
     }

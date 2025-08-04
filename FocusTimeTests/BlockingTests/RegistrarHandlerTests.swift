@@ -68,8 +68,8 @@ struct RegistrarHandlerTests {
             (15, 0, 14, 0)
           ])
     func scheduledBlocking(startHour: Int, startMinute: Int, endHour: Int, endMinute: Int) async throws {
-        let startTime = try #require(TimeComponents(hour: startHour, minute: startMinute))
-        let endTime = try #require(TimeComponents(hour: endHour, minute: endMinute))
+        let startTime = try TimeComponents(hour: startHour, minute: startMinute)
+        let endTime = try TimeComponents(hour: endHour, minute: endMinute)
         // Setup.
         let blockItem = ProtectedBlockItem(
             emoji: "🧪",
@@ -159,8 +159,12 @@ struct RegistrarHandlerTests {
         with selection: FamilyActivitySelection
     ) async throws -> PersistentIdentifier {
         // Make protected items.
-        let startTime = try #require(TimeComponents(hour: 17, minute: 00))
-        let endTime = try #require(TimeComponents(hour: 18, minute: 00))
+        let blockItem = ProtectedBlockItem(emoji: "🧪",
+                                           name: "Test",
+                                           blockedContent: ProtectedActivitySelection(selection))
+        
+        let startTime = try TimeComponents(hour: 17, minute: 00)
+        let endTime = try TimeComponents(hour: 18, minute: 00)
         
         let blockItem = ProtectedBlockItem(emoji: "🧪",
                                            name: "Test",
@@ -205,8 +209,8 @@ struct RegistrarHandlerTests {
     @Test("Unregistering an individual activity")
     func unregisterIndividualActivity() async throws {
         // Setup and register a schedule.
-        let startTime = try #require(TimeComponents(hour: 10, minute: 0))
-        let endTime = try #require(TimeComponents(hour: 11, minute: 0))
+        let startTime = try TimeComponents(hour: 10, minute: 0)
+        let endTime = try TimeComponents(hour: 11, minute: 0)
         
         let blockItem = ProtectedBlockItem(emoji: "🗑️",
                                            name: "UnregisterTest",
@@ -234,21 +238,26 @@ struct RegistrarHandlerTests {
     @Test("Unregistering all activities")
     func unregisterAllActivities() async throws {
         // Register two schedules.
+        let startTimeA = try TimeComponents(hour: 8, minute: 0)
+        let endTimeA = try TimeComponents(hour: 9, minute: 0)
+        
         let blockItemA = ProtectedBlockItem(
             emoji: "🅰️",
             name: "A",
             days: Set(Weekday.allCases),
-            type: ScheduleType.scheduled(startTime: .init(hour: 8, minute: 0)!,
-                             endTime: .init(hour: 9, minute: 0)!),
-            blockedContent: ProtectedActivitySelection(FamilyActivitySelection())
-        )
+            type: .scheduled(startTime: startTimeA,
+                             endTime: endTimeA),
+            blockedContent: ProtectedActivitySelection(FamilyActivitySelection()))
+        
+        let startTimeB = try TimeComponents(hour: 9, minute: 0)
+        let endTimeB = try TimeComponents(hour: 10, minute: 0)
         
         let blockItemB = ProtectedBlockItem(
             emoji: "🅱️",
             name: "B",
             days: Set(Weekday.allCases),
-            type: ScheduleType.scheduled(startTime: .init(hour: 9, minute: 0)!,
-                             endTime: .init(hour: 10, minute: 0)!),
+            type: .scheduled(startTime: startTimeB,
+                             endTime: endTimeB),
             blockedContent: ProtectedActivitySelection(FamilyActivitySelection())
         )
         
@@ -274,10 +283,10 @@ struct RegistrarHandlerTests {
     
     @Test("Overlapping schedules should throw scheduleOverlap error")
     func overlappingSchedulesThrowsError() async throws {
-        let startTime1 = try #require(TimeComponents(hour: 8, minute: 0))
-        let endTime1   = try #require(TimeComponents(hour: 10, minute: 0))
-        let startTime2 = try #require(TimeComponents(hour: 9, minute: 0))
-        let endTime2   = try #require(TimeComponents(hour: 11, minute: 0)) // Overlaps with previous
+        let startTime1 = try TimeComponents(hour: 8, minute: 0)
+        let endTime1   = try TimeComponents(hour: 10, minute: 0)
+        let startTime2 = try TimeComponents(hour: 9, minute: 0)
+        let endTime2   = try TimeComponents(hour: 11, minute: 0) // Overlaps with previous
         
         // Register the first schedule
         let blockItem1 = ProtectedBlockItem(emoji: "🔥",

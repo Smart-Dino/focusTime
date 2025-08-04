@@ -38,6 +38,7 @@ final class DraftsBlockItemListViewModel {
         }
     }
     
+    #warning("Unfinished ViewModel")
     func insertTestItemsIntoDatabase() async {
         Task.detached(priority: .userInitiated) {
             do {

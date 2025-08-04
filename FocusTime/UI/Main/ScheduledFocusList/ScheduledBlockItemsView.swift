@@ -13,8 +13,6 @@ struct ScheduledBlockItemsView: View {
     
     var body: some View {
         ZStack {
-            // MARK: - Gradient
-            MainBackgroundGradientView()
             // MARK: - Wave image
             VStack {
                 Image(Constants.Icons.waveImage)
@@ -34,6 +32,7 @@ struct ScheduledBlockItemsView: View {
             }
             .padding(.horizontal)
         }
+        .background { MainBackgroundGradientView() }
         // MARK: - Bottom floating button
         .safeAreaInset(edge: .bottom) {
             Button(
