@@ -6,13 +6,12 @@
 //
 
 import SwiftUI
-<<<<<<< HEAD
 import OnboardingKit
-=======
-import SwiftData
+
+//import SwiftData
 
 #warning("When creating a splash screen make sure to handle ModelContainer errors!")
->>>>>>> main
+
 
 @main
 struct FocusTimeApp: App {
