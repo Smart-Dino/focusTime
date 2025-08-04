@@ -133,7 +133,9 @@ final class ShieldDebugViewModel {
                 let blockItems = try await blockItemStore.fetch()
                 
                 // Ensure we only add if the store is empty.
-                guard blockItems.isEmpty else { return }
+                if !blockItems.isEmpty {
+                    try await blockItemStore.eraseAllData()
+                }
                 
                 var type: ScheduleType!
                 
@@ -228,7 +230,9 @@ final class ShieldDebugViewModel {
             do {
                 let blockItemStore = BlockItemStore(modelContainer: self.modelContainer)
                 let blockItems = try await blockItemStore.fetch()
+                
                 guard let blockItem = blockItems.first else { return }
+                
                 try await activityRegistrar.suspendActivity(for: blockItem)
             } catch {
                 await MainActor.run {
