@@ -43,7 +43,7 @@ struct DeviceActivityHandler: Sendable {
                                         activity: activity,
                                         activityIdentifier: activityIdentifier,
                                         endTime: endTime)
-        case .oneTime:
+        case .duration:
             await handleDurationUnblocking(for: blockItem)
             // We don't need to handle the end of the interval anymore.
             DeviceActivityCenter().stopMonitoring([activity])
@@ -61,8 +61,8 @@ struct DeviceActivityHandler: Sendable {
         }
         
         // Reset duration values.
-        guard case .oneTime(let duration, _, _, _) = blockItem.type else { return }
-        blockItem.type = .oneTime(
+        guard case .duration(let duration, _, _, _) = blockItem.type else { return }
+        blockItem.type = .duration(
             duration,
             startedAt: nil,
             suspendedAt: nil,

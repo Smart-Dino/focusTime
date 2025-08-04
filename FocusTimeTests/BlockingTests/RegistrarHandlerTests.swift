@@ -158,11 +158,7 @@ struct RegistrarHandlerTests {
     func insertTestBlockItem(
         with selection: FamilyActivitySelection
     ) async throws -> PersistentIdentifier {
-        // Make protected items.
-        let blockItem = ProtectedBlockItem(emoji: "🧪",
-                                           name: "Test",
-                                           blockedContent: ProtectedActivitySelection(selection))
-        
+        // Make protected item.
         let startTime = try TimeComponents(hour: 17, minute: 00)
         let endTime = try TimeComponents(hour: 18, minute: 00)
         
@@ -186,7 +182,7 @@ struct RegistrarHandlerTests {
         let blockItem = ProtectedBlockItem(emoji: "⏱️",
                                            name: "DurationTest",
                                            days: Set(Weekday.allCases),
-                                           type: ScheduleType.oneTime(.init(duration: duration)),
+                                           type: .duration(.init(duration: duration)),
                                            blockedContent: ProtectedActivitySelection(FamilyActivitySelection()))
         // Insert into the store.
         let blockItemModelID = try await blockItemStore.insert(blockItem)
@@ -332,7 +328,7 @@ struct RegistrarHandlerTests {
             emoji: "⏸️",
             name: "SuspendTest",
             days: Set(Weekday.allCases),
-            type: ScheduleType.oneTime(.init(duration: duration)),
+            type: .duration(.init(duration: duration)),
             blockedContent: ProtectedActivitySelection(FamilyActivitySelection())
         )
         let blockItemModelID = try await blockItemStore.insert(blockItem)
@@ -356,7 +352,7 @@ struct RegistrarHandlerTests {
             emoji: "▶️",
             name: "ResumeTest",
             days: Set(Weekday.allCases),
-            type: ScheduleType.oneTime(.init(duration: duration)),
+            type: .duration(.init(duration: duration)),
             blockedContent: ProtectedActivitySelection(FamilyActivitySelection())
         )
         let blockItemModelID = try await blockItemStore.insert(blockItem)
@@ -379,7 +375,7 @@ struct RegistrarHandlerTests {
             emoji: "🔍",
             name: "RegisteredCheck",
             days: Set(Weekday.allCases),
-            type: ScheduleType.oneTime(.init(duration: duration)),
+            type: .duration(.init(duration: duration)),
             blockedContent: ProtectedActivitySelection(FamilyActivitySelection())
         )
         let blockItemModelID = try await blockItemStore.insert(blockItem)
@@ -411,7 +407,7 @@ struct RegistrarHandlerTests {
             emoji: "⏳",
             name: "TimeTravelTest",
             days: Set(Weekday.allCases),
-            type: ScheduleType.oneTime(.init(duration: duration)),
+            type: .duration(.init(duration: duration)),
             blockedContent: ProtectedActivitySelection(FamilyActivitySelection())
         )
         let blockItemModelID = try await blockItemStore.insert(blockItem)
@@ -428,7 +424,7 @@ struct RegistrarHandlerTests {
         
         // Fetch the schedule from your store and check the updated state.
         let resumedBlockItem = try await blockItemStore.fetch(id: blockItemModelID)
-        if case let ScheduleType.oneTime(_, _, _, timeLeft) = resumedBlockItem.type {
+        if case let ScheduleType.duration(_, _, _, timeLeft) = resumedBlockItem.type {
             // The time left should be 10 minutes - 4 minutes = 6 minutes (360 seconds).
             #expect(
                 timeLeft.rawValue == 360,

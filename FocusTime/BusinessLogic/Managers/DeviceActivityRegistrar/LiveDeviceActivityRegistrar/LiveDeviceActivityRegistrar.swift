@@ -57,7 +57,7 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
                     throw error
                 }
             }
-        case .oneTime(let duration, _, _, _):
+        case .duration(let duration, _, _, _):
             try await registerDurationActivity(for: blockItem, duration: duration.rawValue)
         }
     }
@@ -104,8 +104,8 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         let startTime = await clock.now
         try await blockItemStore.updateFields(id: persistentModelID) { blockItem in
             switch blockItem.type {
-            case .oneTime(let originalDuration, _, _, _):
-                blockItem.type = .oneTime(
+            case .duration(let originalDuration, _, _, _):
+                blockItem.type = .duration(
                     originalDuration, // Make sure this is the original value!
                     startedAt: startTime,
                     suspendedAt: nil,
@@ -244,7 +244,7 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         switch schedule.type {
         case .scheduled:
             try await shieldManager.unblock()
-        case .oneTime(let duration, let startedAt, _, let timeLeft):
+        case .duration(let duration, let startedAt, _, let timeLeft):
             guard let startedAt else {
                 throw DeviceActivityRegistrarError.couldNotExtractDatePoints
             }
@@ -255,7 +255,7 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
             
             // Set suspension point and timeLeft.
             try await blockItemStore.updateFields(id: persistentModelID) { editedBlockItem in
-                editedBlockItem.type = .oneTime(
+                editedBlockItem.type = .duration(
                     duration,
                     startedAt: startedAt,
                     suspendedAt: suspensionDate,
@@ -284,11 +284,11 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         switch blockItem.type {
         case .scheduled:
             try await shieldManager.block(specific: blockItem.blockedContent)
-        case .oneTime(let duration, _, _, let timeLeft):
+        case .duration(let duration, _, _, let timeLeft):
             
             // Set that the schedule is no longer suspended and log the new time left.
             try await blockItemStore.updateFields(id: persistentModelID) { editedBlockItem in
-                editedBlockItem.type = .oneTime(
+                editedBlockItem.type = .duration(
                     duration,
                     startedAt: resumptionDate,
                     suspendedAt: nil,

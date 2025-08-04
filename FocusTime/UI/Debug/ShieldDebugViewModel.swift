@@ -138,9 +138,9 @@ final class ShieldDebugViewModel {
                 var type: ScheduleType!
                 
                 switch state.scheduleType {
-                case .oneTime:
-                    type = .oneTime(DurationComponents(duration: state.duration * 60)) // Minutes to seconds.
                 case .duration:
+                    type = .duration(DurationComponents(duration: state.duration * 60)) // Minutes to seconds.
+                case .scheduled:
                     let startComponent = try TimeComponents(from: state.startTime)
                     let endComponent = try TimeComponents(from: state.endTime)
                         
