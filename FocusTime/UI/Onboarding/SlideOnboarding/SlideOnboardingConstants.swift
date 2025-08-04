@@ -5,15 +5,16 @@
 //  Created by Keto Nioradze on 29.05.25.
 //
 
-import Foundation
+import SwiftUI
 import OnboardingKit
 
 extension SlideOnboardingView {
+    
     enum SlideOnboardingConstants {
-        enum Layout{
+        enum Layout {
             static let buttonVerticalPadding: CGFloat = 13
             static let progressBarInactiveColorOpacity: CGFloat = 0.3
-            static let OnboardingMaskOpacity: CGFloat = 0.3
+            static let onboardingMaskOpacity: CGFloat = 0.3
         }
         
         enum Strings {
@@ -21,6 +22,23 @@ extension SlideOnboardingView {
                 localized: "RIDE THE WAVES OF PRODUCTIVITY",
                 table: "OnboardingLocalizable"
             )
+            static let nextButtonTitle: String = String(
+                localized: "Next",
+                table: "OnboardingLocalizable"
+            )
+            static let startAppButtonTitle: String = String(
+                localized: "Start Focusing",
+                table: "OnboardingLocalizable"
+            )
+        }
+        
+        enum Colors {
+            static let progressBarActiveColor: Color = .blue
+            static let skipButtonTextColor: Color = .blue
+        }
+        
+        enum Images {
+            static let onboardingBackgroundImageName = "OnboardingSlideQuizBackground"
         }
     }
 }

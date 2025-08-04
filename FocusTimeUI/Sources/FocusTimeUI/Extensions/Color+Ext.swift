@@ -13,12 +13,12 @@ public extension ShapeStyle where Self == Color {
     // MARK: - Backgrounds
     static var ftBackground: Color { Color("BackgroundColor", bundle: .module) }
     static var ftBackgroundBlueColor: Color { Color("BackgroundBlueColor", bundle: .module) }
-    #warning("Move to extension color")
-    static var ftQuizSlideOnboardingMaskColor: Color { Color("QuizOnboardingMaskColour", bundle: .module) }
+    static var ftQuizSlideOnboardingMaskColor: Color { Color("QuizOnboardingMaskColor", bundle: .module) }
     // MARK: - Blue
     static var ftDarkBlue: Color { Color("DarkBlueColor", bundle: .module) }
     static var ftMainBlue: Color { Color("MainBlueColor", bundle: .module) }
     static var onboardingPaywallContentPad: Color { Color("OnboardingPaywallContentPadColor", bundle: .module) }
+    static var ftOnboardingImageOverlayColor: Color { Color("OnboardingImageOverlayColor", bundle: .module) }
     // MARK: - UIKit Adapted
     // https://stackoverflow.com/questions/65493461/get-dark-style-of-uicolor
     static var ftGray3: Color {
