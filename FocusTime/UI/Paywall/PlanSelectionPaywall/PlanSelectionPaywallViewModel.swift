@@ -18,8 +18,8 @@ final class PlanSelectionPaywallViewModel {
         
         // MARK: Background Images
         let backgroundImages: [ImageResource] = [
-            .debugNightMountain,
-            .debugDayMountain
+            ImageResource.DebugImages.debugNightMountain,
+            ImageResource.DebugImages.debugDayMountain
         ]
         var selectedImageIndex: Int? = .zero
         
@@ -42,7 +42,6 @@ final class PlanSelectionPaywallViewModel {
     // MARK: - Initializers
     init(
         state: State = State(),
-        superState: SuperPaywallViewModel.State = .init(),
         superPaywallVM: SuperPaywallViewModel,
         flowDelegate: PaywallNavigationDelegate?
     ) {
