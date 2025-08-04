@@ -8,7 +8,7 @@
 import SwiftUI
 
 // MARK: - Test exstension!!!
-//Extension for converting view into image
+// Extension for converting view into image
 extension View {
     func asImage() -> UIImage {
         let controller = UIHostingController(rootView: self)

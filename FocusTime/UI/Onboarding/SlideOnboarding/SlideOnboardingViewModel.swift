@@ -16,8 +16,6 @@ final class SlideOnboardingViewModel {
     @MainActor
     struct State {
         let onboardingSlides: [OnboardingSlide]
-     /// TestIng Property!!
-     //   let firstImage = FirstImageView().asImage()
 
         let nextButtonTitle: String
         let startAppButtonTitle: String
@@ -37,17 +35,7 @@ final class SlideOnboardingViewModel {
                 )
             )
         }
-        
-        var startAppButtonConfig: ButtonUIConfiguration {
-            ButtonUIConfiguration(
-                title: startAppButtonTitle,
-                buttonStyle: PrimaryButtonStyle(
-                    verticalPadding: 14
-                ),
-              //  didTapStartFocusing
-            )
-        }
-        
+
         var progressBarConfig: ProgressBarUIConfiguration {
             ProgressBarUIConfiguration(
                 activeColor: progressBarActiveColor,
@@ -93,5 +81,17 @@ final class SlideOnboardingViewModel {
     func didTapStartFocusing() {
         // TODO: Implement actual navigation logic after onboarding
         print("Start Focusing button tapped from ViewModel!")
+    }
+    
+    var startAppButtonConfig: ButtonUIConfiguration {
+        ButtonUIConfiguration(
+            title: state.startAppButtonTitle,
+            buttonStyle: PrimaryButtonStyle(
+                verticalPadding: 14
+            ),
+            { [weak self] in
+                self?.didTapStartFocusing()
+            }
+        )
     }
 }

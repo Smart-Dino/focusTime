@@ -19,7 +19,7 @@ struct SlideOnboardingView: View {
             builder
                 .setViewModel(viewModel.state.onboardingSlides)
                 .setNextButtonConfiguration(viewModel.state.nextButtonConfig)
-                .setStartAppButtonConfiguration(viewModel.state.startAppButtonConfig)
+                .setStartAppButtonConfiguration(viewModel.startAppButtonConfig)
                 .setProgressBarConfiguration(viewModel.state.progressBarConfig)
                 .setSizeUIConfiguration(SizeUIConfiguration())
                 .setThemeStyle(viewModel.state.onboardingThemeStyle)
