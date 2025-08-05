@@ -38,34 +38,6 @@ final class ScheduledBlockItemsViewModel {
     }
     
     #warning("Unfinished ViewModel")
-    func insertTestItemsIntoDatabase() async {
-        Task.detached(priority: .userInitiated) {
-            do {
-                let blockItemStore = BlockItemStore(modelContainer: self.modelContainer)
-                
-                let startTime = try TimeComponents(hour: 17, minute: 00)
-                let endTime = try TimeComponents(hour: 19, minute: 00)
-                let itemsToInsert = (0..<100).map { number in
-                    ProtectedBlockItem(
-                        emoji: "😜",
-                        name: "Block - \(number)",
-                        days: [.saturday, .sunday],
-                        type: .scheduled(startTime: startTime,
-                                         endTime: endTime),
-                        blockedContent: ProtectedActivitySelection(FamilyActivitySelection())
-                    )
-                }
-                try await blockItemStore.insertBatch(itemsToInsert)
-                
-                await self.fetchNextPage()
-            } catch {
-                await MainActor.run {
-                    self.state.error = error
-                }
-            }
-        }
-    }
-    
     private func fetchNextPage() {
         guard fetchTask == nil else { return }
         

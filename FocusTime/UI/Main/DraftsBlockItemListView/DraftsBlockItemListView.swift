@@ -45,11 +45,11 @@ struct DraftsBlockItemListView: View {
         .background { MainBackgroundGradientView() }
         // MARK: - Bottom floating button
         .safeAreaInset(edge: .bottom) {
-            Button(Constants.Strings.newBlocklistButtonTitle, systemImage: "plus.circle") {
-                #warning("Placeholder code")
-                Task {
-                    await viewModel.insertTestItemsIntoDatabase()
-                }
+            Button(
+                Constants.Strings.newBlocklistButtonTitle,
+                systemImage: "plus.circle"
+            ) {
+                #warning("No implementation")
             }
             .buttonStyle(.ftPrimary)
             .padding()

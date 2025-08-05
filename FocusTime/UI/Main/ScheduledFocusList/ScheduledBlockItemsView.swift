@@ -39,10 +39,7 @@ struct ScheduledBlockItemsView: View {
                 Constants.Strings.newSessionButtonTitle,
                 systemImage: Constants.Icons.newSessionSymbol
             ) {
-                #warning("Placeholder code")
-                Task {
-                    await viewModel.insertTestItemsIntoDatabase()
-                }
+                #warning("No implementation")
             }
             .buttonStyle(.ftPrimary)
             .padding()

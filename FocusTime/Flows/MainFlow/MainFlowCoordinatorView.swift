@@ -34,13 +34,6 @@ struct MainFlowCoordinatorView: View {
                                 .environment(\.symbolVariants, .none)
                         }
                         .tag(MainTabScreens.blocks)
-                    Text("Empty for now")
-                        .tabItem {
-                            Label("Profile", systemImage: "person")
-                            // Prevent system from filling system icons.
-                                .environment(\.symbolVariants, .none)
-                        }
-                        .tag(MainTabScreens.profile)
                 }
                 //                .toolbarBackground(Color.ftBackground, for: .tabBar) // Set a specific color
                 // as a background, but we don't do it because the tabbar is transparent
