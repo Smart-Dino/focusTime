@@ -18,6 +18,8 @@ public extension ShapeStyle where Self == Color {
     static var ftDarkBlue: Color { Color("DarkBlueColor", bundle: .module) }
     static var ftMainBlue: Color { Color("MainBlueColor", bundle: .module) }
     static var onboardingPaywallContentPad: Color { Color("OnboardingPaywallContentPadColor", bundle: .module) }
+    // MARK: - Green
+    static var ftPaywallPromoGreen: Color { Color("PaywallPromoGreenColor", bundle: .module) }
     // MARK: - UIKit Adapted
     // https://stackoverflow.com/questions/65493461/get-dark-style-of-uicolor
     static var ftGray3Light: Color {
