@@ -90,7 +90,7 @@ final class AppFlowCoordinatorViewModel {
     }
     
     func setupInitialAppState() {
-        let isOnboardingFinished = (defaultsManager.getValue(for: .isOnboardingFinished) as? Bool) ?? false
+        let isOnboardingFinished: Bool = defaultsManager.getValue(for: .isOnboardingFinished) ?? false
         
         if !isOnboardingFinished {
             setStateFlow(to: .onboarding(viewModel: makeOnboardingFlowCoordinatorViewModel()))

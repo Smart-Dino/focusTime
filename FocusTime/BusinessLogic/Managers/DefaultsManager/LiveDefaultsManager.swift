@@ -14,11 +14,11 @@ struct LiveDefaultsManager: DefaultsManager {
         self.defaults = defaults
     }
     
-    func setValue(for key: SharedAppValues.DefaultsKeys, to value: Any) {
+    func setValue<T>(for key: SharedAppValues.DefaultsKeys, to value: T) {
         defaults.set(value, forKey: key.rawValue)
     }
     
-    func getValue(for key: SharedAppValues.DefaultsKeys) -> Any? {
-        defaults.object(forKey: key.rawValue)
+    func getValue<T>(for key: SharedAppValues.DefaultsKeys) -> T? {
+        defaults.object(forKey: key.rawValue) as? T
     }
 }

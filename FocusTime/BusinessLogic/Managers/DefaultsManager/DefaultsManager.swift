@@ -10,6 +10,6 @@ import Foundation
 protocol DefaultsManager {
     init(defaults: UserDefaults)
     
-    func setValue(for key: SharedAppValues.DefaultsKeys, to value: Any)
-    func getValue(for key: SharedAppValues.DefaultsKeys) -> Any?
+    func setValue<T>(for key: SharedAppValues.DefaultsKeys, to value: T)
+    func getValue<T>(for key: SharedAppValues.DefaultsKeys) -> T?
 }
