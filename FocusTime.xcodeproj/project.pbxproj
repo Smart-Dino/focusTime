@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0C13AD392E42073400151050 /* OnboardingKit in Frameworks */ = {isa = PBXBuildFile; productRef = 0C13AD382E42073400151050 /* OnboardingKit */; };
 		C66B28102E1825160018E7AC /* FocusTimeActivityMonitor.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E97895A52E0AFCBE00E0AF42 /* FocusTimeActivityMonitor.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C66D93522E29108800452D56 /* FocusTimeUI in Frameworks */ = {isa = PBXBuildFile; productRef = 674241722E27EFBA00500101 /* FocusTimeUI */; };
 		C68617AA2E2976BD00E49BF7 /* ManagedSettings.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C68617A92E2976BD00E49BF7 /* ManagedSettings.framework */; };
@@ -185,6 +186,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0C13AD392E42073400151050 /* OnboardingKit in Frameworks */,
 				C66D93522E29108800452D56 /* FocusTimeUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -285,6 +287,7 @@
 			name = FocusTime;
 			packageProductDependencies = (
 				674241722E27EFBA00500101 /* FocusTimeUI */,
+				0C13AD382E42073400151050 /* OnboardingKit */,
 			);
 			productName = FocusTime;
 			productReference = 674FA6A02DB05ACE0002FDC1 /* FocusTime.app */;
@@ -417,6 +420,7 @@
 			mainGroup = 674FA6972DB05ACE0002FDC1;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+				0C13AD372E42070F00151050 /* XCLocalSwiftPackageReference "../../Downloads/OnboardingKit" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 674FA6A12DB05ACE0002FDC1 /* Products */;
@@ -1011,7 +1015,19 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		0C13AD372E42070F00151050 /* XCLocalSwiftPackageReference "../../Downloads/OnboardingKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../../Downloads/OnboardingKit;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
+		0C13AD382E42073400151050 /* OnboardingKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0C13AD372E42070F00151050 /* XCLocalSwiftPackageReference "../../Downloads/OnboardingKit" */;
+			productName = OnboardingKit;
+		};
 		674241722E27EFBA00500101 /* FocusTimeUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = FocusTimeUI;
