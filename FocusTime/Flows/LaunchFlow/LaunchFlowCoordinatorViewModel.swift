@@ -5,27 +5,49 @@
 //  Created by Maksym Horobets on 04.08.2025.
 //
 
+import SwiftUI
 import SwiftData
-import Foundation
+
+// MARK: - Screens
+enum LaunchScreen: Equatable, Hashable {
+    case appFlow(viewModel: AppFlowCoordinatorViewModel)
+    case splash(viewModel: SplashScreenViewModel)
+    
+    static func == (lhs: LaunchScreen, rhs: LaunchScreen) -> Bool {
+        switch (lhs, rhs) {
+        case (.appFlow, .appFlow): true
+        case (.splash, .splash):   true
+        default:                   false
+        }
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        switch self {
+        case .appFlow: hasher.combine(0)
+        case .splash: hasher.combine(1)
+        }
+    }
+}
 
 @MainActor
 @Observable
 final class LaunchFlowCoordinatorViewModel {
     struct State {
         var error: Error?
+        var currentFlow: LaunchScreen
         var appFlowCoordinatorViewModel: AppFlowCoordinatorViewModel?
     }
     
-    private(set) var state: State
+    private(set) var state: State!
     private let defaultsManager: DefaultsManager
+    private var paymentManager: PaymentManager?
     private var modelContainer: ModelContainer?
     
     init() {
-        self.state = State()
         self.defaultsManager = LiveDefaultsManager()
+        self.state = State(currentFlow: .splash(viewModel: makeSplashScreenViewModel()))
         
-        setupModelContainer()
-        setupAppFlowViewModel()
+        setupManagersAndSwitchToAppFlow()
     }
     
     func setErrorVisibility(_ isVisible: Bool) {
@@ -34,7 +56,22 @@ final class LaunchFlowCoordinatorViewModel {
         }
     }
     
-    func setupModelContainer() {
+    private func setupManagersAndSwitchToAppFlow() {
+        Task {
+            setupModelContainer()
+            await setupPaymentManager()
+            
+            try await Task.sleep(for: .seconds(SharedAppValues.splashScreenDuration))
+            if let viewModel = makeAppFlowCoordinatorViewModel() {
+                withAnimation {
+                    self.state.currentFlow = .appFlow(viewModel: viewModel)
+                }
+            }
+        }
+    }
+    
+    // This is done separately for error handling.
+    private func setupModelContainer() {
         do {
             let schema = Schema([BlockItem.self])
             let config = ModelConfiguration(groupContainer: .identifier(SharedAppValues.appGroupIdentifier))
@@ -46,20 +83,30 @@ final class LaunchFlowCoordinatorViewModel {
         }
     }
     
-    func setupAppFlowViewModel() {
-        Task {
-            guard state.error == nil else { return }
-            
-            // Make sure we have modelContainer and our ViewModel has not yet bee initialized.
-            if let modelContainer, state.appFlowCoordinatorViewModel == nil {
-                let paymentManager = await StoreKitPaymentManager()
-                
-                self.state.appFlowCoordinatorViewModel = .init(
-                    defaultsManager: defaultsManager,
-                    modelContainer: modelContainer,
-                    paymentManager: paymentManager
-                )
-            }
-        }
+    private func setupPaymentManager() async {
+        guard paymentManager == nil else { return }
+        
+        paymentManager = await StoreKitPaymentManager()
+    }
+    
+    
+    func makeSplashScreenViewModel() -> SplashScreenViewModel {
+        SplashScreenViewModel(delegate: self)
+    }
+    
+    func makeAppFlowCoordinatorViewModel() -> AppFlowCoordinatorViewModel? {
+        guard let modelContainer, let paymentManager else { return nil }
+        
+        return AppFlowCoordinatorViewModel(
+            defaultsManager: defaultsManager,
+            modelContainer: modelContainer,
+            paymentManager: paymentManager
+        )
+    }
+}
+
+extension LaunchFlowCoordinatorViewModel: SplashScreenDelegate {
+    func didFinishInitWithError(_ error: any Error) {
+        state.error = error
     }
 }

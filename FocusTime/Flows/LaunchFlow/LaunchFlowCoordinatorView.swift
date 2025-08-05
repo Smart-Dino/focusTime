@@ -13,16 +13,18 @@ struct LaunchFlowView: View {
     
     var body: some View {
         Group {
-            if let appFlowCoordinatorViewModel = viewModel.state.appFlowCoordinatorViewModel {
+            switch viewModel.state.currentFlow {
+            case .appFlow(let appFlowViewModel):
                 AppFlowCoordinatorView(
-                    viewModel: appFlowCoordinatorViewModel
+                    viewModel: appFlowViewModel
                 )
-            } else {
-                #warning("Implement splash screen")
-                ProgressView()
-                Text("Hang on...")
+            case .splash(let splashScreenViewModel):
+                SplashScreenView(
+                    viewModel: splashScreenViewModel
+                )
             }
         }
+        .transition(.opacity)
         .alert(
             SharedConstants.Strings.errorHeader,
             isPresented: Binding(get: {
