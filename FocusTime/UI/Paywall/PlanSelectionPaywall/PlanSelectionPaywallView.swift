@@ -69,7 +69,7 @@ struct PlanSelectionPaywallView: View {
                     FTSubscribeButtonView(
                         terms: viewModel.state.subscribeButtonTerms,
                         buttonTitle: viewModel.state.primaryButtonTitle,
-                        buttonAction: {
+                        action: {
                             Task {
                                 await viewModel.initiatePurchaseWithCurrentProduct()
                             }

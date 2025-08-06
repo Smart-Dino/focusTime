@@ -16,14 +16,18 @@ struct FreePlanUpgradeView: View {
     // MARK: - Body
     var body: some View {
         ZStack {
-            Image(.freePlanPaywallBackground)
-                .resizable()
-                .scaledToFill()
-                .containerRelativeFrame([.horizontal])
-                .scaleEffect(1.05, anchor: .bottom) // Scale it to the top a bit
-                .overlay {
-                    Color.ftMainBlue.opacity(0.1)
-                }
+            Image(
+                ImageResource
+                    .PaywallImages
+                    .freePlanBackground
+            )
+            .resizable()
+            .scaledToFill()
+            .containerRelativeFrame([.horizontal])
+            .scaleEffect(1.05, anchor: .bottom) // Scale it to the top a bit
+            .overlay {
+                Color.ftMainBlue.opacity(0.1)
+            }
             // VStack to push the elements down with a spacer.
             VStack {
                 Spacer()
@@ -77,7 +81,7 @@ struct FreePlanUpgradeView: View {
                 .font(.title3.bold())
             Text(Constants.Strings.upgradeMessage)
                 .multilineTextAlignment(.center)
-                .foregroundStyle(.ftGray3)
+                .foregroundStyle(.ftGray3Light)
         }
     }
     
@@ -87,7 +91,7 @@ struct FreePlanUpgradeView: View {
             FTSubscribeButtonView(
                 terms: viewModel.state.trialPeriodDescription,
                 buttonTitle: viewModel.state.purchaseButtonTitle,
-                buttonAction: {
+                action: {
                     Task {
                         await viewModel.initiatePurchaseWithCurrentProduct()
                     }
