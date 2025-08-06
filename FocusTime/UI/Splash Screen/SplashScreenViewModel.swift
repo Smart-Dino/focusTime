@@ -42,15 +42,15 @@ final class SplashScreenViewModel {
     }
     
     func subscribeToPlayer() {
-        playerNotificationTask = Task { [weak self] in
-            let notifications = NotificationCenter.default.notifications(
+        playerNotificationTask = Task.detached { [weak self] in
+            let notifications = await NotificationCenter.default.notifications(
                 named: .AVPlayerItemDidPlayToEndTime,
                 object: self?.player?.currentItem
             )
             
             for await _ in notifications {
                 await self?.player?.seek(to: .zero)
-                self?.player?.play()
+                await self?.player?.play()
             }
         }
     }
