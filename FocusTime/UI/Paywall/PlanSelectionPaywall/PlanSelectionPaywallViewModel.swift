@@ -16,12 +16,7 @@ final class PlanSelectionPaywallViewModel {
     struct State {
         var superState: SuperPaywallViewModel.State
         
-        // MARK: Background Images
-        let backgroundImages: [ImageResource] = [
-            ImageResource.DebugImages.debugNightMountain,
-            ImageResource.DebugImages.debugDayMountain
-        ]
-        var selectedImageIndex: Int? = .zero
+        var selectedViewIndex: Int? = .zero
         
         // MARK: Other
         static let stringConstants = PlanSelectionPaywallView.Constants.Strings.self
@@ -71,8 +66,8 @@ final class PlanSelectionPaywallViewModel {
         flowDelegate
     }
     
-    func updateSelectedImageIndex(index: Int?) {
-        state.selectedImageIndex = index
+    func updateSelectedViewIndex(index: Int?) {
+        state.selectedViewIndex = index
     }
     
     func setErrorVisibility(_ isVisible: Bool) {

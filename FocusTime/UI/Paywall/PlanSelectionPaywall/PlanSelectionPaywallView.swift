@@ -17,31 +17,32 @@ struct PlanSelectionPaywallView: View {
     var body: some View {
         // Won't add zero to constants since it will never change
         VStack(alignment: .leading, spacing: .zero) {
-            let selectedImageIndex = Binding {
-                viewModel.state.selectedImageIndex
+            let selectedViewIndex = Binding {
+                viewModel.state.selectedViewIndex
             } set: { index in
-                viewModel.updateSelectedImageIndex(index: index)
+                viewModel.updateSelectedViewIndex(index: index)
             }
             
             VStack {
                 ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: .zero) {
-                        PromoScreenSecond()
-                            .containerRelativeFrame(.horizontal)
-                        PromoScreenSecond()
-                            .containerRelativeFrame(.horizontal)
+                    LazyHStack(spacing: .zero) {
+                        Group {
+                            PromoScreenFirst().id(0)
+                            PromoScreenSecond().id(1)
+                        }
+                        .containerRelativeFrame(.horizontal)
                     }
                     .scrollTargetLayout()
                 }
                 .scrollTargetBehavior(.paging)
-                .scrollPosition(id: selectedImageIndex)
+                .scrollPosition(id: selectedViewIndex)
             }
             .overlay {
                 VStack {
                     Spacer()
                     FTPageControlView(
-                        viewModel.state.backgroundImages,
-                        selectedItem: selectedImageIndex
+                        [0, 1],
+                        selectedItem: selectedViewIndex
                     )
                     // Should tell the design team to make it brighter?
                     .foregroundTint(.ftMainBlue)
