@@ -27,6 +27,15 @@ final class SlideOnboardingViewModel {
         let onboardingBackgroundImageName: String
         
         // MARK: - Computed Properties for Builder Configurations (referencing `state`)
+        var startAppButtonConfig: ButtonUIConfiguration {
+            ButtonUIConfiguration(
+                title: startAppButtonTitle,
+                buttonStyle: PrimaryButtonStyle(
+                    verticalPadding: 14
+                )
+            )
+        }
+        
         var nextButtonConfig: ButtonUIConfiguration {
             ButtonUIConfiguration(
                 title: nextButtonTitle,
@@ -82,17 +91,5 @@ final class SlideOnboardingViewModel {
     func didTapStartFocusing() {
         // TODO: Implement actual navigation logic after onboarding
         print("Start Focusing button tapped from ViewModel!")
-    }
-    
-    var startAppButtonConfig: ButtonUIConfiguration {
-        ButtonUIConfiguration(
-            title: state.startAppButtonTitle,
-            buttonStyle: PrimaryButtonStyle(
-                verticalPadding: 14
-            ),
-            { [weak self] in
-                self?.didTapStartFocusing()
-            }
-        )
     }
 }
