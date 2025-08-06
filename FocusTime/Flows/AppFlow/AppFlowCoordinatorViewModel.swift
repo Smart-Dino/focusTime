@@ -102,9 +102,11 @@ final class AppFlowCoordinatorViewModel {
     
     func showFreePlanCoverIfNeeded() async {
         guard await !paymentManager.isPro && state.screenCover == nil else { return }
+        
         let viewModel = makeFreePlanUpgradeViewModel(
             requestedProductID: StoreKitProductIdentifiers.trialableWeekly.id
         )
+        
         setScreenCover(to: .freePlanPaywall(viewModel: viewModel))
     }
     
@@ -125,17 +127,17 @@ final class AppFlowCoordinatorViewModel {
         }
     }
     
-    func makeOnboardingFlowCoordinatorViewModel() -> OnboardingFlowCoordinatorViewModel {
+    // MARK: - Factory methods
+    private func makeOnboardingFlowCoordinatorViewModel() -> OnboardingFlowCoordinatorViewModel {
         OnboardingFlowCoordinatorViewModel(appFlowDelegate: self)
     }
     
-    func makeMainFlowCoordinatorViewModel() -> MainFlowCoordinatorViewModel {
+    private func makeMainFlowCoordinatorViewModel() -> MainFlowCoordinatorViewModel {
         MainFlowCoordinatorViewModel(modelContainer: modelContainer, appFlowDelegate: self)
     }
     
-    
-    // MARK: - Paywalls
-    func makeFreePlanUpgradeViewModel(requestedProductID: String) -> FreePlanUpgradeViewModel {
+    // Paywalls
+    private func makeFreePlanUpgradeViewModel(requestedProductID: String) -> FreePlanUpgradeViewModel {
         FreePlanUpgradeViewModel(
             state: .init(requestedProductID: requestedProductID),
             superPaywallVM: superPaywallVM,
@@ -143,7 +145,7 @@ final class AppFlowCoordinatorViewModel {
         )
     }
     
-    func makeOnboardingPaywallViewModel(requestedProductID: String) -> OnboardingPaywallViewModel {
+    private func makeOnboardingPaywallViewModel(requestedProductID: String) -> OnboardingPaywallViewModel {
         OnboardingPaywallViewModel(
             state: .init(requestedProductID: requestedProductID),
             superPaywallVM: superPaywallVM,
@@ -151,7 +153,7 @@ final class AppFlowCoordinatorViewModel {
         )
     }
     
-    func makePlanSelectionPaywallViewModel() -> PlanSelectionPaywallViewModel {
+    private func makePlanSelectionPaywallViewModel() -> PlanSelectionPaywallViewModel {
         PlanSelectionPaywallViewModel(
             superPaywallVM: superPaywallVM,
             flowDelegate: self

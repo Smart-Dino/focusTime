@@ -47,7 +47,10 @@ final class LaunchFlowCoordinatorViewModel {
         self.defaultsManager = LiveDefaultsManager()
         self.state = State(currentFlow: .splash(viewModel: makeSplashScreenViewModel()))
         
-        setupManagersAndSwitchToAppFlow()
+        Task {
+            await setupDependencies()
+            await switchToAppFlow()
+        }
     }
     
     func setErrorVisibility(_ isVisible: Bool) {
@@ -56,16 +59,16 @@ final class LaunchFlowCoordinatorViewModel {
         }
     }
     
-    private func setupManagersAndSwitchToAppFlow() {
-        Task {
-            setupModelContainer()
-            await setupPaymentManager()
-            
-            try await Task.sleep(for: .seconds(SharedAppValues.splashScreenDuration))
-            if let viewModel = makeAppFlowCoordinatorViewModel() {
-                withAnimation {
-                    self.state.currentFlow = .appFlow(viewModel: viewModel)
-                }
+    private func setupDependencies() async {
+        setupModelContainer()
+        await setupPaymentManager()
+    }
+    
+    private func switchToAppFlow() async {
+        try? await Task.sleep(for: .seconds(SharedAppValues.splashScreenDuration))
+        if let viewModel = makeAppFlowCoordinatorViewModel() {
+            withAnimation {
+                self.state.currentFlow = .appFlow(viewModel: viewModel)
             }
         }
     }
