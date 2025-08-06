@@ -27,8 +27,8 @@ struct PlanSelectionPaywallView: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     LazyHStack(spacing: .zero) {
                         Group {
-                            PromoScreenFirst().id(0)
-                            PromoScreenSecond().id(1)
+                            PlanSelectionFirstPromoView().id(0)
+                            PlanSelectionSecondPromoView().id(1)
                         }
                         .containerRelativeFrame(.horizontal)
                     }

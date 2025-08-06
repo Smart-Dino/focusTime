@@ -1,5 +1,5 @@
 //
-//  PromoScreenSecond.swift
+//  PlanSelectionSecondPromoView.swift
 //  FocusTime
 //
 //  Created by Maksym Horobets on 05.08.2025.
@@ -8,7 +8,7 @@
 import SwiftUI
 import FocusTimeUI
 
-struct PromoScreenSecond: View {
+struct PlanSelectionSecondPromoView: View {
     var body: some View {
         ZStack {
             Color.ftBackground
@@ -49,7 +49,7 @@ struct PromoScreenSecond: View {
 }
 
 #Preview {
-    PromoScreenSecond()
+    PlanSelectionSecondPromoView()
         .preferredColorScheme(.dark)
         .frame(width: 400, height: 400)
 }

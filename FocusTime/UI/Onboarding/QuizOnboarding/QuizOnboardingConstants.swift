@@ -21,17 +21,28 @@ extension QuizOnboardingView {
             static let nextButton = String(localized: "quiz_onboarding_next_button", table: "OnboardingLocalizable")
         }
         
-        enum QuizOption: String, CaseIterable, Identifiable, Hashable {
-            case notifications = "quiz_onboarding_option_notifications"
-            case socialMedia = "quiz_onboarding_option_social_media"
-            case workDistractions = "quiz_onboarding_option_work_distractions"
-            case lackOfStructure = "quiz_onboarding_option_lack_of_structure"
-            case mentalFatigue = "quiz_onboarding_option_mental_fatigue"
+        enum QuizOption: CaseIterable, Identifiable, Hashable {
+            case notifications
+            case socialMedia
+            case workDistractions
+            case lackOfStructure
+            case mentalFatigue
             
-            var id: String { rawValue }
+            var id: Self { self }
             
             var localizedString: String {
-                String(localized: String.LocalizationValue(rawValue), table: "OnboardingLocalizable")
+                switch self {
+                case .notifications:
+                    String(localized: "quiz_onboarding_option_notifications", table: "OnboardingLocalizable")
+                case .socialMedia:
+                    String(localized: "quiz_onboarding_option_social_media", table: "OnboardingLocalizable")
+                case .workDistractions:
+                    String(localized: "quiz_onboarding_option_work_distractions", table: "OnboardingLocalizable")
+                case .lackOfStructure:
+                    String(localized: "quiz_onboarding_option_lack_of_structure", table: "OnboardingLocalizable")
+                case .mentalFatigue:
+                    String(localized: "quiz_onboarding_option_mental_fatigue", table: "OnboardingLocalizable")
+                }
             }
         }
     }

@@ -13,16 +13,28 @@ extension OnboardingPaywallView {
     enum Constants {
         // MARK: - Feature Items
         /// Main selling points of the app.
-        enum FeatureItems: String, CaseIterable, Identifiable {
-            case unlimitedSessions = "onboarding_paywall_feature_unlimited_sessions"
-            case unlimitedApps     = "onboarding_paywall_feature_unlimited_apps"
-            case deepFocus         = "onboarding_paywall_feature_deep_focus"
-            case whiteNoise        = "onboarding_paywall_feature_white_noise"
-            case priorityFeatures  = "onboarding_paywall_feature_priority_features"
+        enum FeatureItems: CaseIterable, Identifiable {
+            case unlimitedSessions
+            case unlimitedApps
+            case deepFocus
+            case whiteNoise
+            case priorityFeatures
             
-            var id: String { rawValue }
+            var id: Self { self }
+            
             var title: String {
-                String(localized: String.LocalizationValue(rawValue), table: "PaywallLocalizable")
+                switch self {
+                case .unlimitedSessions:
+                    String(localized: "onboarding_paywall_feature_unlimited_sessions", table: "PaywallLocalizable")
+                case .unlimitedApps:
+                    String(localized: "onboarding_paywall_feature_unlimited_apps", table: "PaywallLocalizable")
+                case .deepFocus:
+                    String(localized: "onboarding_paywall_feature_deep_focus", table: "PaywallLocalizable")
+                case .whiteNoise:
+                    String(localized: "onboarding_paywall_feature_white_noise", table: "PaywallLocalizable")
+                case .priorityFeatures:
+                    String(localized: "onboarding_paywall_feature_priority_features", table: "PaywallLocalizable")
+                }
             }
             
             var systemImage: String {
@@ -85,3 +97,4 @@ extension OnboardingPaywallView {
         
     }
 }
+
