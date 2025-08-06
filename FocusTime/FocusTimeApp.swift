@@ -12,6 +12,7 @@ struct FocusTimeApp: App {
     var body: some Scene {
         WindowGroup {
             LaunchFlowView()
+                .preferredColorScheme(.dark)
         }
     }
 }

@@ -60,7 +60,6 @@ struct QuizOnboardingView: View {
             .padding()
         }
         .dynamicTypeSize(...DynamicTypeSize.large)
-        .preferredColorScheme(.dark)
     }
 }
 

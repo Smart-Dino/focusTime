@@ -81,7 +81,6 @@ struct SlideOnboardingView: View {
             }
         }
         .animation(.easeInOut, value: viewModel.state.currentStep)
-        .preferredColorScheme(.dark)
         
         // MARK: - Skip Confirmation Alert
         .alert(Constants.Strings.alertTitle, isPresented: viewModel.isSkipConfirmationPresented) {

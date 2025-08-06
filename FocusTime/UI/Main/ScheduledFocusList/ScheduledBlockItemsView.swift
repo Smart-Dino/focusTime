@@ -46,7 +46,6 @@ struct ScheduledBlockItemsView: View {
         }
         .navigationTitle(Constants.Strings.navTitle)
         .navigationBarTitleDisplayMode(.inline)
-        .preferredColorScheme(.dark)
         .dynamicTypeSize(...DynamicTypeSize.accessibility2)
         .alert(
             SharedConstants.Strings.errorHeader,
