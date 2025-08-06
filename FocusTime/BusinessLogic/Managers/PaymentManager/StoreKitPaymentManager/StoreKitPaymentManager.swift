@@ -5,16 +5,11 @@
 //  Created by Maksym Horobets on 27.05.2025.
 //
 
-import Foundation
+import os.log
 import StoreKit
-import os
+import Foundation
 
 actor StoreKitPaymentManager: PaymentManager {
-    static let logger = Logger(
-        subsystem: Bundle.main.bundleIdentifier ?? "org.dino.smart.FocusTime",
-        category: String(describing: StoreKitPaymentManager.self)
-    )
-    
     // We do not need a property containing pending products:
     // https://developer.apple.com/forums/thread/706277
     
@@ -33,7 +28,16 @@ actor StoreKitPaymentManager: PaymentManager {
     private var updateListenerTask: Task<Void, Error>? = nil
     var continuation: AsyncStream<Bool>.Continuation?
     
-    init(productIdentifiers: [String] = StoreKitProductIdentifiers.allCases.map { $0.id }) async {
+    // Logger
+    let logger: Logger
+    
+    init(
+        productIdentifiers: [String] = StoreKitProductIdentifiers.allCases.map { $0.id },
+        logger: Logger = Logger(
+            subsystem: Bundle.main.bundleIdentifier ?? .init(),
+            category: String(describing: StoreKitPaymentManager.self)
+        )
+    ) async {
 
         // FTProducts
         self.products = []
@@ -42,6 +46,9 @@ actor StoreKitPaymentManager: PaymentManager {
         // StoreKit Products
         self.skProducts = []
         self.productIdentifiers = productIdentifiers
+        
+        // Logger
+        self.logger = logger
         
         await setup()
     }
@@ -92,11 +99,11 @@ extension StoreKitPaymentManager {
                     purchasedProducts.append(product)
                 }
             } catch {
-                Self.logger.critical("Could not validate the transaction: \(error.localizedDescription)")
+                logger.critical("Could not validate the transaction: \(error.localizedDescription)")
             }
         }
         
-        Self.logger.trace("Successfully updated customer's products with \(purchasedProducts.count) products")
+        logger.trace("Successfully updated customer's products with \(purchasedProducts.count) products")
         
         // Convert to FTProduct.
         self.purchasedProducts = purchasedProducts.map {
@@ -113,7 +120,7 @@ extension StoreKitPaymentManager {
         return Task {
             //Iterate through any transactions that don't come from a direct call to `purchase()`.
             for await result in Transaction.updates {
-                Self.logger.trace("New incoming transaction update: \(result.jwsRepresentation)")
+                logger.trace("New incoming transaction update: \(result.jwsRepresentation)")
                 do {
                     let transaction = try self.checkVerified(result)
                     
@@ -124,7 +131,7 @@ extension StoreKitPaymentManager {
                     await transaction.finish()
                 } catch {
                     //StoreKit has a transaction that fails verification. Don't deliver content to the user.
-                    Self.logger.critical("StoreKit failed to verify transaction: \(error.localizedDescription)")
+                    logger.critical("StoreKit failed to verify transaction: \(error.localizedDescription)")
                 }
             }
         }
@@ -139,7 +146,7 @@ extension StoreKitPaymentManager {
             FTProduct.fromStoreKit($0)
         }
         
-        Self.logger.trace(
+        logger.trace(
             "Successfully retrieved and converted \(storeProducts.count.description) StoreKit products into FTProducts"
         )
         

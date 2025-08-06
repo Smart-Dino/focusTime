@@ -50,6 +50,6 @@ struct SplashScreenView: View {
 }
 
 #Preview {
-    SplashScreenView(viewModel: .init(delegate: nil))
+    SplashScreenView(viewModel: .init())
         .preferredColorScheme(.dark)
 }

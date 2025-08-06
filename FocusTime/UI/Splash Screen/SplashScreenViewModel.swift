@@ -6,6 +6,7 @@
 //
 
 import AVKit
+import os.log
 import SwiftUI
 
 @MainActor
@@ -16,23 +17,30 @@ final class SplashScreenViewModel {
     }
     private(set) var state: State
     private(set) var player: AVPlayer?
+    private let logger: Logger
     @ObservationIgnored var playerNotificationTask: Task<Void, Never>? = nil
-    
-    weak var delegate: SplashScreenDelegate?
     
     init(
         state: State = State(),
         videoURL: URL? = Bundle.main.url(forResource: "splash_screen", withExtension: "mp4"),
-        delegate: SplashScreenDelegate?
+        logger: Logger = Logger(
+            subsystem: Bundle.main.bundleIdentifier ?? .init(),
+            category: String(describing: SplashScreenViewModel.self)
+        )
     ) {
         self.state = state
-        self.delegate = delegate
-        
+        self.logger = logger
+
         if let videoURL {
             self.player = AVPlayer(url: videoURL)
             subscribeToPlayer()
         } else {
-            delegate?.didFinishInitWithError(SplashScreenError.invalidURL)
+            self.logger.warning(
+                """
+                Wasn't able to retrieve media for provided URL. 
+                Falling back to static image.
+                """
+            )
         }
     }
     

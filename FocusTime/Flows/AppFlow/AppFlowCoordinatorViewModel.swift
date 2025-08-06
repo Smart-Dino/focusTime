@@ -126,7 +126,7 @@ final class AppFlowCoordinatorViewModel {
     }
     
     func makeOnboardingFlowCoordinatorViewModel() -> OnboardingFlowCoordinatorViewModel {
-        OnboardingFlowCoordinatorViewModel(delegate: self)
+        OnboardingFlowCoordinatorViewModel(appFlowDelegate: self)
     }
     
     func makeMainFlowCoordinatorViewModel() -> MainFlowCoordinatorViewModel {

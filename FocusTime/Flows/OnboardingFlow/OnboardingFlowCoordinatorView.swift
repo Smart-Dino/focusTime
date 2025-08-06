@@ -24,5 +24,5 @@ struct OnboardingFlowCoordinatorView: View {
 }
 
 #Preview {
-    OnboardingFlowCoordinatorView(viewModel: .init(delegate: nil))
+    OnboardingFlowCoordinatorView(viewModel: .init(appFlowDelegate: nil))
 }

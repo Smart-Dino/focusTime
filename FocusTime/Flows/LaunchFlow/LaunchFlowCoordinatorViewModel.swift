@@ -91,7 +91,7 @@ final class LaunchFlowCoordinatorViewModel {
     
     
     func makeSplashScreenViewModel() -> SplashScreenViewModel {
-        SplashScreenViewModel(delegate: self)
+        SplashScreenViewModel()
     }
     
     func makeAppFlowCoordinatorViewModel() -> AppFlowCoordinatorViewModel? {
@@ -102,11 +102,5 @@ final class LaunchFlowCoordinatorViewModel {
             modelContainer: modelContainer,
             paymentManager: paymentManager
         )
-    }
-}
-
-extension LaunchFlowCoordinatorViewModel: SplashScreenDelegate {
-    func didFinishInitWithError(_ error: any Error) {
-        state.error = error
     }
 }
