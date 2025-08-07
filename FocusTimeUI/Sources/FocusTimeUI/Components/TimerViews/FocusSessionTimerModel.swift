@@ -52,7 +52,7 @@ public final class FocusSessionTimerModel {
     public init(
         state: State,
         deadline: Date,
-        delegate: FocusSessionTimerModelDelegate? = nil
+        delegate: FocusSessionTimerModelDelegate?
     ) {
         self.deadline = deadline
         self.state = state

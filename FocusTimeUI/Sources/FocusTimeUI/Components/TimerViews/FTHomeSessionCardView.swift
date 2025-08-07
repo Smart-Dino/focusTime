@@ -49,7 +49,7 @@ public struct FTHomeSessionCardView: View {
             let shape = FocusSessionBackgroundShape()
             ZStack {
                 shape
-                    .fill(.backgroundScheduledFocus)
+                    .fill(.sessionRowBlue)
                 shape
                     .stroke(gradient, lineWidth: 1.2)
             }
@@ -86,7 +86,8 @@ public struct FTHomeSessionCardView: View {
 #Preview("Countdown", traits: .sizeThatFitsLayout) {
     let viewModel = FocusSessionTimerModel(
         state: .init(isPaused: true),
-        deadline: .now.addingTimeInterval(70)
+        deadline: .now.addingTimeInterval(70),
+        delegate: nil
     )
     
     VStack {

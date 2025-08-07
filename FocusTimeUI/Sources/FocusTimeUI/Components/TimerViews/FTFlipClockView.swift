@@ -45,7 +45,8 @@ public struct FTFlipClockView: View {
 #Preview {
     let viewModel = FocusSessionTimerModel(
         state: .init(isPaused: false),
-        deadline: .now.addingTimeInterval(70)
+        deadline: .now.addingTimeInterval(70),
+        delegate: nil
     )
     
     FTFlipClockView(

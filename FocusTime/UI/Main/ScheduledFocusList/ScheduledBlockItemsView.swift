@@ -65,7 +65,7 @@ struct ScheduledBlockItemsView: View {
         ScrollView(.vertical) {
             LazyVStack {
                 ForEach(viewModel.state.items) { schedule in
-                    FTScheduledFocusRowView(
+                    FTSessionScheduledRowView(
                         emoji: schedule.emoji,
                         title: schedule.name,
                         description: schedule.days.description

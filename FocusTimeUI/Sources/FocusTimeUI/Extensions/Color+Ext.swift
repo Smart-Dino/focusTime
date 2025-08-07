@@ -50,8 +50,8 @@ internal extension ShapeStyle where Self == Color {
     static var trailingScheduledFocus: Color {
         Color("TrailingScheduledFocusColor", bundle: .module)
     }
-    static var backgroundScheduledFocus: Color {
-        Color("BackgroundScheduledFocusColor", bundle: .module)
+    static var sessionRowBlue: Color {
+        Color("SessionRowBlueColor", bundle: .module)
     }
 }
 

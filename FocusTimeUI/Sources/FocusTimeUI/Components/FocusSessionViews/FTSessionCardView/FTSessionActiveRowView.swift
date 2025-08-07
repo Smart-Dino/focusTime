@@ -1,5 +1,5 @@
 //
-//  FTScheduledFocusRowView.swift
+//  FTSessionSummaryCardView.swift
 //  FocusTimeUI
 //
 //  Created by Maksym Horobets on 18.06.2025.
@@ -7,64 +7,67 @@
 
 import SwiftUI
 
-public struct FTScheduledFocusRowView: View {
+internal struct FTSessionActiveRowView: View {
     private let emoji: String
     private let title: String
-    private let description: String
     
-    public var body: some View {
+    private let viewModel: FocusSessionTimerModel
+    
+    internal var body: some View {
         HStack(spacing: 15) {
             Text(emoji)
                 .font(.title2)
             VStack(alignment: .leading) {
                 Text(title)
-                Text(description)
+                Text(viewModel.state.formattedTime)
                     .foregroundStyle(.ftGray3Light)
             }
             Spacer()
-            Image(systemName: "hourglass.bottomhalf.filled")
-                .font(.title3)
-                .foregroundStyle(.blue)
         }
         .padding()
         .background {
             let shape = FocusSessionBackgroundShape()
             ZStack {
                 shape
-                    .fill(.backgroundScheduledFocus)
+                    .fill(.sessionRowBlue)
                 shape
                     .stroke(gradient, lineWidth: 1.2)
             }
         }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(emoji), \(title), \(description)")
+        .accessibilityLabel("\(emoji), \(title), \(viewModel.state.formattedTime)")
     }
     
-    var gradient: LinearGradient {
+    private var gradient: LinearGradient {
         LinearGradient(
-            colors: [.leadingScheduledFocus, .trailingScheduledFocus],
+            colors: [.leadingSummaryCard, .trailingSummaryCard],
             startPoint: .leading,
             endPoint: .trailing
         )
     }
     
-    public init(
+    internal init(
         emoji: String,
         title: String,
-        description: String
+        viewModel: FocusSessionTimerModel
     ) {
         self.emoji = emoji
         self.title = title
-        self.description = description
+        self.viewModel = viewModel
     }
     
 }
 
 #Preview(traits: .sizeThatFitsLayout) {
-    FTScheduledFocusRowView(
+    @Previewable @State var viewModel: FocusSessionTimerModel = .init(
+        state: .init(isPaused: false),
+        deadline: .now.addingTimeInterval(160),
+        delegate: nil
+    )
+    FTSessionActiveRowView(
         emoji: "😎",
         title: "Cool",
-        description: "This is a cool view huh?"
+        viewModel: viewModel
     )
     .padding()
     .preferredColorScheme(.dark)

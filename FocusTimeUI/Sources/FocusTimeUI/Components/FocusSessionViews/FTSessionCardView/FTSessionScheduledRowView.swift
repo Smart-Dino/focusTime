@@ -1,5 +1,5 @@
 //
-//  FTSessionSummaryCardView.swift
+//  FTScheduledFocusRowView.swift
 //  FocusTimeUI
 //
 //  Created by Maksym Horobets on 18.06.2025.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public struct FTSessionSummaryCardView: View {
+public struct FTSessionScheduledRowView: View {
     private let emoji: String
     private let title: String
     private let description: String
@@ -22,11 +22,19 @@ public struct FTSessionSummaryCardView: View {
                     .foregroundStyle(.ftGray3Light)
             }
             Spacer()
+            Image(systemName: "hourglass.bottomhalf.filled")
+                .font(.title3)
+                .foregroundStyle(.blue)
         }
         .padding()
         .background {
-            FocusSessionBackgroundShape()
-                .stroke(gradient, lineWidth: 1.2)
+            let shape = FocusSessionBackgroundShape()
+            ZStack {
+                shape
+                    .fill(.sessionRowBlue)
+                shape
+                    .stroke(gradient, lineWidth: 1.2)
+            }
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(emoji), \(title), \(description)")
@@ -34,7 +42,7 @@ public struct FTSessionSummaryCardView: View {
     
     var gradient: LinearGradient {
         LinearGradient(
-            colors: [.leadingSummaryCard, .trailingSummaryCard],
+            colors: [.leadingScheduledFocus, .trailingScheduledFocus],
             startPoint: .leading,
             endPoint: .trailing
         )
@@ -53,7 +61,7 @@ public struct FTSessionSummaryCardView: View {
 }
 
 #Preview(traits: .sizeThatFitsLayout) {
-    FTSessionSummaryCardView(
+    FTSessionScheduledRowView(
         emoji: "😎",
         title: "Cool",
         description: "This is a cool view huh?"
