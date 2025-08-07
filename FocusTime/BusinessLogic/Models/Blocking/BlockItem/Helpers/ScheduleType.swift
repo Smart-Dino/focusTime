@@ -33,4 +33,46 @@ enum ScheduleType: Codable, Hashable {
                         suspendedAt: suspendedAt,
                         timeLeft: timeLeft ?? duration)
     }
+    
+    var secondsToIntervalEndIfShouldBeRunning: Int? {
+        secondsToIntervalEndIfShouldBeRunning(now: .now)
+    }
+    
+    func secondsToIntervalEndIfShouldBeRunning(now: Date) -> Int? {
+        // Make sure we deal with a scheduled block,
+        // because duration block does not have a set time window in a day,
+        // and it is requested on-demand.
+        guard case .scheduled = self else { return nil }
+        
+        switch self {
+        case .scheduled(let startTime, let endTime):
+            guard let currentTimeComponent = try? TimeComponents(from: now) else { return nil }
+            
+            let timeSinceStart = currentTimeComponent.localizedSecondsSinceMidnight - startTime.localizedSecondsSinceMidnight
+            let timeLeftInSeconds = endTime.localizedSecondsSinceMidnight - currentTimeComponent.localizedSecondsSinceMidnight
+            
+            if timeLeftInSeconds > 60 && timeSinceStart > 0 {
+                return timeLeftInSeconds
+            } else {
+                return nil
+            }
+        case .duration(let initialDuration, let startedAt, let suspendedAt, let timeLeft):
+            guard let startedAt else { return nil }
+
+            let now = Date()
+            let durationInSeconds = initialDuration.rawValue
+            let timeLeftInSeconds = timeLeft.rawValue
+
+            // If it's suspended, timeLeft is the actual value
+            if suspendedAt != nil {
+                return timeLeftInSeconds > 0 ? timeLeftInSeconds : nil
+            }
+
+            // If not suspended, subtract elapsed time from the original duration
+            let elapsed = now.timeIntervalSince(startedAt)
+            let remaining = Int(durationInSeconds - Int(elapsed))
+
+            return remaining > 60 ? remaining : nil
+        }
+    }
 }
