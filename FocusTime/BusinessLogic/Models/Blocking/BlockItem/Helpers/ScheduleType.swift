@@ -59,7 +59,6 @@ enum ScheduleType: Codable, Hashable {
         case .duration(let initialDuration, let startedAt, let suspendedAt, let timeLeft):
             guard let startedAt else { return nil }
 
-            let now = Date()
             let durationInSeconds = initialDuration.rawValue
             let timeLeftInSeconds = timeLeft.rawValue
 
