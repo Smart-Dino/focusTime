@@ -20,7 +20,7 @@ nonisolated struct TotalActivityReport: DeviceActivityReportScene {
         // Reformat the data into a configuration that can be used to create
         // the report's view.
         let formatter = DateComponentsFormatter()
-        formatter.allowedUnits = [.hour, .minute]
+        formatter.allowedUnits = [.hour, .minute, .second]
         formatter.unitsStyle = .abbreviated
         formatter.zeroFormattingBehavior = .dropAll
         
