@@ -39,35 +39,6 @@ final class DraftsBlockItemListViewModel {
         }
     }
     
-    func makeCardMode(for blockItem: ProtectedBlockItem) -> FTSessionCardView.CardMode {
-        let type = blockItem.type
-
-        if let timeLeft = type.secondsToIntervalEndIfShouldBeRunning {
-            let isPaused: Bool = {
-                if case .duration(_, _, let suspendedAt, _) = type {
-                    return suspendedAt != nil
-                }
-                return false
-            }()
-
-            let deadline = Date.now.addingTimeInterval(TimeInterval(timeLeft))
-            let viewModel = FocusSessionTimerModel(
-                state: .init(isPaused: isPaused),
-                deadline: deadline,
-                delegate: nil
-            )
-
-            return .active(viewModel: viewModel)
-        } else {
-            switch type {
-            case .duration(let duration, _, _, _):
-                return .awaiting(timeRange: "Duration: \(duration.description)")
-            case .scheduled(let startTime, let endTime):
-                return .awaiting(timeRange: "\(startTime.description)-\(endTime.description)")
-            }
-        }
-    }
-    
     func reloadData() {
         state.items = .init()
         state.page = 0

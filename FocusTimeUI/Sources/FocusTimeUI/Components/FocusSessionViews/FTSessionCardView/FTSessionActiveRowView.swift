@@ -7,13 +7,13 @@
 
 import SwiftUI
 
-internal struct FTSessionActiveRowView: View {
+public struct FTSessionActiveRowView: View {
     private let emoji: String
     private let title: String
     
-    @State private var viewModel: FocusSessionTimerModel
+    @State private var viewModel: FocusSessionTimerModel // // Does not work without @State.
     
-    internal var body: some View {
+    public var body: some View {
         HStack(spacing: 15) {
             Text(emoji)
                 .font(.title2)
@@ -38,7 +38,7 @@ internal struct FTSessionActiveRowView: View {
         .accessibilityLabel("\(emoji), \(title), \(viewModel.state.formattedTime)")
     }
     
-    private var gradient: LinearGradient {
+    public var gradient: LinearGradient {
         LinearGradient(
             colors: [.leadingSummaryCard, .trailingSummaryCard],
             startPoint: .leading,
@@ -46,7 +46,7 @@ internal struct FTSessionActiveRowView: View {
         )
     }
     
-    internal init(
+    public init(
         emoji: String,
         title: String,
         viewModel: FocusSessionTimerModel
