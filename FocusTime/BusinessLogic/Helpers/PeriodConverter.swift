@@ -55,10 +55,14 @@ enum PeriodConverter: Sendable {
     /// - Prioritizes from years down to seconds.
     /// - If all components are nil or zero, defaults to "0 seconds".
     /// - For positive 1, the unit is singular (e.g., "1 year"); otherwise, it's plural (e.g., "0 years", "-1 years", "2 years").
-    static func localizedConciseTimeString(from seconds: Int) -> String {
+    static func localizedConciseTimeString(
+        from seconds: Int,
+        allowedUnits: NSCalendar.Unit = [.year, .month, .weekOfMonth, .day],
+        unitsStyle: DateComponentsFormatter.UnitsStyle = .full
+    ) -> String {
         let formatter = DateComponentsFormatter()
-        formatter.unitsStyle = .full
-        formatter.allowedUnits = [.year, .month, .weekOfMonth, .day]
+        formatter.unitsStyle = unitsStyle
+        formatter.allowedUnits = allowedUnits
         formatter.maximumUnitCount = 1           // Only the largest non-zero unit
         formatter.zeroFormattingBehavior = .dropAll
         formatter.includesApproximationPhrase = false

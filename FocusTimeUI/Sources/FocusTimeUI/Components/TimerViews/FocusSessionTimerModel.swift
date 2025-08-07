@@ -34,9 +34,7 @@ public final class FocusSessionTimerModel {
             self.hours = hours
             self.minutes = minutes
             self.seconds = seconds
-            self.formattedTime = FocusSessionTimerModel.formattedTime(hours: hours,
-                                                                      minutes: minutes,
-                                                                      seconds: seconds)
+            self.formattedTime = "00:00:00"
             self.isPaused = isPaused
         }
     }
@@ -74,17 +72,17 @@ public final class FocusSessionTimerModel {
 
     private func updateTimeLeft() {
         let remaining = max(Int(deadline.timeIntervalSinceNow), 0)
-        if remaining <= 0 {
-            delegate?.didFinishCountdown()
-            timer?.cancel()
-        }
         state.hours = remaining / 3600
         state.minutes = (remaining % 3600) / 60
         state.seconds = remaining % 60
-        state.formattedTime = Self.formattedTime(hours: state.hours,
-                                                 minutes: state.minutes,
-                                                 seconds: state.seconds)
+        state.formattedTime = String(format: "%02d:%02d:%02d", state.hours, state.minutes, state.seconds)
+
+        if remaining <= 0 {
+            timer?.cancel()
+            delegate?.didFinishCountdown()
+        }
     }
+
 
     // MARK: - Controls
     func togglePause() {
@@ -115,10 +113,5 @@ public final class FocusSessionTimerModel {
     public func setIsPaused(_ isPaused: Bool) {
         state.isPaused = isPaused
         delegate?.didUpdateIsPaused(isPaused)
-    }
-
-    // MARK: - Convenience
-    nonisolated static private func formattedTime(hours: Int, minutes: Int, seconds: Int) -> String {
-        String(format: "%02d:%02d:%02d", hours, minutes, seconds)
     }
 }

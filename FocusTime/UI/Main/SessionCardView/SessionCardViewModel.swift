@@ -22,18 +22,40 @@ final class SessionCardViewModel {
     
     private(set) var state: State
     let blockItem: ProtectedBlockItem
-    let timeRange: String
+    private var dataUpdatingTask: Task<Void, Never>?
     
     init(blockItem: ProtectedBlockItem) {
-        self.state = state
+        self.state = State(mode: .inactive(emoji: blockItem.emoji,
+                                           name: blockItem.name,
+                                           timeRange: blockItem.type.description))
         self.blockItem = blockItem
-        self.timeRange = blockItem.type.description
+        setupDataUpdatingTask()
+    }
+    
+    deinit {
+        Task { @MainActor [weak self] in
+            self?.dataUpdatingTask?.cancel()
+            self?.dataUpdatingTask = nil
+        }
+    }
+    
+    #warning("Task runs in two different ViewModels but neither update the view")
+    func setupDataUpdatingTask() {
+        dataUpdatingTask = Task.detached(priority: .background) { [weak self] in
+            while true {
+                try? await Task.sleep(for: .seconds(20))
+                guard case .inactive = await self?.state.mode else { break }
+                print("Task ran")
+                print(ObjectIdentifier(self!))
+                await self?.setCardMode()
+            }
+        }
     }
     
     func setCardMode() {
         let type = blockItem.type
 
-        if let timeLeft = type.secondsToIntervalEndIfShouldBeRunning {
+        if let timeLeft = type.secondsToIntervalEndIfShouldBeRunning, timeLeft > 0 {
             let isPaused: Bool = {
                 if case .duration(_, _, let suspendedAt, _) = type {
                     return suspendedAt != nil
@@ -45,31 +67,30 @@ final class SessionCardViewModel {
             let viewModel = FocusSessionTimerModel(
                 state: .init(isPaused: isPaused),
                 deadline: deadline,
-                delegate: nil
+                delegate: self
             )
 
             state.mode = .active(
                 emoji: blockItem.emoji,
                 name: blockItem.name,
-                timerViewModel: .init(state: .init(isPaused: isPaused),
-                                      deadline: deadline,
-                                      delegate: self)
+                timerViewModel: viewModel
             )
         } else {
-            switch type {
-            case .duration(let duration, _, _, _):
-                return .awaiting(timeRange: "Duration: \(duration.description)")
-            case .scheduled(let startTime, let endTime):
-                return .awaiting(timeRange: "\(startTime.description)-\(endTime.description)")
-            }
+            state.mode = .inactive(
+                emoji: blockItem.emoji,
+                name: blockItem.name,
+                timeRange: blockItem.type.description
+            )
         }
     }
 }
 
 extension SessionCardViewModel: FocusSessionTimerModelDelegate {
     func didUpdateIsPaused(_: Bool) {
-        <#code#>
+        setCardMode()
     }
-    
-    
+    func didFinishCountdown() {
+            setCardMode()
+
+    }
 }

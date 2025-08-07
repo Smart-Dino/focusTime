@@ -81,10 +81,8 @@ struct DraftsBlockItemListView: View {
         ScrollView(.vertical) {
             LazyVStack {
                 ForEach(viewModel.state.items) { block in
-                    FTSessionCardView(
-                        emoji: block.emoji,
-                        title: block.name,
-                        mode: viewModel.makeCardMode(for: block)
+                    SessionCardView(
+                        viewModel: .init(blockItem: block)
                     )
                     .padding(1)
                     .onAppear { viewModel.hasReachEndOfList(blockItem: block) }

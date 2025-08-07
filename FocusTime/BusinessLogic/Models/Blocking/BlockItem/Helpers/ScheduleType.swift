@@ -18,9 +18,13 @@ enum ScheduleType: Codable, Hashable {
     var description: String {
         switch self {
         case .scheduled(let startTime, let endTime):
-            startTime.description + " " + endTime.description
+            startTime.description + " - " + endTime.description
         case .duration(let duration, _, _, _):
-            PeriodConverter.localizedConciseTimeString(from: duration.rawValue)
+            PeriodConverter.localizedConciseTimeString(
+                from: duration.rawValue,
+                allowedUnits: [.hour, .minute],
+                unitsStyle: .abbreviated
+            )
         }
     }
     
