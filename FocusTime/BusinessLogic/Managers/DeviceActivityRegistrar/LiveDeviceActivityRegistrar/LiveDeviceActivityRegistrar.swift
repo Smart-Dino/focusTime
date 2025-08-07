@@ -229,13 +229,14 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         // Make sure we deal with a scheduled block,
         // because duration block does not have a set time window in a day,
         // and it is requested on-demand.
-        guard case .scheduled(_, let endTime) = item.type else { return }
+        guard case .scheduled(let startTime, let endTime) = item.type else { return }
         
         let currentTimeComponent = try await TimeComponents(from: clock.now)
         
+        let timeSinceStart = currentTimeComponent.localizedSecondsSinceMidnight - startTime.localizedSecondsSinceMidnight
         let timeLeftInSeconds = endTime.localizedSecondsSinceMidnight - currentTimeComponent.localizedSecondsSinceMidnight
         
-        if timeLeftInSeconds > 60 {
+        if timeLeftInSeconds > 60 && timeSinceStart > 0 {
             // No, we cannot just copy item and edit it's values, we need new PersistentIdentifiers and UUIDs.
             let tempItemCopy = ProtectedBlockItem(
                 emoji: "⏳",
