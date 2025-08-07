@@ -11,6 +11,7 @@ import SwiftUI
 @MainActor
 public protocol FocusSessionTimerModelDelegate: AnyObject {
     func didUpdateIsPaused(_: Bool)
+    func didFinishCountdown()
 }
 
 @MainActor
@@ -73,6 +74,10 @@ public final class FocusSessionTimerModel {
 
     private func updateTimeLeft() {
         let remaining = max(Int(deadline.timeIntervalSinceNow), 0)
+        if remaining <= 0 {
+            delegate?.didFinishCountdown()
+            timer?.cancel()
+        }
         state.hours = remaining / 3600
         state.minutes = (remaining % 3600) / 60
         state.seconds = remaining % 60

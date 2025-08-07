@@ -39,11 +39,6 @@ enum ScheduleType: Codable, Hashable {
     }
     
     func secondsToIntervalEndIfShouldBeRunning(now: Date) -> Int? {
-        // Make sure we deal with a scheduled block,
-        // because duration block does not have a set time window in a day,
-        // and it is requested on-demand.
-        guard case .scheduled = self else { return nil }
-        
         switch self {
         case .scheduled(let startTime, let endTime):
             guard let currentTimeComponent = try? TimeComponents(from: now) else { return nil }
@@ -71,7 +66,7 @@ enum ScheduleType: Codable, Hashable {
             let elapsed = now.timeIntervalSince(startedAt)
             let remaining = Int(durationInSeconds - Int(elapsed))
 
-            return remaining > 60 ? remaining : nil
+            return remaining
         }
     }
 }
