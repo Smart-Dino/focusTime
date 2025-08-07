@@ -72,16 +72,19 @@ struct DraftsBlockItemListView: View {
                 Text(viewModel.state.error?.localizedDescription ?? "")
             }
         )
+        .onAppear {
+            viewModel.reloadData()
+        }
     }
     
     var blockListView: some View {
         ScrollView(.vertical) {
             LazyVStack {
                 ForEach(viewModel.state.items) { block in
-                    FTSessionSummaryCardView(
+                    FTSessionCardView(
                         emoji: block.emoji,
                         title: block.name,
-                        description: block.type.description,
+                        mode: viewModel.makeCardMode(for: block)
                     )
                     .padding(1)
                     .onAppear { viewModel.hasReachEndOfList(blockItem: block) }

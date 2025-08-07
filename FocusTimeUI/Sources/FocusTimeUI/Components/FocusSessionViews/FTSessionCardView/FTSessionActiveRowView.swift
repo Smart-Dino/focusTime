@@ -11,7 +11,7 @@ internal struct FTSessionActiveRowView: View {
     private let emoji: String
     private let title: String
     
-    private let viewModel: FocusSessionTimerModel
+    @State private var viewModel: FocusSessionTimerModel
     
     internal var body: some View {
         HStack(spacing: 15) {

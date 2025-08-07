@@ -65,7 +65,8 @@ struct TaskConcentrationView: View {
 #Preview {
     let timerModel = FocusSessionTimerModel(
         state: .init(isPaused: true),
-        deadline: .now.addingTimeInterval(70)
+        deadline: .now.addingTimeInterval(70),
+        delegate: nil
     )
     let viewModel = TaskConcentrationViewModel(timerModel: timerModel)
     NavigationStack {
