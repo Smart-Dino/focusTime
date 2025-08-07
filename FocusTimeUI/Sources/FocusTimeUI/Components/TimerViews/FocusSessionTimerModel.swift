@@ -79,6 +79,7 @@ public final class FocusSessionTimerModel {
 
         if remaining <= 0 {
             timer?.cancel()
+            timer = nil
             delegate?.didFinishCountdown()
         }
     }

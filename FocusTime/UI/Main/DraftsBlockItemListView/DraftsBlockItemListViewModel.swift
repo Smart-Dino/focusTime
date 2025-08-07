@@ -21,8 +21,11 @@ final class DraftsBlockItemListViewModel {
     }
     
     private(set) var state: State
-    private let modelContainer: ModelContainer
+    // Without this hack if the DraftsBlockItemListView refreshes
+    // the ForEach inside it redraws and creates new SessionCardViewModels which causes too many issues.
+    private(set) var sessionCardViewModels: [UUID: SessionCardViewModel] = [:]
     
+    private let modelContainer: ModelContainer
     private var fetchTask: Task<Void, Never>?
     
     init(
@@ -38,10 +41,20 @@ final class DraftsBlockItemListViewModel {
             state.error = nil
         }
     }
+
+    func makeSessionCardViewModel(for blockItem: ProtectedBlockItem) -> SessionCardViewModel {
+        if let cached = sessionCardViewModels[blockItem.id] {
+            return cached
+        }
+        let vm = SessionCardViewModel(blockItem: blockItem)
+        sessionCardViewModels[blockItem.id] = vm
+        return vm
+    }
     
     func reloadData() {
         state.items = .init()
         state.page = 0
+        sessionCardViewModels = [:]
         fetchNextPage()
     }
     

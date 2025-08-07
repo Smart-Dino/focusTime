@@ -82,7 +82,7 @@ struct DraftsBlockItemListView: View {
             LazyVStack {
                 ForEach(viewModel.state.items) { block in
                     SessionCardView(
-                        viewModel: .init(blockItem: block)
+                        viewModel: viewModel.makeSessionCardViewModel(for: block)
                     )
                     .padding(1)
                     .onAppear { viewModel.hasReachEndOfList(blockItem: block) }

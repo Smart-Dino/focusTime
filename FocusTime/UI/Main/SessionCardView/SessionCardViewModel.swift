@@ -30,17 +30,17 @@ final class SessionCardViewModel {
                                            timeRange: blockItem.type.description))
         self.blockItem = blockItem
         setupDataUpdatingTask()
+        print(ObjectIdentifier(self))
     }
     
-    deinit {
-        Task { @MainActor [weak self] in
-            self?.dataUpdatingTask?.cancel()
-            self?.dataUpdatingTask = nil
-        }
+    isolated deinit {
+        self.dataUpdatingTask?.cancel()
+        self.dataUpdatingTask = nil
     }
     
     #warning("Task runs in two different ViewModels but neither update the view")
     func setupDataUpdatingTask() {
+        print("\(#function) called")
         dataUpdatingTask = Task.detached(priority: .background) { [weak self] in
             while true {
                 try? await Task.sleep(for: .seconds(20))

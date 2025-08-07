@@ -11,7 +11,7 @@ import FocusTimeUI
 struct SessionCardView: View {
     @State var viewModel: SessionCardViewModel
     
-    public var body: some View {
+    var body: some View {
         Group {
             switch viewModel.state.mode {
             case .inactive(let emoji, let name, let timeRange):
