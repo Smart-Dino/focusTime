@@ -152,4 +152,20 @@ struct TimeComponentsTests {
         )
     }
     
+    @Test("init(from:) parses valid string")
+    func testValidFromString() throws {
+        let expected = try TimeComponents(hour: 14, minute: 25)
+        let result = try TimeComponents(from: "14:25")
+        #expect(result == expected)
+    }
+
+    @Test("init(from:) throws for invalid input")
+    func testInvalidFromString() {
+        let badInputs = ["99:99", "not-time", "", "12:345"]
+        for input in badInputs {
+            let component = try? TimeComponents(from: input)
+            #expect(component == nil)
+        }
+    }
+    
 }

@@ -104,9 +104,3 @@ struct TimeComponents: Equatable, Codable, Hashable {
         self.secondsSinceMidnight = secondsSinceMidnight
     }
 }
-
-extension TimeComponents: Comparable {
-    static func < (lhs: TimeComponents, rhs: TimeComponents) -> Bool {
-        lhs.secondsSinceMidnight < rhs.secondsSinceMidnight
-    }
-}
