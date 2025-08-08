@@ -15,7 +15,7 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
     private let clock: Clock
     let center: DeviceActivityCenter
     private let shieldManager: ShieldManager
-    private let blockItemStore: BlockItemStore
+    private let blockItemPersistenceManager: BlockItemPersistenceManager
     
     var monitoredIdentifiers: Set<UUID> {
         Set(center.activities.compactMap {
@@ -27,12 +27,12 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
     init(
         center: DeviceActivityCenter = DeviceActivityCenter(),
         clock: Clock = SystemClock(),
-        modelContainer: ModelContainer,
+        blockItemPersistenceManager: BlockItemPersistenceManager,
         shieldManager: ShieldManager
     ) {
         self.center = center
         self.clock = clock
-        self.blockItemStore = BlockItemStore(modelContainer: modelContainer)
+        self.blockItemPersistenceManager = blockItemPersistenceManager
         self.shieldManager = shieldManager
     }
     
@@ -42,7 +42,7 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         try await AuthorizationCenter.shared.requestAuthorization(for: .individual)
         
         switch blockItem.type {
-        case .scheduled(let startTime, let endTime):
+        case .scheduled(let startTime, let endTime, _):
             do {
                 try await registerRegularActivity(for: blockItem,
                                                   startTime: startTime,
@@ -100,20 +100,24 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         
         // Log when the activity was started for proper suspension handling.
         // Important: We only do this if our BlockItem was originally saved as duration block.
+        
+        // Edit blockItem.
         let startTime = await clock.now
-        try await blockItemStore.updateFields(id: persistentModelID) { blockItem in
-            switch blockItem.type {
-            case .duration(let originalDuration, _, _, _):
-                blockItem.type = .duration(
-                    originalDuration, // Make sure this is the original value!
-                    startedAt: startTime,
-                    suspendedAt: nil,
-                    timeLeft: DurationComponents(duration: duration) // And make sure this is the actual intended duration!
-                )
-            default:
-                break
-            }
+        
+        var blockItemCopy = blockItem // Make a mutable copy.
+        switch blockItem.type {
+        case .duration(let originalDuration, _, _, _):
+            blockItemCopy.type = .duration(
+                originalDuration, // Make sure this is the original value!
+                startedAt: startTime,
+                suspendedAt: nil,
+                timeLeft: DurationComponents(duration: duration) // And make sure this is the actual intended duration!
+            )
+        default:
+            break
         }
+        
+        try await blockItemPersistenceManager.editBlockItem(blockItem: blockItemCopy)
     }
     
     private func registerRegularActivity(
@@ -213,9 +217,7 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
                 // 2. Get the schedule ID from it.
                 let blockItemID = decoded.blockItemID
                 // 3. Fetch schedule.
-                let overlappingSchedule = try await blockItemStore.fetch(
-                    descriptor: .init(predicate: #Predicate { $0.id == blockItemID })
-                ).first
+                let overlappingSchedule = try await blockItemPersistenceManager.fetch(by: blockItemID)
                 // 4. Make sure days overlap too and add schedule to return list.
                 if let overlappingSchedule, overlappingSchedule.days.isDisjoint(with: days) == false {
                     overlappingSchedules.append(overlappingSchedule)
@@ -235,7 +237,7 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         
         if let timeLeftInSeconds {
             // No, we cannot just copy item and edit it's values, we need new PersistentIdentifiers and UUIDs.
-            let tempItemCopy = ProtectedBlockItem(
+            var tempItemCopy = ProtectedBlockItem(
                 emoji: "⏳",
                 name: "temp-" + UUID().uuidString,
                 days: item.days,
@@ -244,10 +246,8 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
                 blockedContent: item.blockedContent
             )
             
-            let tempItemID = try await blockItemStore.insert(tempItemCopy)
-            let newDurationItem = try await blockItemStore.fetch(id: tempItemID)
-            
-            try await registerDurationActivity(for: newDurationItem, duration: timeLeftInSeconds)
+            try await blockItemPersistenceManager.insert(tempItemCopy)
+            try await registerDurationActivity(for: tempItemCopy, duration: timeLeftInSeconds)
         }
     }
     
@@ -264,9 +264,9 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         let activity = try getActivityForSchedule(blockItem)
         
         // Make sure we have the latest schedule.
-        let schedule = try await blockItemStore.fetch(id: persistentModelID)
+        var blockItem = try await blockItemPersistenceManager.fetch(by: persistentModelID)
         
-        switch schedule.type {
+        switch blockItem.type {
         case .scheduled:
             try await shieldManager.unblock()
         case .duration(let duration, let startedAt, _, let timeLeft):
@@ -279,14 +279,13 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
             let updatedTimeLeft = max(0, timeLeft.rawValue - Int(elapsedTime))
             
             // Set suspension point and timeLeft.
-            try await blockItemStore.updateFields(id: persistentModelID) { editedBlockItem in
-                editedBlockItem.type = .duration(
-                    duration,
-                    startedAt: startedAt,
-                    suspendedAt: suspensionDate,
-                    timeLeft: DurationComponents(duration: updatedTimeLeft)
-                )
-            }
+            blockItem.type = .duration(
+                duration,
+                startedAt: startedAt,
+                suspendedAt: suspensionDate,
+                timeLeft: DurationComponents(duration: updatedTimeLeft)
+            )
+            try await blockItemPersistenceManager.editBlockItem(blockItem: blockItem)
             
             // Unblock apps.
             try await shieldManager.unblock()
@@ -304,22 +303,21 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         }
         
         // Make sure we have the latest schedule.
-        let blockItem = try await blockItemStore.fetch(id: persistentModelID)
+        var blockItem = try await blockItemPersistenceManager.fetch(by: persistentModelID)
         
         switch blockItem.type {
         case .scheduled:
             try await shieldManager.block(specific: blockItem.blockedContent)
         case .duration(let duration, _, _, let timeLeft):
-            
             // Set that the schedule is no longer suspended and log the new time left.
-            try await blockItemStore.updateFields(id: persistentModelID) { editedBlockItem in
-                editedBlockItem.type = .duration(
-                    duration,
-                    startedAt: resumptionDate,
-                    suspendedAt: nil,
-                    timeLeft: timeLeft
-                )
-            }
+            blockItem.type = .duration(
+                duration,
+                startedAt: resumptionDate,
+                suspendedAt: nil,
+                timeLeft: timeLeft
+            )
+            
+            try await blockItemPersistenceManager.editBlockItem(blockItem: blockItem)
             try await registerDurationActivity(for: blockItem, duration: timeLeft.rawValue)
         }
     }

@@ -80,10 +80,10 @@ struct MainFlowCoordinatorView: View {
 }
 
 #Preview {
+    let factory = MockPersistenceStoreFactory()
+    let manager = LiveBlockItemPersistenceManager(blockItemStore: PreviewData.memoryOnlyBlockItemStore)
+    
     MainFlowCoordinatorView(
-        viewModel: .init(
-            modelContainer: PreviewData.memoryOnlyModelContainer,
-            appFlowDelegate: nil
-        )
+        viewModel: .init(blockItemPersistenceManager: manager, appFlowDelegate: nil)
     )
 }

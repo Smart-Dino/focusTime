@@ -72,17 +72,17 @@ final class AppFlowCoordinatorViewModel {
     
     private(set) var state: State!
     private let defaultsManager: DefaultsManager
-    private let modelContainer: ModelContainer
+    private let blockItemPersistenceManager: BlockItemPersistenceManager
     private let paymentManager: PaymentManager
     private let superPaywallVM: SuperPaywallViewModel
     
     init(
         defaultsManager: DefaultsManager,
-        modelContainer: ModelContainer,
+        blockItemPersistenceManager: BlockItemPersistenceManager,
         paymentManager: PaymentManager
     ) {
         self.defaultsManager = defaultsManager
-        self.modelContainer = modelContainer
+        self.blockItemPersistenceManager = blockItemPersistenceManager
         self.paymentManager = paymentManager
         self.superPaywallVM = SuperPaywallViewModel(paymentManager: paymentManager)
         
@@ -133,7 +133,10 @@ final class AppFlowCoordinatorViewModel {
     }
     
     private func makeMainFlowCoordinatorViewModel() -> MainFlowCoordinatorViewModel {
-        MainFlowCoordinatorViewModel(modelContainer: modelContainer, appFlowDelegate: self)
+        MainFlowCoordinatorViewModel(
+            blockItemPersistenceManager: blockItemPersistenceManager,
+            appFlowDelegate: self
+        )
     }
     
     // Paywalls

@@ -44,12 +44,17 @@ struct AppFlowCoordinatorView: View {
 }
 
 #Preview {
+    let mockPaymentManager = MockPaymentManagerWithPurchaseError()
     let defaultsManager = LiveDefaultsManager()
+    let manager = LiveBlockItemPersistenceManager(blockItemStore: PreviewData.memoryOnlyBlockItemStore)
+    
+    let viewModel = AppFlowCoordinatorViewModel(
+        defaultsManager: defaultsManager,
+        blockItemPersistenceManager: manager,
+        paymentManager: mockPaymentManager
+    )
+    
     AppFlowCoordinatorView(
-        viewModel: .init(
-            defaultsManager: defaultsManager,
-            modelContainer: PreviewData.memoryOnlyModelContainer,
-            paymentManager: MockPaymentManagerWithPurchaseError()
-        )
+        viewModel: viewModel
     )
 }

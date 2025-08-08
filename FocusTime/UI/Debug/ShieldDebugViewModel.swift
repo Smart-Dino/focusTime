@@ -51,7 +51,7 @@ final class ShieldDebugViewModel {
     private let shieldManager: ShieldManager
     private let activityRegistrar: DeviceActivityRegistrar
     // Model-related.
-    private let modelContainer: ModelContainer
+    private let blockItemPersistenceManager: BlockItemPersistenceManager
     
     // Prepare for future async fetching tasks.
     private var fetchTask: Task<Void, Never>? = nil
@@ -61,12 +61,15 @@ final class ShieldDebugViewModel {
         state: State = State(),
         center: DeviceActivityCenter = DeviceActivityCenter(),
         shieldManager: ShieldManager = LiveShieldManager(),
-        modelContainer: ModelContainer,
+        blockItemPersistenceManager: BlockItemPersistenceManager,
     ) {
         self.state = state
         self.shieldManager = shieldManager
-        self.modelContainer = modelContainer
-        self.activityRegistrar = LiveDeviceActivityRegistrar(modelContainer: modelContainer, shieldManager: shieldManager)
+        self.blockItemPersistenceManager = blockItemPersistenceManager
+        self.activityRegistrar = LiveDeviceActivityRegistrar(
+            blockItemPersistenceManager: blockItemPersistenceManager,
+            shieldManager: shieldManager
+        )
     }
     
     // MARK: - Setters
@@ -110,16 +113,13 @@ final class ShieldDebugViewModel {
     
     // MARK: - Methods
     func eraseAllData() {
-        Task.detached(priority: .userInitiated) {
+        Task {
             do {
-                let blockItemStore = BlockItemStore(modelContainer: self.modelContainer)
-                try await blockItemStore.eraseAllData()
-                await self.fetchAllItems()
+                try await blockItemPersistenceManager.eraseAllData()
+                self.fetchAllItems()
                 await self.activityRegistrar.unregisterAll()
             } catch {
-                await MainActor.run {
-                    self.state.error = error
-                }
+                self.state.error = error
             }
         }
     }
@@ -127,14 +127,13 @@ final class ShieldDebugViewModel {
     func addScheduleToDB() {
         let protectedSelection = ProtectedActivitySelection(state.selection)
         let state = self.state
-        Task.detached(priority: .userInitiated) {
+        Task {
             do {
-                let blockItemStore = BlockItemStore(modelContainer: self.modelContainer)
-                let blockItems = try await blockItemStore.fetch()
+                let blockItems = try await self.blockItemPersistenceManager.fetch(includeTemporary: true)
                 
                 // Ensure we only add if the store is empty.
                 if !blockItems.isEmpty {
-                    try await blockItemStore.eraseAllData()
+                    try await self.blockItemPersistenceManager.eraseAllData()
                 }
                 
                 var type: ScheduleType!
@@ -149,16 +148,16 @@ final class ShieldDebugViewModel {
                     type = .scheduled(startTime: startComponent, endTime: endComponent)
                 }
                 
-                let blockItem = await ProtectedBlockItem(emoji: "❌",
+                let blockItem = ProtectedBlockItem(emoji: "❌",
                                                    name: "Block",
-                                                    days: self.state.daySelection,
+                                                    days: state.daySelection,
                                                    type: type,
                                                    blockedContent: protectedSelection)
                 
                 
-                    try await blockItemStore.insert(blockItem)
+                try await self.blockItemPersistenceManager.insert(blockItem)
                 
-                await self.fetchAllItems()
+                self.fetchAllItems()
             } catch {
                 await MainActor.run {
                     self.state.error = error
@@ -168,34 +167,26 @@ final class ShieldDebugViewModel {
     }
     
     func fetchAllItems() {
-        Task.detached(priority: .userInitiated) {
+        Task {
             do {
-                let blockItemStore = BlockItemStore(modelContainer: self.modelContainer)
-                let fetchedBlockItems = try await blockItemStore.fetch()
-                await MainActor.run {
-                    self.state.blockItems = fetchedBlockItems
-                }
+                let fetchedBlockItems = try await self.blockItemPersistenceManager.fetch(includeTemporary: true)
+                self.state.blockItems = fetchedBlockItems
             } catch {
-                await MainActor.run {
-                    self.state.error = error
-                }
+                self.state.error = error
             }
         }
     }
     
     func blockSelectionDuringSchedule() {
-        Task.detached(priority: .userInitiated) {
+        Task {
             do {
-                let blockItemStore = BlockItemStore(modelContainer: self.modelContainer)
-                guard let blockItem = try await blockItemStore.fetch(descriptor: .init()).first else {
+                guard let blockItem = try await self.blockItemPersistenceManager.fetch(includeTemporary: true).first else {
                     return
                 }
                 
                 try await self.activityRegistrar.registerActivity(during: blockItem)
             } catch {
-                await MainActor.run {
-                    self.state.error = error
-                }
+                self.state.error = error
             }
         }
     }
@@ -226,33 +217,27 @@ final class ShieldDebugViewModel {
     }
     
     func suspendSession() {
-        Task.detached(priority: .userInitiated) { [self] in
+        Task {
             do {
-                let blockItemStore = BlockItemStore(modelContainer: self.modelContainer)
-                let blockItems = try await blockItemStore.fetch()
+                let blockItems = try await self.blockItemPersistenceManager.fetch(includeTemporary: true)
                 
                 guard let blockItem = blockItems.first else { return }
                 
                 try await activityRegistrar.suspendActivity(for: blockItem)
             } catch {
-                await MainActor.run {
-                    self.state.error = error
-                }
+                self.state.error = error
             }
         }
     }
     
     func resumeSession() {
-        Task.detached(priority: .userInitiated) { [self] in
+        Task {
             do {
-                let blockItemStore = BlockItemStore(modelContainer: self.modelContainer)
-                let blockItems = try await blockItemStore.fetch()
+                let blockItems = try await self.blockItemPersistenceManager.fetch(includeTemporary: true)
                 guard let blockItem = blockItems.first else { return }
                 try await activityRegistrar.resumeActivity(for: blockItem)
             } catch {
-                await MainActor.run {
-                    self.state.error = error
-                }
+                self.state.error = error
             }
         }
     }

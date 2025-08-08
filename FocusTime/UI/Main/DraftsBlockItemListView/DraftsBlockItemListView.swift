@@ -49,7 +49,7 @@ struct DraftsBlockItemListView: View {
                 Constants.Strings.newBlocklistButtonTitle,
                 systemImage: "plus.circle"
             ) {
-                #warning("No implementation")
+#warning("No implementation")
             }
             .buttonStyle(.ftPrimary)
             .padding()
@@ -81,15 +81,33 @@ struct DraftsBlockItemListView: View {
         ScrollView(.vertical) {
             LazyVStack {
                 ForEach(viewModel.state.items) { block in
-                    SessionCardView(
-                        viewModel: viewModel.makeSessionCardViewModel(for: block)
-                    )
-                    .padding(1)
-                    .onAppear { viewModel.hasReachEndOfList(blockItem: block) }
+                    makeSessionCardView(for: block)
+                        .padding(1)
+                        .onAppear { viewModel.hasReachEndOfList(blockItem: block) }
                 }
             }
         }
         .padding(.top)
+    }
+    
+    @ViewBuilder
+    func makeSessionCardView(for block: ProtectedBlockItem) -> some View {
+        if let secondsLeft = block.type.secondsToIntervalEndIfShouldBeRunning() {
+            FTSessionActiveRowView(
+                emoji: block.emoji,
+                title: block.name,
+                viewModel: viewModel.makeTimerViewModelForActiveSession(
+                    blockItem: block,
+                    timeLeft: secondsLeft
+                )
+            )
+        } else {
+            FTSessionScheduledRowView(
+                emoji: block.emoji,
+                title: block.name,
+                description: block.type.description
+            )
+        }
     }
     
     var noBlockListView: some View {
@@ -106,5 +124,10 @@ struct DraftsBlockItemListView: View {
 }
 
 #Preview {
-    DraftsBlockItemListView(viewModel: .init(modelContainer: PreviewData.memoryOnlyModelContainer))
+    let factory = MockPersistenceStoreFactory()
+    let manager = LiveBlockItemPersistenceManager(blockItemStore: PreviewData.memoryOnlyBlockItemStore)
+    
+    DraftsBlockItemListView(
+        viewModel: .init(blockItemPersistenceManager: manager)
+    )
 }

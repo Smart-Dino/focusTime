@@ -41,9 +41,11 @@ final class LaunchFlowCoordinatorViewModel {
     private(set) var state: State!
     private let defaultsManager: DefaultsManager
     private var paymentManager: PaymentManager?
-    private var modelContainer: ModelContainer?
+    private var blockItemPersistenceManager: BlockItemPersistenceManager?
+    private var persistenceStoreFactory: PersistenceStoreFactory
     
-    init() {
+    init(persistenceStoreFactory: PersistenceStoreFactory) {
+        self.persistenceStoreFactory = persistenceStoreFactory
         self.defaultsManager = LiveDefaultsManager()
         self.state = State(currentFlow: .splash(viewModel: makeSplashScreenViewModel()))
         
@@ -60,7 +62,7 @@ final class LaunchFlowCoordinatorViewModel {
     }
     
     private func setupDependencies() async {
-        setupModelContainer()
+        await setupBlockItemStore()
         await setupPaymentManager()
     }
     
@@ -73,17 +75,12 @@ final class LaunchFlowCoordinatorViewModel {
         }
     }
     
-    // This is done separately for error handling.
-    private func setupModelContainer() {
-        do {
-            let schema = Schema([BlockItem.self])
-            let config = ModelConfiguration(groupContainer: .identifier(SharedAppValues.appGroupIdentifier))
-            let container = try ModelContainer(for: schema, configurations: config)
-            
-            self.modelContainer = container
-        } catch {
-            state.error = error
-        }
+    private func setupBlockItemStore() async {
+        guard blockItemPersistenceManager == nil else { return }
+        
+        blockItemPersistenceManager = await LiveBlockItemPersistenceManager(
+            blockItemStore: persistenceStoreFactory.makeBlockItemStore()
+        )
     }
     
     private func setupPaymentManager() async {
@@ -92,17 +89,16 @@ final class LaunchFlowCoordinatorViewModel {
         paymentManager = await StoreKitPaymentManager()
     }
     
-    
     func makeSplashScreenViewModel() -> SplashScreenViewModel {
         SplashScreenViewModel()
     }
     
     func makeAppFlowCoordinatorViewModel() -> AppFlowCoordinatorViewModel? {
-        guard let modelContainer, let paymentManager else { return nil }
+        guard let blockItemPersistenceManager, let paymentManager else { return nil }
         
         return AppFlowCoordinatorViewModel(
             defaultsManager: defaultsManager,
-            modelContainer: modelContainer,
+            blockItemPersistenceManager: blockItemPersistenceManager,
             paymentManager: paymentManager
         )
     }

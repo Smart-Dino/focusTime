@@ -114,6 +114,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				BusinessLogic/Helpers/PeriodConverter.swift,
+				BusinessLogic/Managers/DeviceActivityHandler/BlockItemExtensionStore.swift,
 				BusinessLogic/Managers/DeviceActivityHandler/DeviceActivityHandler.swift,
 				BusinessLogic/Managers/ShieldManager/LiveShieldManager.swift,
 				BusinessLogic/Managers/ShieldManager/ShieldManager.swift,

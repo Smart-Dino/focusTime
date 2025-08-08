@@ -36,16 +36,16 @@ final class HomeViewModel {
     }
     
     private(set) var state: State
-    private let modelContainer: ModelContainer
+    private let blockItemPersistenceManager: BlockItemPersistenceManager
     weak var delegate: HomeViewDelegate?
     
     init(
         state: State = State(),
-        modelContainer: ModelContainer,
+        blockItemPersistenceManager: BlockItemPersistenceManager,
         delegate: HomeViewDelegate?
     ) {
         self.state = state
-        self.modelContainer = modelContainer
+        self.blockItemPersistenceManager = blockItemPersistenceManager
         self.delegate = delegate
     }
     
@@ -60,6 +60,6 @@ final class HomeViewModel {
     }
     
     private func makeScheduledFocusViewModel() -> ScheduledBlockItemsViewModel {
-        ScheduledBlockItemsViewModel(modelContainer: modelContainer)
+        ScheduledBlockItemsViewModel(blockItemPersistenceManager: blockItemPersistenceManager)
     }
 }

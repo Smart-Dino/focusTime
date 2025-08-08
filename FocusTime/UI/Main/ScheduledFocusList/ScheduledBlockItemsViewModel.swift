@@ -14,21 +14,23 @@ import FamilyControls
 final class ScheduledBlockItemsViewModel {
     struct State {
         var error: Error? = nil
+        
         var page = 0
+        let amountPerPage = 100
         var items = [ProtectedBlockItem]()
     }
     
     private(set) var state: State
-    private let modelContainer: ModelContainer
+    private let blockItemPersistenceManager: BlockItemPersistenceManager
     
     private var fetchTask: Task<Void, Never>?
     
     init(
         state: State = State(),
-        modelContainer: ModelContainer
+        blockItemPersistenceManager: BlockItemPersistenceManager
     ) {
         self.state = state
-        self.modelContainer = modelContainer
+        self.blockItemPersistenceManager = blockItemPersistenceManager
     }
     
     func setErrorVisibility(_ isVisible: Bool) {
@@ -41,22 +43,15 @@ final class ScheduledBlockItemsViewModel {
     private func fetchNextPage() {
         guard fetchTask == nil else { return }
         
-        self.fetchTask = Task.detached(priority: .userInitiated) {
+        self.fetchTask = Task {
             do {
-                let blockItemStore = BlockItemStore(modelContainer: self.modelContainer)
-                
-                let insertedItems = try await blockItemStore.fetch(page: self.state.page)
-                await MainActor.run {
-                    self.state.items.append(contentsOf: insertedItems)
-                    self.state.page += 1
-                    self.state.error = nil
-                    self.fetchTask = nil
-                }
+                state.items = try await blockItemPersistenceManager.fetchPaginated(
+                    page: state.page,
+                    amountPerPage: state.amountPerPage,
+                    includeTemporary: false
+                )
             } catch {
-                await MainActor.run {
-                    self.state.error = error
-                    self.fetchTask = nil
-                }
+                state.error = error
             }
         }
     }

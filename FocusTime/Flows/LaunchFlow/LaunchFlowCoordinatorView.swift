@@ -9,7 +9,7 @@ import SwiftUI
 import SwiftData
 
 struct LaunchFlowView: View {
-    @State private var viewModel: LaunchFlowCoordinatorViewModel = LaunchFlowCoordinatorViewModel()
+    @State var viewModel: LaunchFlowCoordinatorViewModel
     
     var body: some View {
         Group {
@@ -41,5 +41,5 @@ struct LaunchFlowView: View {
 }
 
 #Preview {
-    LaunchFlowView()
+    LaunchFlowView(viewModel: .init(persistenceStoreFactory: LivePersistenceStoreFactory()))
 }

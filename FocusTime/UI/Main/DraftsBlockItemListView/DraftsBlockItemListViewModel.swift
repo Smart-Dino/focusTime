@@ -17,23 +17,21 @@ final class DraftsBlockItemListViewModel {
         var error: Error? = nil
         
         var page = 0
+        let amountPerPage = 100
         var items = [ProtectedBlockItem]()
     }
     
     private(set) var state: State
-    // Without this hack if the DraftsBlockItemListView refreshes
-    // the ForEach inside it redraws and creates new SessionCardViewModels which causes too many issues.
-    private(set) var sessionCardViewModels: [UUID: SessionCardViewModel] = [:]
     
-    private let modelContainer: ModelContainer
+    private let blockItemPersistenceManager: BlockItemPersistenceManager
     private var fetchTask: Task<Void, Never>?
     
     init(
         state: State = State(),
-        modelContainer: ModelContainer
+        blockItemPersistenceManager: BlockItemPersistenceManager
     ) {
         self.state = state
-        self.modelContainer = modelContainer
+        self.blockItemPersistenceManager = blockItemPersistenceManager
     }
     
     func setErrorVisibility(_ isVisible: Bool) {
@@ -41,44 +39,42 @@ final class DraftsBlockItemListViewModel {
             state.error = nil
         }
     }
-
-    func makeSessionCardViewModel(for blockItem: ProtectedBlockItem) -> SessionCardViewModel {
-        if let cached = sessionCardViewModels[blockItem.id] {
-            return cached
-        }
-        let vm = SessionCardViewModel(blockItem: blockItem)
-        sessionCardViewModels[blockItem.id] = vm
-        return vm
-    }
     
     func reloadData() {
         state.items = .init()
         state.page = 0
-        sessionCardViewModels = [:]
         fetchNextPage()
+    }
+    
+    func makeTimerViewModelForActiveSession(blockItem: ProtectedBlockItem, timeLeft: Int) -> FocusSessionTimerModel {
+        let isPaused: Bool = {
+            if case .duration(_, _, let suspendedAt, _) = blockItem.type {
+                return suspendedAt != nil
+            }
+            return false
+        }()
+
+        let deadline = Date.now.addingTimeInterval(TimeInterval(timeLeft))
+        return FocusSessionTimerModel(
+            state: .init(isPaused: isPaused),
+            deadline: deadline,
+            delegate: nil
+        )
     }
     
     #warning("Unfinished ViewModel")
     private func fetchNextPage() {
         guard fetchTask == nil else { return }
         
-        self.fetchTask = Task.detached(priority: .userInitiated) {
+        self.fetchTask = Task {
             do {
-                let blockItemStore = BlockItemStore(modelContainer: self.modelContainer)
-                
-                let insertedItems = try await blockItemStore.fetch(page: self.state.page)
-                let filteredItems = insertedItems.filter { $0.isTemporary == false }
-                await MainActor.run {
-                    self.state.items.append(contentsOf: filteredItems)
-                    self.state.page += 1
-                    self.state.error = nil
-                    self.fetchTask = nil
-                }
+                state.items = try await blockItemPersistenceManager.fetchPaginated(
+                    page: state.page,
+                    amountPerPage: state.amountPerPage,
+                    includeTemporary: false
+                )
             } catch {
-                await MainActor.run {
-                    self.state.error = error
-                    self.fetchTask = nil
-                }
+                state.error = error
             }
         }
     }

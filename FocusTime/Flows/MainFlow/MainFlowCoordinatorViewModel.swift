@@ -44,18 +44,18 @@ final class MainFlowCoordinatorViewModel {
         var nextNavigationScreen: MainFlowNavigationRoute?
     }
     private(set) var state: State!
-    private let modelContainer: ModelContainer
+    private let blockItemPersistenceManager: BlockItemPersistenceManager
     weak var appFlowDelegate: MainFlowDelegate?
     
     #warning("Find out how we would wire up the isPro property to here")
     
     init(
         state: State = State(currentTabScreen: .home),
-        modelContainer: ModelContainer,
+        blockItemPersistenceManager: BlockItemPersistenceManager,
         appFlowDelegate: MainFlowDelegate?
     ) {
         self.state = state
-        self.modelContainer = modelContainer
+        self.blockItemPersistenceManager = blockItemPersistenceManager
         self.appFlowDelegate = appFlowDelegate
     }
     
@@ -83,15 +83,15 @@ final class MainFlowCoordinatorViewModel {
     }
     
     func makeHomeViewModel() -> HomeViewModel {
-        HomeViewModel(modelContainer: modelContainer, delegate: self)
+        HomeViewModel(blockItemPersistenceManager: blockItemPersistenceManager, delegate: self)
     }
     
     func makeDraftsBlockItemListViewModel() -> DraftsBlockItemListViewModel {
-        DraftsBlockItemListViewModel(modelContainer: modelContainer)
+        DraftsBlockItemListViewModel(blockItemPersistenceManager: blockItemPersistenceManager)
     }
     
     func makeShieldDebugViewModel() -> ShieldDebugViewModel {
-        ShieldDebugViewModel(modelContainer: modelContainer)
+        ShieldDebugViewModel(blockItemPersistenceManager: blockItemPersistenceManager)
     }
     
     func requestPaywall() {

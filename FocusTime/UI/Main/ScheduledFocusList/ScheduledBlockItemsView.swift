@@ -93,8 +93,11 @@ struct ScheduledBlockItemsView: View {
 
 #Preview {
     NavigationStack {
+        let blockItemPersistenceManager = LiveBlockItemPersistenceManager(
+            blockItemStore: PreviewData.memoryOnlyBlockItemStore
+        )
         ScheduledBlockItemsView(
-            viewModel: .init(modelContainer: PreviewData.memoryOnlyModelContainer)
+            viewModel: .init(blockItemPersistenceManager: blockItemPersistenceManager)
         )
     }
 }
