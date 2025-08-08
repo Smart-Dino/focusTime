@@ -17,7 +17,7 @@ enum MainTabScreens: Equatable, Hashable {
 }
 
 enum MainScreens: Equatable, Hashable {
-    case scheduledFocusList(_ viewModel: ScheduledFocusListViewModel)
+    case scheduledFocusList(_ viewModel: ScheduledBlockItemsViewModel)
     
     var id: Self { self }
     
@@ -67,8 +67,8 @@ final class MainFlowCoordinatorViewModel {
         HomeViewModel(modelContainer: modelContainer)
     }
     
-    func makeAppBlockListViewModel() -> AppBlockingListViewModel {
-        AppBlockingListViewModel(modelContainer: modelContainer)
+    func makeDraftsBlockItemListViewModel() -> DraftsBlockItemListViewModel {
+        DraftsBlockItemListViewModel(modelContainer: modelContainer)
     }
     
 }

@@ -28,25 +28,6 @@ struct ShieldDebugView: View {
                     devices: .init([.iPhone])
                 )
             )
-            // MARK: - Schedule list
-            VStack {
-                ScrollView(.vertical) {
-                    ForEach(viewModel.state.schedules) { schedule in
-                        HStack {
-                            Text(schedule.emoji)
-                            VStack(alignment: .leading) {
-                                HStack {
-                                    Text(schedule.name)
-                                    Text(schedule.type.description)
-                                        .font(.footnote)
-                                }
-                                Text("Id: " + schedule.id.uuidString)
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
-                    }
-                }
-            }
             
             // MARK: - BlockItem list
             VStack {
@@ -65,9 +46,7 @@ struct ShieldDebugView: View {
             }
             
             Button("Erase all data", role: .destructive) {
-                Task {
-                    await viewModel.eraseAllData()
-                }
+                viewModel.eraseAllData()
             }
             .buttonBorderShape(.capsule)
             .buttonStyle(.borderedProminent)
@@ -106,28 +85,19 @@ struct ShieldDebugView: View {
             }
             
             Button("Create schedule") {
-                Task {
-                    await viewModel.addScheduleToDB()
-                }
+                viewModel.addScheduleToDB()
             }
             
             Button(viewModel.state.scheduleType.buttonTitle) {
-                Task {
-                    await viewModel.appendBlockItemToSchedule()
-                    await viewModel.blockSelectionDuringSchedule()
-                }
+                    viewModel.blockSelectionDuringSchedule()
             }
             
             HStack {
                 Button("Suspend") {
-                    Task {
-                        await viewModel.suspendSession()
-                    }
+                    viewModel.suspendSession()
                 }
                 Button("Resume") {
-                    Task {
-                        await viewModel.resumeSession()
-                    }
+                    viewModel.resumeSession()
                 }
             }
             
@@ -182,9 +152,6 @@ struct ShieldDebugView: View {
         )
         .task {
             await viewModel.fetchAllItems()
-        }
-        .onAppear {
-            print(DeviceActivityCenter().activities)
         }
     }
     
@@ -249,3 +216,4 @@ struct ShieldDebugView: View {
         )
     )
 }
+

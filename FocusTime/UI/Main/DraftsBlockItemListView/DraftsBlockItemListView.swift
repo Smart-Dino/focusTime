@@ -1,5 +1,5 @@
 //
-//  AppBlockingListView.swift
+//  DraftsBlockItemListView.swift
 //  FocusTime
 //
 //  Created by Maksym Horobets on 17.06.2025.
@@ -8,8 +8,8 @@
 import SwiftUI
 import FocusTimeUI
 
-struct AppBlockingListView: View {
-    @State var viewModel: AppBlockingListViewModel
+struct DraftsBlockItemListView: View {
+    @State var viewModel: DraftsBlockItemListViewModel
     
     var body: some View {
         ZStack {
@@ -82,7 +82,7 @@ struct AppBlockingListView: View {
                     FTSessionSummaryCardView(
                         emoji: block.emoji,
                         title: block.name,
-                        description: block.schedulesDescription,
+                        description: block.type.description,
                     )
                     .padding(1)
                     .onAppear { viewModel.hasReachEndOfList(blockItem: block) }

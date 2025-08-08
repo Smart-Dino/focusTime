@@ -1,33 +1,34 @@
 //
-//  ScheduledFocusListViewModel.swift
+//  ScheduledBlockItemsViewModel.swift
 //  FocusTime
 //
 //  Created by Maksym Horobets on 19.06.2025.
 //
 
-import Foundation
 import SwiftData
+import Foundation
+import FamilyControls
 
 @MainActor
 @Observable
-final class ScheduledFocusListViewModel {
+final class ScheduledBlockItemsViewModel {
     struct State {
         var error: Error? = nil
         var page = 0
-        var items = [ProtectedSchedule]()
+        var items = [ProtectedBlockItem]()
     }
     
     private(set) var state: State
-    private let scheduleStore: ScheduleStore
+    private let blockItemStore: BlockItemStore
     
     private var fetchTask: Task<Void, Never>?
     
     init(
         state: State = State(),
-        modelContainer: ModelContainer
+        blockItemStore: BlockItemStore
     ) {
         self.state = state
-        self.scheduleStore = ScheduleStore(modelContainer: modelContainer)
+        self.blockItemStore = blockItemStore
     }
     
     func keepShowingError(showError: Bool) {
@@ -40,23 +41,21 @@ final class ScheduledFocusListViewModel {
     func insertTestItemsIntoDatabase() async {
         Task.detached(priority: .userInitiated) {
             do {
+                let startTime = try TimeComponents(hour: 17, minute: 00)
+                let endTime = try TimeComponents(hour: 19, minute: 00)
                 let itemsToInsert = try (0..<100).map { number in
-                    let startTime = try TimeComponents(hour: 17, minute: 00)
-                    let endTime = try TimeComponents(hour: 19, minute: 00)
-                    
-                    return ProtectedSchedule(
-                        emoji: "🏠",
-                        name: "Schedule - \(number)",
+                    ProtectedBlockItem(
+                        emoji: "😜",
+                        name: "Block - \(number)",
                         days: [.saturday, .sunday],
                         type: .scheduled(startTime: startTime,
-                                         endTime: endTime)
+                                         endTime: endTime),
+                        blockedContent: ProtectedActivitySelection(FamilyActivitySelection())
                     )
                 }
-                try await self.scheduleStore.insertBatch(itemsToInsert)
+                try await self.blockItemStore.insertBatch(itemsToInsert)
+                
                 await self.fetchNextPage()
-                await MainActor.run {
-                    self.state.error = nil
-                }
             } catch {
                 await MainActor.run {
                     self.state.error = error
@@ -67,9 +66,10 @@ final class ScheduledFocusListViewModel {
     
     private func fetchNextPage() {
         guard fetchTask == nil else { return }
+        
         self.fetchTask = Task.detached(priority: .userInitiated) {
             do {
-                let insertedItems = try await self.scheduleStore.fetch(page: self.state.page)
+                let insertedItems = try await self.blockItemStore.fetch(page: self.state.page)
                 await MainActor.run {
                     self.state.items.append(contentsOf: insertedItems)
                     self.state.page += 1
@@ -87,8 +87,8 @@ final class ScheduledFocusListViewModel {
         }
     }
     
-    func hasReachEndOfList(schedule: ProtectedSchedule) {
-        if schedule.id == state.items.last?.id {
+    func hasReachEndOfList(blockItem: ProtectedBlockItem){
+        if blockItem.id == state.items.last?.id {
             fetchNextPage()
         }
     }
