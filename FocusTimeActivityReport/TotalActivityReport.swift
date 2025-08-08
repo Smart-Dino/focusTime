@@ -20,13 +20,23 @@ nonisolated struct TotalActivityReport: DeviceActivityReportScene {
         // Reformat the data into a configuration that can be used to create
         // the report's view.
         let formatter = DateComponentsFormatter()
-        formatter.allowedUnits = [.hour, .minute]
+        formatter.allowedUnits = [.hour, .minute, .second]
         formatter.unitsStyle = .abbreviated
         formatter.zeroFormattingBehavior = .dropAll
         
-        let totalActivityDuration = await data.flatMap { $0.activitySegments }.reduce(0, {
-            $0 + $1.totalActivityDuration
-        })
+        // This is Apple's code with sendability issues.
+//        let totalActivityDuration = await data.flatMap { $0.activitySegments }.reduce(0, {
+//            $0 + $1.totalActivityDuration
+//        })
+        
+        
+        let segments = data.map(\.activitySegments)
+        var totalActivityDuration: Double = .zero
+
+        for await activityGroup in segments {
+            let groupTotal = await activityGroup.reduce(0) { $0 + $1.totalActivityDuration }
+            totalActivityDuration += groupTotal
+        }
         
         return formatter.string(from: totalActivityDuration) ?? "No activity data"
     }
