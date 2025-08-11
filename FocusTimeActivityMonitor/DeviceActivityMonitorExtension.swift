@@ -47,7 +47,6 @@ final class DeviceActivityMonitorExtension: DeviceActivityMonitor {
         let schema = Schema([BlockItem.self])
         let configurations = [
             ModelConfiguration(
-                allowsSave: false,
                 groupContainer: .identifier(SharedAppValues.appGroupIdentifier)
             )
         ]

@@ -14,7 +14,7 @@ import DeviceActivity
 // This is why it is structured the way it is.
 // It has to inherit the caller's execution context - hence why it is not an actor.
 // But it cannot be a class due to Task sendability issues.
-struct DeviceActivityHandler: Sendable {
+nonisolated struct DeviceActivityHandler: Sendable {
     private let logger: Logger?
     private let container: ModelContainer
     private let shieldManager: ShieldManager
@@ -37,7 +37,7 @@ struct DeviceActivityHandler: Sendable {
         
         let blockItem = store.fetchBlockItem(id: activityIdentifier.blockItemID)
         
-        // Make sure we have our schedule.
+        // Make sure we have our block item.
         guard let blockItem else { return }
         
         switch blockItem.type {
@@ -128,7 +128,7 @@ struct DeviceActivityHandler: Sendable {
         }
         
         // Reset duration values if this BlockItem was created as duration block.
-        guard case .duration(let duration, _, _, _) = blockItem.type else { return }
+        guard case .duration = blockItem.type else { return }
         
         // If it is temporary then we just delete it.
         if !blockItem.isTemporary {

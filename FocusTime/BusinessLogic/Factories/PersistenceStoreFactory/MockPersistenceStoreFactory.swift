@@ -5,8 +5,6 @@
 //  Created by Maksym Horobets on 08.08.2025.
 //
 
-import Foundation
-
 import SwiftData
 
 actor MockPersistenceStoreFactory: PersistenceStoreFactory {
@@ -20,7 +18,7 @@ actor MockPersistenceStoreFactory: PersistenceStoreFactory {
             
             self.modelContainer = container
         } catch {
-            fatalError("Could not setup database.")
+            fatalError("Could not setup database: \(error).")
         }
     }
     func makeBlockItemStore() -> BlockItemStore {

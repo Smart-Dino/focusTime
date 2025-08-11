@@ -18,7 +18,7 @@ actor LivePersistenceStoreFactory: PersistenceStoreFactory {
             
             self.modelContainer = container
         } catch {
-            fatalError("Could not setup database.")
+            fatalError("Could not setup database: \(error).")
         }
     }
     func makeBlockItemStore() -> BlockItemStore {
