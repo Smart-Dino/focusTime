@@ -27,14 +27,7 @@ struct ShieldDebugView: View {
             VStack {
                 ScrollView(.vertical) {
                     ForEach(viewModel.state.blockItems) { blockItem in
-                        HStack {
-                            Text(blockItem.emoji)
-                            VStack(alignment: .leading) {
-                                Text(blockItem.name)
-                                Text(Constants.Strings.blockItemIdPrefix + blockItem.id.uuidString)
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
+                        makeCard(blockItem)
                     }
                 }
             }
@@ -201,6 +194,26 @@ struct ShieldDebugView: View {
             Divider()
             Text(sectionName).bold()
             Divider()
+        }
+    }
+    
+    func makeCard(_ blockItem: ProtectedBlockItem) -> some View {
+        HStack {
+            Text(blockItem.emoji)
+            VStack(alignment: .leading) {
+                Text(blockItem.name)
+                Text ({
+                    switch blockItem.type {
+                    case .scheduled(_, _, let isActive):
+                        isActive.description
+                    case .duration(_, let startedAt, _, _):
+                        (startedAt != nil).description
+                    }
+                }())
+
+                Text(Constants.Strings.blockItemIdPrefix + blockItem.id.uuidString)
+                    .foregroundStyle(.secondary)
+            }
         }
     }
 }

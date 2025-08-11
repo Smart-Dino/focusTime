@@ -10,10 +10,17 @@ import Foundation
 
 actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
     private var store: BlockItemStore
+
     private(set) var continuation: AsyncStream<Bool>.Continuation?
     
     init(blockItemStore: BlockItemStore) {
         self.store = blockItemStore
+        
+        Task {
+            for await _ in NotificationCenter.default.notifications(named: .NSPersistentStoreRemoteChange) {
+                print("UPDATEEEEEE!!!!")
+            }
+        }
     }
     
     // MARK: If any ViewModel needs specific values of methods add them here instead of that ViewModel.
