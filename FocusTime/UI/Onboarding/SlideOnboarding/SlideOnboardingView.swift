@@ -12,8 +12,8 @@ import FocusTimeUI
 
 struct SlideOnboardingView: View {
     // MARK: - Properties
-    @State private var viewModel = SlideOnboardingViewModel()
-        
+    @State var viewModel: SlideOnboardingViewModel
+    
     // MARK: - Body
     var body: some View {
         VStack {
@@ -22,12 +22,14 @@ struct SlideOnboardingView: View {
                 Text(Constants.Strings.title)
                     .font(.title3.bold())
                     .multilineTextAlignment(.center)
-                 
+                
                 FTProgressBarView(
                     items: viewModel.state.progressItems,
                     selectedItem: Binding(
                         get: { viewModel.state.currentStep },
-                        set: { _ in } ))
+                        set: { _ in }
+                    )
+                )
                 .padding(.top, Constants.Layout.progressBarTopPadding)
             }
             
@@ -72,7 +74,7 @@ struct SlideOnboardingView: View {
                 
             } else {
                 Button(Constants.Strings.startButton) {
-                    // TODO: - Navigate to main app flow
+                    viewModel.skipOnboarding()
                 }
                 .frame(height: Constants.Layout.buttonSectionHeight)
                 .buttonStyle(FTPrimaryButtonStyle())
@@ -87,15 +89,15 @@ struct SlideOnboardingView: View {
                 viewModel.skipOnboarding()
             }
             Button(Constants.Strings.goBack, role: .cancel) {
-                            viewModel.cancelSkipConfirmation()
-                        }
-                    } message: {
-                        Text(Constants.Strings.alertMessage)
-                    }
+                viewModel.cancelSkipConfirmation()
+            }
+        } message: {
+            Text(Constants.Strings.alertMessage)
+        }
     }
 }
 
 
 #Preview {
-    SlideOnboardingView()
+    SlideOnboardingView(viewModel: .init(delegate: nil))
 }

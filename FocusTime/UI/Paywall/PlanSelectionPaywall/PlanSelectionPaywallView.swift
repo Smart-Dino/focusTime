@@ -109,21 +109,14 @@ struct PlanSelectionPaywallView: View {
             Constants.Strings.errorHeader,
             isPresented: Binding(get: {
                 viewModel.state.superState.error != nil
-            }, set: { showError in
-                viewModel.keepShowingError(showError: showError)
+            }, set: { isVisible in
+                viewModel.setErrorVisibility(isVisible)
             }), actions: {
                 // OK dismissal button by default
             }, message: {
                 Text(viewModel.state.superState.error?.localizedDescription ?? "")
             }
         )
-        .task {
-            // Do NOT put these in the initializer
-            await viewModel.fetchProducts()
-            viewModel.selectFirstProductIfNeeded()
-            await viewModel.checkIfUserIsEligibleForFreeTrial()
-            viewModel.configureBottomSectionForSelectedProduct()
-        }
     }
     
     // MARK: - Computed properties

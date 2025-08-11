@@ -45,11 +45,11 @@ struct DraftsBlockItemListView: View {
         .background { MainBackgroundGradientView() }
         // MARK: - Bottom floating button
         .safeAreaInset(edge: .bottom) {
-            Button(Constants.Strings.newBlocklistButtonTitle, systemImage: "plus.circle") {
-                #warning("Placeholder code")
-                Task {
-                    await viewModel.insertTestItemsIntoDatabase()
-                }
+            Button(
+                Constants.Strings.newBlocklistButtonTitle,
+                systemImage: "plus.circle"
+            ) {
+                #warning("No implementation")
             }
             .buttonStyle(.ftPrimary)
             .padding()
@@ -65,8 +65,8 @@ struct DraftsBlockItemListView: View {
             SharedConstants.Strings.errorHeader,
             isPresented: Binding(get: {
                 viewModel.state.error != nil
-            }, set: { showError in
-                viewModel.keepShowingError(showError: showError)
+            }, set: { isVisible in
+                viewModel.setErrorVisibility(isVisible)
             }), actions: {
                 // OK dismissal button by default
             }, message: {
@@ -105,9 +105,6 @@ struct DraftsBlockItemListView: View {
     }
 }
 
-#warning("No preview.")
-//#Preview {
-//    if let blockItemStore = BlockItemStore(isStoredInMemoryOnly: true) {
-//        AppBlockingListView(viewModel: .init(blockItemStore: blockItemStore))
-//    }
-//}
+#Preview {
+    DraftsBlockItemListView(viewModel: .init(modelContainer: PreviewData.memoryOnlyModelContainer))
+}

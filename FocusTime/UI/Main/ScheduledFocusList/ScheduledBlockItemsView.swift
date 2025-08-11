@@ -39,10 +39,7 @@ struct ScheduledBlockItemsView: View {
                 Constants.Strings.newSessionButtonTitle,
                 systemImage: Constants.Icons.newSessionSymbol
             ) {
-                #warning("Placeholder code")
-                Task {
-                    await viewModel.insertTestItemsIntoDatabase()
-                }
+                #warning("No implementation")
             }
             .buttonStyle(.ftPrimary)
             .padding()
@@ -55,8 +52,8 @@ struct ScheduledBlockItemsView: View {
             SharedConstants.Strings.errorHeader,
             isPresented: Binding(get: {
                 viewModel.state.error != nil
-            }, set: { showError in
-                viewModel.keepShowingError(showError: showError)
+            }, set: { isVisible in
+                viewModel.setErrorVisibility(isVisible)
             }), actions: {
                 // OK dismissal button by default
             }, message: {
@@ -95,10 +92,10 @@ struct ScheduledBlockItemsView: View {
     }
 }
 
-//#Preview {
-//    NavigationStack {
-//        ScheduledBlockItemsView(
-//            viewModel: .init(blockItemStore: BlockItemStore(modelContainer: PreviewData.memoryOnlyModelContainer))
-//        )
-//    }
-//}
+#Preview {
+    NavigationStack {
+        ScheduledBlockItemsView(
+            viewModel: .init(modelContainer: PreviewData.memoryOnlyModelContainer)
+        )
+    }
+}

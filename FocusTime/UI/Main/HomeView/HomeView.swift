@@ -47,9 +47,9 @@ struct HomeView: View {
                 }
                 VStack(spacing: .zero) {
                     // MARK: - Scheduled focus button
-                    NavigationLink(
-                        value: MainScreens.scheduledFocusList(viewModel.makeScheduledFocusViewModel())
-                    ) {
+                    Button {
+                        viewModel.showScheduledFocusView()
+                    } label: {
                         HStack {
                             VStack(alignment: .leading) {
                                 Text(Constants.Strings.scheduledFocusTitle)
@@ -82,6 +82,16 @@ struct HomeView: View {
             }
         }
         .background { MainBackgroundGradientView() }
+        .navigationDestination(isPresented: .init(
+            get: { viewModel.state.nextNavigationScreen != nil },
+            set: { viewModel.setNextNavigationScreen($0) }
+        )) {
+            switch viewModel.state.nextNavigationScreen {
+            case .scheduledFocusList(let viewModel):
+                ScheduledBlockItemsView(viewModel: viewModel)
+            case .none: Text("No view")
+            }
+        }
         // MARK: - Bottom floating button
         .safeAreaInset(edge: .bottom) {
             Button(Constants.Strings.bottomButtonTitle, systemImage: Constants.Icons.hourglass) {
@@ -102,6 +112,11 @@ struct HomeView: View {
 
 #Preview {
     NavigationStack {
-        HomeView(viewModel: .init(modelContainer: PreviewData.memoryOnlyModelContainer))
+        HomeView(
+            viewModel: .init(
+                modelContainer: PreviewData.memoryOnlyModelContainer,
+                delegate: nil
+            )
+        )
     }
 }
