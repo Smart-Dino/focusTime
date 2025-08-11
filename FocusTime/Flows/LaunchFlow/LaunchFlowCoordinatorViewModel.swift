@@ -18,11 +18,17 @@ final class LaunchFlowCoordinatorViewModel {
     
     private(set) var state: State
     private let defaultsManager: DefaultsManager
+    private let paymentManagerFactory: PaymentManagerFactory
     private var modelContainer: ModelContainer?
     
-    init() {
-        self.state = State()
-        self.defaultsManager = LiveDefaultsManager()
+    init(
+        state: State = State(),
+        defaultsManager: DefaultsManager = LiveDefaultsManager(),
+        paymentManagerFactory: PaymentManagerFactory = LivePaymentManagerFactory()
+    ) {
+        self.state = state
+        self.defaultsManager = defaultsManager
+        self.paymentManagerFactory = paymentManagerFactory
         
         setupModelContainer()
         setupAppFlowViewModel()
@@ -52,7 +58,7 @@ final class LaunchFlowCoordinatorViewModel {
             
             // Make sure we have modelContainer and our ViewModel has not yet bee initialized.
             if let modelContainer, state.appFlowCoordinatorViewModel == nil {
-                let paymentManager = await StoreKitPaymentManager()
+                let paymentManager = await paymentManagerFactory.makePaymentManager()
                 
                 self.state.appFlowCoordinatorViewModel = .init(
                     defaultsManager: defaultsManager,
