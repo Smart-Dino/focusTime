@@ -104,13 +104,12 @@ nonisolated struct DeviceActivityHandler: Sendable {
                 } // Unfortunately sleeping task for a long time causes extension to close before unblock.
                 
                 try await shieldManager.unblock()
+                store.setSessionIsActive(for: blockItem, isActive: false)
                 
                 DeviceActivityCenter()
                     .stopMonitoring(
                         [DeviceActivityName(stringActivityName)]
                     )
-                
-                store.setSessionIsActive(for: blockItem, isActive: false)
             } catch {
                 logger?.error("Failed to unblock in \(#function) while handling fallback: \(error.localizedDescription)")
             }

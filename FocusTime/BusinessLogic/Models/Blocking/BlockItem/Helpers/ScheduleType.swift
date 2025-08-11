@@ -46,7 +46,7 @@ enum ScheduleType: Codable, Hashable {
             let timeSinceStart = currentTimeComponent.localizedSecondsSinceMidnight - startTime.localizedSecondsSinceMidnight
             let timeLeftInSeconds = endTime.localizedSecondsSinceMidnight - currentTimeComponent.localizedSecondsSinceMidnight
             
-            if timeSinceStart > 0 {
+            if timeSinceStart >= 0 {
                 return timeLeftInSeconds
             } else {
                 return nil

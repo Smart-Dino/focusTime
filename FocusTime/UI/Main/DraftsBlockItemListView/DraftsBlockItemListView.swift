@@ -73,7 +73,7 @@ struct DraftsBlockItemListView: View {
             }
         )
         .onAppear {
-            viewModel.reloadData()
+            viewModel.loadData()
         }
     }
     
@@ -90,23 +90,32 @@ struct DraftsBlockItemListView: View {
         .padding(.top)
     }
     
-    @ViewBuilder
     func makeSessionCardView(for block: ProtectedBlockItem) -> some View {
-        if let secondsLeft = block.type.secondsToIntervalEndIfShouldBeRunning() {
-            FTSessionActiveRowView(
-                emoji: block.emoji,
-                title: block.name,
-                viewModel: viewModel.makeTimerViewModelForActiveSession(
-                    blockItem: block,
-                    timeLeft: secondsLeft
+        let isActive: Bool
+        switch block.type {
+        case .duration(_, let startedAt, _, _):
+            isActive = (startedAt != nil)
+        case .scheduled(_, _, let active):
+            isActive = active
+        }
+
+        return Group {
+            if isActive, let timeLeft = block.type.secondsToIntervalEndIfShouldBeRunning() {
+                FTSessionActiveRowView(
+                    emoji: block.emoji,
+                    title: block.name,
+                    viewModel: viewModel.makeTimerViewModelForActiveSession(blockItem: block, timeLeft: timeLeft)
                 )
-            )
-        } else {
-            FTSessionScheduledRowView(
-                emoji: block.emoji,
-                title: block.name,
-                description: block.type.description
-            )
+            } else {
+                FTSessionScheduledRowView(
+                    emoji: block.emoji,
+                    title: block.name,
+                    description: block.type.description
+                )
+            }
+        }
+        .onAppear {
+            print("Group changed")
         }
     }
     

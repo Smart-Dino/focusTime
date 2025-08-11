@@ -16,7 +16,7 @@ final class DraftsBlockItemListViewModel {
     struct State {
         var error: Error? = nil
         
-        var page = 0
+        var page = 1
         let amountPerPage = 100
         var items = [ProtectedBlockItem]()
     }
@@ -25,6 +25,7 @@ final class DraftsBlockItemListViewModel {
     
     private let blockItemPersistenceManager: BlockItemPersistenceManager
     private var fetchTask: Task<Void, Never>?
+    private var dbChangesNotificationTask: Task<Void, Never>?
     
     init(
         state: State = State(),
@@ -32,6 +33,17 @@ final class DraftsBlockItemListViewModel {
     ) {
         self.state = state
         self.blockItemPersistenceManager = blockItemPersistenceManager
+        
+        subscribeToDB()
+    }
+    
+    func subscribeToDB() {
+        print(String(describing: self) + " " + ObjectIdentifier(self).debugDescription)
+        dbChangesNotificationTask = Task {
+            for await _ in await blockItemPersistenceManager.contextChangesStream() {
+                loadData()
+            }
+        }
     }
     
     func setErrorVisibility(_ isVisible: Bool) {
@@ -40,10 +52,31 @@ final class DraftsBlockItemListViewModel {
         }
     }
     
-    func reloadData() {
-        state.items = .init()
-        state.page = 0
-        fetchNextPage()
+    func loadData() {
+        if state.items.isEmpty {
+            fetchNextPage()
+        } else {
+            reloadItems()
+        }
+    }
+    
+    private func reloadItems() {
+        fetchTask = nil
+        
+        fetchTask = Task {
+            do {
+                let newItems = try await blockItemPersistenceManager.reloadPaginatedData(
+                    totalCount: state.items.count,
+                    packSize: state.amountPerPage,
+                    includeTemporary: false
+                )
+                state.items = newItems
+                print(#function)
+                print(newItems)
+            } catch {
+                state.error = error
+            }
+        }
     }
     
     func makeTimerViewModelForActiveSession(blockItem: ProtectedBlockItem, timeLeft: Int) -> FocusSessionTimerModel {
@@ -64,15 +97,19 @@ final class DraftsBlockItemListViewModel {
     
     #warning("Unfinished ViewModel")
     private func fetchNextPage() {
-        guard fetchTask == nil else { return }
+        fetchTask = nil
         
-        self.fetchTask = Task {
+        fetchTask = Task {
             do {
-                state.items = try await blockItemPersistenceManager.fetchPaginated(
+                let newItems = try await blockItemPersistenceManager.fetchPaginated(
                     page: state.page,
                     amountPerPage: state.amountPerPage,
                     includeTemporary: false
                 )
+                state.items = newItems
+                state.page += 1
+                print(#function)
+                print(newItems)
             } catch {
                 state.error = error
             }

@@ -21,6 +21,7 @@ actor MockPersistenceStoreFactory: PersistenceStoreFactory {
             fatalError("Could not setup database: \(error).")
         }
     }
+    
     func makeBlockItemStore() -> BlockItemStore {
         BlockItemStore(modelContainer: modelContainer)
     }

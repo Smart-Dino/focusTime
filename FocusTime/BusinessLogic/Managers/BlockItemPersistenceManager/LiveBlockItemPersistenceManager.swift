@@ -12,13 +12,29 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
     private var store: BlockItemStore
 
     private(set) var continuation: AsyncStream<Bool>.Continuation?
+    private var databaseChanges: Task<Void, Never>? = nil
     
     init(blockItemStore: BlockItemStore) {
         self.store = blockItemStore
         
         Task {
+            await listenToDatabaseFileChanges()
+        }
+    }
+    
+    deinit {
+        // Continuation.
+        continuation?.finish()
+        continuation = nil
+        // Database-tracking task.
+        databaseChanges?.cancel()
+        databaseChanges = nil
+    }
+    
+    func listenToDatabaseFileChanges() {
+        databaseChanges = Task {
             for await _ in NotificationCenter.default.notifications(named: .NSPersistentStoreRemoteChange) {
-                print("UPDATEEEEEE!!!!")
+                continuation?.yield(true)
             }
         }
     }
@@ -31,6 +47,8 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
     
     func insert(_ item: inout ProtectedBlockItem) async throws {
         let persistenceID = try await store.insert(item)
+        
+        // I cannot set persistentID since it is a constant so I will create a new instance instead.
         let itemCopy = ProtectedBlockItem(
             id: item.id,
             persistentModelID: persistenceID,
@@ -95,49 +113,31 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
         }
     }
     
-    /// Loads `ProtectedBlockItem`s in packs of `packSize` asynchronously
-    /// and updates the given array in-place one pack at a time.
-    /// - Parameters:
-    ///   - items: The existing list to update in place (must already have `count` slots).
-    ///   - packSize: Number of items to fetch per batch.
-    ///   - includeTemporary: If `false`, filters out temporary items.
     func reloadPaginatedData(
-        items: inout [ProtectedBlockItem],
+        totalCount: Int,
         packSize: Int,
         includeTemporary: Bool
-    ) async throws {
-        // Total number of items to process (based on the initial array length).
-        let totalCount = items.count
+    ) async throws -> [ProtectedBlockItem] {
+        var allItems: [ProtectedBlockItem] = []
 
-        // Loop over offsets in steps of `packSize`.
-        // Example: totalCount=10, packSize=3 → offsets: 0, 3, 6, 9
         for offset in stride(from: 0, to: totalCount, by: packSize) {
-            
-            // Build a predicate to include/exclude temporary items.
             let predicate = #Predicate<BlockItem> { model in
                 includeTemporary || !model.isTemporary
             }
 
-            // Configure fetch descriptor for the current page.
             var descriptor = FetchDescriptor<BlockItem>(predicate: predicate)
-            descriptor.fetchLimit = min(packSize, totalCount - offset) // Don't overrun the end.
-            descriptor.fetchOffset = offset // Start position for this page.
+            descriptor.fetchLimit = min(packSize, totalCount - offset)
+            descriptor.fetchOffset = offset
 
-            // Perform the async fetch from the data store.
             let fetchedBlockItems = try await store.fetch(descriptor: descriptor)
+            allItems.append(contentsOf: fetchedBlockItems)
 
-            // Replace the corresponding slice of the existing `items` array
-            // with the newly fetched protected items.
-            items.replaceSubrange(
-                offset..<offset + fetchedBlockItems.count,
-                with: fetchedBlockItems
-            )
-
-            // Optional: yield back to the executor so SwiftUI can refresh UI
-            // between batches (especially useful for large lists).
-            await Task.yield()
+            await Task.yield() // Allow thread to breathe between batches.
         }
+
+        return allItems
     }
+
     
     func eraseAllData() async throws {
         try await store.eraseAllData()

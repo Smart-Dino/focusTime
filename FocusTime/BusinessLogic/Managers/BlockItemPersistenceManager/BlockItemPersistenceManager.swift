@@ -19,6 +19,8 @@ protocol BlockItemPersistenceManager: Actor {
     func fetch(includeTemporary: Bool) async throws -> [ProtectedBlockItem]
     func fetchPaginated(page: Int, amountPerPage: Int, includeTemporary: Bool) async throws -> [ProtectedBlockItem]
     
+    func reloadPaginatedData(totalCount: Int, packSize: Int, includeTemporary: Bool) async throws -> [ProtectedBlockItem]
+    
     func eraseAllData() async throws
     
     func contextChangesStream() -> AsyncStream<Bool>

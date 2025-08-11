@@ -47,6 +47,11 @@ final class MainFlowCoordinatorViewModel {
     private let blockItemPersistenceManager: BlockItemPersistenceManager
     weak var appFlowDelegate: MainFlowDelegate?
     
+    // Cached view models.
+    private var cachedHomeViewModel: HomeViewModel?
+    private var cachedDraftsBlockItemListViewModel: DraftsBlockItemListViewModel?
+    private var cachedShieldDebugViewModel: ShieldDebugViewModel?
+    
     #warning("Find out how we would wire up the isPro property to here")
     
     init(
@@ -83,15 +88,24 @@ final class MainFlowCoordinatorViewModel {
     }
     
     func makeHomeViewModel() -> HomeViewModel {
-        HomeViewModel(blockItemPersistenceManager: blockItemPersistenceManager, delegate: self)
+        if let cached = cachedHomeViewModel { return cached }
+        let viewModel = HomeViewModel(blockItemPersistenceManager: blockItemPersistenceManager, delegate: self)
+        cachedHomeViewModel = viewModel
+        return viewModel
     }
     
     func makeDraftsBlockItemListViewModel() -> DraftsBlockItemListViewModel {
-        DraftsBlockItemListViewModel(blockItemPersistenceManager: blockItemPersistenceManager)
+        if let cached = cachedDraftsBlockItemListViewModel { return cached }
+        let viewModel = DraftsBlockItemListViewModel(blockItemPersistenceManager: blockItemPersistenceManager)
+        cachedDraftsBlockItemListViewModel = viewModel
+        return viewModel
     }
     
     func makeShieldDebugViewModel() -> ShieldDebugViewModel {
-        ShieldDebugViewModel(blockItemPersistenceManager: blockItemPersistenceManager)
+        if let cached = cachedShieldDebugViewModel { return cached }
+        let viewModel = ShieldDebugViewModel(blockItemPersistenceManager: blockItemPersistenceManager)
+        cachedShieldDebugViewModel = viewModel
+        return viewModel
     }
     
     func requestPaywall() {
