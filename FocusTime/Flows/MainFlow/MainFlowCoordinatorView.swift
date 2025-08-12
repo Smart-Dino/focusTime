@@ -19,35 +19,20 @@ struct MainFlowCoordinatorView: View {
                 viewModel.setTabScreen(screen)
             })) {
                 Group {
-                    HomeView(viewModel: viewModel.homeViewModel)
-                        .tabItem {
-                            LabeledContent("Home") {
-                                Image(.wavelogo)
-                                    .renderingMode(.template)
-                            }
-                        }
-                        .tag(MainTabScreens.home)
-                    DraftsBlockItemListView(viewModel: viewModel.draftsBlockItemListViewModel)
-                        .tabItem {
-                            Label("Blocks", systemImage: "hand.raised")
-                            // Prevent system from filling system icons.
-                                .environment(\.symbolVariants, .none)
-                        }
-                        .tag(MainTabScreens.blocks)
+                    ForEach(viewModel.state.tabViewModels) { screen in
+                        makeViewForTab(screen)
+                    }
                 }
-                //                .toolbarBackground(Color.ftBackground, for: .tabBar) // Set a specific color
+                // .toolbarBackground(Color.ftBackground, for: .tabBar) // Set a specific color
                 // as a background, but we don't do it because the tabbar is transparent
                 // in a non-scrolling content so we underlay our own behind it.
                 .toolbarBackground(.hidden, for: .tabBar) // Removes background and sets
                 // selected item to be white-tinted.
                 .toolbarColorScheme(.dark, for: .tabBar)
             }
-            .onAppear {
-                viewModel.setupFlow()
-            }
             .toolbar(.visible)
             .toolbar {
-                if viewModel.state.currentTabScreen == .home {
+                if case .home = viewModel.state.currentTabScreen {
                     ToolbarItem {
                         FTProUpgradeButtonView {
                             viewModel.requestPaywall()
@@ -61,8 +46,8 @@ struct MainFlowCoordinatorView: View {
                         FTPlusToolbarButtonView {
 #warning("Action is empty")
                         }
-                    case .blocks: EmptyView()
-                    case .profile: EmptyView()
+                    case .drafts: EmptyView()
+                    case .none: EmptyView()
                     }
                 }
             }
@@ -79,6 +64,31 @@ struct MainFlowCoordinatorView: View {
             }
         }
         .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+    }
+    
+    @ViewBuilder
+    func makeViewForTab(_ screen: MainFlowCoordinatorViewModel.State.MainTabScreens) -> some View {
+        switch screen {
+        case .home(let homeViewModel):
+            HomeView(viewModel: homeViewModel)
+                .tabItem {
+                    LabeledContent("Home") {
+                        Image(.wavelogo)
+                            .renderingMode(.template)
+                    }
+                }
+                .tag(screen)
+        case .drafts(let draftsViewModel):
+            DraftsBlockItemListView(viewModel: draftsViewModel)
+                .tabItem {
+                    Label("Blocks", systemImage: "hand.raised")
+                    // Prevent system from filling system icons.
+                        .environment(\.symbolVariants, .none)
+                }
+                .tag(screen)
+        case .none:
+            Text("This view does not seem to have been setup.")
+        }
     }
 }
 

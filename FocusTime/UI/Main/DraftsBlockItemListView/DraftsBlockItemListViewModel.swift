@@ -16,7 +16,7 @@ final class DraftsBlockItemListViewModel {
     struct State {
         var error: Error? = nil
         
-        var page = 1
+        var page = 0
         let amountPerPage = 100
         var items = [ProtectedBlockItem]()
     }
@@ -71,8 +71,6 @@ final class DraftsBlockItemListViewModel {
                     includeTemporary: false
                 )
                 state.items = newItems
-                print(#function)
-                print(newItems)
             } catch {
                 state.error = error
             }
@@ -106,10 +104,8 @@ final class DraftsBlockItemListViewModel {
                     amountPerPage: state.amountPerPage,
                     includeTemporary: false
                 )
-                state.items = newItems
+                state.items.append(contentsOf: newItems)
                 state.page += 1
-                print(#function)
-                print(newItems)
             } catch {
                 state.error = error
             }

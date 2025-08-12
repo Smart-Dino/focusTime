@@ -73,6 +73,7 @@ struct DraftsBlockItemListView: View {
             }
         )
         .onAppear {
+            print("Appeared")
             viewModel.loadData()
         }
     }

@@ -31,28 +31,35 @@ enum MainFlowNavigationRoute: Equatable, Hashable {
 @Observable
 final class MainFlowCoordinatorViewModel {
     struct State {
-        enum MainTabScreens {
+        enum MainTabScreens: Identifiable, Equatable, Hashable {
             case home(viewModel: HomeViewModel)
             case drafts(viewModel: DraftsBlockItemListViewModel)
             case none
             
-//            static func == (lhs: MainFlowNavigationRoute, rhs: MainFlowNavigationRoute) -> Bool {
-//                switch (lhs, rhs) {
-//                case (.home, .home): true
-//                case (.home, .home): true
-//                }
-//            }
+            var id: Int { hashValue }
             
-//            func hash(into hasher: inout Hasher) {
-//                switch self {
-//                case .shieldDebug:
-//                    hasher.combine(0)
-//                }
-//            }
+            static func == (lhs: MainTabScreens, rhs: MainTabScreens) -> Bool {
+                switch (lhs, rhs) {
+                case (.home, .home): true
+                case (.drafts, .drafts): true
+                case (.none, .none): true
+                default: false
+                }
+            }
+            
+            func hash(into hasher: inout Hasher) {
+                switch self {
+                case .home:
+                    hasher.combine(0)
+                case .drafts:
+                    hasher.combine(1)
+                case .none:
+                    hasher.combine(2)
+                }
+            }
         }
-        
         var currentTabScreen: MainTabScreens
-        var tabs = [MainTabScreens]()
+        var tabViewModels: [MainTabScreens] = .init()
         
         let debugViewCountGoal: Int = 5
         var debugViewCount: Int = 0
@@ -72,6 +79,20 @@ final class MainFlowCoordinatorViewModel {
         self.state = state
         self.blockItemPersistenceManager = blockItemPersistenceManager
         self.appFlowDelegate = appFlowDelegate
+        
+        setupFlow()
+    }
+    
+    func setupFlow() {
+        state.tabViewModels = [
+            State.MainTabScreens.home(
+                viewModel: HomeViewModel(blockItemPersistenceManager: blockItemPersistenceManager, delegate: self)
+            ),
+            State.MainTabScreens.drafts(
+                viewModel: DraftsBlockItemListViewModel(blockItemPersistenceManager: blockItemPersistenceManager)
+            )
+        ]
+        state.currentTabScreen = state.tabViewModels.first!
     }
     
     func setNextNavigationScreen(_ showing: Bool) {
@@ -80,22 +101,14 @@ final class MainFlowCoordinatorViewModel {
         }
     }
     
-    func setupFlow() {
-        state.tabs = [
-            .home(viewModel: HomeViewModel(blockItemPersistenceManager: blockItemPersistenceManager, delegate: self)),
-            .drafts(viewModel: DraftsBlockItemListViewModel(blockItemPersistenceManager: blockItemPersistenceManager))
-        ]
-        state.currentTabScreen = state.tabs.first!
-    }
-    
     func showDebugView() {
         state.nextNavigationScreen = .shieldDebug(makeShieldDebugViewModel())
     }
     
     func setTabScreen(_ screen: State.MainTabScreens) {
-//        if state.currentTabScreen == screen {
-//            state.debugViewCount += 1
-//        }
+        if state.currentTabScreen == screen {
+            state.debugViewCount += 1
+        }
         
         if state.debugViewCount >= state.debugViewCountGoal {
             showDebugView()
