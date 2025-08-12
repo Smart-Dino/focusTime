@@ -59,6 +59,9 @@ struct ScheduledBlockItemsView: View {
                 Text(viewModel.state.error?.localizedDescription ?? "")
             }
         )
+        .onAppear {
+            viewModel.loadData()
+        }
     }
     
     var schedulesView: some View {
@@ -93,11 +96,10 @@ struct ScheduledBlockItemsView: View {
 
 #Preview {
     NavigationStack {
-        let blockItemPersistenceManager = LiveBlockItemPersistenceManager(
-            blockItemStore: PreviewData.memoryOnlyBlockItemStore
-        )
+        let manager = PreviewData.mockBlockItemPersistenceManager
+        
         ScheduledBlockItemsView(
-            viewModel: .init(blockItemPersistenceManager: blockItemPersistenceManager)
+            viewModel: .init(blockItemPersistenceManager: manager)
         )
     }
 }

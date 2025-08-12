@@ -9,17 +9,16 @@ import Foundation
 import DeviceActivity
 
 extension LiveDeviceActivityRegistrar {
-    func getActivityForSchedule(_ blockItem: ProtectedBlockItem) throws -> DeviceActivityName {
-        guard let activity = center.activities.first(where: {
-            if let identifier = CodableActivityIdentifier(from: $0) {
-                return identifier.blockItemID == blockItem.id
-            } else {
-                return false
-            }
-        }) else {
+    func getActivityForSchedule(_ blockItem: ProtectedBlockItem) async throws -> DeviceActivityName {
+        guard let activityName = await centerManager.activities
+            .first(where: { name in
+                CodableActivityIdentifier(from: name)?.blockItemID == blockItem.id
+            })
+        else {
             throw DeviceActivityRegistrarError.activityNotFound
         }
         
-        return activity
+        return activityName
     }
 }
+

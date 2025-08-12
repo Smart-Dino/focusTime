@@ -13,24 +13,17 @@ import FamilyControls
 actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
     private static let fallbackIntervalSeconds = 15 * 60
     private let clock: Clock
-    let center: DeviceActivityCenter
+    let centerManager: DeviceActivityCenterManager
     private let shieldManager: ShieldManager
     private let blockItemPersistenceManager: BlockItemPersistenceManager
     
-    var monitoredIdentifiers: Set<UUID> {
-        Set(center.activities.compactMap {
-            guard let identifier = CodableActivityIdentifier(from: $0) else { return nil }
-            return identifier.blockItemID
-        })
-    }
-    
     init(
-        center: DeviceActivityCenter = DeviceActivityCenter(),
+        centerManager: DeviceActivityCenterManager = LiveDeviceActivityCenterManager(),
         clock: Clock = SystemClock(),
         blockItemPersistenceManager: BlockItemPersistenceManager,
         shieldManager: ShieldManager
     ) {
-        self.center = center
+        self.centerManager = centerManager
         self.clock = clock
         self.blockItemPersistenceManager = blockItemPersistenceManager
         self.shieldManager = shieldManager
@@ -70,7 +63,7 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         for blockItem: ProtectedBlockItem,
         duration: Int
     ) async throws {
-        guard let persistentModelID = blockItem.persistentModelID else {
+        guard blockItem.persistentModelID != nil else {
             throw DeviceActivityRegistrarError.noPersistentItem
         }
         
@@ -96,7 +89,7 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         
         let activityName = DeviceActivityName(activityIdentifier)
         
-        try center.startMonitoring(activityName, during: deviceActivitySchedule)
+        try await centerManager.startMonitoring(activityName, during: deviceActivitySchedule)
         
         // Log when the activity was started for proper suspension handling.
         // Important: We only do this if our BlockItem was originally saved as duration block.
@@ -150,7 +143,7 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         
         let activityName = DeviceActivityName(activityIdentifier)
         
-        try center.startMonitoring(activityName, during: deviceActivitySchedule)
+        try await centerManager.startMonitoring(activityName, during: deviceActivitySchedule)
     }
     
     private func registerFallbackActivity(
@@ -183,7 +176,7 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         
         let activityName = DeviceActivityName(activityIdentifier)
         
-        try center.startMonitoring(activityName, during: deviceActivitySchedule)
+        try await centerManager.startMonitoring(activityName, during: deviceActivitySchedule)
     }
     
     private func overlapsWithAlreadyRegisteredSchedules(
@@ -193,11 +186,11 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
     ) async throws -> [ProtectedBlockItem] {
         var overlappingSchedules: [ProtectedBlockItem] = []
         
-        let activities = center.activities
+        let activities = await centerManager.activities
         
         for activity in activities {
             guard
-                let existingSchedule = center.schedule(for: activity),
+                let existingSchedule = await centerManager.schedule(for: activity),
                 let start1 = calendar.date(from: newSchedule.intervalStart),
                 let end1 = calendar.date(from: newSchedule.intervalEnd),
                 let start2 = calendar.date(from: existingSchedule.intervalStart),
@@ -237,7 +230,7 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         
         if let timeLeftInSeconds {
             // No, we cannot just copy item and edit it's values, we need new PersistentIdentifiers and UUIDs.
-            var tempItemCopy = ProtectedBlockItem(
+            let tempItemCopy = ProtectedBlockItem(
                 emoji: "⏳",
                 name: "temp-" + UUID().uuidString,
                 days: item.days,
@@ -252,8 +245,8 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
     }
     
     func unregisterActivity(during blockItem: ProtectedBlockItem) async throws {
-        let activity = try getActivityForSchedule(blockItem)
-        center.stopMonitoring([activity])
+        let activity = try await getActivityForSchedule(blockItem)
+        await centerManager.stopMonitoring([activity])
     }
     
     func suspendActivity(for blockItem: ProtectedBlockItem) async throws {
@@ -261,7 +254,7 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         guard let persistentModelID = blockItem.persistentModelID else {
             throw DeviceActivityRegistrarError.activityNotFound
         }
-        let activity = try getActivityForSchedule(blockItem)
+        let activity = try await getActivityForSchedule(blockItem)
         
         // Make sure we have the latest schedule.
         var blockItem = try await blockItemPersistenceManager.fetch(by: persistentModelID)
@@ -291,7 +284,7 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
             try await shieldManager.unblock()
             
             // Stop monitoring activity.
-            center.stopMonitoring([activity])
+            await centerManager.stopMonitoring([activity])
         }
     }
     
@@ -322,20 +315,20 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         }
     }
     
-    func isActivityRegistered(for blockItem: ProtectedBlockItem) throws -> Bool {
+    func isActivityRegistered(for blockItem: ProtectedBlockItem) async throws -> Bool {
         guard blockItem.persistentModelID != nil else {
             throw DeviceActivityRegistrarError.activityNotFound
         }
         
-        if (try? getActivityForSchedule(blockItem)) != nil {
+        if (try? await getActivityForSchedule(blockItem)) != nil {
             return true
         } else {
             return false
         }
     }
     
-    func unregisterAll() {
-        center.stopMonitoring()
+    func unregisterAll() async {
+        await centerManager.stopMonitoring()
     }
 }
 

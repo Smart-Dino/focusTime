@@ -44,7 +44,7 @@ final class DraftsBlockItemListViewModel {
                 let newItems = try await blockItemPersistenceManager.reloadPaginatedData(
                     totalCount: state.items.count,
                     packSize: state.amountPerPage,
-                    includeTemporary: false
+                    scheduledOnly: false
                 )
                 state.items = newItems
             } catch {
@@ -61,7 +61,7 @@ final class DraftsBlockItemListViewModel {
                 let newItems = try await blockItemPersistenceManager.fetchPaginated(
                     page: state.page,
                     amountPerPage: state.amountPerPage,
-                    includeTemporary: false
+                    scheduledOnly: false
                 )
                 state.items.append(contentsOf: newItems)
                 state.page += 1

@@ -59,6 +59,11 @@ public final class FocusSessionTimerModel {
         updateTimeLeft()
         startTimer()
     }
+    
+    isolated deinit {
+        timer?.cancel()
+        print("Timer deinit")
+    }
 
     // MARK: - Timer
     private func startTimer() {

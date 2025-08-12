@@ -9,13 +9,18 @@ import SwiftData
 import Foundation
 
 actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
-    private var store: BlockItemStore
+    private let store: BlockItemStore
+    private let centerManager: DeviceActivityCenterManager
 
     private(set) var continuation: AsyncStream<Bool>.Continuation?
     private var databaseChanges: Task<Void, Never>? = nil
     
-    init(blockItemStore: BlockItemStore) {
+    init(
+        blockItemStore: BlockItemStore,
+        deviceActivityCenterManager: DeviceActivityCenterManager
+    ) {
         self.store = blockItemStore
+        self.centerManager = deviceActivityCenterManager
         
         Task {
             await listenToDatabaseFileChanges()
@@ -102,27 +107,24 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
     func fetchPaginated(
         page: Int,
         amountPerPage: Int,
-        includeTemporary: Bool
+        scheduledOnly: Bool
     ) async throws -> [ProtectedBlockItem] {
         let items = try await store.fetch(page: page, amountPerPage: page)
+        let filteredFromTemp = items.filter { !$0.isTemporary }
         
-        if includeTemporary {
-            return items
-        } else {
-            return items.filter { !$0.isTemporary }
-        }
+        return scheduledOnly ? await filterScheduled(filteredFromTemp) : filteredFromTemp
     }
     
     func reloadPaginatedData(
         totalCount: Int,
         packSize: Int,
-        includeTemporary: Bool
+        scheduledOnly: Bool
     ) async throws -> [ProtectedBlockItem] {
         var allItems: [ProtectedBlockItem] = []
 
         for offset in stride(from: 0, to: totalCount, by: packSize) {
             let predicate = #Predicate<BlockItem> { model in
-                includeTemporary || !model.isTemporary
+                !model.isTemporary
             }
 
             var descriptor = FetchDescriptor<BlockItem>(predicate: predicate)
@@ -135,7 +137,7 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
             await Task.yield() // Allow thread to breathe between batches.
         }
 
-        return allItems
+        return scheduledOnly ? await filterScheduled(allItems) : allItems
     }
 
     
@@ -166,5 +168,13 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
         //   case .cancelled:   …
         //   case .finished:    …
         // }
+    }
+}
+
+// MARK: Helpers
+extension LiveBlockItemPersistenceManager {
+    func filterScheduled(_ items: [ProtectedBlockItem]) async -> [ProtectedBlockItem] {
+        let trackedIdentifiers = await centerManager.monitoredIdentifiers
+        return items.filter { trackedIdentifiers.contains($0.id) }
     }
 }

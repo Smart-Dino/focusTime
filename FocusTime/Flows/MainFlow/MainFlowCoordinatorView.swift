@@ -94,7 +94,7 @@ struct MainFlowCoordinatorView: View {
 
 #Preview {
     let factory = MockPersistenceStoreFactory()
-    let manager = LiveBlockItemPersistenceManager(blockItemStore: PreviewData.memoryOnlyBlockItemStore)
+    let manager = PreviewData.mockBlockItemPersistenceManager
     
     MainFlowCoordinatorView(
         viewModel: .init(blockItemPersistenceManager: manager, appFlowDelegate: nil)

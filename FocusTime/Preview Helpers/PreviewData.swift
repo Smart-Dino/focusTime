@@ -25,4 +25,12 @@ enum PreviewData {
             fatalError("Failed to create preview ModelContainer: \(error)")
         }
     }()
+    
+    static let mockBlockItemPersistenceManager = {
+        return LiveBlockItemPersistenceManager(
+            blockItemStore: PreviewData.memoryOnlyBlockItemStore,
+            deviceActivityCenterManager: LiveDeviceActivityCenterManager()
+        )
+    }()
+    
 }

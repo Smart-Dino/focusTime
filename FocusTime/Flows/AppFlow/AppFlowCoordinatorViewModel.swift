@@ -148,7 +148,8 @@ final class AppFlowCoordinatorViewModel {
         // Async init dependencies.
         async let paymentManager = paymentManagerFactory.makePaymentManager()
         async let blockItemPersistenceManager = LiveBlockItemPersistenceManager(
-            blockItemStore: persistenceStoreFactory.makeBlockItemStore()
+            blockItemStore: persistenceStoreFactory.makeBlockItemStore(),
+            deviceActivityCenterManager: LiveDeviceActivityCenterManager()
         )
         // Await init.
         self.paymentManager = await paymentManager

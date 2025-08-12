@@ -219,8 +219,9 @@ struct ShieldDebugView: View {
 }
 
 #Preview {
+    let centerManager = LiveDeviceActivityCenterManager()
     let factory = MockPersistenceStoreFactory()
-    let manager = LiveBlockItemPersistenceManager(blockItemStore: PreviewData.memoryOnlyBlockItemStore)
+    let manager = PreviewData.mockBlockItemPersistenceManager
     
     ShieldDebugView(
         viewModel: .init(blockItemPersistenceManager: manager)

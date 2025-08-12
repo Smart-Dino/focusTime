@@ -17,9 +17,9 @@ protocol BlockItemPersistenceManager: Actor {
     func fetch(by uuid: UUID) async throws -> ProtectedBlockItem?
     func fetch(by persistenceIdentifier: PersistentIdentifier) async throws -> ProtectedBlockItem
     func fetch(includeTemporary: Bool) async throws -> [ProtectedBlockItem]
-    func fetchPaginated(page: Int, amountPerPage: Int, includeTemporary: Bool) async throws -> [ProtectedBlockItem]
     
-    func reloadPaginatedData(totalCount: Int, packSize: Int, includeTemporary: Bool) async throws -> [ProtectedBlockItem]
+    func fetchPaginated(page: Int, amountPerPage: Int, scheduledOnly: Bool) async throws -> [ProtectedBlockItem]
+    func reloadPaginatedData(totalCount: Int, packSize: Int, scheduledOnly: Bool) async throws -> [ProtectedBlockItem]
     
     func eraseAllData() async throws
     

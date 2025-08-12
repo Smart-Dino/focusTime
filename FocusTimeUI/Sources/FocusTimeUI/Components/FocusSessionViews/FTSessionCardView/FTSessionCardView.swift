@@ -9,16 +9,23 @@ import SwiftUI
 
 public struct FTSessionCardView: View {
     public enum CardMode {
-        case awaiting(timeRange: String)
+        case draft(timeRange: String)
+        case scheduled(timeRange: String)
         case active(viewModel: FocusSessionTimerModel)
     }
     private let emoji: String
     private let title: String
-    private let mode: CardMode
+    @State private var mode: CardMode
     
     public var body: some View {
         switch mode {
-        case .awaiting(let timeRange):
+        case .draft(timeRange: let timeRange):
+            FTSessionActiveRowView(
+                emoji: emoji,
+                title: title,
+                description: timeRange
+            )
+        case .scheduled(let timeRange):
             FTSessionScheduledRowView(
                 emoji: emoji,
                 title: title,
@@ -28,7 +35,7 @@ public struct FTSessionCardView: View {
             FTSessionActiveRowView(
                 emoji: emoji,
                 title: title,
-                viewModel: viewModel
+                description: viewModel.state.formattedTime
             )
         }
     }
@@ -48,7 +55,7 @@ public struct FTSessionCardView: View {
     FTSessionCardView(
         emoji: "🧪",
         title: "Test",
-        mode: .awaiting(timeRange: "8:00 - 15:00")
+        mode: .scheduled(timeRange: "8:00 - 15:00")
     )
     .padding()
     .preferredColorScheme(.dark)

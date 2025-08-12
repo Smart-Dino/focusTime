@@ -111,12 +111,10 @@ struct HomeView: View {
 
 #Preview {
     NavigationStack {
-        let blockItemPersistenceManager = LiveBlockItemPersistenceManager(
-            blockItemStore: PreviewData.memoryOnlyBlockItemStore
-        )
+        let manager = PreviewData.mockBlockItemPersistenceManager
         HomeView(
             viewModel: .init(
-                blockItemPersistenceManager: blockItemPersistenceManager,
+                blockItemPersistenceManager: manager,
                 delegate: nil
             )
         )

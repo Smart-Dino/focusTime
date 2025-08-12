@@ -73,7 +73,6 @@ struct DraftsBlockItemListView: View {
             }
         )
         .onAppear {
-            print("Appeared")
             viewModel.loadData()
         }
     }
@@ -99,13 +98,16 @@ struct DraftsBlockItemListView: View {
         case .scheduled(_, _, let active):
             isActive = active
         }
-
+        
         return Group {
             if isActive, let timeLeft = block.type.secondsToIntervalEndIfShouldBeRunning() {
-                FTSessionActiveRowView(
+                FTSessionCardView(
                     emoji: block.emoji,
                     title: block.name,
-                    viewModel: viewModel.makeTimerViewModelForActiveSession(blockItem: block, timeLeft: timeLeft)
+                    mode: .active(viewModel: viewModel.makeTimerViewModelForActiveSession(
+                        blockItem: block,
+                        timeLeft: timeLeft
+                    ))
                 )
             } else {
                 FTSessionScheduledRowView(
@@ -114,9 +116,6 @@ struct DraftsBlockItemListView: View {
                     description: block.type.description
                 )
             }
-        }
-        .onAppear {
-            print("Group changed")
         }
     }
     
@@ -135,7 +134,7 @@ struct DraftsBlockItemListView: View {
 
 #Preview {
     let factory = MockPersistenceStoreFactory()
-    let manager = LiveBlockItemPersistenceManager(blockItemStore: PreviewData.memoryOnlyBlockItemStore)
+    let manager = PreviewData.mockBlockItemPersistenceManager
     
     DraftsBlockItemListView(
         viewModel: .init(blockItemPersistenceManager: manager)

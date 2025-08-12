@@ -10,8 +10,7 @@ import SwiftUI
 public struct FTSessionActiveRowView: View {
     private let emoji: String
     private let title: String
-    
-    @State private var viewModel: FocusSessionTimerModel // // Does not work without @State.
+    @State private var description: String
     
     public var body: some View {
         HStack(spacing: 15) {
@@ -19,7 +18,7 @@ public struct FTSessionActiveRowView: View {
                 .font(.title2)
             VStack(alignment: .leading) {
                 Text(title)
-                Text(viewModel.state.formattedTime)
+                Text(description)
                     .foregroundStyle(.ftGray3Light)
             }
             Spacer()
@@ -35,7 +34,7 @@ public struct FTSessionActiveRowView: View {
             }
         }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(emoji), \(title), \(viewModel.state.formattedTime)")
+        .accessibilityLabel("\(emoji), \(title), \(description)")
     }
     
     public var gradient: LinearGradient {
@@ -49,11 +48,11 @@ public struct FTSessionActiveRowView: View {
     public init(
         emoji: String,
         title: String,
-        viewModel: FocusSessionTimerModel
+        description: String
     ) {
         self.emoji = emoji
         self.title = title
-        self.viewModel = viewModel
+        self.description = description
     }
     
 }
@@ -67,7 +66,7 @@ public struct FTSessionActiveRowView: View {
     FTSessionActiveRowView(
         emoji: "😎",
         title: "Cool",
-        viewModel: viewModel
+        description: viewModel.state.formattedTime
     )
     .padding()
     .preferredColorScheme(.dark)
