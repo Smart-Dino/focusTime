@@ -10,7 +10,7 @@ import SwiftUI
 public struct FTActiveSessionCardView: View {
     private let emoji: String
     private let title: String
-    @State private var timerModel: FocusSessionTimerModel
+    private let timerModel: FocusSessionTimerModel // Do not add state here.
     
     public var body: some View {
         FTSessionDraftRowView(

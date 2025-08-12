@@ -58,11 +58,13 @@ public final class FocusSessionTimerModel {
         self.delegate = delegate
         updateTimeLeft()
         startTimer()
+        print(String(describing: self) + " " + ObjectIdentifier(self).debugDescription)
     }
     
     isolated deinit {
         timer?.cancel()
         print("Timer deinit")
+        print(String(describing: self) + " " + ObjectIdentifier(self).debugDescription)
     }
 
     // MARK: - Timer
@@ -83,8 +85,7 @@ public final class FocusSessionTimerModel {
         state.formattedTime = String(format: "%02d:%02d:%02d", state.hours, state.minutes, state.seconds)
 
         if remaining <= 0 {
-            timer?.cancel()
-            timer = nil
+            self.stop()
             delegate?.didFinishCountdown()
         }
     }

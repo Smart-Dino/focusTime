@@ -105,7 +105,7 @@ struct DraftsBlockItemListView: View {
     
     @ViewBuilder
     private func sessionCard(for block: ProtectedBlockItem) -> some View {
-        if let timeLeft = block.type.secondsToIntervalEndIfShouldBeRunning() {
+        if let timeLeft = block.type.secondsToIntervalEndIfShouldBeRunning(), timeLeft >= 1 {
             FTActiveSessionCardView(
                 emoji: block.emoji,
                 title: block.name,
