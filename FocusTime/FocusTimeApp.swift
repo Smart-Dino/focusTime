@@ -9,17 +9,16 @@ import SwiftUI
 
 @main
 struct FocusTimeApp: App {
-    let launchFlowViewModel: LaunchFlowCoordinatorViewModel
+    let appFlowViewModel: AppFlowCoordinatorViewModel
     
     var body: some Scene {
         WindowGroup {
-            LaunchFlowView(viewModel: launchFlowViewModel)
+            AppFlowCoordinatorView(viewModel: appFlowViewModel)
                 .preferredColorScheme(.dark) // Inject dark color scheme throughout the app.
         }
     }
     
     init() {
-        let persistenceStoreFactory = LivePersistenceStoreFactory()
-        self.launchFlowViewModel = LaunchFlowCoordinatorViewModel(persistenceStoreFactory: persistenceStoreFactory)
+        self.appFlowViewModel = AppFlowCoordinatorViewModel()
     }
 }
