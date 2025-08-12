@@ -41,16 +41,16 @@ final class LaunchFlowCoordinatorViewModel {
     private(set) var state: State!
     private let defaultsManager: DefaultsManager
     private let paymentManagerFactory: PaymentManagerFactory
+    private var paymentManager: PaymentManager?
     private var modelContainer: ModelContainer?
     
     init(
-        state: State = State(),
         defaultsManager: DefaultsManager = LiveDefaultsManager(),
         paymentManagerFactory: PaymentManagerFactory = LivePaymentManagerFactory()
     ) {
-        self.state = state
         self.defaultsManager = defaultsManager
         self.paymentManagerFactory = paymentManagerFactory
+        self.state = State(currentFlow: .splash(viewModel: makeSplashScreenViewModel()))
         
         Task {
             await setupDependencies()
