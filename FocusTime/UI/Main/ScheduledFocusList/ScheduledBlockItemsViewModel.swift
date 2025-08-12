@@ -37,10 +37,9 @@ final class ScheduledBlockItemsViewModel {
             do {
                 let newItems = try await blockItemPersistenceManager.reloadPaginatedData(
                     totalCount: state.items.count,
-                    packSize: state.amountPerPage,
-                    scheduledOnly: true
+                    packSize: state.amountPerPage
                 )
-                state.items = newItems
+                state.items = newItems.filter(\.isScheduled)
             } catch {
                 state.error = error
             }
@@ -54,10 +53,9 @@ final class ScheduledBlockItemsViewModel {
             do {
                 let newItems = try await blockItemPersistenceManager.fetchPaginated(
                     page: state.page,
-                    amountPerPage: state.amountPerPage,
-                    scheduledOnly: true
+                    amountPerPage: state.amountPerPage
                 )
-                state.items.append(contentsOf: newItems)
+                state.items.append(contentsOf: newItems.filter(\.isScheduled))
                 state.page += 1
             } catch {
                 state.error = error

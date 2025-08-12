@@ -67,14 +67,14 @@ struct ScheduledBlockItemsView: View {
     var schedulesView: some View {
         ScrollView(.vertical) {
             LazyVStack {
-                ForEach(viewModel.state.items) { schedule in
-                    FTSessionScheduledRowView(
-                        emoji: schedule.emoji,
-                        title: schedule.name,
-                        description: schedule.days.description
+                ForEach(viewModel.state.items) { block in
+                    FTSessionCardView(
+                        emoji: block.emoji,
+                        title: block.name,
+                        mode: .scheduled(description: block.type.description)
                     )
                     .padding(1)
-                    .onAppear { viewModel.hasReachEndOfList(blockItem: schedule) }
+                    .onAppear { viewModel.hasReachEndOfList(blockItem: block) }
                 }
             }
         }

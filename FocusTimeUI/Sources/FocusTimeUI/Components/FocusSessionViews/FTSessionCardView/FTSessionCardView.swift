@@ -9,33 +9,26 @@ import SwiftUI
 
 public struct FTSessionCardView: View {
     public enum CardMode {
-        case draft(timeRange: String)
-        case scheduled(timeRange: String)
-        case active(viewModel: FocusSessionTimerModel)
+        case draft(description: String)
+        case scheduled(description: String)
     }
     private let emoji: String
     private let title: String
-    @State private var mode: CardMode
+    private var mode: CardMode
     
     public var body: some View {
         switch mode {
-        case .draft(timeRange: let timeRange):
-            FTSessionActiveRowView(
+        case .draft(let description):
+            FTSessionDraftRowView(
                 emoji: emoji,
                 title: title,
-                description: timeRange
+                description: description
             )
-        case .scheduled(let timeRange):
+        case .scheduled(let description):
             FTSessionScheduledRowView(
                 emoji: emoji,
                 title: title,
-                description: timeRange
-            )
-        case .active(let viewModel):
-            FTSessionActiveRowView(
-                emoji: emoji,
-                title: title,
-                description: viewModel.state.formattedTime
+                description: description
             )
         }
     }
@@ -55,22 +48,7 @@ public struct FTSessionCardView: View {
     FTSessionCardView(
         emoji: "🧪",
         title: "Test",
-        mode: .scheduled(timeRange: "8:00 - 15:00")
-    )
-    .padding()
-    .preferredColorScheme(.dark)
-}
-
-#Preview("Active", traits: .sizeThatFitsLayout) {
-    @Previewable @State var viewModel = FocusSessionTimerModel(
-        state: .init(isPaused: false),
-        deadline: .now.addingTimeInterval(160),
-        delegate: nil
-    )
-    FTSessionCardView(
-        emoji: "🧪",
-        title: "Test",
-        mode: .active(viewModel: viewModel)
+        mode: .scheduled(description: "8:00 - 15:00")
     )
     .padding()
     .preferredColorScheme(.dark)

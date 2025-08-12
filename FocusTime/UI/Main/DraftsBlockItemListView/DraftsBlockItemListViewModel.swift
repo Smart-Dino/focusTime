@@ -24,6 +24,8 @@ final class DraftsBlockItemListViewModel {
     private(set) var state: State
     
     private let blockItemPersistenceManager: BlockItemPersistenceManager
+    private var currentTimerViewModel: FocusSessionTimerModel? = nil
+    
     private var fetchTask: Task<Void, Never>?
     private var dbChangesNotificationTask: Task<Void, Never>?
     
@@ -37,14 +39,34 @@ final class DraftsBlockItemListViewModel {
         subscribeToDB()
     }
     
+    func makeTimerViewModel(for blockItem: ProtectedBlockItem, timeLeft: Int) -> FocusSessionTimerModel {
+        if let currentTimerViewModel {
+            return currentTimerViewModel
+        }
+        
+        let isPaused = {
+            if case .duration(_, _, let suspendedAt, _) = blockItem.type {
+                return suspendedAt != nil
+            }
+            return false
+        }()
+        
+        currentTimerViewModel = FocusSessionTimerModel(
+            state: .init(isPaused: isPaused),
+            deadline: .now.addingTimeInterval(TimeInterval(timeLeft)),
+            delegate: self
+        )
+
+        return currentTimerViewModel!
+    }
+    
     private func reloadItems() {
         fetchTask?.cancel()
         fetchTask = Task {
             do {
                 let newItems = try await blockItemPersistenceManager.reloadPaginatedData(
                     totalCount: state.items.count,
-                    packSize: state.amountPerPage,
-                    scheduledOnly: false
+                    packSize: state.amountPerPage
                 )
                 state.items = newItems
             } catch {
@@ -53,15 +75,14 @@ final class DraftsBlockItemListViewModel {
             fetchTask = nil
         }
     }
-
+    
     private func fetchNextPage() {
         guard fetchTask == nil else { return }
         fetchTask = Task {
             do {
                 let newItems = try await blockItemPersistenceManager.fetchPaginated(
                     page: state.page,
-                    amountPerPage: state.amountPerPage,
-                    scheduledOnly: false
+                    amountPerPage: state.amountPerPage
                 )
                 state.items.append(contentsOf: newItems)
                 state.page += 1
@@ -71,7 +92,7 @@ final class DraftsBlockItemListViewModel {
             fetchTask = nil
         }
     }
-
+    
     func subscribeToDB() {
         dbChangesNotificationTask = Task {
             for await _ in await blockItemPersistenceManager.contextChangesStream() {
@@ -96,26 +117,19 @@ final class DraftsBlockItemListViewModel {
         }
     }
     
-    func makeTimerViewModelForActiveSession(blockItem: ProtectedBlockItem, timeLeft: Int) -> FocusSessionTimerModel {
-        let isPaused: Bool = {
-            if case .duration(_, _, let suspendedAt, _) = blockItem.type {
-                return suspendedAt != nil
-            }
-            return false
-        }()
-
-        let deadline = Date.now.addingTimeInterval(TimeInterval(timeLeft))
-        return FocusSessionTimerModel(
-            state: .init(isPaused: isPaused),
-            deadline: deadline,
-            delegate: nil
-        )
-    }
-
-    
     func hasReachEndOfList(blockItem: ProtectedBlockItem){
         if blockItem.id == state.items.last?.id {
             fetchNextPage()
         }
+    }
+}
+
+extension DraftsBlockItemListViewModel: FocusSessionTimerModelDelegate {
+    func didUpdateIsPaused(_: Bool) {
+        return // Cannot pause from this view.
+    }
+    
+    func didFinishCountdown() {
+        currentTimerViewModel = nil
     }
 }

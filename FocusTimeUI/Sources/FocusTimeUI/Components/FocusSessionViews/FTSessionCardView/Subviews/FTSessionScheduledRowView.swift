@@ -1,5 +1,5 @@
 //
-//  FTSessionSummaryCardView.swift
+//  FTScheduledFocusRowView.swift
 //  FocusTimeUI
 //
 //  Created by Maksym Horobets on 18.06.2025.
@@ -7,12 +7,12 @@
 
 import SwiftUI
 
-public struct FTSessionActiveRowView: View {
+struct FTSessionScheduledRowView: View {
     private let emoji: String
     private let title: String
-    @State private var description: String
+    private let description: String
     
-    public var body: some View {
+    var body: some View {
         HStack(spacing: 15) {
             Text(emoji)
                 .font(.title2)
@@ -22,6 +22,9 @@ public struct FTSessionActiveRowView: View {
                     .foregroundStyle(.ftGray3Light)
             }
             Spacer()
+            Image(systemName: "hourglass.bottomhalf.filled")
+                .font(.title3)
+                .foregroundStyle(.blue)
         }
         .padding()
         .background {
@@ -37,15 +40,15 @@ public struct FTSessionActiveRowView: View {
         .accessibilityLabel("\(emoji), \(title), \(description)")
     }
     
-    public var gradient: LinearGradient {
+    var gradient: LinearGradient {
         LinearGradient(
-            colors: [.leadingSummaryCard, .trailingSummaryCard],
+            colors: [.leadingScheduledFocus, .trailingScheduledFocus],
             startPoint: .leading,
             endPoint: .trailing
         )
     }
     
-    public init(
+    init(
         emoji: String,
         title: String,
         description: String
@@ -58,15 +61,10 @@ public struct FTSessionActiveRowView: View {
 }
 
 #Preview(traits: .sizeThatFitsLayout) {
-    @Previewable @State var viewModel: FocusSessionTimerModel = .init(
-        state: .init(isPaused: false),
-        deadline: .now.addingTimeInterval(160),
-        delegate: nil
-    )
-    FTSessionActiveRowView(
+    FTSessionScheduledRowView(
         emoji: "😎",
         title: "Cool",
-        description: viewModel.state.formattedTime
+        description: "This is a cool view huh?"
     )
     .padding()
     .preferredColorScheme(.dark)

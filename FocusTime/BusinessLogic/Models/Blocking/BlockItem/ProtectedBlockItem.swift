@@ -19,6 +19,7 @@ struct ProtectedBlockItem: ProtectedModel {
     var days: Set<Weekday>
     var type: ScheduleType
     var isTemporary: Bool
+    var isScheduled: Bool
     var blockedContent: ProtectedActivitySelection
     
     init(
@@ -29,6 +30,7 @@ struct ProtectedBlockItem: ProtectedModel {
         days: Set<Weekday>,
         type: ScheduleType,
         isTemporary: Bool = false,
+        isScheduled: Bool = false,
         blockedContent: ProtectedActivitySelection
     ) {
         self.id = id
@@ -38,6 +40,7 @@ struct ProtectedBlockItem: ProtectedModel {
         self.days = days
         self.type = type
         self.isTemporary = isTemporary
+        self.isScheduled = isScheduled
         self.blockedContent = blockedContent
     }
     

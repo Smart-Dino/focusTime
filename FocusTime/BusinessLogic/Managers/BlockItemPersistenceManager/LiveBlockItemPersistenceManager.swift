@@ -106,19 +106,17 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
     
     func fetchPaginated(
         page: Int,
-        amountPerPage: Int,
-        scheduledOnly: Bool
+        amountPerPage: Int
     ) async throws -> [ProtectedBlockItem] {
         let items = try await store.fetch(page: page, amountPerPage: page)
         let filteredFromTemp = items.filter { !$0.isTemporary }
         
-        return scheduledOnly ? await filterScheduled(filteredFromTemp) : filteredFromTemp
+        return await markScheduled(filteredFromTemp)
     }
     
     func reloadPaginatedData(
         totalCount: Int,
-        packSize: Int,
-        scheduledOnly: Bool
+        packSize: Int
     ) async throws -> [ProtectedBlockItem] {
         var allItems: [ProtectedBlockItem] = []
 
@@ -137,7 +135,7 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
             await Task.yield() // Allow thread to breathe between batches.
         }
 
-        return scheduledOnly ? await filterScheduled(allItems) : allItems
+        return await markScheduled(allItems)
     }
 
     
@@ -173,8 +171,17 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
 
 // MARK: Helpers
 extension LiveBlockItemPersistenceManager {
-    func filterScheduled(_ items: [ProtectedBlockItem]) async -> [ProtectedBlockItem] {
+    func markScheduled(_ items: [ProtectedBlockItem]) async -> [ProtectedBlockItem] {
         let trackedIdentifiers = await centerManager.monitoredIdentifiers
-        return items.filter { trackedIdentifiers.contains($0.id) }
+        var items = items
+        
+        for i in 0..<items.count {
+            let item = items[i]
+            if trackedIdentifiers.contains(item.id) {
+                items[i].isScheduled = true
+            }
+        }
+        
+        return items
     }
 }

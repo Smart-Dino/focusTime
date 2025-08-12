@@ -12,6 +12,7 @@ struct DraftsBlockItemListView: View {
     @State var viewModel: DraftsBlockItemListViewModel
     
     var body: some View {
+        let _ = Self._printChanges()
         ZStack {
             // MARK: - Wave image
             VStack {
@@ -77,48 +78,6 @@ struct DraftsBlockItemListView: View {
         }
     }
     
-    var blockListView: some View {
-        ScrollView(.vertical) {
-            LazyVStack {
-                ForEach(viewModel.state.items) { block in
-                    makeSessionCardView(for: block)
-                        .padding(1)
-                        .onAppear { viewModel.hasReachEndOfList(blockItem: block) }
-                }
-            }
-        }
-        .padding(.top)
-    }
-    
-    func makeSessionCardView(for block: ProtectedBlockItem) -> some View {
-        let isActive: Bool
-        switch block.type {
-        case .duration(_, let startedAt, _, _):
-            isActive = (startedAt != nil)
-        case .scheduled(_, _, let active):
-            isActive = active
-        }
-        
-        return Group {
-            if isActive, let timeLeft = block.type.secondsToIntervalEndIfShouldBeRunning() {
-                FTSessionCardView(
-                    emoji: block.emoji,
-                    title: block.name,
-                    mode: .active(viewModel: viewModel.makeTimerViewModelForActiveSession(
-                        blockItem: block,
-                        timeLeft: timeLeft
-                    ))
-                )
-            } else {
-                FTSessionScheduledRowView(
-                    emoji: block.emoji,
-                    title: block.name,
-                    description: block.type.description
-                )
-            }
-        }
-    }
-    
     var noBlockListView: some View {
         VStack(spacing: 15) {
             Spacer()
@@ -128,6 +87,44 @@ struct DraftsBlockItemListView: View {
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.ftGray3Light)
             Spacer()
+        }
+    }
+    
+    var blockListView: some View {
+        ScrollView(.vertical) {
+            LazyVStack {
+                ForEach(viewModel.state.items) { block in
+                    sessionCard(for: block)
+                        .padding(1)
+                        .onAppear { viewModel.hasReachEndOfList(blockItem: block) }
+                }
+            }
+        }
+        .padding(.top)
+    }
+    
+    @ViewBuilder
+    private func sessionCard(for block: ProtectedBlockItem) -> some View {
+        if let timeLeft = block.type.secondsToIntervalEndIfShouldBeRunning() {
+            FTActiveSessionCardView(
+                emoji: block.emoji,
+                title: block.name,
+                timerModel: viewModel.makeTimerViewModel(
+                    for: block,
+                    timeLeft: timeLeft
+                )
+            )
+        } else {
+            let description = block.type.description
+            let mode: FTSessionCardView.CardMode = block.isScheduled
+            ? .scheduled(description: description)
+            : .draft(description: description)
+            
+            FTSessionCardView(
+                emoji: block.emoji,
+                title: block.name,
+                mode: mode
+            )
         }
     }
 }
