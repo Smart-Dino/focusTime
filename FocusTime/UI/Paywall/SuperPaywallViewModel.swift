@@ -66,7 +66,8 @@ final class SuperPaywallViewModel {
     }
     
     deinit {
-        subscriptionTask?.cancel()
+        self.subscriptionTask?.cancel()
+        self.subscriptionTask = nil
     }
     
     // MARK: - Stream

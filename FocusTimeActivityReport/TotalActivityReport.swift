@@ -24,18 +24,11 @@ nonisolated struct TotalActivityReport: DeviceActivityReportScene {
         formatter.unitsStyle = .abbreviated
         formatter.zeroFormattingBehavior = .dropAll
         
-        // This is Apple's code with sendability issues.
-//        let totalActivityDuration = await data.flatMap { $0.activitySegments }.reduce(0, {
-//            $0 + $1.totalActivityDuration
-//        })
-        
-        
-        let segments = data.map(\.activitySegments)
-        var totalActivityDuration: Double = .zero
-
-        for await activityGroup in segments {
-            let groupTotal = await activityGroup.reduce(0) { $0 + $1.totalActivityDuration }
-            totalActivityDuration += groupTotal
+        var totalActivityDuration: TimeInterval = 0
+        for await result in data {
+            for await segment in result.activitySegments {
+                totalActivityDuration += segment.totalActivityDuration
+            }
         }
         
         return formatter.string(from: totalActivityDuration) ?? "No activity data"

@@ -89,10 +89,7 @@
 		C64C07892E329BEF00350A45 /* Exceptions for "FocusTimeActivityReport" folder in "FocusTime" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Colors.xcassets,
 				"DeviceActivityReportContext+Ext.swift",
-				TotalActivityReport.swift,
-				TotalActivityView.swift,
 			);
 			target = 674FA69F2DB05ACE0002FDC1 /* FocusTime */;
 		};
@@ -765,8 +762,7 @@
 		C68617B62E2976BD00E49BF7 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = FocusTimeShieldConfiguration/FocusTimeShieldConfiguration.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_ENTITLEMENTS = FocusTimeShieldConfiguration/FocusTimeShieldConfigurationRelease.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
@@ -831,8 +827,7 @@
 		C6A8A0C42E327781004B0D75 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = FocusTimeActivityReport/FocusTimeActivityReport.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_ENTITLEMENTS = FocusTimeActivityReport/FocusTimeActivityReportRelease.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
