@@ -41,9 +41,9 @@ final class DraftsBlockItemListViewModel {
         fetchTask?.cancel()
         fetchTask = Task {
             do {
-                let newItems = try await blockItemPersistenceManager.fetchPaginated(
-                    page: state.page,
-                    amountPerPage: state.amountPerPage,
+                let newItems = try await blockItemPersistenceManager.reloadPaginatedData(
+                    totalCount: state.items.count,
+                    packSize: state.amountPerPage,
                     includeTemporary: false
                 )
                 state.items = newItems
@@ -89,6 +89,7 @@ final class DraftsBlockItemListViewModel {
     
     func loadData() {
         if state.items.isEmpty {
+            state.page = 0
             fetchNextPage()
         } else {
             reloadItems()
