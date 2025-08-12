@@ -2,11 +2,11 @@
 //  PaymentManagerFactory.swift
 //  FocusTime
 //
-//  Created by Maksym Horobets on 12.08.2025.
+//  Created by Maksym Horobets on 11.08.2025.
 //
 
 import Foundation
 
-protocol PaymentManagerFactory: Actor {
+protocol PaymentManagerFactory: Sendable {
     func makePaymentManager() async -> PaymentManager
 }
