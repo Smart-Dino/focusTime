@@ -19,7 +19,7 @@ struct MainFlowCoordinatorView: View {
                 viewModel.setTabScreen(screen)
             })) {
                 Group {
-                    HomeView(viewModel: viewModel.makeHomeViewModel())
+                    HomeView(viewModel: viewModel.homeViewModel)
                         .tabItem {
                             LabeledContent("Home") {
                                 Image(.wavelogo)
@@ -27,7 +27,7 @@ struct MainFlowCoordinatorView: View {
                             }
                         }
                         .tag(MainTabScreens.home)
-                    DraftsBlockItemListView(viewModel: viewModel.makeDraftsBlockItemListViewModel())
+                    DraftsBlockItemListView(viewModel: viewModel.draftsBlockItemListViewModel)
                         .tabItem {
                             Label("Blocks", systemImage: "hand.raised")
                             // Prevent system from filling system icons.
@@ -41,6 +41,9 @@ struct MainFlowCoordinatorView: View {
                 .toolbarBackground(.hidden, for: .tabBar) // Removes background and sets
                 // selected item to be white-tinted.
                 .toolbarColorScheme(.dark, for: .tabBar)
+            }
+            .onAppear {
+                viewModel.setupFlow()
             }
             .toolbar(.visible)
             .toolbar {
