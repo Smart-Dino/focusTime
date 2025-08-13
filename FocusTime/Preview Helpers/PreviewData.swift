@@ -33,4 +33,12 @@ enum PreviewData {
         )
     }()
     
+    
+    static let mockActivityRegistrar = {
+        return LiveDeviceActivityRegistrar(
+            blockItemPersistenceManager: mockBlockItemPersistenceManager,
+            shieldManager: LiveShieldManager()
+        )
+    }()
+    
 }

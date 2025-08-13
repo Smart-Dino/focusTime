@@ -8,35 +8,32 @@
 import SwiftUI
 
 public struct FTHomeSessionCardView: View {
-    public enum CardMode {
-        case scheduled(timeRange: String)
-        case countdown(timer: FTTimer)
-    }
-    
     private let title: String
-    @State private var mode: CardMode // Does not work without @State.
+    private let description: String
+    private let isActive: Bool
+    
+    @Binding var isPaused: Bool
     
     public var body: some View {
         HStack(spacing: 15) {
-            switch mode {
-            case .scheduled(let timeRange):
+            if !isActive {
                 VStack(alignment: .leading) {
                     Text(title)
-                    Text(timeRange)
+                    Text(description)
                         .foregroundStyle(.ftGray3Light)
                 }
                 Spacer()
-            case .countdown(let timer):
+            } else {
                 VStack(alignment: .leading) {
                     Text(title)
-                    Text(timer.payload.formatted)
+                    Text(description)
                         .foregroundStyle(.ftGray3Light)
                 }
                 Spacer()
                 Button {
-                    timer.isPaused ? timer.resume() : timer.pause()
+                    isPaused.toggle()
                 } label: {
-                    timer.isPaused
+                    isPaused
                     ? Image(systemName: "play.circle").foregroundStyle(.blue)
                     : Image(systemName: "pause.circle").foregroundStyle(.red)
                 }
@@ -66,10 +63,14 @@ public struct FTHomeSessionCardView: View {
     
     public init(
         title: String,
-        mode: CardMode,
+        description: String,
+        isActive: Bool,
+        isPaused: Binding<Bool>
     ) {
         self.title = title
-        self.mode = mode
+        self.description = description
+        self.isActive = isActive
+        self._isPaused = isPaused
     }
     
 }
@@ -77,23 +78,9 @@ public struct FTHomeSessionCardView: View {
 #Preview("Scheduled", traits: .sizeThatFitsLayout) {
     FTHomeSessionCardView(
         title: "Work time",
-        mode: .scheduled(timeRange: "8:00 - 16:00"),
+        description: "00:00:01",
+        isActive: true,
+        isPaused: .constant(true)
     )
     .preferredColorScheme(.dark)
 }
-
-
-//#Preview("Countdown", traits: .sizeThatFitsLayout) {
-//    VStack {
-//        FTHomeSessionCardView(
-//            title: "Work time",
-//            mode: .countdown(
-//                viewModel: ...
-//            ),
-//        )
-//        .preferredColorScheme(.dark)
-//        Button("Toggle pause") {
-//            viewModel.togglePause()
-//        }
-//    }
-//}

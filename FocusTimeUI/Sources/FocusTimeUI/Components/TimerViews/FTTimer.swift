@@ -37,13 +37,14 @@ public protocol FTTimerDelegate: AnyObject {
 public protocol FTTimer: AnyObject, Observable {
     var payload: FTTimerPayload { get }
     var isPaused: Bool { get }
+    var isRunning: Bool { get }
     var delegate: FTTimerDelegate? { get set }
     
     func setHours(_ hours: Int)
     func setMinutes(_ minutes: Int)
     func setSeconds(_ seconds: Int)
     
-    func start(deadline: Date, isInitiallyPaused: Bool, delegate: FTTimerDelegate?)
+    func start(deadline: Date, isInitiallyPaused: Bool)
     func pause()
     func resume()
     func cancel()

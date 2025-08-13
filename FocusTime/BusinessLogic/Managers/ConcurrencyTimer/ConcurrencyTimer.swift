@@ -15,6 +15,9 @@ final class ConcurrencyTimer: FTTimer {
     
     @ObservationIgnored weak var delegate: FTTimerDelegate?
     private(set) var isPaused = false
+    var isRunning: Bool {
+        timer != nil
+    }
     private(set) var payload: FTTimerPayload = .init()
 
     private func ping() {
@@ -45,9 +48,8 @@ final class ConcurrencyTimer: FTTimer {
         payload.seconds = seconds
     }
 
-    func start(deadline: Date, isInitiallyPaused: Bool, delegate: FTTimerDelegate?) {
+    func start(deadline: Date, isInitiallyPaused: Bool) {
         self.deadline = deadline
-        self.delegate = delegate
         self.isPaused = isInitiallyPaused
 
         timer?.cancel()

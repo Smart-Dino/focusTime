@@ -5,8 +5,9 @@
 //  Created by Maksym Horobets on 13.06.2025.
 //
 
-import Foundation
 import SwiftData
+import Foundation
+import FocusTimeUI
 
 enum MainFlowNavigationRoute: Equatable, Hashable {
     case shieldDebug(_ viewModel: ShieldDebugViewModel)
@@ -65,7 +66,11 @@ final class MainFlowCoordinatorViewModel {
         var debugViewCount: Int = 0
         var nextNavigationScreen: MainFlowNavigationRoute?
     }
+    
     private(set) var state: State
+    let timer: FTTimer
+    
+    private let deviceActivityRegistrar: DeviceActivityRegistrar
     private let blockItemPersistenceManager: BlockItemPersistenceManager
     weak var appFlowDelegate: MainFlowDelegate?
     
@@ -73,10 +78,14 @@ final class MainFlowCoordinatorViewModel {
     
     init(
         state: State = State(currentTabScreen: .none),
+        timer: FTTimer = ConcurrencyTimer(),
+        deviceActivityRegistrar: DeviceActivityRegistrar,
         blockItemPersistenceManager: BlockItemPersistenceManager,
         appFlowDelegate: MainFlowDelegate?
     ) {
         self.state = state
+        self.timer = timer
+        self.deviceActivityRegistrar = deviceActivityRegistrar
         self.blockItemPersistenceManager = blockItemPersistenceManager
         self.appFlowDelegate = appFlowDelegate
         
@@ -86,10 +95,18 @@ final class MainFlowCoordinatorViewModel {
     func setupFlow() {
         state.tabViewModels = [
             State.MainTabScreens.home(
-                viewModel: HomeViewModel(blockItemPersistenceManager: blockItemPersistenceManager, delegate: self)
+                viewModel: HomeViewModel(
+                    timer: timer,
+                    deviceActivityRegistrar: deviceActivityRegistrar,
+                    blockItemPersistenceManager: blockItemPersistenceManager,
+                    delegate: self
+                )
             ),
             State.MainTabScreens.drafts(
-                viewModel: DraftsBlockItemListViewModel(blockItemPersistenceManager: blockItemPersistenceManager)
+                viewModel: DraftsBlockItemListViewModel(
+                    timer: timer,
+                    blockItemPersistenceManager: blockItemPersistenceManager
+                )
             )
         ]
         state.currentTabScreen = state.tabViewModels.first!

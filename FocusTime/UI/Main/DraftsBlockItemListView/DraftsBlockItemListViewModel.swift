@@ -22,7 +22,7 @@ final class DraftsBlockItemListViewModel {
     }
     
     private(set) var state: State
-    private(set) var timer: FTTimer // There can only be one schedule running at a time.
+    let timer: FTTimer // There can only be one schedule running at a time.
     
     private let blockItemPersistenceManager: BlockItemPersistenceManager
     
@@ -31,29 +31,16 @@ final class DraftsBlockItemListViewModel {
     
     init(
         state: State = State(),
-        timer: FTTimer = ConcurrencyTimer(),
+        timer: FTTimer,
         blockItemPersistenceManager: BlockItemPersistenceManager
     ) {
         self.state = state
         self.timer = timer
         self.blockItemPersistenceManager = blockItemPersistenceManager
-        
-        subscribeToDB()
     }
     
-    func startTimer(for blockItem: ProtectedBlockItem, timeLeft: Int) {
-        let isPaused = {
-            if case .duration(_, _, let suspendedAt, _) = blockItem.type {
-                return suspendedAt != nil
-            }
-            return false
-        }()
-        
-        timer.start(
-            deadline: .now.addingTimeInterval(TimeInterval(timeLeft)),
-            isInitiallyPaused: isPaused,
-            delegate: self
-        )
+    func startTimer(for blockItem: ProtectedBlockItem) {
+        timer.startTimer(for: blockItem)
     }
     
     private func reloadItems() {
@@ -92,7 +79,7 @@ final class DraftsBlockItemListViewModel {
     func subscribeToDB() {
         dbChangesNotificationTask = Task {
             for await _ in await blockItemPersistenceManager.contextChangesStream() {
-                try? await Task.sleep(nanoseconds: 200_000_000) // debounce 0.2s
+                try? await Task.sleep(for: SharedAppValues.debounceAfterDBRefreshed)
                 reloadItems()
             }
         }
@@ -117,15 +104,5 @@ final class DraftsBlockItemListViewModel {
         if blockItem.id == state.items.last?.id {
             fetchNextPage()
         }
-    }
-}
-
-extension DraftsBlockItemListViewModel: FTTimerDelegate {
-    func didUpdateIsPaused(_: Bool) {
-        return // Cannot pause from this view.
-    }
-    
-    func didFinishCountdown() {
-        timer.cancel()
     }
 }

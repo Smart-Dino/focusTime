@@ -78,21 +78,25 @@ final class AppFlowCoordinatorViewModel {
     }
     
     private(set) var state: State
-    private var defaultsManager: DefaultsManager
+    private let shieldManager: ShieldManager
+    private let defaultsManager: DefaultsManager
     private let persistenceStoreFactory: PersistenceStoreFactory
     private let paymentManagerFactory: PaymentManagerFactory
     
     // Async.
+    private var deviceActivityRegistrar: DeviceActivityRegistrar?
     private var blockItemPersistenceManager: BlockItemPersistenceManager?
     private var paymentManager: PaymentManager?
     private var superPaywallVM: SuperPaywallViewModel?
     
     init(
+        shieldManager: ShieldManager = LiveShieldManager(),
         defaultsManager: LiveDefaultsManager = LiveDefaultsManager(),
         paymentManagerFactory: PaymentManagerFactory = LivePaymentManagerFactory(),
         persistenceStoreFactory: PersistenceStoreFactory = LivePersistenceStoreFactory()
     ) {
         self.state = State(currentFlow: .none)
+        self.shieldManager = shieldManager
         self.defaultsManager = defaultsManager
         self.paymentManagerFactory = paymentManagerFactory
         self.persistenceStoreFactory = persistenceStoreFactory
@@ -155,6 +159,10 @@ final class AppFlowCoordinatorViewModel {
         self.paymentManager = await paymentManager
         self.superPaywallVM = await SuperPaywallViewModel(paymentManager: paymentManager)
         self.blockItemPersistenceManager = await blockItemPersistenceManager
+        self.deviceActivityRegistrar = LiveDeviceActivityRegistrar(
+            blockItemPersistenceManager: await blockItemPersistenceManager,
+            shieldManager: shieldManager
+        )
     }
     
     private func setupInitialAppState() {
@@ -180,11 +188,12 @@ final class AppFlowCoordinatorViewModel {
     }
     
     private func makeMainFlowCoordinatorViewModel() -> MainFlowCoordinatorViewModel? {
-        guard let blockItemPersistenceManager else { return nil }
+        guard let blockItemPersistenceManager, let deviceActivityRegistrar else { return nil }
         
         return MainFlowCoordinatorViewModel(
+            deviceActivityRegistrar: deviceActivityRegistrar,
             blockItemPersistenceManager: blockItemPersistenceManager,
-            appFlowDelegate: self
+            appFlowDelegate: self,
         )
     }
     

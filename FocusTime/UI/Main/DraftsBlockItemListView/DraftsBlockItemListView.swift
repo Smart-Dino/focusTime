@@ -74,6 +74,7 @@ struct DraftsBlockItemListView: View {
         )
         .onAppear {
             viewModel.loadData()
+            viewModel.subscribeToDB()
         }
     }
     
@@ -104,14 +105,14 @@ struct DraftsBlockItemListView: View {
     
     @ViewBuilder
     private func sessionCard(for block: ProtectedBlockItem) -> some View {
-        if let timeLeft = block.type.secondsToIntervalEndIfShouldBeRunning(), timeLeft >= 1 {
+        if block.isActive {
             FTSessionDraftRowView(
                 emoji: block.emoji,
                 title: block.name,
                 description: viewModel.timer.payload.formatted
             )
             .onAppear {
-                viewModel.startTimer(for: block, timeLeft: timeLeft)
+                viewModel.startTimer(for: block)
             }
         } else {
             if block.isScheduled {
@@ -137,6 +138,9 @@ struct DraftsBlockItemListView: View {
     let manager = PreviewData.mockBlockItemPersistenceManager
     
     DraftsBlockItemListView(
-        viewModel: .init(blockItemPersistenceManager: manager)
+        viewModel: .init(
+            timer: ConcurrencyTimer(),
+            blockItemPersistenceManager: manager
+        )
     )
 }

@@ -104,6 +104,51 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
         }
     }
     
+    func fetchClosestOrRunningCurrentScheduled(now: Date) async throws -> ProtectedBlockItem? {
+        let identifiers = await centerManager.monitoredIdentifiers
+
+        // 1. Predicate for monitored identifiers.
+        let predicate = #Predicate<BlockItem> { identifiers.contains($0.id) }
+        let descriptor = FetchDescriptor<BlockItem>(predicate: predicate)
+
+        // 2. Fetch all monitored blocks.
+        let blocks = try await store.fetch(descriptor: descriptor)
+
+        // 3. Return running if found.
+        if let running = blocks.first(where: { $0.isActive }) {
+            return running
+        }
+
+        // 4. Mark scheduled & filter only scheduled ones.
+        let scheduledBlocks = await markScheduled(blocks).filter(\.isScheduled)
+
+        guard !scheduledBlocks.isEmpty else {
+            return nil
+        }
+
+        // 5. Sort by start time.
+        let sortedByStartTime = scheduledBlocks.sorted {
+            guard case .scheduled(let firstStart, _, _) = $0.type,
+                  case .scheduled(let secondStart, _, _) = $1.type else {
+                return false
+            }
+            return firstStart < secondStart
+        }
+
+        // 6. Find the closest future schedule.
+        let currentTimeComponent = try TimeComponents(from: now)
+        if let upcoming = sortedByStartTime.first(where: {
+            guard case .scheduled(let start, _, _) = $0.type else { return false }
+            return start > currentTimeComponent
+        }) {
+            return upcoming
+        }
+
+        // 7. If no future found, wrap to earliest (next day)
+        return sortedByStartTime.first!
+    }
+
+    
     func fetchPaginated(
         page: Int,
         amountPerPage: Int

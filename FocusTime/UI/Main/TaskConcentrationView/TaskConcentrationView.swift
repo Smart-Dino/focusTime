@@ -71,8 +71,7 @@ struct TaskConcentrationView: View {
             .onAppear {
                 timer.start(
                     deadline: .now.addingTimeInterval(70),
-                    isInitiallyPaused: false,
-                    delegate: nil
+                    isInitiallyPaused: false
                 )
             }
     }

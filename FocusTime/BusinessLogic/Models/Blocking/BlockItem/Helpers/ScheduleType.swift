@@ -43,8 +43,7 @@ enum ScheduleType: Codable, Hashable {
         case .scheduled(let startTime, let endTime, let isActive):
             guard isActive != false else { return nil }
             
-            let startOfDay = Calendar.current.startOfDay(for: now)
-            let currentSecondsFromMidnight = Int(now.timeIntervalSince(startOfDay))
+            let currentSecondsFromMidnight = Date.secondsSinceMidnight(now: now)
             
             let timeSinceStart = currentSecondsFromMidnight - startTime.localizedSecondsSinceMidnight
             let timeLeftInSeconds = endTime.localizedSecondsSinceMidnight - currentSecondsFromMidnight

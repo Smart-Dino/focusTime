@@ -22,6 +22,15 @@ final class BlockItem {
     // Blocked apps.
     var blockedContent: ProtectedActivitySelection
     
+    var isActive: Bool {
+        switch type {
+        case .scheduled(_, _, let isActive):
+            isActive
+        case .duration(_, let startedAt, _, _):
+            startedAt != nil
+        }
+    }
+    
     init(
         id: UUID = UUID(),
         name: String,
