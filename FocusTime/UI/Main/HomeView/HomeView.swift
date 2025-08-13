@@ -115,6 +115,7 @@ struct HomeView: View {
         )
         .onAppear {
             viewModel.setUpcomingItem()
+            viewModel.subscribeToDB()
             viewModel.injectDelegateToTimer()
         }
     }
