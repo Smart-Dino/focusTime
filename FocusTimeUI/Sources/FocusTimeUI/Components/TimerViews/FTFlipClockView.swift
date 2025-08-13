@@ -10,23 +10,23 @@ import SwiftUI
 public struct FTFlipClockView: View {
     let configuration: FTFlipClockConfiguration
     
-    private let viewModel: FocusSessionTimerModel // Indeed does work with no @State.
+    private let timer: FTTimer // Indeed does work with no @State.
     
     public var body: some View {
         HStack {
             FTFlipClockComponentView(
                 value: Binding {
-                    viewModel.state.hours
+                    timer.payload.hours
                 } set: { hours in
-                    viewModel.setHours(hours)
+                    timer.setHours(hours)
                 },
                 configuration: configuration
             )
             FTFlipClockComponentView(
                 value: Binding {
-                    viewModel.state.minutes
+                    timer.payload.minutes
                 } set: { minutes in
-                    viewModel.setMinutes(minutes)
+                    timer.setMinutes(minutes)
                 },
                 configuration: configuration
             )
@@ -35,23 +35,17 @@ public struct FTFlipClockView: View {
     
     public init(
         configuration: FTFlipClockConfiguration,
-        viewModel: FocusSessionTimerModel
+        timer: FTTimer
     ) {
         self.configuration = configuration
-        self.viewModel = viewModel
+        self.timer = timer
     }
 }
 
-#Preview {
-    let viewModel = FocusSessionTimerModel(
-        state: .init(isPaused: false),
-        deadline: .now.addingTimeInterval(70),
-        delegate: nil
-    )
-    
-    FTFlipClockView(
-        configuration: .init(),
-        viewModel: viewModel
-    )
-    .preferredColorScheme(.dark)
-}
+//#Preview {
+//    FTFlipClockView(
+//        configuration: .init(),
+//        viewModel: ...
+//    )
+//    .preferredColorScheme(.dark)
+//}

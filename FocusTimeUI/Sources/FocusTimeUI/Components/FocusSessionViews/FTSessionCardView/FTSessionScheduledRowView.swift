@@ -1,5 +1,5 @@
 //
-//  FTSessionSummaryCardView.swift
+//  FTScheduledFocusRowView.swift
 //  FocusTimeUI
 //
 //  Created by Maksym Horobets on 18.06.2025.
@@ -7,12 +7,12 @@
 
 import SwiftUI
 
-struct FTSessionDraftRowView: View {
+public struct FTSessionScheduledRowView: View {
     private let emoji: String
     private let title: String
-    private var description: String
+    private let description: String
     
-    var body: some View {
+    public var body: some View {
         HStack(spacing: 15) {
             Text(emoji)
                 .font(.title2)
@@ -22,6 +22,9 @@ struct FTSessionDraftRowView: View {
                     .foregroundStyle(.ftGray3Light)
             }
             Spacer()
+            Image(systemName: "hourglass.bottomhalf.filled")
+                .font(.title3)
+                .foregroundStyle(.blue)
         }
         .padding()
         .background {
@@ -39,13 +42,13 @@ struct FTSessionDraftRowView: View {
     
     var gradient: LinearGradient {
         LinearGradient(
-            colors: [.leadingSummaryCard, .trailingSummaryCard],
+            colors: [.leadingScheduledFocus, .trailingScheduledFocus],
             startPoint: .leading,
             endPoint: .trailing
         )
     }
     
-    init(
+    public init(
         emoji: String,
         title: String,
         description: String
@@ -58,15 +61,10 @@ struct FTSessionDraftRowView: View {
 }
 
 #Preview(traits: .sizeThatFitsLayout) {
-    @Previewable @State var viewModel: FocusSessionTimerModel = .init(
-        state: .init(isPaused: false),
-        deadline: .now.addingTimeInterval(160),
-        delegate: nil
-    )
-    FTSessionDraftRowView(
+    FTSessionScheduledRowView(
         emoji: "😎",
         title: "Cool",
-        description: viewModel.state.formattedTime
+        description: "This is a cool view huh?"
     )
     .padding()
     .preferredColorScheme(.dark)

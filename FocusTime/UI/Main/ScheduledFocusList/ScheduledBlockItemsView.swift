@@ -68,10 +68,10 @@ struct ScheduledBlockItemsView: View {
         ScrollView(.vertical) {
             LazyVStack {
                 ForEach(viewModel.state.items) { block in
-                    FTSessionCardView(
+                    FTSessionScheduledRowView(
                         emoji: block.emoji,
                         title: block.name,
-                        mode: .scheduled(description: block.type.description)
+                        description: block.type.description
                     )
                     .padding(1)
                     .onAppear { viewModel.hasReachEndOfList(blockItem: block) }

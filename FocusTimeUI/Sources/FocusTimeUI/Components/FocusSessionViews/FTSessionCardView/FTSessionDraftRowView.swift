@@ -1,5 +1,5 @@
 //
-//  FTScheduledFocusRowView.swift
+//  FTSessionSummaryCardView.swift
 //  FocusTimeUI
 //
 //  Created by Maksym Horobets on 18.06.2025.
@@ -7,12 +7,12 @@
 
 import SwiftUI
 
-struct FTSessionScheduledRowView: View {
+public struct FTSessionDraftRowView: View {
     private let emoji: String
     private let title: String
     private let description: String
     
-    var body: some View {
+    public var body: some View {
         HStack(spacing: 15) {
             Text(emoji)
                 .font(.title2)
@@ -22,9 +22,6 @@ struct FTSessionScheduledRowView: View {
                     .foregroundStyle(.ftGray3Light)
             }
             Spacer()
-            Image(systemName: "hourglass.bottomhalf.filled")
-                .font(.title3)
-                .foregroundStyle(.blue)
         }
         .padding()
         .background {
@@ -42,13 +39,13 @@ struct FTSessionScheduledRowView: View {
     
     var gradient: LinearGradient {
         LinearGradient(
-            colors: [.leadingScheduledFocus, .trailingScheduledFocus],
+            colors: [.leadingSummaryCard, .trailingSummaryCard],
             startPoint: .leading,
             endPoint: .trailing
         )
     }
     
-    init(
+    public init(
         emoji: String,
         title: String,
         description: String
@@ -61,10 +58,10 @@ struct FTSessionScheduledRowView: View {
 }
 
 #Preview(traits: .sizeThatFitsLayout) {
-    FTSessionScheduledRowView(
+    FTSessionDraftRowView(
         emoji: "😎",
         title: "Cool",
-        description: "This is a cool view huh?"
+        description: "Draft"
     )
     .padding()
     .preferredColorScheme(.dark)

@@ -22,28 +22,26 @@ final class DraftsBlockItemListViewModel {
     }
     
     private(set) var state: State
+    private(set) var timer: FTTimer // There can only be one schedule running at a time.
     
     private let blockItemPersistenceManager: BlockItemPersistenceManager
-    private var currentTimerViewModel: FocusSessionTimerModel? = nil
     
     private var fetchTask: Task<Void, Never>?
     private var dbChangesNotificationTask: Task<Void, Never>?
     
     init(
         state: State = State(),
+        timer: FTTimer = ConcurrencyTimer(),
         blockItemPersistenceManager: BlockItemPersistenceManager
     ) {
         self.state = state
+        self.timer = timer
         self.blockItemPersistenceManager = blockItemPersistenceManager
         
         subscribeToDB()
     }
     
-    func makeTimerViewModel(for blockItem: ProtectedBlockItem, timeLeft: Int) -> FocusSessionTimerModel {
-        if let currentTimerViewModel {
-            return currentTimerViewModel
-        }
-        
+    func startTimer(for blockItem: ProtectedBlockItem, timeLeft: Int) {
         let isPaused = {
             if case .duration(_, _, let suspendedAt, _) = blockItem.type {
                 return suspendedAt != nil
@@ -51,13 +49,11 @@ final class DraftsBlockItemListViewModel {
             return false
         }()
         
-        currentTimerViewModel = FocusSessionTimerModel(
-            state: .init(isPaused: isPaused),
+        timer.start(
             deadline: .now.addingTimeInterval(TimeInterval(timeLeft)),
+            isInitiallyPaused: isPaused,
             delegate: self
         )
-
-        return currentTimerViewModel!
     }
     
     private func reloadItems() {
@@ -124,12 +120,12 @@ final class DraftsBlockItemListViewModel {
     }
 }
 
-extension DraftsBlockItemListViewModel: FocusSessionTimerModelDelegate {
+extension DraftsBlockItemListViewModel: FTTimerDelegate {
     func didUpdateIsPaused(_: Bool) {
         return // Cannot pause from this view.
     }
     
     func didFinishCountdown() {
-        currentTimerViewModel = nil
+        timer.cancel()
     }
 }

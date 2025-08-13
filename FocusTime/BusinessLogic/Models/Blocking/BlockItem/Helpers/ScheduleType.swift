@@ -41,10 +41,13 @@ enum ScheduleType: Codable, Hashable {
     func secondsToIntervalEndIfShouldBeRunning(now: Date = .now) -> Int? {
         switch self {
         case .scheduled(let startTime, let endTime, let isActive):
-            guard isActive != false, let currentTimeComponent = try? TimeComponents(from: now) else { return nil }
+            guard isActive != false else { return nil }
             
-            let timeSinceStart = currentTimeComponent.localizedSecondsSinceMidnight - startTime.localizedSecondsSinceMidnight
-            let timeLeftInSeconds = endTime.localizedSecondsSinceMidnight - currentTimeComponent.localizedSecondsSinceMidnight
+            let startOfDay = Calendar.current.startOfDay(for: now)
+            let currentSecondsFromMidnight = Int(now.timeIntervalSince(startOfDay))
+            
+            let timeSinceStart = currentSecondsFromMidnight - startTime.localizedSecondsSinceMidnight
+            let timeLeftInSeconds = endTime.localizedSecondsSinceMidnight - currentSecondsFromMidnight
             
             if timeSinceStart >= 0 {
                 return timeLeftInSeconds

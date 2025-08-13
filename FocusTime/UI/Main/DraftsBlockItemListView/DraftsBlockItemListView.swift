@@ -12,7 +12,6 @@ struct DraftsBlockItemListView: View {
     @State var viewModel: DraftsBlockItemListViewModel
     
     var body: some View {
-        let _ = Self._printChanges()
         ZStack {
             // MARK: - Wave image
             VStack {
@@ -106,27 +105,31 @@ struct DraftsBlockItemListView: View {
     @ViewBuilder
     private func sessionCard(for block: ProtectedBlockItem) -> some View {
         if let timeLeft = block.type.secondsToIntervalEndIfShouldBeRunning(), timeLeft >= 1 {
-            FTActiveSessionCardView(
+            FTSessionDraftRowView(
                 emoji: block.emoji,
                 title: block.name,
-                timerModel: viewModel.makeTimerViewModel(
-                    for: block,
-                    timeLeft: timeLeft
-                )
+                description: viewModel.timer.payload.formatted
             )
+            .onAppear {
+                viewModel.startTimer(for: block, timeLeft: timeLeft)
+            }
         } else {
-            let description = block.type.description
-            let mode: FTSessionCardView.CardMode = block.isScheduled
-            ? .scheduled(description: description)
-            : .draft(description: description)
-            
-            FTSessionCardView(
-                emoji: block.emoji,
-                title: block.name,
-                mode: mode
-            )
+            if block.isScheduled {
+                FTSessionScheduledRowView(
+                    emoji: block.emoji,
+                    title: block.name,
+                    description: block.type.description
+                )
+            } else {
+                FTSessionDraftRowView(
+                    emoji: block.emoji,
+                    title: block.name,
+                    description: block.type.description
+                )
+            }
         }
     }
+    
 }
 
 #Preview {

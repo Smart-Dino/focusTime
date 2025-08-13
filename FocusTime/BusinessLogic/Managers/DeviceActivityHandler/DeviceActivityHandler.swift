@@ -58,6 +58,11 @@ nonisolated struct DeviceActivityHandler: Sendable {
     func handleBlockingEnd(for activity: DeviceActivityName) async {
         do {
             guard let activityIdentifier = CodableActivityIdentifier(from: activity) else { return }
+            
+            // If this is fallback's end - ignore it.
+            // Fallback schedules run at blockingStart and finish there respectively.
+            guard !activityIdentifier.isFallback else { return }
+            
             // Create context from scratch because using mainContext in a
             // non-isolated to MainActor environment is not allowed.
             let store = BlockItemExtensionStore(logger: logger, context: ModelContext(container))
@@ -92,9 +97,6 @@ nonisolated struct DeviceActivityHandler: Sendable {
             logger?.error("Failed to block in \(#function): \(error.localizedDescription)")
         }
         
-        // Sendability workaround since DeviceActivityName is not sendable.
-        let stringActivityName = activity.rawValue
-        
         if activityIdentifier.isFallback {
             // TimeComponents has an accuracy of a minute.
             // Hence why we are comparing it directly - we have a whole minute to detect the match.
@@ -105,11 +107,6 @@ nonisolated struct DeviceActivityHandler: Sendable {
                 
                 try await shieldManager.unblock()
                 store.setSessionIsActive(for: blockItem, isActive: false)
-                
-                DeviceActivityCenter()
-                    .stopMonitoring(
-                        [DeviceActivityName(stringActivityName)]
-                    )
             } catch {
                 logger?.error("Failed to unblock in \(#function) while handling fallback: \(error.localizedDescription)")
             }

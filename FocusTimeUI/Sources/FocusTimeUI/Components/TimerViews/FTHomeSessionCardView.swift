@@ -10,7 +10,7 @@ import SwiftUI
 public struct FTHomeSessionCardView: View {
     public enum CardMode {
         case scheduled(timeRange: String)
-        case countdown(viewModel: FocusSessionTimerModel)
+        case countdown(timer: FTTimer)
     }
     
     private let title: String
@@ -26,17 +26,17 @@ public struct FTHomeSessionCardView: View {
                         .foregroundStyle(.ftGray3Light)
                 }
                 Spacer()
-            case .countdown(let viewModel):
+            case .countdown(let timer):
                 VStack(alignment: .leading) {
                     Text(title)
-                    Text(viewModel.state.formattedTime)
+                    Text(timer.payload.formatted)
                         .foregroundStyle(.ftGray3Light)
                 }
                 Spacer()
                 Button {
-                    viewModel.togglePause()
+                    timer.isPaused ? timer.resume() : timer.pause()
                 } label: {
-                    viewModel.state.isPaused
+                    timer.isPaused
                     ? Image(systemName: "play.circle").foregroundStyle(.blue)
                     : Image(systemName: "pause.circle").foregroundStyle(.red)
                 }
@@ -83,23 +83,17 @@ public struct FTHomeSessionCardView: View {
 }
 
 
-#Preview("Countdown", traits: .sizeThatFitsLayout) {
-    let viewModel = FocusSessionTimerModel(
-        state: .init(isPaused: true),
-        deadline: .now.addingTimeInterval(70),
-        delegate: nil
-    )
-    
-    VStack {
-        FTHomeSessionCardView(
-            title: "Work time",
-            mode: .countdown(
-                viewModel: viewModel
-            ),
-        )
-        .preferredColorScheme(.dark)
-        Button("Toggle pause") {
-            viewModel.togglePause()
-        }
-    }
-}
+//#Preview("Countdown", traits: .sizeThatFitsLayout) {
+//    VStack {
+//        FTHomeSessionCardView(
+//            title: "Work time",
+//            mode: .countdown(
+//                viewModel: ...
+//            ),
+//        )
+//        .preferredColorScheme(.dark)
+//        Button("Toggle pause") {
+//            viewModel.togglePause()
+//        }
+//    }
+//}
