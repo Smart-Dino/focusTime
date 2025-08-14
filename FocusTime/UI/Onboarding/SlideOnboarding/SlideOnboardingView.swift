@@ -30,5 +30,5 @@ struct SlideOnboardingView: View {
 }
 
 #Preview {
-    SlideOnboardingView(viewModel: .init(delegate: nil))
+    SlideOnboardingView()
 }

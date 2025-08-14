@@ -88,7 +88,6 @@ final class SlideOnboardingViewModel {
     }
     
     // MARK: - ViewModel Properties
-    // MARK: - ViewModel Properties
     private(set) var state: State
     private let startAction: () -> Void
     
