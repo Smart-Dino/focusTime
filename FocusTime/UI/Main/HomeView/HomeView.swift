@@ -127,10 +127,6 @@ struct HomeView: View {
     func makeSessionViewForItem(_ item: ProtectedBlockItem) -> some View {
         let isActive = item.isActive
         
-        if isActive {
-            viewModel.startTimer(for: item)
-        }
-        
         let description = isActive
         ? viewModel.timer.payload.formatted
         : item.type.description
@@ -150,6 +146,9 @@ struct HomeView: View {
         )
         .padding(.horizontal)
         .padding(.vertical, 5)
+        .onAppear {
+            viewModel.startTimer(for: item)
+        }
     }
 }
 
