@@ -18,10 +18,15 @@ struct ShieldDebugView: View {
             // This view causes DeviceActivityMonitorExtension unblock to fail on Simulator only.
             // Important: All bugs related to this view can only be replicated on a Simulator, so avoid using it
             // altogether!
+#if targetEnvironment(simulator)
+            Text(SharedConstants.Strings.simulatorUnavailability)
+#else
             DeviceActivityReport(
                 Constants.ActivityConfiguration.context,
                 filter: Constants.ActivityConfiguration.filter
             )
+            .frame(height: Constants.Layout.activityReportSceneHeight)
+#endif
             
             // MARK: - BlockItem list
             VStack {
@@ -78,7 +83,7 @@ struct ShieldDebugView: View {
             }
             
             Button(viewModel.state.scheduleType.buttonTitle) {
-                    viewModel.blockSelectionDuringSchedule()
+                viewModel.blockSelectionDuringSchedule()
             }
             
             HStack {
@@ -210,7 +215,7 @@ struct ShieldDebugView: View {
                         (startedAt != nil).description
                     }
                 }())
-
+                
                 Text(Constants.Strings.blockItemIdPrefix + blockItem.id.uuidString)
                     .foregroundStyle(.secondary)
             }

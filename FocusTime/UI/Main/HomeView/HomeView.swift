@@ -36,11 +36,15 @@ struct HomeView: View {
                 
                 // Timer
                 VStack {
+#if targetEnvironment(simulator)
+                    Text(SharedConstants.Strings.simulatorUnavailability)
+#else
                     DeviceActivityReport(
                         Constants.ActivityConfiguration.context,
                         filter: Constants.ActivityConfiguration.filter
                     )
                     .frame(height: Constants.Layout.activityReportSceneHeight)
+#endif
                     Text(Constants.Strings.timerSubtitle)
                         .font(.callout)
                         .foregroundStyle(.ftGray3Light)
@@ -71,7 +75,7 @@ struct HomeView: View {
                     if let item = viewModel.state.upcomingOrRunningItem {
                         makeSessionViewForItem(item)
                     }
-
+                    
                 }
                 .frame(minHeight: 130) // Used so that the screen time value stays in the same place
             }
@@ -128,15 +132,15 @@ struct HomeView: View {
         }
         
         let description = isActive
-            ? viewModel.timer.payload.formatted
-            : item.type.description
+        ? viewModel.timer.payload.formatted
+        : item.type.description
         
         let isPausedBinding: Binding<Bool> = isActive
-            ? Binding(
-                get: { viewModel.timer.isPaused },
-                set: { viewModel.setTimerIsPaused($0) }
-            )
-            : .constant(true)
+        ? Binding(
+            get: { viewModel.timer.isPaused },
+            set: { viewModel.setTimerIsPaused($0) }
+        )
+        : .constant(true)
         
         return FTHomeSessionCardView(
             title: item.name,
