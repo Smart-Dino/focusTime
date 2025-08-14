@@ -11,12 +11,14 @@ import DeviceActivity
 import FamilyControls
 
 actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
-    private static let fallbackIntervalSeconds = 15 * 60
-    private let clock: Clock
+    // MARK: - Constants & Dependencies
+    static let fallbackIntervalSeconds = 15 * 60
+
+    let clock: Clock
     let centerManager: DeviceActivityCenterManager
-    private let shieldManager: ShieldManager
-    private let blockItemPersistenceManager: BlockItemPersistenceManager
-    
+    let shieldManager: ShieldManager
+    let blockItemPersistenceManager: BlockItemPersistenceManager
+
     init(
         centerManager: DeviceActivityCenterManager = LiveDeviceActivityCenterManager(),
         clock: Clock = SystemClock(),
@@ -28,305 +30,95 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         self.blockItemPersistenceManager = blockItemPersistenceManager
         self.shieldManager = shieldManager
     }
-    
-    // Try to schedule event.
-    // If schedule fails - use fallback method.
+
+    // MARK: - Public API (conforms to DeviceActivityRegistrar)
+
     func registerActivity(during blockItem: ProtectedBlockItem) async throws {
         try await AuthorizationCenter.shared.requestAuthorization(for: .individual)
-        
+
         switch blockItem.type {
         case .scheduled(let startTime, let endTime, _):
             do {
-                try await registerRegularActivity(for: blockItem,
-                                                  startTime: startTime,
-                                                  endTime: endTime)
+                try await registerRegularActivity(for: blockItem, startTime: startTime, endTime: endTime)
             } catch {
                 switch error {
                 case DeviceActivityCenter.MonitoringError.intervalTooShort:
-                    try await registerFallbackActivity(for: blockItem,
-                                                       startTime: startTime,
-                                                       endTime: endTime)
+                    try await registerFallbackActivity(for: blockItem, startTime: startTime, endTime: endTime)
                 default:
                     throw error
                 }
             }
-            try await startActivityIfRegisteredDuringIntervalWindow(item: blockItem)
-        case .duration(let duration, _, _, _):
-            try await registerDurationActivity(for: blockItem, duration: duration.rawValue)
-        }
-    }
-    
-    // Schedule an event like this: startTime - 15 minutes - endTime.
-    // The startTime will be triggered with user's duration.
-    // So if user sets duration of 1800 - 30 mins - then our startTime will be now + 30 mins.
-    private func registerDurationActivity(
-        for blockItem: ProtectedBlockItem,
-        duration: Int
-    ) async throws {
-        guard blockItem.persistentModelID != nil else {
-            throw DeviceActivityRegistrarError.noPersistentItem
-        }
-        
-        // Block starts from now.
-        try await shieldManager.block(specific: blockItem.blockedContent)
-        
-        let now = Calendar.current.dateComponents([.hour, .minute], from: await clock.now)
-        
-        // Now schedule activity to end blockage.
-        // The DeviceActivitySchedule interval requires the schedule to be 15 or more minutes long
-        // so the intervalEnd is offset by that 15 minutes.
-        let intervalStart = now.adding(seconds: duration)
-        let intervalEnd = intervalStart.adding(seconds: Self.fallbackIntervalSeconds)
-        
-        let deviceActivitySchedule = DeviceActivitySchedule(intervalStart: intervalStart,
-                                                            intervalEnd: intervalEnd,
-                                                            repeats: true)
-        
-        // Let the DeviceActivityMonitorExtension know that we need a regular scenario.
-        guard let activityIdentifier = CodableActivityIdentifier(blockItemID: blockItem.id,
-                                                                 isFallback: false).jsonString
-        else { throw DeviceActivityRegistrarError.couldNotGenerateIdentifier }
-        
-        let activityName = DeviceActivityName(activityIdentifier)
-        
-        try await centerManager.startMonitoring(activityName, during: deviceActivitySchedule)
-        
-        // Log when the activity was started for proper suspension handling.
-        // Important: We only do this if our BlockItem was originally saved as duration block.
-        
-        // Edit blockItem.
-        let startTime = await clock.now
-        
-        var blockItemCopy = blockItem // Make a mutable copy.
-        switch blockItem.type {
-        case .duration(let originalDuration, _, _, _):
-            blockItemCopy.type = .duration(
-                originalDuration, // Make sure this is the original value!
-                startedAt: startTime,
-                suspendedAt: nil,
-                timeLeft: DurationComponents(duration: duration) // And make sure this is the actual intended duration!
-            )
-        default:
-            break
-        }
-        
-        try await blockItemPersistenceManager.editBlockItem(blockItem: blockItemCopy)
-    }
-    
-    private func registerRegularActivity(
-        for blockItem: ProtectedBlockItem,
-        startTime: TimeComponents,
-        endTime: TimeComponents
-    ) async throws {
-        guard blockItem.persistentModelID != nil else {
-            throw DeviceActivityRegistrarError.noPersistentItem
-        }
-        
-        let intervalStart = startTime.dateComponents
-        let intervalEnd = endTime.dateComponents
-        let deviceActivitySchedule = DeviceActivitySchedule(intervalStart: intervalStart,
-                                                            intervalEnd: intervalEnd,
-                                                            repeats: true)
-        
-        let overlapSchedules = try await overlapsWithAlreadyRegisteredSchedules(
-            deviceActivitySchedule,
-            days: blockItem.days
-        )
-        guard overlapSchedules.isEmpty else {
-            throw DeviceActivityRegistrarError.scheduleOverlap(with: overlapSchedules)
-        }
-        
-        // Let the DeviceActivityMonitorExtension know that we need a regular scenario.
-        guard let activityIdentifier = CodableActivityIdentifier(blockItemID: blockItem.id,
-                                                                 isFallback: false).jsonString
-        else { throw DeviceActivityRegistrarError.couldNotGenerateIdentifier }
-        
-        let activityName = DeviceActivityName(activityIdentifier)
-        
-        try await centerManager.startMonitoring(activityName, during: deviceActivitySchedule)
-    }
-    
-    private func registerFallbackActivity(
-        for blockItem: ProtectedBlockItem,
-        startTime: TimeComponents,
-        endTime: TimeComponents
-    ) async throws {
-        guard blockItem.persistentModelID != nil else { throw DeviceActivityRegistrarError.noPersistentItem }
-        
-        let intervalStart = startTime.dateComponents
-        // Shift interval end to satisfy DeviceActivityCenter - workaround.
-        let intervalEnd = endTime.dateComponents.adding(seconds: Self.fallbackIntervalSeconds)
 
-        let deviceActivitySchedule = DeviceActivitySchedule(intervalStart: intervalStart,
-                                                            intervalEnd: intervalEnd,
-                                                            repeats: true)
-        
-        let overlapSchedules = try await overlapsWithAlreadyRegisteredSchedules(
-            deviceActivitySchedule,
-            days: blockItem.days
-        )
-        guard overlapSchedules.isEmpty else {
-            throw DeviceActivityRegistrarError.scheduleOverlap(with: overlapSchedules)
-        }
-        
-        // Let the DeviceActivityMonitorExtension know that we need a fallback scenario.
-        guard let activityIdentifier = CodableActivityIdentifier(blockItemID: blockItem.id,
-                                                                 isFallback: true).jsonString
-        else { throw DeviceActivityRegistrarError.couldNotGenerateIdentifier }
-        
-        let activityName = DeviceActivityName(activityIdentifier)
-        
-        try await centerManager.startMonitoring(activityName, during: deviceActivitySchedule)
-    }
-    
-    private func overlapsWithAlreadyRegisteredSchedules(
-        _ newSchedule: DeviceActivitySchedule,
-        days: Set<Weekday>,
-        on calendar: Calendar = .current
-    ) async throws -> [ProtectedBlockItem] {
-        var overlappingSchedules: [ProtectedBlockItem] = []
-        
-        let activities = await centerManager.activities
-        
-        for activity in activities {
-            guard
-                let existingSchedule = await centerManager.schedule(for: activity),
-                let start1 = calendar.date(from: newSchedule.intervalStart),
-                let end1 = calendar.date(from: newSchedule.intervalEnd),
-                let start2 = calendar.date(from: existingSchedule.intervalStart),
-                let end2 = calendar.date(from: existingSchedule.intervalEnd)
-            else {
-                // Failed to resolve one or more DateComponents.
-                throw DeviceActivityRegistrarError.couldNotCheckOverlap
-            }
-            if start1 < end2 && start2 < end1 {
-                // Overlap detected.
-                // Find schedule related to this activity:
-                
-                // 1. Decode activity name.
-                guard let decoded = CodableActivityIdentifier(from: activity) else {
-                    throw DeviceActivityRegistrarError.couldNotCheckOverlap
-                }
-                // 2. Get the schedule ID from it.
-                let blockItemID = decoded.blockItemID
-                // 3. Fetch schedule.
-                let overlappingSchedule = try await blockItemPersistenceManager.fetch(by: blockItemID)
-                // 4. Make sure days overlap too and add schedule to return list.
-                if let overlappingSchedule, overlappingSchedule.days.isDisjoint(with: days) == false {
-                    overlappingSchedules.append(overlappingSchedule)
-                }
-            }
-        }
-        return overlappingSchedules
-    }
-    
-    private func startActivityIfRegisteredDuringIntervalWindow(item: ProtectedBlockItem) async throws {
-        // Make sure we deal with a scheduled block,
-        // because duration block does not have a set time window in a day,
-        // and it is requested on-demand.
-        guard case .scheduled = item.type else { return }
-        
-        let timeLeftInSeconds = item.type.secondsToIntervalEndIfShouldBeRunning(now: await clock.now)
-        
-        if let timeLeftInSeconds {
-            // No, we cannot just copy item and edit it's values, we need new PersistentIdentifiers and UUIDs.
-            let tempItemCopy = ProtectedBlockItem(
-                emoji: "⏳",
-                name: "temp-" + UUID().uuidString,
-                days: item.days,
-                type: .duration(.init(duration: timeLeftInSeconds)),
-                isTemporary: true,
-                blockedContent: item.blockedContent
-            )
-            
-            try await blockItemPersistenceManager.insert(tempItemCopy)
-            try await registerDurationActivity(for: tempItemCopy, duration: timeLeftInSeconds)
+            try await startActivityIfRegisteredDuringIntervalWindow(item: blockItem)
+
+        case .duration:
+            try await registerDurationActivity(for: blockItem)
         }
     }
-    
+
     func unregisterActivity(during blockItem: ProtectedBlockItem) async throws {
         let activity = try await getActivityForSchedule(blockItem)
         await centerManager.stopMonitoring([activity])
     }
-    
+
     func suspendActivity(for blockItem: ProtectedBlockItem) async throws {
         let suspensionDate = await clock.now
         guard let persistentModelID = blockItem.persistentModelID else {
             throw DeviceActivityRegistrarError.activityNotFound
         }
+
         let activity = try await getActivityForSchedule(blockItem)
-        
-        // Make sure we have the latest schedule.
-        var blockItem = try await blockItemPersistenceManager.fetch(by: persistentModelID)
-        
-        switch blockItem.type {
+        var stored = try await blockItemPersistenceManager.fetch(by: persistentModelID)
+
+        switch stored.type {
         case .scheduled:
             try await shieldManager.unblock()
-        case .duration(let duration, let startedAt, _, let timeLeft):
+
+        case .duration(let duration, let startedAt, _, let endDate):
             guard let startedAt else {
                 throw DeviceActivityRegistrarError.couldNotExtractDatePoints
             }
-            
-            // Calculate how much time was left before unblock.
-            let elapsedTime = suspensionDate.timeIntervalSince(startedAt)
-            let updatedTimeLeft = max(0, timeLeft.rawValue - Int(elapsedTime))
-            
-            // Set suspension point and timeLeft.
-            blockItem.type = .duration(
-                duration,
-                startedAt: startedAt,
-                suspendedAt: suspensionDate,
-                timeLeft: DurationComponents(duration: updatedTimeLeft)
-            )
-            try await blockItemPersistenceManager.editBlockItem(blockItem: blockItem)
-            
-            // Unblock apps.
+
+            // Store suspension moment and keep endDate unchanged.
+            stored.type = .duration(duration, startedAt: startedAt, suspendedAt: suspensionDate, endDate: endDate)
+            try await blockItemPersistenceManager.editBlockItem(blockItem: stored)
+
             try await shieldManager.unblock()
-            
-            // Stop monitoring activity.
             await centerManager.stopMonitoring([activity])
         }
     }
-    
+
     // The activity isn't always 100% accurate since DeviceActivitySchedule does not account for seconds.
     func resumeActivity(for blockItem: ProtectedBlockItem) async throws {
         let resumptionDate = await clock.now
         guard let persistentModelID = blockItem.persistentModelID else {
             throw DeviceActivityRegistrarError.activityNotFound
         }
-        
-        // Make sure we have the latest schedule.
-        var blockItem = try await blockItemPersistenceManager.fetch(by: persistentModelID)
-        
-        switch blockItem.type {
+
+        var stored = try await blockItemPersistenceManager.fetch(by: persistentModelID)
+
+        switch stored.type {
         case .scheduled:
-            try await shieldManager.block(specific: blockItem.blockedContent)
-        case .duration(let duration, _, _, let timeLeft):
-            // Set that the schedule is no longer suspended and log the new time left.
-            blockItem.type = .duration(
-                duration,
-                startedAt: resumptionDate,
-                suspendedAt: nil,
-                timeLeft: timeLeft
-            )
-            
-            try await blockItemPersistenceManager.editBlockItem(blockItem: blockItem)
-            try await registerDurationActivity(for: blockItem, duration: timeLeft.rawValue)
+            try await shieldManager.block(specific: stored.blockedContent)
+
+        case .duration(let duration, _, let suspendedAt, let endDate):
+            // If suspended, slide the end date forward by pause duration so remaining time stays consistent.
+            let adjustedEndDate = Self.adjustedEndDate(endDate: endDate, suspendedAt: suspendedAt, resumedAt: resumptionDate)
+            let remainingSeconds = max(0, Int(adjustedEndDate.timeIntervalSince(resumptionDate)))
+
+            stored.type = .duration(duration, startedAt: resumptionDate, suspendedAt: nil, endDate: adjustedEndDate)
+            try await blockItemPersistenceManager.editBlockItem(blockItem: stored)
+
+            // Re-register device activity for the remaining duration.
+            try await registerDurationActivity(for: stored, forcedDuration: remainingSeconds)
         }
     }
-    
+
     func isActivityRegistered(for blockItem: ProtectedBlockItem) async throws -> Bool {
-        guard blockItem.persistentModelID != nil else {
-            throw DeviceActivityRegistrarError.activityNotFound
-        }
-        
-        if (try? await getActivityForSchedule(blockItem)) != nil {
-            return true
-        } else {
-            return false
-        }
+        guard blockItem.persistentModelID != nil else { throw DeviceActivityRegistrarError.activityNotFound }
+        return (try? await getActivityForSchedule(blockItem)) != nil
     }
-    
+
     func unregisterAll() async {
         await centerManager.stopMonitoring()
     }

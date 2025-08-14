@@ -85,7 +85,11 @@ final class HomeViewModel {
         if pause {
             timer.pause()
         } else {
-            timer.resume()
+            if let upcomingOrRunningItem = state.upcomingOrRunningItem {
+                // Since duration blocking updates it's deadline after resumption we need to recreate the timer.
+                timer.startTimer(for: upcomingOrRunningItem)
+                timer.resume()
+            }
         }
     }
     

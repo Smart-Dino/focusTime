@@ -13,7 +13,7 @@ enum ScheduleType: Codable, Hashable {
                  // Suspension helper properties.
                  startedAt: Date?,
                  suspendedAt: Date?,
-                 timeLeft: DurationComponents)
+                 endDate: Date) // absolute Date representing supposed end-time
     
     var description: String {
         switch self {
@@ -29,13 +29,17 @@ enum ScheduleType: Codable, Hashable {
     }
     
     static func duration(_ duration: DurationComponents,
-                        startedAt: Date? = nil,
-                        suspendedAt: Date? = nil,
-                        timeLeft: DurationComponents? = nil) -> ScheduleType {
+                         startedAt: Date? = nil,
+                         suspendedAt: Date? = nil,
+                         endDate: Date? = nil) -> ScheduleType {
+        // If caller provides explicit end Date, use it.
+        // Otherwise, compute end Date from startedAt (if present) or now.
+        let start = startedAt ?? Date()
+        let computedEnd = endDate ?? start.addingTimeInterval(TimeInterval(duration.rawValue))
         return .duration(duration,
-                        startedAt: startedAt,
-                        suspendedAt: suspendedAt,
-                        timeLeft: timeLeft ?? duration)
+                         startedAt: startedAt,
+                         suspendedAt: suspendedAt,
+                         endDate: computedEnd)
     }
     
     func secondsToIntervalEndIfShouldBeRunning(now: Date = .now) -> Int? {
@@ -53,23 +57,21 @@ enum ScheduleType: Codable, Hashable {
             } else {
                 return nil
             }
-        case .duration(_, let startedAt, let suspendedAt, let timeLeft):
-            guard startedAt != nil else { return nil }
-            print("Running duration")
-
-            let timeLeftInSeconds = timeLeft.rawValue
-
-            // If it's suspended, show seconds to next minute boundary or full minute if exactly on the minute.
-            if suspendedAt != nil {
-                let secondsToNextMinute = timeLeftInSeconds % 60 == 0 ? 60 : timeLeftInSeconds % 60
-                return secondsToNextMinute
+            
+        case .duration(_, let startedAt, let suspendedAt, let endDate):
+            // If there's no startedAt, duration isn't running.
+            guard let _ = startedAt else { return nil }
+            
+            if let suspendedAt {
+                // If suspended, freeze remaining seconds as of suspension time.
+                let remainingAtSuspension = max(0, Int(endDate.timeIntervalSince(suspendedAt)))
+                return remainingAtSuspension
+            } else {
+                // Not suspended — remaining is based on "now".
+                let remaining = max(0, Int(endDate.timeIntervalSince(now)))
+                return remaining
             }
-
-            // If not suspended, return seconds to the next full minute mark from 'now'.
-            let seconds = Calendar.current.component(.second, from: now)
-            let secondsToNextMinute = 60 - seconds
-            return secondsToNextMinute
         }
     }
-}
 
+}

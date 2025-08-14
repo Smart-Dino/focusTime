@@ -26,8 +26,8 @@ struct ProtectedBlockItem: ProtectedModel {
         switch type {
         case .scheduled(_, _, let isActive):
             isActive
-        case .duration(_, let startedAt, _, _):
-            startedAt != nil
+        case .duration(_, let startedAt, let suspendedAt, _):
+            (startedAt != nil) || (suspendedAt != nil)
         }
     }
     
