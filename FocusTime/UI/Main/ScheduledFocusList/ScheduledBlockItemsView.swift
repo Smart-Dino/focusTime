@@ -8,8 +8,8 @@
 import SwiftUI
 import FocusTimeUI
 
-struct ScheduledFocusListView: View {
-    @State var viewModel: ScheduledFocusListViewModel
+struct ScheduledBlockItemsView: View {
+    @State var viewModel: ScheduledBlockItemsViewModel
     
     var body: some View {
         ZStack {
@@ -39,10 +39,7 @@ struct ScheduledFocusListView: View {
                 Constants.Strings.newSessionButtonTitle,
                 systemImage: Constants.Icons.newSessionSymbol
             ) {
-                #warning("Placeholder code")
-                Task {
-                    await viewModel.insertTestItemsIntoDatabase()
-                }
+                #warning("No implementation")
             }
             .buttonStyle(.ftPrimary)
             .padding()
@@ -55,8 +52,8 @@ struct ScheduledFocusListView: View {
             SharedConstants.Strings.errorHeader,
             isPresented: Binding(get: {
                 viewModel.state.error != nil
-            }, set: { showError in
-                viewModel.keepShowingError(showError: showError)
+            }, set: { isVisible in
+                viewModel.setErrorVisibility(isVisible)
             }), actions: {
                 // OK dismissal button by default
             }, message: {
@@ -75,7 +72,7 @@ struct ScheduledFocusListView: View {
                         description: schedule.days.description
                     )
                     .padding(1)
-                    .onAppear { viewModel.hasReachEndOfList(schedule: schedule) }
+                    .onAppear { viewModel.hasReachEndOfList(blockItem: schedule) }
                 }
             }
         }
@@ -97,6 +94,8 @@ struct ScheduledFocusListView: View {
 
 #Preview {
     NavigationStack {
-        ScheduledFocusListView(viewModel: .init(modelContainer: PreviewData.memoryOnlyModelContainer))
+        ScheduledBlockItemsView(
+            viewModel: .init(modelContainer: PreviewData.memoryOnlyModelContainer)
+        )
     }
 }

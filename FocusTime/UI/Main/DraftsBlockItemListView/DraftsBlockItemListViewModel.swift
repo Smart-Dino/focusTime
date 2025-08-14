@@ -11,7 +11,7 @@ import FamilyControls
 
 @MainActor
 @Observable
-final class AppBlockingListViewModel {
+final class DraftsBlockItemListViewModel {
     struct State {
         var error: Error? = nil
         
@@ -20,7 +20,7 @@ final class AppBlockingListViewModel {
     }
     
     private(set) var state: State
-    private let blockItemStore: BlockItemStore
+    private let modelContainer: ModelContainer
     
     private var fetchTask: Task<Void, Never>?
     
@@ -29,55 +29,34 @@ final class AppBlockingListViewModel {
         modelContainer: ModelContainer
     ) {
         self.state = state
-        self.blockItemStore = BlockItemStore(modelContainer: modelContainer)
+        self.modelContainer = modelContainer
     }
     
-    func keepShowingError(showError: Bool) {
-        if !showError {
+    func setErrorVisibility(_ isVisible: Bool) {
+        if !isVisible {
             state.error = nil
         }
     }
     
     #warning("Unfinished ViewModel")
-    func insertTestItemsIntoDatabase() async {
-        Task.detached(priority: .userInitiated) {
-            do {
-                let itemsToInsert = (0..<100).map { number in
-                    ProtectedBlockItem(
-                        emoji: "😜",
-                        name: "Block - \(number)",
-                        blockedContent: ProtectedActivitySelection(FamilyActivitySelection())
-                    )
-                }
-                try await self.blockItemStore.insertBatch(itemsToInsert)
-                
-                await self.fetchNextPage()
-            } catch {
-                await MainActor.run {
-                    self.state.error = error
-                }
-            }
-        }
-    }
-    
     private func fetchNextPage() {
         guard fetchTask == nil else { return }
         
         self.fetchTask = Task.detached(priority: .userInitiated) {
             do {
-                let insertedItems = try await self.blockItemStore.fetch(page: self.state.page)
+                let blockItemStore = BlockItemStore(modelContainer: self.modelContainer)
+                
+                let insertedItems = try await blockItemStore.fetch(page: self.state.page)
                 await MainActor.run {
                     self.state.items.append(contentsOf: insertedItems)
                     self.state.page += 1
                     self.state.error = nil
                     self.fetchTask = nil
-                    print("Items on screen: \(self.state.items.count)")
                 }
             } catch {
                 await MainActor.run {
                     self.state.error = error
                     self.fetchTask = nil
-                    print("Failed to fetch page \(self.state.page): \(error)")
                 }
             }
         }

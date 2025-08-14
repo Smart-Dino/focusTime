@@ -23,10 +23,8 @@ struct RegistrarHandlerTests {
     let activityRegistrar: DeviceActivityRegistrar
     let activityHandler: DeviceActivityHandler
     // Stores.
-    let scheduleStore: ScheduleStore
     let blockItemStore: BlockItemStore
-    // Relationship manager.
-    let relationshipCoordinator: RelationshipCoordinator
+    let container: ModelContainer
     
     init() async {
         // Native managers.
@@ -35,16 +33,14 @@ struct RegistrarHandlerTests {
         
         // Custom.
         let container = SharedTestHelpers.generateTestModelContainer()
+        self.container = container
         self.shieldManager = LiveShieldManager()
-        self.activityHandler = DeviceActivityHandler(container: container, shieldManager: shieldManager)
+        self.activityHandler = DeviceActivityHandler(logger: nil, container: container, shieldManager: shieldManager)
         
         // Stores.
-        self.scheduleStore = ScheduleStore(modelContainer: container)
         self.blockItemStore = BlockItemStore(modelContainer: container)
-        // Relationship manager.
-        self.relationshipCoordinator = RelationshipCoordinator(modelContainer: container)
-        
-        self.activityRegistrar = LiveDeviceActivityRegistrar(scheduleStore: scheduleStore, shieldManager: shieldManager)
+        //  Activity registrar.
+        self.activityRegistrar = LiveDeviceActivityRegistrar(modelContainer: container, shieldManager: shieldManager)
         
         // Reset.
         resetDeviceActivityCenter()
@@ -75,23 +71,26 @@ struct RegistrarHandlerTests {
         let startTime = try TimeComponents(hour: startHour, minute: startMinute)
         let endTime = try TimeComponents(hour: endHour, minute: endMinute)
         // Setup.
-        let schedule = ProtectedSchedule(emoji: "🧪",
-                                         name: "Test",
-                                         days: Set(Weekday.allCases),
-                                         type: .scheduled(startTime: startTime, endTime: endTime))
+        let blockItem = ProtectedBlockItem(
+            emoji: "🧪",
+            name: "Test",
+            days: Set(Weekday.allCases),
+            type: .scheduled(startTime: startTime, endTime: endTime),
+            blockedContent: ProtectedActivitySelection(FamilyActivitySelection())
+        )
         
         // Insert the schedule and get the new ProtectedSchedule with persistentIdentifier.
-        let scheduleModelID = try await scheduleStore.insert(schedule)
-        let fetchedSchedule = try await scheduleStore.fetch(id: scheduleModelID)
+        let blockItemModelID = try await blockItemStore.insert(blockItem)
+        let fetchedBlockItem = try await blockItemStore.fetch(id: blockItemModelID)
         
         // Register the activity.
-        try await activityRegistrar.registerActivity(during: fetchedSchedule)
+        try await activityRegistrar.registerActivity(during: fetchedBlockItem)
         
         // Fetch the registered schedule.
         let activities = center.activities
         
         let registeredScheduleName = try #require(
-            activities.first(where: { $0.rawValue.contains(fetchedSchedule.id.uuidString) })
+            activities.first(where: { $0.rawValue.contains(fetchedBlockItem.id.uuidString) })
         )
         
         // Decide the identifier to check whether it was scheduled with fallback.
@@ -122,19 +121,19 @@ struct RegistrarHandlerTests {
         selection.categoryTokens = categories
         
         // Create a schedule with selection.
-        let scheduleModelID = try await insertTestScheduleRelatedToBlockItem(with: selection)
+        let blockItemModelID = try await insertTestBlockItem(with: selection)
         
         // Fetch schedule model.
-        let fetchedSchedule = try await scheduleStore.fetch(id: scheduleModelID)
+        let fetchedBlockItem = try await blockItemStore.fetch(id: blockItemModelID)
         
         // Build the activity identifier and name.
-        let activityIdentifier = CodableActivityIdentifier(scheduleID: fetchedSchedule.id, isFallback: false)
+        let activityIdentifier = CodableActivityIdentifier(blockItemID: fetchedBlockItem.id, isFallback: false)
         let activityIdentifierJSON = try #require(activityIdentifier.jsonString)
         
         let activityName = DeviceActivityName(activityIdentifierJSON)
         
         // Start schedule in the registrar.
-        try await activityRegistrar.registerActivity(during: fetchedSchedule)
+        try await activityRegistrar.registerActivity(during: fetchedBlockItem)
         
         // Simulate starting the interval.
         await activityHandler.handleBlockingStart(for: activityName)
@@ -156,53 +155,48 @@ struct RegistrarHandlerTests {
         )
     }
     
-    func insertTestScheduleRelatedToBlockItem(
+    func insertTestBlockItem(
         with selection: FamilyActivitySelection
     ) async throws -> PersistentIdentifier {
-        // Make protected items.
-        let blockItem = ProtectedBlockItem(emoji: "🧪",
-                                           name: "Test",
-                                           blockedContent: ProtectedActivitySelection(selection))
-        
+        // Make protected item.
         let startTime = try TimeComponents(hour: 17, minute: 00)
         let endTime = try TimeComponents(hour: 18, minute: 00)
         
-        let schedule = ProtectedSchedule(emoji: "🧪",
-                                         name: "Test",
-                                         days: Set(Weekday.allCases),
-                                         type: .scheduled(startTime: startTime, endTime: endTime))
+        let blockItem = ProtectedBlockItem(emoji: "🧪",
+                                           name: "Test",
+                                           days: Set(Weekday.allCases),
+                                           type: .scheduled(startTime: startTime, endTime: endTime),
+                                           blockedContent: ProtectedActivitySelection(selection))
         
         // Add items to the database.
         let blockItemModelID = try await blockItemStore.insert(blockItem)
-        let scheduleModelID = try await scheduleStore.insert(schedule)
         
-        // Add BlockItem to the Schedule.
-        try await relationshipCoordinator.relate(blockItemID: blockItemModelID, scheduleID: scheduleModelID)
-        
-        return scheduleModelID
+        // Return identifier.
+        return blockItemModelID
     }
     
     @Test("Duration-based blocking registration")
     func durationBasedBlocking() async throws {
         // Create a one-time schedule (duration in seconds).
         let duration = 60 // 1 min
-        let schedule = ProtectedSchedule(emoji: "⏱️",
-                                         name: "DurationTest",
-                                         days: Set(Weekday.allCases),
-                                         type: .oneTime(.init(duration: duration)))
+        let blockItem = ProtectedBlockItem(emoji: "⏱️",
+                                           name: "DurationTest",
+                                           days: Set(Weekday.allCases),
+                                           type: .duration(.init(duration: duration)),
+                                           blockedContent: ProtectedActivitySelection(FamilyActivitySelection()))
         // Insert into the store.
-        let scheduleModelID = try await scheduleStore.insert(schedule)
-        let fetchedSchedule = try await scheduleStore.fetch(id: scheduleModelID)
+        let blockItemModelID = try await blockItemStore.insert(blockItem)
+        let fetchedBlockedItem = try await blockItemStore.fetch(id: blockItemModelID)
         
         // Register duration activity.
-        try await activityRegistrar.registerActivity(during: fetchedSchedule)
+        try await activityRegistrar.registerActivity(during: fetchedBlockedItem)
         
         // Fetch the registered schedule.
         let activities = center.activities
         
         // Should be a newly scheduled interval for our test schedule.
         let registeredName = try #require(
-            activities.first(where: { $0.rawValue.contains(fetchedSchedule.id.uuidString) })
+            activities.first(where: { $0.rawValue.contains(fetchedBlockedItem.id.uuidString) })
         )
         let decodedIdentifier = try #require(try CodableActivityIdentifier(from: registeredName))
         #expect(!decodedIdentifier.isFallback)
@@ -214,26 +208,27 @@ struct RegistrarHandlerTests {
         let startTime = try TimeComponents(hour: 10, minute: 0)
         let endTime = try TimeComponents(hour: 11, minute: 0)
         
-        let schedule = ProtectedSchedule(emoji: "🗑️",
-                                         name: "UnregisterTest",
-                                         days: Set(Weekday.allCases),
-                                         type: .scheduled(startTime: startTime, endTime: endTime))
+        let blockItem = ProtectedBlockItem(emoji: "🗑️",
+                                           name: "UnregisterTest",
+                                           days: Set(Weekday.allCases),
+                                           type: ScheduleType.scheduled(startTime: startTime, endTime: endTime),
+                                           blockedContent: ProtectedActivitySelection(FamilyActivitySelection()))
         
-        let scheduleModelID = try await scheduleStore.insert(schedule)
-        let fetchedSchedule = try await scheduleStore.fetch(id: scheduleModelID)
+        let blockItemModelID = try await blockItemStore.insert(blockItem)
+        let fetchedBlockItem = try await blockItemStore.fetch(id: blockItemModelID)
         
-        try await activityRegistrar.registerActivity(during: fetchedSchedule)
+        try await activityRegistrar.registerActivity(during: fetchedBlockItem)
         
         // Confirm registration.
         let preActivities = center.activities
-        #expect(preActivities.contains(where: { $0.rawValue.contains(fetchedSchedule.id.uuidString) }))
+        #expect(preActivities.contains(where: { $0.rawValue.contains(fetchedBlockItem.id.uuidString) }))
         
         // Unregister.
-        try await activityRegistrar.unregisterActivity(during: fetchedSchedule)
+        try await activityRegistrar.unregisterActivity(during: fetchedBlockItem)
         
         // Confirm removal.
         let postActivities = center.activities
-        #expect(!postActivities.contains(where: { $0.rawValue.contains(fetchedSchedule.id.uuidString) }))
+        #expect(!postActivities.contains(where: { $0.rawValue.contains(fetchedBlockItem.id.uuidString) }))
     }
     
     @Test("Unregistering all activities")
@@ -242,28 +237,31 @@ struct RegistrarHandlerTests {
         let startTimeA = try TimeComponents(hour: 8, minute: 0)
         let endTimeA = try TimeComponents(hour: 9, minute: 0)
         
-        let scheduleA = ProtectedSchedule(
+        let blockItemA = ProtectedBlockItem(
             emoji: "🅰️",
             name: "A",
             days: Set(Weekday.allCases),
             type: .scheduled(startTime: startTimeA,
-                             endTime: endTimeA))
+                             endTime: endTimeA),
+            blockedContent: ProtectedActivitySelection(FamilyActivitySelection()))
         
         let startTimeB = try TimeComponents(hour: 9, minute: 0)
         let endTimeB = try TimeComponents(hour: 10, minute: 0)
         
-        let scheduleB = ProtectedSchedule(
+        let blockItemB = ProtectedBlockItem(
             emoji: "🅱️",
             name: "B",
             days: Set(Weekday.allCases),
             type: .scheduled(startTime: startTimeB,
-                             endTime: endTimeB))
+                             endTime: endTimeB),
+            blockedContent: ProtectedActivitySelection(FamilyActivitySelection())
+        )
         
-        let scheduleAID = try await scheduleStore.insert(scheduleA)
-        let scheduleBID = try await scheduleStore.insert(scheduleB)
+        let blockItemAID = try await blockItemStore.insert(blockItemA)
+        let blockItemBID = try await blockItemStore.insert(blockItemB)
         
-        let fetchedA = try await scheduleStore.fetch(id: scheduleAID)
-        let fetchedB = try await scheduleStore.fetch(id: scheduleBID)
+        let fetchedA = try await blockItemStore.fetch(id: blockItemAID)
+        let fetchedB = try await blockItemStore.fetch(id: blockItemBID)
         
         try await activityRegistrar.registerActivity(during: fetchedA)
         try await activityRegistrar.registerActivity(during: fetchedB)
@@ -287,25 +285,27 @@ struct RegistrarHandlerTests {
         let endTime2   = try TimeComponents(hour: 11, minute: 0) // Overlaps with previous
         
         // Register the first schedule
-        let schedule1 = ProtectedSchedule(emoji: "🔥",
+        let blockItem1 = ProtectedBlockItem(emoji: "🔥",
                                           name: "OverlapA",
                                           days: Set(Weekday.allCases),
-                                          type: .scheduled(startTime: startTime1, endTime: endTime1))
-        let schedule1ID = try await scheduleStore.insert(schedule1)
-        let fetchedSchedule1 = try await scheduleStore.fetch(id: schedule1ID)
-        try await activityRegistrar.registerActivity(during: fetchedSchedule1)
+                                          type: ScheduleType.scheduled(startTime: startTime1, endTime: endTime1),
+                                          blockedContent: ProtectedActivitySelection(FamilyActivitySelection()))
+        let blockItem1ID = try await blockItemStore.insert(blockItem1)
+        let fetchedBlockItem1 = try await blockItemStore.fetch(id: blockItem1ID)
+        try await activityRegistrar.registerActivity(during: fetchedBlockItem1)
         
         // Register the second, overlapping schedule
-        let schedule2 = ProtectedSchedule(emoji: "💧",
+        let blockItem2 = ProtectedBlockItem(emoji: "💧",
                                           name: "OverlapB",
                                           days: Set(Weekday.allCases),
-                                          type: .scheduled(startTime: startTime2, endTime: endTime2))
-        let schedule2ID = try await scheduleStore.insert(schedule2)
-        let fetchedSchedule2 = try await scheduleStore.fetch(id: schedule2ID)
+                                          type: ScheduleType.scheduled(startTime: startTime2, endTime: endTime2),
+                                          blockedContent: ProtectedActivitySelection(FamilyActivitySelection()))
+        let blockItem2ID = try await blockItemStore.insert(blockItem2)
+        let fetchedBlockItem2 = try await blockItemStore.fetch(id: blockItem2ID)
         
         // Expect scheduleOverlap error
         await #expect {
-            try await activityRegistrar.registerActivity(during: fetchedSchedule2)
+            try await activityRegistrar.registerActivity(during: fetchedBlockItem2)
         } throws: { error in
             guard let error = error as? DeviceActivityRegistrarError else {
                 return false
@@ -324,68 +324,72 @@ struct RegistrarHandlerTests {
     func suspendActivityTest() async throws {
         // Setup: Register a duration-based schedule.
         let duration = 90 // seconds
-        let schedule = ProtectedSchedule(
+        let blockItem = ProtectedBlockItem(
             emoji: "⏸️",
             name: "SuspendTest",
             days: Set(Weekday.allCases),
-            type: .oneTime(.init(duration: duration))
+            type: .duration(.init(duration: duration)),
+            blockedContent: ProtectedActivitySelection(FamilyActivitySelection())
         )
-        let scheduleModelID = try await scheduleStore.insert(schedule)
-        let fetchedSchedule = try await scheduleStore.fetch(id: scheduleModelID)
-        try await activityRegistrar.registerActivity(during: fetchedSchedule)
+        let blockItemModelID = try await blockItemStore.insert(blockItem)
+        let fetchedBlockItem = try await blockItemStore.fetch(id: blockItemModelID)
+        try await activityRegistrar.registerActivity(during: fetchedBlockItem)
 
         // Confirm the activity is registered.
-        #expect(try await activityRegistrar.isActivityRegistered(for: fetchedSchedule))
+        #expect(try await activityRegistrar.isActivityRegistered(for: fetchedBlockItem))
 
         // Suspend the activity.
-        try await activityRegistrar.suspendActivity(for: fetchedSchedule)
+        try await activityRegistrar.suspendActivity(for: fetchedBlockItem)
         // After suspension, it should not be registered.
-        #expect(try await !activityRegistrar.isActivityRegistered(for: fetchedSchedule))
+        #expect(try await !activityRegistrar.isActivityRegistered(for: fetchedBlockItem))
     }
 
     @Test("Resuming a suspended activity")
     func resumeActivityTest() async throws {
         // Setup: Register, then suspend a schedule.
         let duration = 120 // seconds
-        let schedule = ProtectedSchedule(
+        let blockItem = ProtectedBlockItem(
             emoji: "▶️",
             name: "ResumeTest",
             days: Set(Weekday.allCases),
-            type: .oneTime(.init(duration: duration))
+            type: .duration(.init(duration: duration)),
+            blockedContent: ProtectedActivitySelection(FamilyActivitySelection())
         )
-        let scheduleModelID = try await scheduleStore.insert(schedule)
-        let fetchedSchedule = try await scheduleStore.fetch(id: scheduleModelID)
-        try await activityRegistrar.registerActivity(during: fetchedSchedule)
-        try await activityRegistrar.suspendActivity(for: fetchedSchedule)
+        let blockItemModelID = try await blockItemStore.insert(blockItem)
+        let fetchedBlockItem = try await blockItemStore.fetch(id: blockItemModelID)
+        
+        try await activityRegistrar.registerActivity(during: fetchedBlockItem)
+        try await activityRegistrar.suspendActivity(for: fetchedBlockItem)
 
         // Resume the activity.
-        try await activityRegistrar.resumeActivity(for: fetchedSchedule)
+        try await activityRegistrar.resumeActivity(for: fetchedBlockItem)
         // After resumption, should be registered again.
-        #expect(try await activityRegistrar.isActivityRegistered(for: fetchedSchedule))
+        #expect(try await activityRegistrar.isActivityRegistered(for: fetchedBlockItem))
     }
 
     @Test("isActivityRegistered returns correct value after registration and unregistration")
     func isActivityRegisteredTest() async throws {
         // Register a schedule.
         let duration = 60 // seconds
-        let schedule = ProtectedSchedule(
+        let blockItem = ProtectedBlockItem(
             emoji: "🔍",
             name: "RegisteredCheck",
             days: Set(Weekday.allCases),
-            type: .oneTime(.init(duration: duration))
+            type: .duration(.init(duration: duration)),
+            blockedContent: ProtectedActivitySelection(FamilyActivitySelection())
         )
-        let scheduleModelID = try await scheduleStore.insert(schedule)
-        let fetchedSchedule = try await scheduleStore.fetch(id: scheduleModelID)
-        try await activityRegistrar.registerActivity(during: fetchedSchedule)
+        let blockItemModelID = try await blockItemStore.insert(blockItem)
+        let fetchedBlockItem = try await blockItemStore.fetch(id: blockItemModelID)
+        try await activityRegistrar.registerActivity(during: fetchedBlockItem)
 
         // Should be registered now.
-        #expect(try await activityRegistrar.isActivityRegistered(for: fetchedSchedule))
+        #expect(try await activityRegistrar.isActivityRegistered(for: fetchedBlockItem))
 
         // Unregister.
-        try await activityRegistrar.unregisterActivity(during: fetchedSchedule)
+        try await activityRegistrar.unregisterActivity(during: fetchedBlockItem)
 
         // Should not be registered anymore.
-        #expect(try await !activityRegistrar.isActivityRegistered(for: fetchedSchedule))
+        #expect(try await !activityRegistrar.isActivityRegistered(for: fetchedBlockItem))
     }
     
     @Test("Correct time left after 4 minutes of suspension")
@@ -394,32 +398,33 @@ struct RegistrarHandlerTests {
         let registrar = LiveDeviceActivityRegistrar(
             center: DeviceActivityCenter(),
             clock: testClock,
-            scheduleStore: scheduleStore,
+            modelContainer: container,
             shieldManager: shieldManager
         )
 
         let duration = 600 // 10 minutes
-        let schedule = ProtectedSchedule(
+        let blockItem = ProtectedBlockItem(
             emoji: "⏳",
             name: "TimeTravelTest",
             days: Set(Weekday.allCases),
-            type: .oneTime(.init(duration: duration))
+            type: .duration(.init(duration: duration)),
+            blockedContent: ProtectedActivitySelection(FamilyActivitySelection())
         )
-        let scheduleModelID = try await scheduleStore.insert(schedule)
-        let fetchedSchedule = try await scheduleStore.fetch(id: scheduleModelID)
-        try await registrar.registerActivity(during: fetchedSchedule)
+        let blockItemModelID = try await blockItemStore.insert(blockItem)
+        let fetchedBlockItem = try await blockItemStore.fetch(id: blockItemModelID)
+        try await registrar.registerActivity(during: fetchedBlockItem)
         
         // Simulate 4 minutes passing.
         await testClock.advance(by: 4 * 60)
-        try await registrar.suspendActivity(for: fetchedSchedule)
+        try await registrar.suspendActivity(for: fetchedBlockItem)
         
         // Simulate 4 minutes passing.
         await testClock.advance(by: 4 * 60)
-        try await registrar.resumeActivity(for: fetchedSchedule)
+        try await registrar.resumeActivity(for: fetchedBlockItem)
         
         // Fetch the schedule from your store and check the updated state.
-        let resumedSchedule = try await scheduleStore.fetch(id: scheduleModelID)
-        if case let .oneTime(_, _, _, timeLeft) = resumedSchedule.type {
+        let resumedBlockItem = try await blockItemStore.fetch(id: blockItemModelID)
+        if case let ScheduleType.duration(_, _, _, timeLeft) = resumedBlockItem.type {
             // The time left should be 10 minutes - 4 minutes = 6 minutes (360 seconds).
             #expect(
                 timeLeft.rawValue == 360,
@@ -431,3 +436,4 @@ struct RegistrarHandlerTests {
     }
     
 }
+

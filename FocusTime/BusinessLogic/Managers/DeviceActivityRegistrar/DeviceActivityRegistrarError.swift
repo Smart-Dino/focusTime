@@ -12,7 +12,7 @@ enum DeviceActivityRegistrarError: LocalizedError {
     case couldNotGenerateIdentifier
     case activityNotFound
     case couldNotCheckOverlap
-    case scheduleOverlap(with: [ProtectedSchedule])
+    case scheduleOverlap(with: [ProtectedBlockItem])
     
     case activityAlreadySuspended
     case activityAlreadyRunning
@@ -28,10 +28,10 @@ enum DeviceActivityRegistrarError: LocalizedError {
             String(localized: "device_activity_registrar_activity_not_found_description", table: "ErrorLocalizable")
         case .couldNotCheckOverlap:
             String(localized: "device_activity_registrar_could_not_check_overlap_description", table: "ErrorLocalizable")
-        case .scheduleOverlap(let schedules):
+        case .scheduleOverlap(let blockItems):
             String(
                 format: String(localized: "device_activity_registrar_schedule_overlap_description", table: "ErrorLocalizable"),
-                schedules.map { $0.emoji + " " + $0.name }.joined(separator: ", ")
+                blockItems.map { $0.emoji + " " + $0.name }.joined(separator: ", ")
             )
         case .activityAlreadyRunning:
             String(localized: "device_activity_registrar_activity_already_running_description", table: "ErrorLocalizable")

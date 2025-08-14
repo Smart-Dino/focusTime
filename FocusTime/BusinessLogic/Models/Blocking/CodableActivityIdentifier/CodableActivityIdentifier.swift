@@ -9,7 +9,7 @@ import Foundation
 import DeviceActivity
 
 struct CodableActivityIdentifier: Codable {
-    let scheduleID: UUID
+    let blockItemID: UUID
     let isFallback: Bool
 }
 

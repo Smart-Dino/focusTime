@@ -9,10 +9,10 @@ import Foundation
 import DeviceActivity
 
 extension LiveDeviceActivityRegistrar {
-    func getActivityForSchedule(_ schedule: ProtectedSchedule) throws -> DeviceActivityName {
+    func getActivityForSchedule(_ blockItem: ProtectedBlockItem) throws -> DeviceActivityName {
         guard let activity = center.activities.first(where: {
             if let identifier = CodableActivityIdentifier(from: $0) {
-                return identifier.scheduleID == schedule.id
+                return identifier.blockItemID == blockItem.id
             } else {
                 return false
             }

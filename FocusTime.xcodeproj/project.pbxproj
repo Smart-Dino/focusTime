@@ -16,6 +16,57 @@
 		E962077F2DD4D1E5002F037F /* FocusTimeUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = FocusTimeUI; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		C64C07892E329BEF00350A45 /* Exceptions for "FocusTimeActivityReport" folder in "FocusTime" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"DeviceActivityReportContext+Ext.swift",
+			);
+			target = 674FA69F2DB05ACE0002FDC1 /* FocusTime */;
+		};
+		C68617B72E2976BD00E49BF7 /* Exceptions for "FocusTimeShieldConfiguration" folder in "FocusTimeShieldConfiguration" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = C68617A72E2976BD00E49BF7 /* FocusTimeShieldConfiguration */;
+		};
+		C6A8A0C52E327781004B0D75 /* Exceptions for "FocusTimeActivityReport" folder in "FocusTimeActivityReport" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = C6A8A0B42E327781004B0D75 /* FocusTimeActivityReport */;
+		};
+		E977C59E2E0B0AF40035A6AF /* Exceptions for "FocusTime" folder in "FocusTimeActivityMonitor" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				BusinessLogic/Helpers/PeriodConverter.swift,
+				BusinessLogic/Managers/DeviceActivityHandler/DeviceActivityHandler.swift,
+				BusinessLogic/Managers/ShieldManager/LiveShieldManager.swift,
+				BusinessLogic/Managers/ShieldManager/ShieldManager.swift,
+				BusinessLogic/Models/Blocking/BlockItem/BlockItem.swift,
+				BusinessLogic/Models/Blocking/BlockItem/Helpers/DurationComponents.swift,
+				BusinessLogic/Models/Blocking/BlockItem/Helpers/ProtectedActivitySelection.swift,
+				BusinessLogic/Models/Blocking/BlockItem/Helpers/ScheduleType.swift,
+				BusinessLogic/Models/Blocking/BlockItem/Helpers/TimeComponents.swift,
+				BusinessLogic/Models/Blocking/BlockItem/Helpers/Weekday.swift,
+				BusinessLogic/Models/Blocking/BlockItem/ProtectedBlockItem.swift,
+				BusinessLogic/Models/Blocking/CodableActivityIdentifier/CodableActivityIdentifier.swift,
+				BusinessLogic/Stores/Protocols/ProtectedModel.swift,
+				Shared/SharedAppValues.swift,
+			);
+			target = E97895A42E0AFCBE00E0AF42 /* FocusTimeActivityMonitor */;
+		};
+		E97895B12E0AFCBF00E0AF42 /* Exceptions for "FocusTimeActivityMonitor" folder in "FocusTimeActivityMonitor" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = E97895A42E0AFCBE00E0AF42 /* FocusTimeActivityMonitor */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		674FA6A22DB05ACE0002FDC1 /* FocusTime */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
@@ -325,6 +376,235 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.dino.smart.FocusTime;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		C68617B52E2976BD00E49BF7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = FocusTimeShieldConfiguration/FocusTimeShieldConfiguration.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 242HT6L8AJ;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FocusTimeShieldConfiguration/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = FocusTimeShieldConfiguration;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.dino.smart.FocusTime.FocusTimeShieldConfiguration;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = FTShieldProfile;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		C68617B62E2976BD00E49BF7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = FocusTimeShieldConfiguration/FocusTimeShieldConfigurationRelease.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 242HT6L8AJ;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FocusTimeShieldConfiguration/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = FocusTimeShieldConfiguration;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.dino.smart.FocusTime.FocusTimeShieldConfiguration;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		C6A8A0C32E327781004B0D75 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = FocusTimeActivityReport/FocusTimeActivityReport.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 242HT6L8AJ;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FocusTimeActivityReport/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = FocusTimeActivityReport;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.dino.smart.FocusTime.FocusTimeActivityReport;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = FTActivityMonitor;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		C6A8A0C42E327781004B0D75 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = FocusTimeActivityReport/FocusTimeActivityReportRelease.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 242HT6L8AJ;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FocusTimeActivityReport/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = FocusTimeActivityReport;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.dino.smart.FocusTime.FocusTimeActivityReport;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		C6FE59EC2E156D8B003A2199 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.dino.smart.FocusTimeTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FocusTime.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FocusTime";
+			};
+			name = Debug;
+		};
+		C6FE59ED2E156D8B003A2199 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.dino.smart.FocusTimeTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FocusTime.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FocusTime";
+			};
+			name = Release;
+		};
+		E97895B32E0AFCBF00E0AF42 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = FocusTimeActivityMonitor/FocusTimeActivityMonitorDebug.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 242HT6L8AJ;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FocusTimeActivityMonitor/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = FocusTimeActivityMonitor;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.dino.smart.FocusTime.FocusTimeActivityMonitor;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = FTActivityMonitor2;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		E97895B42E0AFCBF00E0AF42 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = FocusTimeActivityMonitor/FocusTimeActivityMonitor.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 242HT6L8AJ;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FocusTimeActivityMonitor/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = FocusTimeActivityMonitor;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
