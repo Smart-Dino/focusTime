@@ -31,7 +31,7 @@ extension LiveDeviceActivityRegistrar {
 
         // Persist start time and absolute end date.
         let startTime = await clock.now
-        let actualTimeBeforeEnd = computeActualTimeBeforeEnd(intervalStart: intervalStart, forcedDuration: forcedDuration, originalDuration: originalDuration)
+        let actualTimeBeforeEnd = await computeActualTimeBeforeEnd(intervalStart: intervalStart, forcedDuration: forcedDuration, originalDuration: originalDuration)
         let endDate = startTime.addingTimeInterval(TimeInterval(max(0, actualTimeBeforeEnd)))
 
         var copy = blockItem
@@ -124,7 +124,7 @@ extension LiveDeviceActivityRegistrar {
         guard let timeLeft = timeLeftInSeconds else { return }
 
         // Create temporary duration block and schedule it immediately.
-        let temp = ProtectedBlockItem(
+        var temp = ProtectedBlockItem(
             emoji: "⏳",
             name: "temp-" + UUID().uuidString,
             days: item.days,
@@ -133,16 +133,16 @@ extension LiveDeviceActivityRegistrar {
             blockedContent: item.blockedContent
         )
 
-        try await blockItemPersistenceManager.insert(temp)
+        try await blockItemPersistenceManager.insert(&temp)
         try await registerDurationActivity(for: temp, forcedDuration: timeLeft)
     }
 
     // Compute actual seconds until end using existing logic (keeps previous behaviour).
-    func computeActualTimeBeforeEnd(intervalStart: DateComponents, forcedDuration: Int?, originalDuration: DurationComponents) -> Int {
+    func computeActualTimeBeforeEnd(intervalStart: DateComponents, forcedDuration: Int?, originalDuration: DurationComponents) async -> Int {
         if let forced = forcedDuration { return forced }
         if let hour = intervalStart.hour, let minute = intervalStart.minute {
             let endTime = (try? TimeComponents(hour: hour, minute: minute).localizedSecondsSinceMidnight) ?? originalDuration.rawValue
-            let currentSecond = Date.secondsSinceMidnight()
+            let currentSecond = await clock.now.secondsSinceMidnight()
             return endTime - currentSecond
         }
         return originalDuration.rawValue

@@ -152,6 +152,7 @@ struct HomeView: View {
         }
         .padding(.horizontal)
         .padding(.vertical, 5)
+        .id(viewModel.state.upcomingOrRunningItem?.id) // Force refresh on blockItem.id change.
     }
 }
 

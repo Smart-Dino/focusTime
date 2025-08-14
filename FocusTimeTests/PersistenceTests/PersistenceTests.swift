@@ -15,8 +15,8 @@ struct PersistenceTests {
     let modelContainer: ModelContainer
     
     // MARK: - Initializer
-    init() {
-        let container = SharedTestHelpers.generateTestModelContainer()
+    init() async {
+        let container = await MockPersistenceStoreFactory().makeBlockItemStore().modelContainer
         self.modelContainer = container
     }
 

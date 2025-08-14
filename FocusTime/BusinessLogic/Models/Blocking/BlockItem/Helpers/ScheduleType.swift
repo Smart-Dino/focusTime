@@ -49,9 +49,7 @@ enum ScheduleType: Codable, Hashable {
     
     func secondsToIntervalEndIfShouldBeRunning(now: Date = .now) -> Int? {
         switch self {
-        case .scheduled(let startTime, let endTime, let isActive, _):
-            guard isActive != false else { return nil }
-            
+        case .scheduled(let startTime, let endTime, _, _):
             let currentSecondsFromMidnight = Date.secondsSinceMidnight(now: now)
             
             let timeSinceStart = currentSecondsFromMidnight - startTime.localizedSecondsSinceMidnight

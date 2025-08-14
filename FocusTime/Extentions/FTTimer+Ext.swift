@@ -11,7 +11,7 @@ import FocusTimeUI
 extension FTTimer {
     func startTimer(for blockItem: ProtectedBlockItem) {
         guard let timeLeft = blockItem.type.secondsToIntervalEndIfShouldBeRunning(),
-              timeLeft >= 1 else { return }
+              timeLeft >= 1 && blockItem.isActive else { return }
         
         self.start(
             deadline: .now.addingTimeInterval(TimeInterval(timeLeft)),

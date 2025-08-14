@@ -114,7 +114,7 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
         )
 
         // 2. Return running if found.
-        if let running = blocks.first(where: { $0.isActive }) {
+        if let running = runningOrScheduledBlocks.first(where: { $0.isActive }) {
             return running
         }
 
