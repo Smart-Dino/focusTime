@@ -127,28 +127,31 @@ struct HomeView: View {
     func makeSessionViewForItem(_ item: ProtectedBlockItem) -> some View {
         let isActive = item.isActive
         
-        let description = isActive
-        ? viewModel.timer.payload.formatted
-        : item.type.description
-        
-        let isPausedBinding: Binding<Bool> = isActive
-        ? Binding(
-            get: { viewModel.timer.isPaused },
-            set: { viewModel.setTimerIsPaused($0) }
-        )
-        : .constant(true)
-        
-        return FTHomeSessionCardView(
-            title: item.name,
-            description: description,
-            isActive: item.isActive,
-            isPaused: isPausedBinding
-        )
+        return Group {
+            if isActive {
+                FTHomeSessionCardView(
+                    title: item.name,
+                    description: viewModel.timer.payload.formatted,
+                    isActive: isActive,
+                    isPaused: .init(
+                        get: { viewModel.timer.isPaused },
+                        set: { viewModel.setTimerIsPaused($0) }
+                    )
+                )
+                .onAppear {
+                    viewModel.startTimer(for: item)
+                }
+            } else {
+                FTHomeSessionCardView(
+                    title: item.name,
+                    description: item.type.description,
+                    isActive: isActive,
+                    isPaused: .constant(true)
+                )
+            }
+        }
         .padding(.horizontal)
         .padding(.vertical, 5)
-        .onAppear {
-            viewModel.startTimer(for: item)
-        }
     }
 }
 
