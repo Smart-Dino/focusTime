@@ -25,7 +25,6 @@ struct ShieldDebugView: View {
                 Constants.ActivityConfiguration.context,
                 filter: Constants.ActivityConfiguration.filter
             )
-            .frame(height: Constants.Layout.activityReportSceneHeight)
 #endif
             
             // MARK: - BlockItem list
