@@ -88,25 +88,31 @@ final class SlideOnboardingViewModel {
     }
     
     // MARK: - ViewModel Properties
+    // MARK: - ViewModel Properties
     private(set) var state: State
+    private let startAction: () -> Void
     
     // MARK: - Lifecycle
-    init() {
-        self.state = State(
-            nextButtonTitle: SlideOnboardingView.SlideOnboardingConstants.Strings.nextButtonTitle,
-            startAppButtonTitle: SlideOnboardingView.SlideOnboardingConstants.Strings.startAppButtonTitle,
-            buttonVerticalPadding: SlideOnboardingView.SlideOnboardingConstants.Layout.buttonVerticalPadding,
-            progressBarActiveColor: SlideOnboardingView.SlideOnboardingConstants.Colors.progressBarActiveColor,
-            progressBarInactiveColorOpacity: SlideOnboardingView.SlideOnboardingConstants.Layout.progressBarInactiveColorOpacity,
-            onboardingMaskOpacity: SlideOnboardingView.SlideOnboardingConstants.Layout.onboardingMaskOpacity,
-            skipButtonTextColor: SlideOnboardingView.SlideOnboardingConstants.Colors.skipButtonTextColor,
-            onboardingBackgroundImageName: SlideOnboardingView.SlideOnboardingConstants.Images.onboardingBackgroundImageName
-        )
-    }
+    init(
+          state: State = State(
+               nextButtonTitle: SlideOnboardingView.SlideOnboardingConstants.Strings.nextButtonTitle,
+               startAppButtonTitle: SlideOnboardingView.SlideOnboardingConstants.Strings.startAppButtonTitle,
+               buttonVerticalPadding: SlideOnboardingView.SlideOnboardingConstants.Layout.buttonVerticalPadding,
+               progressBarActiveColor: SlideOnboardingView.SlideOnboardingConstants.Colors.progressBarActiveColor,
+               progressBarInactiveColorOpacity: SlideOnboardingView.SlideOnboardingConstants.Layout.progressBarInactiveColorOpacity,
+               onboardingMaskOpacity: SlideOnboardingView.SlideOnboardingConstants.Layout.onboardingMaskOpacity,
+               skipButtonTextColor: SlideOnboardingView.SlideOnboardingConstants.Colors.skipButtonTextColor,
+               onboardingBackgroundImageName: SlideOnboardingView.SlideOnboardingConstants.Images.onboardingBackgroundImageName
+          ),
+          onStart: @escaping () -> Void = {}
+      ) {
+          self.state = state
+          self.startAction = onStart
+       }
 
-    // MARK: - Actions (Placeholder for navigation logic)
-    func didTapStartFocusing() {
-        // TODO: Implement actual navigation logic after onboarding
-        print("Start Focusing button tapped from ViewModel!")
-    }
+
+    // MARK: - Actions
+        func didTapStartFocusing() {
+            startAction()
+        }
 }
