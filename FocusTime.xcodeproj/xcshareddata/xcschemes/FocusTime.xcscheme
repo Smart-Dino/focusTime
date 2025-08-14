@@ -16,7 +16,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "674FA69F2DB05ACE0002FDC1"
-               BuildableName = "FocusTime.app"
+               BuildableName = "&quot;FocusTime&quot;.app"
                BlueprintName = "FocusTime"
                ReferencedContainer = "container:FocusTime.xcodeproj">
             </BuildableReference>
@@ -72,7 +72,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "674FA69F2DB05ACE0002FDC1"
-            BuildableName = "FocusTime.app"
+            BuildableName = "&quot;FocusTime&quot;.app"
             BlueprintName = "FocusTime"
             ReferencedContainer = "container:FocusTime.xcodeproj">
          </BuildableReference>
@@ -92,7 +92,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "674FA69F2DB05ACE0002FDC1"
-            BuildableName = "FocusTime.app"
+            BuildableName = "&quot;FocusTime&quot;.app"
             BlueprintName = "FocusTime"
             ReferencedContainer = "container:FocusTime.xcodeproj">
          </BuildableReference>

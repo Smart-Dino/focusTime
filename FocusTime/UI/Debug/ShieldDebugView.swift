@@ -19,7 +19,7 @@ struct ShieldDebugView: View {
             // Important: All bugs related to this view can only be replicated on a Simulator, so avoid using it
             // altogether!
             DeviceActivityReport(
-                .totalActivity,
+                .init("totalActivity"),
                 filter: DeviceActivityFilter(
                     segment: .daily(during: DateInterval(
                                     start: Calendar.current.startOfDay(for: .now),

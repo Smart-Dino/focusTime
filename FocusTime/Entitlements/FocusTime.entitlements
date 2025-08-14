@@ -8,5 +8,7 @@
 	<true/>
 	<key>com.apple.security.application-groups</key>
 	<array/>
+    <string>group.org.dino.smart.FocusTime</string>
+    </array>
 </dict>
 </plist>

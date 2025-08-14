@@ -13,7 +13,7 @@ extension HomeView {
         // MARK: - DeviceActivityReport
         @MainActor
         enum ActivityConfiguration {
-            static let context: DeviceActivityReport.Context = .totalActivity
+            static let context: DeviceActivityReport.Context = .init("totalActivity")
             static let filter: DeviceActivityFilter = .init(
                 users: .all, devices: .init([.iPhone])
             )

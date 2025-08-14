@@ -64,27 +64,44 @@ final class SlideOnboardingViewModel {
             )
         }
 
-        init() {
-            self.onboardingSlides = SlideOnboardingStep.allCases.map { $0.slide }
-
-            self.nextButtonTitle = SlideOnboardingView.SlideOnboardingConstants.Strings.nextButtonTitle
-            self.startAppButtonTitle = SlideOnboardingView.SlideOnboardingConstants.Strings.startAppButtonTitle
-            self.buttonVerticalPadding = SlideOnboardingView.SlideOnboardingConstants.Layout.buttonVerticalPadding
-            self.progressBarActiveColor = SlideOnboardingView.SlideOnboardingConstants.Colors.progressBarActiveColor
-            self.progressBarInactiveColorOpacity = SlideOnboardingView.SlideOnboardingConstants.Layout.progressBarInactiveColorOpacity
-            self.onboardingMaskOpacity = SlideOnboardingView.SlideOnboardingConstants.Layout.onboardingMaskOpacity
-            self.skipButtonTextColor = SlideOnboardingView.SlideOnboardingConstants.Colors.skipButtonTextColor
-            self.onboardingBackgroundImageName = SlideOnboardingView.SlideOnboardingConstants.Images.onboardingBackgroundImageName
+        init(
+            onboardingSlides: [OnboardingSlide] = SlideOnboardingStep.allCases.map { $0.slide },
+            nextButtonTitle: String,
+            startAppButtonTitle: String,
+            buttonVerticalPadding: CGFloat,
+            progressBarActiveColor: Color,
+            progressBarInactiveColorOpacity: CGFloat,
+            onboardingMaskOpacity: CGFloat,
+            skipButtonTextColor: Color,
+            onboardingBackgroundImageName: String
+        ) {
+            self.onboardingSlides = onboardingSlides
+            self.nextButtonTitle = nextButtonTitle
+            self.startAppButtonTitle = startAppButtonTitle
+            self.buttonVerticalPadding = buttonVerticalPadding
+            self.progressBarActiveColor = progressBarActiveColor
+            self.progressBarInactiveColorOpacity = progressBarInactiveColorOpacity
+            self.onboardingMaskOpacity = onboardingMaskOpacity
+            self.skipButtonTextColor = skipButtonTextColor
+            self.onboardingBackgroundImageName = onboardingBackgroundImageName
         }
     }
-
+    
     // MARK: - ViewModel Properties
-    private(set) var state = State()
-
-
+    private(set) var state: State
+    
     // MARK: - Lifecycle
-    init(state: State = State()) {
-        self.state = state
+    init() {
+        self.state = State(
+            nextButtonTitle: SlideOnboardingView.SlideOnboardingConstants.Strings.nextButtonTitle,
+            startAppButtonTitle: SlideOnboardingView.SlideOnboardingConstants.Strings.startAppButtonTitle,
+            buttonVerticalPadding: SlideOnboardingView.SlideOnboardingConstants.Layout.buttonVerticalPadding,
+            progressBarActiveColor: SlideOnboardingView.SlideOnboardingConstants.Colors.progressBarActiveColor,
+            progressBarInactiveColorOpacity: SlideOnboardingView.SlideOnboardingConstants.Layout.progressBarInactiveColorOpacity,
+            onboardingMaskOpacity: SlideOnboardingView.SlideOnboardingConstants.Layout.onboardingMaskOpacity,
+            skipButtonTextColor: SlideOnboardingView.SlideOnboardingConstants.Colors.skipButtonTextColor,
+            onboardingBackgroundImageName: SlideOnboardingView.SlideOnboardingConstants.Images.onboardingBackgroundImageName
+        )
     }
 
     // MARK: - Actions (Placeholder for navigation logic)
