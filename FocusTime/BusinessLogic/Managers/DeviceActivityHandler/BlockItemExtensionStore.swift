@@ -37,7 +37,7 @@ nonisolated final class BlockItemExtensionStore {
     
     func setSessionIsActive(for blockItem: BlockItem, isActive: Bool) {
         switch blockItem.type {
-        case .scheduled(let startTime, let endTime, _):
+        case .scheduled(let startTime, let endTime, _, _):
             blockItem.type = .scheduled(startTime: startTime, endTime: endTime, isActive: isActive)
         case .duration(let duration, _, _, let endDate):
             if isActive {

@@ -208,7 +208,7 @@ struct ShieldDebugView: View {
                 Text(blockItem.name)
                 Text ({
                     switch blockItem.type {
-                    case .scheduled(_, _, let isActive):
+                    case .scheduled(_, _, let isActive, _):
                         isActive.description
                     case .duration(_, let startedAt, _, _):
                         (startedAt != nil).description

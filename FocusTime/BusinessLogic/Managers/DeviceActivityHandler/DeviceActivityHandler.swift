@@ -41,7 +41,7 @@ nonisolated struct DeviceActivityHandler: Sendable {
         guard let blockItem else { return }
         
         switch blockItem.type {
-        case .scheduled(_, let endTime, _):
+        case .scheduled(_, let endTime, _, _):
             await handleRegularBlocking(blockItem: blockItem,
                                         activity: activity,
                                         activityIdentifier: activityIdentifier,

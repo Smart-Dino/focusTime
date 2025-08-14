@@ -37,7 +37,7 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         try await AuthorizationCenter.shared.requestAuthorization(for: .individual)
 
         switch blockItem.type {
-        case .scheduled(let startTime, let endTime, _):
+        case .scheduled(let startTime, let endTime, _, _):
             do {
                 try await registerRegularActivity(for: blockItem, startTime: startTime, endTime: endTime)
             } catch {
@@ -71,9 +71,11 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         var stored = try await blockItemPersistenceManager.fetch(by: persistentModelID)
 
         switch stored.type {
-        case .scheduled:
+        case .scheduled(let startTime, let endTime, let isActive, _):
+            stored.type = .scheduled(startTime: startTime, endTime: endTime, isActive: isActive, isPaused: true)
+            try await blockItemPersistenceManager.editBlockItem(blockItem: stored)
+            
             try await shieldManager.unblock()
-
         case .duration(let duration, let startedAt, _, let endDate):
             guard let startedAt else {
                 throw DeviceActivityRegistrarError.couldNotExtractDatePoints
@@ -98,7 +100,10 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         var stored = try await blockItemPersistenceManager.fetch(by: persistentModelID)
 
         switch stored.type {
-        case .scheduled:
+        case .scheduled(let startTime, let endTime, let isActive, _):
+            stored.type = .scheduled(startTime: startTime, endTime: endTime, isActive: isActive, isPaused: false)
+            try await blockItemPersistenceManager.editBlockItem(blockItem: stored)
+            
             try await shieldManager.block(specific: stored.blockedContent)
 
         case .duration(let duration, _, let suspendedAt, let endDate):

@@ -13,16 +13,9 @@ extension FTTimer {
         guard let timeLeft = blockItem.type.secondsToIntervalEndIfShouldBeRunning(),
               timeLeft >= 1 else { return }
         
-        let isPaused = {
-            if case .duration(_, _, let suspendedAt, _) = blockItem.type {
-                return suspendedAt != nil
-            }
-            return false
-        }()
-        
         self.start(
             deadline: .now.addingTimeInterval(TimeInterval(timeLeft)),
-            isInitiallyPaused: isPaused
+            isInitiallyPaused: blockItem.isPaused
         )
     }
 }

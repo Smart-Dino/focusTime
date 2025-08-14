@@ -8,7 +8,12 @@
 import Foundation
 
 enum ScheduleType: Codable, Hashable {
-    case scheduled(startTime: TimeComponents, endTime: TimeComponents, isActive: Bool = false)
+    case scheduled(
+        startTime: TimeComponents,
+        endTime: TimeComponents,
+        isActive: Bool = false,
+        isPaused: Bool = false
+    )
     case duration(_ duration: DurationComponents,
                  // Suspension helper properties.
                  startedAt: Date?,
@@ -17,7 +22,7 @@ enum ScheduleType: Codable, Hashable {
     
     var description: String {
         switch self {
-        case .scheduled(let startTime, let endTime, _):
+        case .scheduled(let startTime, let endTime, _, _):
             startTime.description + " - " + endTime.description
         case .duration(let duration, _, _, _):
             PeriodConverter.localizedConciseTimeString(
@@ -44,7 +49,7 @@ enum ScheduleType: Codable, Hashable {
     
     func secondsToIntervalEndIfShouldBeRunning(now: Date = .now) -> Int? {
         switch self {
-        case .scheduled(let startTime, let endTime, let isActive):
+        case .scheduled(let startTime, let endTime, let isActive, _):
             guard isActive != false else { return nil }
             
             let currentSecondsFromMidnight = Date.secondsSinceMidnight(now: now)

@@ -127,8 +127,8 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
 
         // 4. Sort by start time.
         let sortedByStartTime = scheduledBlocks.sorted {
-            guard case .scheduled(let firstStart, _, _) = $0.type,
-                  case .scheduled(let secondStart, _, _) = $1.type else {
+            guard case .scheduled(let firstStart, _, _, _) = $0.type,
+                  case .scheduled(let secondStart, _, _, _) = $1.type else {
                 return false
             }
             return firstStart < secondStart
@@ -137,7 +137,7 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
         // 5. Find the closest future schedule.
         let currentTimeComponent = try TimeComponents(from: now)
         if let upcoming = sortedByStartTime.first(where: {
-            guard case .scheduled(let start, _, _) = $0.type else { return false }
+            guard case .scheduled(let start, _, _, _) = $0.type else { return false }
             return start > currentTimeComponent
         }) {
             return upcoming
