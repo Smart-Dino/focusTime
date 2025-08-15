@@ -76,13 +76,13 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		674FA6A02DB05ACE0002FDC1 /* "FocusTime".app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "FocusTime.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		E962077F2DD4D1E5002F037F /* FocusTimeUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = FocusTimeUI; sourceTree = "<group>"; };
+		674FA6A02DB05ACE0002FDC1 /* FocusTime.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FocusTime.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C68617A82E2976BD00E49BF7 /* FocusTimeShieldConfiguration.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FocusTimeShieldConfiguration.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		C68617A92E2976BD00E49BF7 /* ManagedSettings.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ManagedSettings.framework; path = System/Library/Frameworks/ManagedSettings.framework; sourceTree = SDKROOT; };
 		C68617AB2E2976BD00E49BF7 /* ManagedSettingsUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ManagedSettingsUI.framework; path = System/Library/Frameworks/ManagedSettingsUI.framework; sourceTree = SDKROOT; };
 		C6A8A0B52E327781004B0D75 /* FocusTimeActivityReport.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.extensionkit-extension"; includeInIndex = 0; path = FocusTimeActivityReport.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		C6FE59E62E156D8B003A2199 /* FocusTimeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FocusTimeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E962077F2DD4D1E5002F037F /* FocusTimeUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = FocusTimeUI; sourceTree = "<group>"; };
 		E97895A52E0AFCBE00E0AF42 /* FocusTimeActivityMonitor.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FocusTimeActivityMonitor.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		E97895A72E0AFCBE00E0AF42 /* DeviceActivity.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DeviceActivity.framework; path = System/Library/Frameworks/DeviceActivity.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -249,7 +249,7 @@
 		674FA6A12DB05ACE0002FDC1 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				674FA6A02DB05ACE0002FDC1 /* "FocusTime".app */,
+				674FA6A02DB05ACE0002FDC1 /* FocusTime.app */,
 				C6FE59E62E156D8B003A2199 /* FocusTimeTests.xctest */,
 				E97895A52E0AFCBE00E0AF42 /* FocusTimeActivityMonitor.appex */,
 				C68617A82E2976BD00E49BF7 /* FocusTimeShieldConfiguration.appex */,
@@ -297,7 +297,7 @@
 				0C439A262E3249F80031E7EB /* OnboardingKit */,
 			);
 			productName = FocusTime;
-			productReference = 674FA6A02DB05ACE0002FDC1 /* "FocusTime".app */;
+			productReference = 674FA6A02DB05ACE0002FDC1 /* FocusTime.app */;
 			productType = "com.apple.product-type.application";
 		};
 		C68617A72E2976BD00E49BF7 /* FocusTimeShieldConfiguration */ = {

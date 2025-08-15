@@ -10,7 +10,7 @@ import SwiftUI
 extension QuizOnboardingView {
     enum Constants {
         enum Images {
-            static let backgroundImage = ImageResource.OnboardingImages.onboardingQuizBackground
+            static let backgroundImage = ImageResource.OnboardingImages.onboardingBackground
             static let backgroundImageOpacity = 0.7
         }
         
