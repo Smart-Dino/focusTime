@@ -102,6 +102,8 @@ struct HomeView: View {
             switch viewModel.state.nextNavigationScreen {
             case .scheduledFocusList(let viewModel):
                 ScheduledBlockItemsView(viewModel: viewModel)
+            case .taskConcentration(let viewModel):
+                TaskConcentrationView(viewModel: viewModel)
             case .none: Text("No view")
             }
         }
@@ -136,7 +138,8 @@ struct HomeView: View {
                     isPaused: .init(
                         get: { viewModel.timer.isPaused },
                         set: { viewModel.setTimerIsPaused($0) }
-                    )
+                    ),
+                    action: viewModel.showTaskConcentrationView
                 )
                 .onAppear {
                     viewModel.startTimer(for: item)
@@ -146,7 +149,8 @@ struct HomeView: View {
                     title: item.name,
                     description: item.type.description,
                     isActive: isActive,
-                    isPaused: .constant(true)
+                    isPaused: .constant(true),
+                    action: nil
                 )
             }
         }
@@ -169,4 +173,5 @@ struct HomeView: View {
             )
         )
     }
+    .preferredColorScheme(.dark)
 }

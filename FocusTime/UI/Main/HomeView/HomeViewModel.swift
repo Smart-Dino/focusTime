@@ -11,12 +11,15 @@ import FocusTimeUI
 
 enum HomeViewNavigationRoute: Equatable, Hashable {
     case scheduledFocusList(_ viewModel: ScheduledBlockItemsViewModel)
+    case taskConcentration(_ viewModel: TaskConcentrationViewModel)
     
     var id: Self { self }
     
     static func == (lhs: HomeViewNavigationRoute, rhs: HomeViewNavigationRoute) -> Bool {
         switch (lhs, rhs) {
         case (.scheduledFocusList, .scheduledFocusList): true
+        case (.taskConcentration, .taskConcentration): true
+        default: false
         }
     }
     
@@ -24,6 +27,8 @@ enum HomeViewNavigationRoute: Equatable, Hashable {
         switch self {
         case .scheduledFocusList:
             hasher.combine(0)
+        case .taskConcentration:
+            hasher.combine(1)
         }
     }
 }
@@ -119,8 +124,24 @@ final class HomeViewModel {
         state.nextNavigationScreen = .scheduledFocusList(makeScheduledFocusViewModel())
     }
     
+    func showTaskConcentrationView() {
+        if let viewModel = makeTaskConcentrationViewModel() {
+            state.nextNavigationScreen = .taskConcentration(viewModel)
+        }
+    }
+    
     private func makeScheduledFocusViewModel() -> ScheduledBlockItemsViewModel {
         ScheduledBlockItemsViewModel(blockItemPersistenceManager: blockItemPersistenceManager)
+    }
+    
+    private func makeTaskConcentrationViewModel() -> TaskConcentrationViewModel? {
+        guard let upcomingOrRunningItem = state.upcomingOrRunningItem else { return nil }
+        
+        return TaskConcentrationViewModel(
+            state: .init(item: upcomingOrRunningItem),
+            timer: timer,
+            deviceActivityRegistrar: deviceActivityRegistrar
+        )
     }
 }
 

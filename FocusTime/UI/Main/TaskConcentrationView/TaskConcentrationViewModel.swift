@@ -12,6 +12,9 @@ import FocusTimeUI
 @Observable
 final class TaskConcentrationViewModel {
     struct State {
+        var error: Error?
+        
+        var item: ProtectedBlockItem
         var timerIsPaused: Bool = true
         
         var timerControlButtonIcon = TaskConcentrationView.Constants.Icons.pause
@@ -20,35 +23,46 @@ final class TaskConcentrationViewModel {
     
     private(set) var state: State
     let timer: FTTimer
+    private let deviceActivityRegistrar: DeviceActivityRegistrar
     
     init(
-        state: State = State(),
-        timer: FTTimer
+        state: State,
+        timer: FTTimer,
+        deviceActivityRegistrar: DeviceActivityRegistrar
     ) {
         self.state = state
         self.timer = timer
+        self.deviceActivityRegistrar = deviceActivityRegistrar
         
         self.timer.delegate = self
+        self.state.timerIsPaused = timer.isPaused
     }
     
     func updateUIBasedOnTimerState() {
         if state.timerIsPaused {
-            state.timerControlButtonIcon = TaskConcentrationView.Constants.Icons.pause
+            state.timerControlButtonIcon = TaskConcentrationView.Constants.Icons.play
             state.timerControlButtonTitle = TaskConcentrationView.Constants.Strings.resumeButtonTitle
         } else {
-            state.timerControlButtonIcon = TaskConcentrationView.Constants.Icons.play
+            state.timerControlButtonIcon = TaskConcentrationView.Constants.Icons.pause
             state.timerControlButtonTitle = TaskConcentrationView.Constants.Strings.pauseButtonTitle
         }
     }
     
-    func toggleSession() {
-        if state.timerIsPaused {
-            resumeSession()
-        } else {
-            pauseSession()
+    func setErrorVisibility(_ isVisible: Bool) {
+        if !isVisible {
+            state.error = nil
         }
-        
-        updateUIBasedOnTimerState()
+    }
+    
+    func setTimerIsPaused(_ pause: Bool) {
+        if pause {
+            timer.pause()
+        } else {
+                // Since duration blocking updates it's deadline after resumption we need to recreate the timer.
+            timer.startTimer(for: state.item)
+            timer.resume()
+
+        }
     }
     
     func pauseSession() {
@@ -70,12 +84,22 @@ final class TaskConcentrationViewModel {
 }
 
 extension TaskConcentrationViewModel: FTTimerDelegate {
-    func didFinishCountdown() {
-        #warning("Move to next page")
+    func didUpdateIsPaused(_ pause: Bool) {
+        Task {
+            do {
+                pause
+                ? try await deviceActivityRegistrar.suspendActivity(for: state.item)
+                : try await deviceActivityRegistrar.resumeActivity(for: state.item)
+
+                self.state.timerIsPaused = pause
+                self.updateUIBasedOnTimerState()
+            } catch {
+                state.error = error
+            }
+        }
     }
     
-    func didUpdateIsPaused(_ timerIsPaused: Bool) {
-        state.timerIsPaused = timerIsPaused
-        updateUIBasedOnTimerState()
+    func didFinishCountdown() {
+        timer.cancel()
     }
 }

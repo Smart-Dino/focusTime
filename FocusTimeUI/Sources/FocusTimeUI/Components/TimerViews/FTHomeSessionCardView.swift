@@ -14,31 +14,16 @@ public struct FTHomeSessionCardView: View {
     
     @Binding var isPaused: Bool
     
+    let action: (() -> Void)?
+    
     public var body: some View {
         HStack(spacing: 15) {
-            if !isActive {
-                VStack(alignment: .leading) {
-                    Text(title)
-                    Text(description)
-                        .foregroundStyle(.ftGray3Light)
-                }
-                Spacer()
-            } else {
-                VStack(alignment: .leading) {
-                    Text(title)
-                    Text(description)
-                        .foregroundStyle(.ftGray3Light)
-                }
-                Spacer()
-                Button {
-                    isPaused.toggle()
-                } label: {
-                    isPaused
-                    ? Image(systemName: "play.circle").foregroundStyle(.blue)
-                    : Image(systemName: "pause.circle").foregroundStyle(.red)
-                }
-                .font(.title2)
+            VStack(alignment: .leading) {
+                Text(title)
+                Text(description)
+                    .foregroundStyle(.ftGray3Light)
             }
+            Spacer()
         }
         .padding(.horizontal)
         .padding(.vertical, 10)
@@ -49,6 +34,24 @@ public struct FTHomeSessionCardView: View {
                     .fill(.sessionRowBlue)
                 shape
                     .stroke(gradient, lineWidth: 1.2)
+            }
+        }
+        .contentShape(.rect)
+        .onTapGesture(perform: action ?? {})
+        .overlay {
+            if isActive {
+                HStack {
+                    Spacer()
+                    Button {
+                        isPaused.toggle()
+                    } label: {
+                        isPaused
+                        ? Image(systemName: "play.circle").foregroundStyle(.blue)
+                        : Image(systemName: "pause.circle").foregroundStyle(.red)
+                    }
+                    .font(.title2)
+                    .padding(.horizontal)
+                }
             }
         }
     }
@@ -65,12 +68,14 @@ public struct FTHomeSessionCardView: View {
         title: String,
         description: String,
         isActive: Bool,
-        isPaused: Binding<Bool>
+        isPaused: Binding<Bool>,
+        action: (() -> Void)?
     ) {
         self.title = title
         self.description = description
         self.isActive = isActive
         self._isPaused = isPaused
+        self.action = action
     }
     
 }
@@ -80,7 +85,8 @@ public struct FTHomeSessionCardView: View {
         title: "Work time",
         description: "00:00:01",
         isActive: true,
-        isPaused: .constant(true)
+        isPaused: .constant(true),
+        action: nil
     )
     .preferredColorScheme(.dark)
 }
