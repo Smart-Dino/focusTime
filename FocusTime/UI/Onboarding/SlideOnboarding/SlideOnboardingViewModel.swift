@@ -76,9 +76,9 @@ final class SlideOnboardingViewModel {
     
     var nextButtonConfig: ButtonUIConfiguration {
         ButtonUIConfiguration(
-            title: nextButtonTitle,
+            title: state.nextButtonTitle,
             buttonStyle: PrimaryButtonStyle(
-                verticalPadding: buttonVerticalPadding
+                verticalPadding: state.buttonVerticalPadding
             )
         ) {
             // Log action.
