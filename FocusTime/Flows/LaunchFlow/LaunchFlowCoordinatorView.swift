@@ -8,7 +8,7 @@
 import SwiftUI
 import SwiftData
 
-struct LaunchFlowView: View {
+struct LaunchFlowCoordinatorView: View {
     @State private var viewModel: LaunchFlowCoordinatorViewModel = LaunchFlowCoordinatorViewModel()
     
     var body: some View {
@@ -41,5 +41,5 @@ struct LaunchFlowView: View {
 }
 
 #Preview {
-    LaunchFlowView()
+    LaunchFlowCoordinatorView()
 }

@@ -14,7 +14,7 @@ struct SplashScreenView: View {
     
     var body: some View {
         ZStack {
-            if let player = viewModel.player {
+            if let player = viewModel.state.player {
                 makeVideoPlayer(with: player)
             } else {
                 makeFallbackImage()

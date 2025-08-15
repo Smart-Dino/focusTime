@@ -38,73 +38,69 @@ final class LaunchFlowCoordinatorViewModel {
         var appFlowCoordinatorViewModel: AppFlowCoordinatorViewModel?
     }
     
-    private(set) var state: State!
+    private(set) var state: State
+    
     private let defaultsManager: DefaultsManager
     private let paymentManagerFactory: PaymentManagerFactory
+    
     private var paymentManager: PaymentManager?
     private var modelContainer: ModelContainer?
     
+    // MARK: - Init
     init(
         defaultsManager: DefaultsManager = LiveDefaultsManager(),
         paymentManagerFactory: PaymentManagerFactory = LivePaymentManagerFactory()
     ) {
         self.defaultsManager = defaultsManager
         self.paymentManagerFactory = paymentManagerFactory
-        self.state = State(currentFlow: .splash(viewModel: makeSplashScreenViewModel()))
+        self.state = State(currentFlow: .splash(viewModel: SplashScreenViewModel()))
         
-        Task {
-            await setupDependencies()
-            await switchToAppFlow()
-        }
+        Task { await startLaunchSequence() }
     }
     
     func setErrorVisibility(_ isVisible: Bool) {
-        if !isVisible {
-            state.error = nil
+        if !isVisible { state.error = nil }
+    }
+    
+    // MARK: - Launch Sequence
+    private func startLaunchSequence() async {
+        async let splashDelay: Void = delayIfNeeded()
+        async let dependencies: Void = setupDependencies()
+        _ = await (splashDelay, dependencies)
+        
+        if let appFlowVM = makeAppFlowCoordinatorViewModel() {
+            withAnimation { state.currentFlow = .appFlow(viewModel: appFlowVM) }
         }
+    }
+    
+    // MARK: - Helpers
+    private func delayIfNeeded() async {
+        guard defaultsManager.getValue(for: .isOnboardingFinished) != true else { return }
+        try? await Task.sleep(for: .seconds(SharedAppValues.splashScreenDuration))
     }
     
     private func setupDependencies() async {
-        setupModelContainer()
-        await setupPaymentManager()
-    }
-    
-    private func switchToAppFlow() async {
-        try? await Task.sleep(for: .seconds(SharedAppValues.splashScreenDuration))
-        if let viewModel = makeAppFlowCoordinatorViewModel() {
-            withAnimation {
-                self.state.currentFlow = .appFlow(viewModel: viewModel)
-            }
-        }
-    }
-    
-    // This is done separately for error handling.
-    private func setupModelContainer() {
         do {
-            let schema = Schema([BlockItem.self])
-            let config = ModelConfiguration(groupContainer: .identifier(SharedAppValues.appGroupIdentifier))
-            let container = try ModelContainer(for: schema, configurations: config)
-            
-            self.modelContainer = container
+            try setupModelContainer()
+            try await setupPaymentManager()
         } catch {
             state.error = error
         }
     }
     
-    private func setupPaymentManager() async {
+    private func setupModelContainer() throws {
+        let schema = Schema([BlockItem.self])
+        let config = ModelConfiguration(groupContainer: .identifier(SharedAppValues.appGroupIdentifier))
+        modelContainer = try ModelContainer(for: schema, configurations: config)
+    }
+    
+    private func setupPaymentManager() async throws {
         guard paymentManager == nil else { return }
-        
         paymentManager = await StoreKitPaymentManager()
     }
     
-    
-    func makeSplashScreenViewModel() -> SplashScreenViewModel {
-        SplashScreenViewModel()
-    }
-    
-    func makeAppFlowCoordinatorViewModel() -> AppFlowCoordinatorViewModel? {
+    private func makeAppFlowCoordinatorViewModel() -> AppFlowCoordinatorViewModel? {
         guard let modelContainer, let paymentManager else { return nil }
-        
         return AppFlowCoordinatorViewModel(
             defaultsManager: defaultsManager,
             modelContainer: modelContainer,
