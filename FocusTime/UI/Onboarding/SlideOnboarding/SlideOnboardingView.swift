@@ -18,7 +18,7 @@ struct SlideOnboardingView: View {
         VStack {
             builder
                 .setViewModel(viewModel.state.onboardingSlides)
-                .setNextButtonConfiguration(viewModel.state.nextButtonConfig)
+                .setNextButtonConfiguration(viewModel.nextButtonConfig)
                 .setStartAppButtonConfiguration(viewModel.startAppButtonConfig)
                 .setProgressBarConfiguration(viewModel.state.progressBarConfig)
                 .setSizeUIConfiguration(SizeUIConfiguration())

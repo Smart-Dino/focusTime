@@ -27,15 +27,6 @@ final class SlideOnboardingViewModel {
         let onboardingBackgroundImageName: String
         
         // MARK: - Computed Properties for Builder Configurations (referencing `state`)
-        var nextButtonConfig: ButtonUIConfiguration {
-            ButtonUIConfiguration(
-                title: nextButtonTitle,
-                buttonStyle: PrimaryButtonStyle(
-                    verticalPadding: buttonVerticalPadding
-                )
-            )
-        }
-        
         var progressBarConfig: ProgressBarUIConfiguration {
             ProgressBarUIConfiguration(
                 activeColor: progressBarActiveColor,
@@ -82,6 +73,17 @@ final class SlideOnboardingViewModel {
     private(set) var state: State
     private let startAction: () -> Void
     weak var delegate: SlideOnboardingDelegate?
+    
+    var nextButtonConfig: ButtonUIConfiguration {
+        ButtonUIConfiguration(
+            title: nextButtonTitle,
+            buttonStyle: PrimaryButtonStyle(
+                verticalPadding: buttonVerticalPadding
+            )
+        ) {
+            // Log action.
+        }
+    }
     
     var startAppButtonConfig: ButtonUIConfiguration {
         ButtonUIConfiguration(
