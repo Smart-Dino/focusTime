@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0C439A272E3249F80031E7EB /* OnboardingKit in Frameworks */ = {isa = PBXBuildFile; productRef = 0C439A262E3249F80031E7EB /* OnboardingKit */; };
+		674241732E27EFBA00500101 /* FocusTimeUI in Frameworks */ = {isa = PBXBuildFile; productRef = 674241722E27EFBA00500101 /* FocusTimeUI */; };
 		C66B28102E1825160018E7AC /* FocusTimeActivityMonitor.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E97895A52E0AFCBE00E0AF42 /* FocusTimeActivityMonitor.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C66D93522E29108800452D56 /* FocusTimeUI in Frameworks */ = {isa = PBXBuildFile; productRef = 674241722E27EFBA00500101 /* FocusTimeUI */; };
 		C68617AA2E2976BD00E49BF7 /* ManagedSettings.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C68617A92E2976BD00E49BF7 /* ManagedSettings.framework */; };
@@ -74,13 +76,13 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		674FA6A02DB05ACE0002FDC1 /* FocusTime.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FocusTime.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		674FA6A02DB05ACE0002FDC1 /* "FocusTime".app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "FocusTime.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E962077F2DD4D1E5002F037F /* FocusTimeUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = FocusTimeUI; sourceTree = "<group>"; };
 		C68617A82E2976BD00E49BF7 /* FocusTimeShieldConfiguration.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FocusTimeShieldConfiguration.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		C68617A92E2976BD00E49BF7 /* ManagedSettings.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ManagedSettings.framework; path = System/Library/Frameworks/ManagedSettings.framework; sourceTree = SDKROOT; };
 		C68617AB2E2976BD00E49BF7 /* ManagedSettingsUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ManagedSettingsUI.framework; path = System/Library/Frameworks/ManagedSettingsUI.framework; sourceTree = SDKROOT; };
 		C6A8A0B52E327781004B0D75 /* FocusTimeActivityReport.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.extensionkit-extension"; includeInIndex = 0; path = FocusTimeActivityReport.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		C6FE59E62E156D8B003A2199 /* FocusTimeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FocusTimeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		E962077F2DD4D1E5002F037F /* FocusTimeUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = FocusTimeUI; sourceTree = "<group>"; };
 		E97895A52E0AFCBE00E0AF42 /* FocusTimeActivityMonitor.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FocusTimeActivityMonitor.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		E97895A72E0AFCBE00E0AF42 /* DeviceActivity.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DeviceActivity.framework; path = System/Library/Frameworks/DeviceActivity.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -182,6 +184,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0C439A272E3249F80031E7EB /* OnboardingKit in Frameworks */,
+				674241732E27EFBA00500101 /* FocusTimeUI in Frameworks */,
 				C66D93522E29108800452D56 /* FocusTimeUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -220,6 +224,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		6742416F2E27EED600500101 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		674FA6972DB05ACE0002FDC1 = {
 			isa = PBXGroup;
 			children = (
@@ -230,6 +241,7 @@
 				C68617AD2E2976BD00E49BF7 /* FocusTimeShieldConfiguration */,
 				C6A8A0B62E327781004B0D75 /* FocusTimeActivityReport */,
 				E97895A62E0AFCBE00E0AF42 /* Frameworks */,
+				6742416F2E27EED600500101 /* Frameworks */,
 				674FA6A12DB05ACE0002FDC1 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -237,7 +249,7 @@
 		674FA6A12DB05ACE0002FDC1 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				674FA6A02DB05ACE0002FDC1 /* FocusTime.app */,
+				674FA6A02DB05ACE0002FDC1 /* "FocusTime".app */,
 				C6FE59E62E156D8B003A2199 /* FocusTimeTests.xctest */,
 				E97895A52E0AFCBE00E0AF42 /* FocusTimeActivityMonitor.appex */,
 				C68617A82E2976BD00E49BF7 /* FocusTimeShieldConfiguration.appex */,
@@ -282,9 +294,10 @@
 			name = FocusTime;
 			packageProductDependencies = (
 				674241722E27EFBA00500101 /* FocusTimeUI */,
+				0C439A262E3249F80031E7EB /* OnboardingKit */,
 			);
 			productName = FocusTime;
-			productReference = 674FA6A02DB05ACE0002FDC1 /* FocusTime.app */;
+			productReference = 674FA6A02DB05ACE0002FDC1 /* "FocusTime".app */;
 			productType = "com.apple.product-type.application";
 		};
 		C68617A72E2976BD00E49BF7 /* FocusTimeShieldConfiguration */ = {
@@ -414,6 +427,7 @@
 			mainGroup = 674FA6972DB05ACE0002FDC1;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+				0C439A252E3249F80031E7EB /* XCRemoteSwiftPackageReference "OnboardingKit" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 674FA6A12DB05ACE0002FDC1 /* Products */;
@@ -694,7 +708,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = FocusTime/Entitlements/FocusTime.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"FocusTime/Preview Content\"";
@@ -716,6 +730,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = org.dino.smart.FocusTime;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = FocusTimeProvisioning;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1016,7 +1031,23 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		0C439A252E3249F80031E7EB /* XCRemoteSwiftPackageReference "OnboardingKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Smart-Dino/OnboardingKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
+		0C439A262E3249F80031E7EB /* OnboardingKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0C439A252E3249F80031E7EB /* XCRemoteSwiftPackageReference "OnboardingKit" */;
+			productName = OnboardingKit;
+		};
 		674241722E27EFBA00500101 /* FocusTimeUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = FocusTimeUI;

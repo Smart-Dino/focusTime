@@ -5,13 +5,17 @@
 //  Created by Keto Nioradze on 26.05.25.
 //
 
-import Foundation
+import SwiftUI
 
 extension QuizOnboardingView {
     enum Constants {
+        enum Images {
+            static let backgroundImage = ImageResource.OnboardingImages.onboardingQuizBackground
+            static let backgroundImageOpacity = 0.7
+        }
+        
         enum Layout {
             static let titleSpacing: CGFloat = 11
-            static let bottomPadding: CGFloat = 40
             static let quizSpacing: CGFloat = 42
         }
         

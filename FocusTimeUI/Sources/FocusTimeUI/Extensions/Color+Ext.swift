@@ -13,11 +13,17 @@ import SwiftUI
 public extension ShapeStyle where Self == Color {
     // MARK: - Backgrounds
     static var ftBackground: Color { Color("BackgroundColor", bundle: .module) }
-    static var ftBackgroundBlue: Color { Color("BackgroundBlueColor", bundle: .module) }
+    static var ftBackgroundBlueColor: Color { Color("BackgroundBlueColor", bundle: .module) }
+    static var ftQuizSlideOnboardingMaskColor: Color { Color("QuizOnboardingMaskColor", bundle: .module) }
+
+    //MARK: - Onboarding Colors
+    static var ftSlidesTimerStrokeColor: Color { Color("SlidesTimerStrokeColor", bundle: .module) }
+
     // MARK: - Blue
     static var ftDarkBlue: Color { Color("DarkBlueColor", bundle: .module) }
     static var ftMainBlue: Color { Color("MainBlueColor", bundle: .module) }
     static var onboardingPaywallContentPad: Color { Color("OnboardingPaywallContentPadColor", bundle: .module) }
+    static var ftOnboardingImageOverlayColor: Color { Color("OnboardingImageOverlayColor", bundle: .module) }
     // MARK: - Green
     static var ftPaywallPromoGreen: Color { Color("PaywallPromoGreenColor", bundle: .module) }
     // MARK: - UIKit Adapted
