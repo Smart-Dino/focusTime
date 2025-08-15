@@ -48,13 +48,23 @@ final class FreePlanUpgradeViewModel {
         self.superPaywallVM = superPaywallVM
         self.flowDelegate = flowDelegate
         superPaywallVM.delegate = self
+        
+        setupView()
+    }
+    
+    func setupView() {
+        Task {
+            await fetchProducts()
+            selectRequestedProduct()
+            setupProductInfo()
+        }
     }
     
     
     // MARK: - Methods
     // MARK: State setter methods
-    func keepShowingError(showError: Bool) {
-        if !showError {
+    func setErrorVisibility(_ isVisible: Bool) {
+        if !isVisible {
             state.superState.error = nil
         }
     }

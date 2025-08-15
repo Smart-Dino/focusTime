@@ -10,12 +10,16 @@ import DeviceActivity
 
 extension HomeView {
     enum Constants {
-        // MARK: - DeviceActivityReport
+        // MARK: - ActivityConfiguration
         @MainActor
         enum ActivityConfiguration {
-            static let context: DeviceActivityReport.Context = .init("totalActivity")
-            static let filter: DeviceActivityFilter = .init(
-                users: .all, devices: .init([.iPhone])
+            static let context = DeviceActivityReport.Context.totalActivity
+            static let filter = DeviceActivityFilter(
+                segment: .daily(during: DateInterval(
+                    start: Calendar.current.startOfDay(for: .now),
+                    duration: 86400)),
+                users: .all,
+                devices: .init([.iPhone])
             )
         }
         // MARK: - Strings

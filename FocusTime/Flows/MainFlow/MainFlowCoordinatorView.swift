@@ -12,13 +12,9 @@ struct MainFlowCoordinatorView: View {
     @State var viewModel: MainFlowCoordinatorViewModel
     
     var body: some View {
-        NavigationStack(path: Binding(get: {
-            viewModel.flowState.currentPath
-        }, set: { screens in
-            viewModel.setScreens(screens)
-        })) {
+        NavigationStack {
             TabView(selection: Binding(get: {
-                viewModel.flowState.currentTabScreen
+                viewModel.state.currentTabScreen
             }, set: { screen in
                 viewModel.setTabScreen(screen)
             })) {
@@ -31,21 +27,13 @@ struct MainFlowCoordinatorView: View {
                             }
                         }
                         .tag(MainTabScreens.home)
-                    AppBlockingListView(viewModel: viewModel.makeAppBlockListViewModel())
+                    DraftsBlockItemListView(viewModel: viewModel.makeDraftsBlockItemListViewModel())
                         .tabItem {
                             Label("Blocks", systemImage: "hand.raised")
                             // Prevent system from filling system icons.
                                 .environment(\.symbolVariants, .none)
-                            
                         }
                         .tag(MainTabScreens.blocks)
-                    Text("Empty for now")
-                        .tabItem {
-                            Label("Profile", systemImage: "person")
-                            // Prevent system from filling system icons.
-                                .environment(\.symbolVariants, .none)
-                        }
-                        .tag(MainTabScreens.profile)
                 }
                 //                .toolbarBackground(Color.ftBackground, for: .tabBar) // Set a specific color
                 // as a background, but we don't do it because the tabbar is transparent
@@ -56,16 +44,16 @@ struct MainFlowCoordinatorView: View {
             }
             .toolbar(.visible)
             .toolbar {
-                if viewModel.flowState.currentTabScreen == .home {
+                if viewModel.state.currentTabScreen == .home {
                     ToolbarItem {
                         FTProUpgradeButtonView {
-#warning("Action is empty")
+                            viewModel.requestPaywall()
                         }
                     }
                 }
                 // In future SDKs of iOS we would have to put a spacer here.
                 ToolbarItemGroup {
-                    switch viewModel.flowState.currentTabScreen {
+                    switch viewModel.state.currentTabScreen {
                     case .home:
                         FTPlusToolbarButtonView {
 #warning("Action is empty")
@@ -75,13 +63,15 @@ struct MainFlowCoordinatorView: View {
                     }
                 }
             }
-            // Navigation has to be managed here
-            // since declaring navDest in the views nested in the tabbar
-            // makes them load lazily which will cause navigation bugs.
-            .navigationDestination(for: MainScreens.self) { screen in
-                switch screen {
-                case .scheduledFocusList(let scheduledFocusViewModel):
-                    ScheduledFocusListView(viewModel: scheduledFocusViewModel)
+            .navigationDestination(isPresented: .init(
+                get: { viewModel.state.nextNavigationScreen != nil },
+                set: { viewModel.setNextNavigationScreen($0) }
+            )) {
+                switch viewModel.state.nextNavigationScreen {
+                case .shieldDebug(let viewModel):
+                    ShieldDebugView(viewModel: viewModel)
+                case .none:
+                    Text("No view")
                 }
             }
         }
@@ -91,5 +81,10 @@ struct MainFlowCoordinatorView: View {
 }
 
 #Preview {
-    MainFlowCoordinatorView(viewModel: .init(modelContainer: PreviewData.memoryOnlyModelContainer))
+    MainFlowCoordinatorView(
+        viewModel: .init(
+            modelContainer: PreviewData.memoryOnlyModelContainer,
+            appFlowDelegate: nil
+        )
+    )
 }

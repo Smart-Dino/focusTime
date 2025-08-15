@@ -65,17 +65,20 @@ final class SuperPaywallViewModel {
         startListeningToSubscriptionUpdates()
     }
     
-    // A deinitializer is called immediately before a class instance is deallocated
-    // - so we should have access to self.state before it deinits?
     deinit {
-        Task { [weak self] in // Capture of 'self' in a closure that outlives deinit.
-            await self?.subscriptionTask?.cancel()
-        }
+        self.subscriptionTask?.cancel()
+        self.subscriptionTask = nil
     }
     
     // MARK: - Stream
     private func startListeningToSubscriptionUpdates() {
+        #if DEBUG
+        // Very important debug info.
+        // Make sure this ViewModel does not get created multiple times,
+        // or esle it will lead to some very messy results.
         print(#function)
+        print(ObjectIdentifier(self))
+        #endif
         subscriptionTask?.cancel()
         
         subscriptionTask = Task {

@@ -1,5 +1,5 @@
 //
-//  AppBlockingListView.swift
+//  DraftsBlockItemListView.swift
 //  FocusTime
 //
 //  Created by Maksym Horobets on 17.06.2025.
@@ -8,8 +8,8 @@
 import SwiftUI
 import FocusTimeUI
 
-struct AppBlockingListView: View {
-    @State var viewModel: AppBlockingListViewModel
+struct DraftsBlockItemListView: View {
+    @State var viewModel: DraftsBlockItemListViewModel
     
     var body: some View {
         ZStack {
@@ -45,11 +45,11 @@ struct AppBlockingListView: View {
         .background { MainBackgroundGradientView() }
         // MARK: - Bottom floating button
         .safeAreaInset(edge: .bottom) {
-            Button(Constants.Strings.newBlocklistButtonTitle, systemImage: "plus.circle") {
-                #warning("Placeholder code")
-                Task {
-                    await viewModel.insertTestItemsIntoDatabase()
-                }
+            Button(
+                Constants.Strings.newBlocklistButtonTitle,
+                systemImage: "plus.circle"
+            ) {
+                #warning("No implementation")
             }
             .buttonStyle(.ftPrimary)
             .padding()
@@ -65,8 +65,8 @@ struct AppBlockingListView: View {
             SharedConstants.Strings.errorHeader,
             isPresented: Binding(get: {
                 viewModel.state.error != nil
-            }, set: { showError in
-                viewModel.keepShowingError(showError: showError)
+            }, set: { isVisible in
+                viewModel.setErrorVisibility(isVisible)
             }), actions: {
                 // OK dismissal button by default
             }, message: {
@@ -82,7 +82,7 @@ struct AppBlockingListView: View {
                     FTSessionSummaryCardView(
                         emoji: block.emoji,
                         title: block.name,
-                        description: block.schedulesDescription,
+                        description: block.type.description,
                     )
                     .padding(1)
                     .onAppear { viewModel.hasReachEndOfList(blockItem: block) }
@@ -105,9 +105,6 @@ struct AppBlockingListView: View {
     }
 }
 
-#warning("No preview.")
-//#Preview {
-//    if let blockItemStore = BlockItemStore(isStoredInMemoryOnly: true) {
-//        AppBlockingListView(viewModel: .init(blockItemStore: blockItemStore))
-//    }
-//}
+#Preview {
+    DraftsBlockItemListView(viewModel: .init(modelContainer: PreviewData.memoryOnlyModelContainer))
+}
