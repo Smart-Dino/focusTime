@@ -15,7 +15,7 @@ struct MainBackgroundGradientView: View {
             VStack {
                 Group {
                     Circle()
-                        .fill(.ftBackgroundBlueColor.opacity(0.5))
+                        .fill(.ftBackgroundBlue.opacity(0.5))
                     Spacer()
                     Circle()
                         .fill(.ftDarkBlue)

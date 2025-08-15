@@ -6,135 +6,63 @@
 //
 
 import SwiftUI
-import OnboardingKit
 
 extension SlideOnboardingView {
-    
-    enum SlideOnboardingConstants {
-        enum Layout {
-            // General size constants
-            static let buttonVerticalPadding: CGFloat = 13
-            static let progressBarInactiveColorOpacity: CGFloat = 0.3
-            static let onboardingMaskOpacity: CGFloat = 0.3
-            
-            // Constants for first slide blur
-            static let blurRotationDegrees: Angle = .degrees(90)
-            static let blurRadius: CGFloat = 30
-            static let blurColorOpacity: CGFloat = 0.5
-            static let blurWidth: CGFloat = 197
-            static let blurHorisontalPadding: CGFloat = 150
-            
-            // Constants for first slide timer
-            static let timerStackSpacing: CGFloat = 7
-            static let timerBlockWidth: CGFloat = 77
-            static let timerBlockHeight: CGFloat = 65
-            static let timerBlockCornerRadius: CGFloat = 10
-            static let timerStrokeWidth: CGFloat = 1
-            static let shadowColorOpacity: CGFloat = 0.8
-            static let shadowRadius: CGFloat = 2
-            
-            // Divider Constants
-            static let dividerWidth: CGFloat = 70
-            static let dividerHeight: CGFloat = 2
-        }
-        
+    enum Constants {
         enum Strings {
-            static let slideSubtitle: String = String(
-                localized: "RIDE THE WAVES OF PRODUCTIVITY",
-                table: "OnboardingLocalizable"
-            )
-            static let nextButtonTitle: String = String(
-                localized: "Next",
-                table: "OnboardingLocalizable"
-            )
-            static let startAppButtonTitle: String = String(
-                localized: "Start Focusing",
-                table: "OnboardingLocalizable"
-            )
-            static let firstSlideTextTitle: String = String(
-                localized: "Focus time",
-                table: "OnboardingLocalizable"
-            )
+            static let title = String(localized: "slide_onboarding_main_title", table: "OnboardingLocalizable")
+            static let nextButton = String(localized: "slide_onboarding_next_button", table: "OnboardingLocalizable")
+            static let skipButton = String(localized: "slide_onboarding_skip_button", table: "OnboardingLocalizable")
+            static let startButton = String(localized: "slide_onboarding_start_button", table: "OnboardingLocalizable")
+            static let alertTitle = String(localized: "slide_onboarding_alert_title", table: "OnboardingLocalizable")
+            static let alertMessage = String(localized: "slide_onboarding_alert_message", table: "OnboardingLocalizable")
+            static let skipAnyway = String(localized: "slide_onboarding_alert_skip_anyway_button", table: "OnboardingLocalizable")
+            static let goBack = String(localized: "slide_onboarding_alert_go_back_button", table: "OnboardingLocalizable")
         }
         
-        enum Colors {
-            static let progressBarActiveColor: Color = .blue
-            static let skipButtonTextColor: Color = .blue
-            static let timerBackgroundColor: Color = .ftOnboardingImageOverlayColor
-            static let timerStrokeColor: Color = .ftSlidesTimerStrokeColor
-        }
-        
-        enum Images {
-            static let onboardingBackgroundImageName = "OnboardingSlideQuizBackground"
+        enum Layout {
+            static let topPadding: CGFloat = 20
+            static let subtitleSectionHeight: CGFloat = 152
+            static let buttonSectionHeight: CGFloat = 78
+            static let buttonSpacing: CGFloat = 16
+            static let progressBarTopPadding: CGFloat = 31
         }
     }
 }
 
+
 enum SlideOnboardingStep: CaseIterable {
     case step1, step2, step3, step4
-
-    var slide: OnboardingSlide {
+    
+    var subtitle1: String {
         switch self {
-        case .step1:
-            return OnboardingSlide(
-                slideTitle: SlideOnboardingView.SlideOnboardingConstants.Strings.slideSubtitle,
-                subtitle: String(
-                    localized: "Wave Cycles",
-                    table: "OnboardingLocalizable"
-                ),
-                subtitleDescription: String(
-                    localized: "25-minute focus sessions followed by 5-minute recovery breaks, modeled after the natural rhythm of ocean waves",
-                    table: "OnboardingLocalizable"
-                ),
-                customView: AnyView(FirstImageView()),
-                imageAlignment: .center,
-                imageContentMode: .fill
-            )
-        case .step2:
-            return OnboardingSlide(
-                slideTitle: SlideOnboardingView.SlideOnboardingConstants.Strings.slideSubtitle,
-                subtitle: String(
-                    localized: "Tide Blocker",
-                    table: "OnboardingLocalizable"
-                ),
-                subtitleDescription: String(
-                    localized: "Automatically silences notifications and blocks distracting apps during your focus sessions, keeping your mental waters clear",
-                    table: "OnboardingLocalizable"
-                ),
-                imageName: "TideBlocker",
-                imageAlignment: .center,
-                imageContentMode: .fill
-            )
-        case .step3:
-            return OnboardingSlide(
-                slideTitle: SlideOnboardingView.SlideOnboardingConstants.Strings.slideSubtitle,
-                subtitle: String(
-                    localized: "Tide Schedule",
-                    table: "OnboardingLocalizable"
-                ),
-                subtitleDescription: String(
-                    localized: "Set up automatic focus sessions that activate at predetermined times, blocking distracting apps like ocean",
-                    table: "OnboardingLocalizable"
-                ),
-                imageName: "TideSchedule",
-                imageAlignment: .bottom,
-                imageContentMode: .fill
-            )
-        case .step4:
-            return OnboardingSlide(
-                slideTitle: SlideOnboardingView.SlideOnboardingConstants.Strings.slideSubtitle,
-                subtitle: String(
-                    localized: "Ocean of Achievement",
-                    table: "OnboardingLocalizable"
-                ),
-                subtitleDescription: String(
-                    localized: "Collect unique marine-themed awards as you develop stronger focus habits and reach new productivity depths",
-                    table: "OnboardingLocalizable"
-                ),
-                imageName: "OceanOfAchivement",
-                imageAlignment: .bottom,
-                imageContentMode: .fill
-            )
+        case .step1: String(localized: "slide_onboarding_step1_title", table: "OnboardingLocalizable")
+        case .step2: String(localized: "slide_onboarding_step2_title", table: "OnboardingLocalizable")
+        case .step3: String(localized: "slide_onboarding_step3_title", table: "OnboardingLocalizable")
+        case .step4: String(localized: "slide_onboarding_step4_title", table: "OnboardingLocalizable")
         }
+        
+    }
+    
+    var subtitle2: String {
+        switch self {
+        case .step1: String(localized: "slide_onboarding_step1_description", table: "OnboardingLocalizable")
+        case .step2: String(localized: "slide_onboarding_step2_description", table: "OnboardingLocalizable")
+        case .step3: String(localized: "slide_onboarding_step3_description", table: "OnboardingLocalizable")
+        case .step4: String(localized: "slide_onboarding_step4_description", table: "OnboardingLocalizable")
+        }
+    }
+    
+    var image: ImageResource {
+        switch self {
+        case .step1: .slideOnboardingImage1
+        case .step2: .slideOnboardingImage2
+        case .step3: .slideOnboardingImage1
+        case .step4: .slideOnboardingImage2
+        }
+    }
+    
+    var isLast: Bool {
+        self == Self.allCases.last
     }
 }
