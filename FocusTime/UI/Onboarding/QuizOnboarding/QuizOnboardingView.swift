@@ -17,27 +17,30 @@ struct QuizOnboardingView: View {
     
     // MARK: - Body
     var body: some View {
-        
         // MARK: - Header Section
-        VStack{
-            VStack(alignment: .leading){
+        VStack {
+            VStack {
                 
                 /// Title and subtitle
                 VStack(alignment: .center, spacing: Constants.Layout.titleSpacing) {
                     Text(Constants.Strings.title)
-                        .font(.title3.bold())
+                        .font(.title2)
                         .multilineTextAlignment(.center)
                     
                     Text(Constants.Strings.subtitle)
-                        .font(.body)
+                        .font(.caption)
+                        .foregroundStyle(.ftGray3Light )
                         .multilineTextAlignment(.center)
                 }
                 .foregroundColor(.white)
-                .padding(.bottom, Constants.Layout.bottomPadding)
+                .padding(.bottom)
                 
                 // MARK: - Scrollable Quiz Section
                 ScrollView {
-                    VStack(alignment: .leading, spacing: Constants.Layout.quizSpacing) {
+                    VStack(
+                        alignment: .leading,
+                        spacing: Constants.Layout.quizSpacing
+                    ) {
                         ForEach(Constants.QuizOption.allCases) { option in
                             Toggle(option.localizedString, isOn: Binding(
                                 get: { viewModel.state.isOptionSelected(option) },
@@ -47,6 +50,8 @@ struct QuizOnboardingView: View {
                             .font(.body)
                         }
                     }
+                    .padding()
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .scrollBounceBehavior(.basedOnSize, axes: [.vertical])
             }
@@ -60,11 +65,18 @@ struct QuizOnboardingView: View {
             .padding()
         }
         .dynamicTypeSize(...DynamicTypeSize.large)
-        .preferredColorScheme(.dark)
+        .background {
+            Image(Constants.Images.backgroundImage)
+                .resizable()
+                .scaledToFill()
+                .ignoresSafeArea()
+                .opacity(Constants.Images.backgroundImageOpacity)
+        }
     }
 }
 
 
 #Preview {
     QuizOnboardingView(viewModel: .init(delegate: nil))
+        .preferredColorScheme(.dark)
 }
