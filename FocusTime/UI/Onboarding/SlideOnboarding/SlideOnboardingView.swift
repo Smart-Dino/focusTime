@@ -11,7 +11,7 @@ import OnboardingKit
 // MARK: - SlideOnboardingView
 struct SlideOnboardingView: View {
     
-    @State private var viewModel = SlideOnboardingViewModel()
+    @State var viewModel: SlideOnboardingViewModel
     @State private var builder = LiveOnboardingBuilder()
     
     var body: some View {
@@ -19,7 +19,7 @@ struct SlideOnboardingView: View {
             builder
                 .setViewModel(viewModel.state.onboardingSlides)
                 .setNextButtonConfiguration(viewModel.state.nextButtonConfig)
-                .setStartAppButtonConfiguration(viewModel.state.startAppButtonConfig)
+                .setStartAppButtonConfiguration(viewModel.startAppButtonConfig)
                 .setProgressBarConfiguration(viewModel.state.progressBarConfig)
                 .setSizeUIConfiguration(SizeUIConfiguration())
                 .setThemeStyle(viewModel.state.onboardingThemeStyle)

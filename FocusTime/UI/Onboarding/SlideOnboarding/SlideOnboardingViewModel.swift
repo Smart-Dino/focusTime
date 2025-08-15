@@ -16,7 +16,7 @@ final class SlideOnboardingViewModel {
     @MainActor
     struct State {
         let onboardingSlides: [OnboardingSlide]
-
+        
         let nextButtonTitle: String
         let startAppButtonTitle: String
         let buttonVerticalPadding: CGFloat
@@ -27,15 +27,6 @@ final class SlideOnboardingViewModel {
         let onboardingBackgroundImageName: String
         
         // MARK: - Computed Properties for Builder Configurations (referencing `state`)
-        var startAppButtonConfig: ButtonUIConfiguration {
-            ButtonUIConfiguration(
-                title: startAppButtonTitle,
-                buttonStyle: PrimaryButtonStyle(
-                    verticalPadding: 14
-                )
-            )
-        }
-        
         var nextButtonConfig: ButtonUIConfiguration {
             ButtonUIConfiguration(
                 title: nextButtonTitle,
@@ -44,7 +35,7 @@ final class SlideOnboardingViewModel {
                 )
             )
         }
-
+        
         var progressBarConfig: ProgressBarUIConfiguration {
             ProgressBarUIConfiguration(
                 activeColor: progressBarActiveColor,
@@ -63,7 +54,7 @@ final class SlideOnboardingViewModel {
                 )
             )
         }
-
+        
         init(
             onboardingSlides: [OnboardingSlide] = SlideOnboardingStep.allCases.map { $0.slide },
             nextButtonTitle: String,
@@ -88,31 +79,44 @@ final class SlideOnboardingViewModel {
     }
     
     // MARK: - ViewModel Properties
-    // MARK: - ViewModel Properties
     private(set) var state: State
     private let startAction: () -> Void
+    weak var delegate: SlideOnboardingDelegate?
+    
+    var startAppButtonConfig: ButtonUIConfiguration {
+        ButtonUIConfiguration(
+            title: state.startAppButtonTitle,
+            buttonStyle: PrimaryButtonStyle(
+                verticalPadding: 14
+            )
+        ) {
+            self.delegate?.didFinishOnboardingSlides(skipped: nil)
+        }
+    }
     
     // MARK: - Lifecycle
     init(
-          state: State = State(
-               nextButtonTitle: SlideOnboardingView.SlideOnboardingConstants.Strings.nextButtonTitle,
-               startAppButtonTitle: SlideOnboardingView.SlideOnboardingConstants.Strings.startAppButtonTitle,
-               buttonVerticalPadding: SlideOnboardingView.SlideOnboardingConstants.Layout.buttonVerticalPadding,
-               progressBarActiveColor: SlideOnboardingView.SlideOnboardingConstants.Colors.progressBarActiveColor,
-               progressBarInactiveColorOpacity: SlideOnboardingView.SlideOnboardingConstants.Layout.progressBarInactiveColorOpacity,
-               onboardingMaskOpacity: SlideOnboardingView.SlideOnboardingConstants.Layout.onboardingMaskOpacity,
-               skipButtonTextColor: SlideOnboardingView.SlideOnboardingConstants.Colors.skipButtonTextColor,
-               onboardingBackgroundImageName: SlideOnboardingView.SlideOnboardingConstants.Images.onboardingBackgroundImageName
-          ),
-          onStart: @escaping () -> Void = {}
-      ) {
-          self.state = state
-          self.startAction = onStart
-       }
-
-
+        state: State = State(
+            nextButtonTitle: SlideOnboardingView.SlideOnboardingConstants.Strings.nextButtonTitle,
+            startAppButtonTitle: SlideOnboardingView.SlideOnboardingConstants.Strings.startAppButtonTitle,
+            buttonVerticalPadding: SlideOnboardingView.SlideOnboardingConstants.Layout.buttonVerticalPadding,
+            progressBarActiveColor: SlideOnboardingView.SlideOnboardingConstants.Colors.progressBarActiveColor,
+            progressBarInactiveColorOpacity: SlideOnboardingView.SlideOnboardingConstants.Layout.progressBarInactiveColorOpacity,
+            onboardingMaskOpacity: SlideOnboardingView.SlideOnboardingConstants.Layout.onboardingMaskOpacity,
+            skipButtonTextColor: SlideOnboardingView.SlideOnboardingConstants.Colors.skipButtonTextColor,
+            onboardingBackgroundImageName: SlideOnboardingView.SlideOnboardingConstants.Images.onboardingBackgroundImageName
+        ),
+        delegate: SlideOnboardingDelegate?,
+        onStart: @escaping () -> Void = {}
+    ) {
+        self.state = state
+        self.delegate = delegate
+        self.startAction = onStart
+    }
+    
+    
     // MARK: - Actions
-        func didTapStartFocusing() {
-            startAction()
-        }
+    func didTapStartFocusing() {
+        startAction()
+    }
 }

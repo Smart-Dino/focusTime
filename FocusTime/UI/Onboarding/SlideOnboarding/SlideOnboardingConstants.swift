@@ -39,20 +39,20 @@ extension SlideOnboardingView {
         }
         
         enum Strings {
-            static let slideSubtitle: String = String(
-                localized: "RIDE THE WAVES OF PRODUCTIVITY",
+            static let slideMainTitle: String = String(
+                localized: "slide_onboarding_main_title",
                 table: "OnboardingLocalizable"
             )
             static let nextButtonTitle: String = String(
-                localized: "Next",
+                localized: "slide_onboarding_next_button",
                 table: "OnboardingLocalizable"
             )
             static let startAppButtonTitle: String = String(
-                localized: "Start Focusing",
+                localized: "slide_onboarding_start_button",
                 table: "OnboardingLocalizable"
             )
             static let firstSlideTextTitle: String = String(
-                localized: "Focus time",
+                localized: "slide_onboarding_focustime_title",
                 table: "OnboardingLocalizable"
             )
         }
@@ -77,13 +77,13 @@ enum SlideOnboardingStep: CaseIterable {
         switch self {
         case .step1:
             return OnboardingSlide(
-                slideTitle: SlideOnboardingView.SlideOnboardingConstants.Strings.slideSubtitle,
+                slideTitle: SlideOnboardingView.SlideOnboardingConstants.Strings.slideMainTitle,
                 subtitle: String(
-                    localized: "Wave Cycles",
+                    localized: "slide_onboarding_step1_title",
                     table: "OnboardingLocalizable"
                 ),
                 subtitleDescription: String(
-                    localized: "25-minute focus sessions followed by 5-minute recovery breaks, modeled after the natural rhythm of ocean waves",
+                    localized: "slide_onboarding_step1_description",
                     table: "OnboardingLocalizable"
                 ),
                 customView: AnyView(FirstImageView()),
@@ -92,46 +92,46 @@ enum SlideOnboardingStep: CaseIterable {
             )
         case .step2:
             return OnboardingSlide(
-                slideTitle: SlideOnboardingView.SlideOnboardingConstants.Strings.slideSubtitle,
+                slideTitle: SlideOnboardingView.SlideOnboardingConstants.Strings.slideMainTitle,
                 subtitle: String(
-                    localized: "Tide Blocker",
+                    localized: "slide_onboarding_step2_title",
                     table: "OnboardingLocalizable"
                 ),
                 subtitleDescription: String(
-                    localized: "Automatically silences notifications and blocks distracting apps during your focus sessions, keeping your mental waters clear",
+                    localized: "slide_onboarding_step2_description",
                     table: "OnboardingLocalizable"
                 ),
-                imageName: "TideBlocker",
+                imageName: "OnboardingImages/TideBlocker",
                 imageAlignment: .center,
                 imageContentMode: .fill
             )
         case .step3:
             return OnboardingSlide(
-                slideTitle: SlideOnboardingView.SlideOnboardingConstants.Strings.slideSubtitle,
+                slideTitle: SlideOnboardingView.SlideOnboardingConstants.Strings.slideMainTitle,
                 subtitle: String(
-                    localized: "Tide Schedule",
+                    localized: "slide_onboarding_step3_title",
                     table: "OnboardingLocalizable"
                 ),
                 subtitleDescription: String(
-                    localized: "Set up automatic focus sessions that activate at predetermined times, blocking distracting apps like ocean",
+                    localized: "slide_onboarding_step3_description",
                     table: "OnboardingLocalizable"
                 ),
-                imageName: "TideSchedule",
+                imageName: "OnboardingImages/TideSchedule",
                 imageAlignment: .bottom,
                 imageContentMode: .fill
             )
         case .step4:
             return OnboardingSlide(
-                slideTitle: SlideOnboardingView.SlideOnboardingConstants.Strings.slideSubtitle,
+                slideTitle: SlideOnboardingView.SlideOnboardingConstants.Strings.slideMainTitle,
                 subtitle: String(
-                    localized: "Ocean of Achievement",
+                    localized: "slide_onboarding_step4_title",
                     table: "OnboardingLocalizable"
                 ),
                 subtitleDescription: String(
-                    localized: "Collect unique marine-themed awards as you develop stronger focus habits and reach new productivity depths",
+                    localized: "slide_onboarding_step4_description",
                     table: "OnboardingLocalizable"
                 ),
-                imageName: "OceanOfAchivement",
+                imageName: "OnboardingImages/OceanOfAchivement",
                 imageAlignment: .bottom,
                 imageContentMode: .fill
             )

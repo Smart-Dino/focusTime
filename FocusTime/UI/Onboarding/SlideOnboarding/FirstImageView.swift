@@ -11,7 +11,7 @@ import FocusTimeUI
 struct FirstImageView: View {
     var body: some View {
         ZStack(alignment: .center) {
-            Image("WaveCycles")
+            Image(.waveCycles)
                 .resizable()
             
             Ellipse()
