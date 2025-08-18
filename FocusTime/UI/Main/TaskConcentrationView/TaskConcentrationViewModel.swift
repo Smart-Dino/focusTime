@@ -5,20 +5,51 @@
 //  Created by Maksym Horobets on 28.07.2025.
 //
 
-import Foundation
+import SwiftUI
 import FocusTimeUI
 
 @MainActor
 @Observable
 final class TaskConcentrationViewModel {
     struct State {
+        enum Phase {
+            case focus(
+                title: String,
+                subtitle: String,
+                timerTitle: String,
+                runningTitle: String,
+                pausedTitle: String,
+                runningIcon: String,
+                pausedIcon: String
+            )
+            case breakTransition(
+                title: String,
+                subtitle: String
+            )
+            case breakTime(
+                title: String,
+                subtitle: String,
+                timerTitle: String,
+                buttonTitle: String
+            )
+            case almostDone(
+                title: String,
+                subtitle: String,
+                message: String,
+                buttonTitle: String
+            )
+            case finished(
+                title: String,
+                buttonTitle: String
+            )
+        }
+
         var error: Error?
-        
         var item: ProtectedBlockItem
         var timerIsPaused: Bool = true
         
-        var timerControlButtonIcon = TaskConcentrationView.Constants.Icons.pause
-        var timerControlButtonTitle = TaskConcentrationView.Constants.Strings.resumeButtonTitle
+        var breakTimer: FTTimer? = nil
+        var phase: Phase = .focus
     }
     
     private(set) var state: State
@@ -38,16 +69,6 @@ final class TaskConcentrationViewModel {
         self.state.timerIsPaused = timer.isPaused
     }
     
-    func updateUIBasedOnTimerState() {
-        if state.timerIsPaused {
-            state.timerControlButtonIcon = TaskConcentrationView.Constants.Icons.play
-            state.timerControlButtonTitle = TaskConcentrationView.Constants.Strings.resumeButtonTitle
-        } else {
-            state.timerControlButtonIcon = TaskConcentrationView.Constants.Icons.pause
-            state.timerControlButtonTitle = TaskConcentrationView.Constants.Strings.pauseButtonTitle
-        }
-    }
-    
     func setErrorVisibility(_ isVisible: Bool) {
         if !isVisible {
             state.error = nil
@@ -63,6 +84,17 @@ final class TaskConcentrationViewModel {
             timer.resume()
 
         }
+    }
+    
+    // MARK: - Navigation
+    func moveTo(_ phase: State.Phase) {
+        withAnimation {
+            state.phase = phase
+        }
+    }
+    
+    func startABreak(for seconds: Int = SharedAppValues.breakTimeDuration) {
+        
     }
     
     func pauseSession() {
@@ -92,7 +124,6 @@ extension TaskConcentrationViewModel: FTTimerDelegate {
                 : try await deviceActivityRegistrar.resumeActivity(for: state.item)
 
                 self.state.timerIsPaused = pause
-                self.updateUIBasedOnTimerState()
             } catch {
                 state.error = error
             }
@@ -101,5 +132,6 @@ extension TaskConcentrationViewModel: FTTimerDelegate {
     
     func didFinishCountdown() {
         timer.cancel()
+        moveTo(.breakTransition)
     }
 }

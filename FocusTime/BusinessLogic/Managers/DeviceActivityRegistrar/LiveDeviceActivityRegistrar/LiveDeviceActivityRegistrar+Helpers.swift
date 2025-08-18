@@ -11,7 +11,11 @@ import DeviceActivity
 extension LiveDeviceActivityRegistrar {
     // MARK: - Register helpers (duration / regular / fallback)
 
-    func registerDurationActivity(for blockItem: ProtectedBlockItem, forcedDuration: Int? = nil) async throws {
+    func registerDurationActivity(
+        for blockItem: ProtectedBlockItem,
+        forcedDuration: Int? = nil,
+        isResumption: Bool = false
+    ) async throws {
         guard blockItem.persistentModelID != nil else { throw DeviceActivityRegistrarError.noPersistentItem }
         guard case let .duration(originalDuration, _, _, _) = blockItem.type else { return }
 
@@ -26,7 +30,7 @@ extension LiveDeviceActivityRegistrar {
 
         let schedule = DeviceActivitySchedule(intervalStart: intervalStart, intervalEnd: intervalEnd, repeats: false)
 
-        let activityName = try getActivityName(for: blockItem, isFallback: false)
+        let activityName = try createActivityName(for: blockItem, actionType: .regular)
         try await centerManager.startMonitoring(activityName, during: schedule)
 
         // Persist start time and absolute end date.
@@ -47,7 +51,7 @@ extension LiveDeviceActivityRegistrar {
         let overlaps = try await overlapsWithAlreadyRegisteredSchedules(schedule, days: blockItem.days)
         guard overlaps.isEmpty else { throw DeviceActivityRegistrarError.scheduleOverlap(with: overlaps) }
 
-        let activityName = try getActivityName(for: blockItem, isFallback: false)
+        let activityName = try createActivityName(for: blockItem, actionType: .regular)
         try await centerManager.startMonitoring(activityName, during: schedule)
     }
 
@@ -61,15 +65,23 @@ extension LiveDeviceActivityRegistrar {
         let overlaps = try await overlapsWithAlreadyRegisteredSchedules(schedule, days: blockItem.days)
         guard overlaps.isEmpty else { throw DeviceActivityRegistrarError.scheduleOverlap(with: overlaps) }
 
-        let activityName = try getActivityName(for: blockItem, isFallback: true)
+        let activityName = try createActivityName(for: blockItem, actionType: .fallback)
         try await centerManager.startMonitoring(activityName, during: schedule)
     }
 
     // MARK: - Utilities & Small helpers
 
-    func getActivityName(for blockItem: ProtectedBlockItem, isFallback: Bool) throws -> DeviceActivityName {
-        guard let identifier = CodableActivityIdentifier(blockItemID: blockItem.id, isFallback: isFallback).jsonString
-        else { throw DeviceActivityRegistrarError.couldNotGenerateIdentifier }
+    func createActivityName(
+        for blockItem: ProtectedBlockItem,
+        actionType: CodableActivityIdentifier.ActionType
+    ) throws -> DeviceActivityName {
+        guard let identifier = CodableActivityIdentifier(
+            blockItemID: blockItem.id,
+            actionType: actionType
+        ).jsonString else {
+            throw DeviceActivityRegistrarError.couldNotGenerateIdentifier
+        }
+        
         return DeviceActivityName(identifier)
     }
 

@@ -18,9 +18,48 @@ extension TaskConcentrationView {
             static let navigationTitle = String(localized: "task_concentration_navigation_title", table: "MainLocalizable")
         }
         enum Icons {
-            static let background = ImageResource.MainImages.taskConcentrationBackground
+            static let background = ImageResource.MainImages.TaskConcentrationImages.taskConcentrationFocus
             static let play = "play.fill"
             static let pause = "pause"
         }
     }
+}
+
+// MARK: - Predefined phases
+extension TaskConcentrationViewModel.State.Phase {
+    typealias Phase = TaskConcentrationViewModel.State.Phase
+    
+    static let focus = Phase.focus(
+        title: "Focus Session",
+        subtitle: "Concentrate on your task",
+        timerTitle: "Focus time",
+        runningTitle: "Pause",
+        pausedTitle: "Start",
+        runningIcon: "pause",
+        pausedIcon: "play.fill"
+    )
+    
+    static let breakTransition = Phase.breakTransition(
+        title: "Keep it up!",
+        subtitle: "Now allow yourself a little rest and don’t forget to start the timer"
+    )
+    
+    static let breakTime = Phase.breakTime(
+        title: "Break Time",
+        subtitle: "Your well-deserved pause",
+        timerTitle: "Rest time",
+        buttonTitle: "Start A Break"
+    )
+    
+    static let almostDone = Phase.almostDone(
+        title: "You're almost there!",
+        subtitle: "Don’t lose achievement 🥺",
+        message: "You’ll lose your streak and session reward if you end now. Need a small break?",
+        buttonTitle: "Take a break"
+    )
+    
+    static let finished = Phase.finished(
+        title: "Finished",
+        buttonTitle: "Done"
+    )
 }

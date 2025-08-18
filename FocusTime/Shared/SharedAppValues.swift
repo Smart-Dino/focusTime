@@ -12,6 +12,7 @@ enum SharedAppValues {
     static let appName = Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String
     
     static let splashScreenDuration: TimeInterval = 2
+    static let breakTimeDuration: Int = 300 // 5 minutes.
     static let debounceAfterDBRefreshed: Duration = .seconds(0.3)
     
     enum DefaultsKeys: String {

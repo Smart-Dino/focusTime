@@ -12,7 +12,11 @@ protocol DeviceActivityRegistrar: Actor {
     func unregisterActivity(during blockItem: ProtectedBlockItem) async throws
     
     func suspendActivity(for blockItem: ProtectedBlockItem) async throws
+    func suspendActivity(for blockItem: ProtectedBlockItem, forSeconds seconds: TimeInterval) async throws
+    
     func resumeActivity(for blockItem: ProtectedBlockItem) async throws
+    func cancelScheduledResume(blockItemID: UUID) async throws
+    
     func isActivityRegistered(for blockItem: ProtectedBlockItem) async throws -> Bool
     
     func unregisterAll() async

@@ -48,7 +48,12 @@ nonisolated struct DeviceActivityHandler: Sendable {
                                         endTime: endTime,
                                         store: store)
         case .duration:
-            await handleDurationUnblocking(for: blockItem, store: store)
+            switch activityIdentifier.actionType {
+            case .fallback, .regular:
+                await handleDurationUnblocking(for: blockItem, store: store)
+            case .resumption:
+                handleResumptionBlocking(for: blockItem, store: store)
+            }
             // We don't need to handle the end of the interval anymore.
             DeviceActivityCenter().stopMonitoring([activity])
         }
@@ -61,7 +66,7 @@ nonisolated struct DeviceActivityHandler: Sendable {
             
             // If this is fallback's end - ignore it.
             // Fallback schedules run at blockingStart and finish there respectively.
-            guard !activityIdentifier.isFallback else { return }
+            guard activityIdentifier.actionType != .fallback else { return }
             
             // Create context from scratch because using mainContext in a
             // non-isolated to MainActor environment is not allowed.
@@ -97,7 +102,7 @@ nonisolated struct DeviceActivityHandler: Sendable {
             logger?.error("Failed to block in \(#function): \(error.localizedDescription)")
         }
         
-        if activityIdentifier.isFallback {
+        if case .fallback = activityIdentifier.actionType {
             // TimeComponents has an accuracy of a minute.
             // Hence why we are comparing it directly - we have a whole minute to detect the match.
             do {
@@ -131,6 +136,17 @@ nonisolated struct DeviceActivityHandler: Sendable {
             store.setSessionIsActive(for: blockItem, isActive: false)
         } else {
             store.delete(model: blockItem)
+        }
+    }
+    
+    private func handleResumptionBlocking(for blockItem: BlockItem, store: BlockItemExtensionStore) async {
+        // Block user's selections again.
+        let selection = blockItem.blockedContent
+        do {
+            try await shieldManager.block(specific: selection)
+            store.setSessionIsActive(for: blockItem, isActive: true)
+        } catch {
+            logger?.error("Failed to block in \(#function): \(error.localizedDescription)")
         }
     }
 }
