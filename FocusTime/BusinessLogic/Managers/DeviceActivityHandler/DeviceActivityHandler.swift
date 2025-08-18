@@ -51,11 +51,11 @@ nonisolated struct DeviceActivityHandler: Sendable {
             switch activityIdentifier.actionType {
             case .fallback, .regular:
                 await handleDurationUnblocking(for: blockItem, store: store)
+                // We don't need to handle the end of the interval anymore.
+                DeviceActivityCenter().stopMonitoring([activity])
             case .resumption:
                 await handleResumptionBlocking(for: blockItem, store: store)
             }
-            // We don't need to handle the end of the interval anymore.
-            DeviceActivityCenter().stopMonitoring([activity])
         }
         
     }
