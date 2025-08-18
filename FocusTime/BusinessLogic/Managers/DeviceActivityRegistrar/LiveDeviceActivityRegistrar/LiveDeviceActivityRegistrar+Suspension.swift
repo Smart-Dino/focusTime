@@ -15,25 +15,44 @@ extension LiveDeviceActivityRegistrar {
     /// will be launched by the system and re-block when the time arrives.
     func suspendActivity(
         for blockItem: ProtectedBlockItem,
-        forSeconds seconds: TimeInterval
+        forSeconds seconds: Int
     ) async throws {
+        guard blockItem.persistentModelID != nil else {
+            throw DeviceActivityRegistrarError.noPersistentItem
+        }
+        guard let secondsLeft = blockItem.type.secondsToIntervalEndIfShouldBeRunning(),
+              secondsLeft > seconds else {
+            throw DeviceActivityRegistrarError.cannotSuspend
+        }
+        
         // 1. Immediate suspend.
         try await suspendActivity(for: blockItem)
 
         // 2. compute resume date.
         let now = await clock.now
-        let resumeAt = now.addingTimeInterval(seconds)
+        let resumeAt = now.addingTimeInterval(TimeInterval(seconds))
 
         guard let persistentModelID = blockItem.persistentModelID else { return }
 
         // 3. persist resumeAt on the stored model so you can check it elsewise.
         var stored = try await blockItemPersistenceManager.fetch(by: persistentModelID)
         switch stored.type {
-        case .scheduled(let startTime, let endTime, let isActive, _):
-            stored.type = .scheduled(startTime: startTime, endTime: endTime, isActive: isActive, isPaused: true)
+        case .scheduled(let startTime, let endTime, let isActive, _, _):
+            stored.type = .scheduled(
+                startTime: startTime,
+                endTime: endTime,
+                isActive: isActive,
+                isPaused: true,
+                suspendedUntil: resumeAt
+            )
             try await blockItemPersistenceManager.editBlockItem(blockItem: stored)
         case .duration(let duration, _, _, let endDate):
-            stored.type = .duration(duration, suspendedAt: now, suspendedUntil: resumeAt, endDate: endDate)
+            stored.type = .duration(
+                duration,
+                suspendedAt: now,
+                suspendedUntil: resumeAt,
+                endDate: endDate
+            )
             try await blockItemPersistenceManager.editBlockItem(blockItem: stored)
         }
 
@@ -42,18 +61,20 @@ extension LiveDeviceActivityRegistrar {
     }
     
     /// When user manually resumes or unregisters, cancel the scheduled resume activity for that block item.
-    func cancelScheduledResume(blockItemID: UUID) async throws {
+    func cancelScheduledResume(for blockItem: ProtectedBlockItem) async throws {
+        guard blockItem.persistentModelID != nil else { throw DeviceActivityRegistrarError.noPersistentItem }
+        
         // Build the same DeviceActivityName.
-        let activityIdentifier = CodableActivityIdentifier(blockItemID: blockItemID, actionType: .resumption)
+        let activityIdentifier = CodableActivityIdentifier(blockItemID: blockItem.id, actionType: .resumption)
         guard let jsonIdentifier = activityIdentifier.jsonString else { return }
         
         let activity = DeviceActivityName(jsonIdentifier)
         await centerManager.stopMonitoring([activity])
 
         // Also clear persisted resumeAt/suspendedAt.
-        if var stored = (try? await blockItemPersistenceManager.fetch(by: blockItemID)) {
+        if var stored = (try? await blockItemPersistenceManager.fetch(by: blockItem.id)) {
             switch stored.type {
-            case .scheduled(let start, let end, let isActive, _):
+            case .scheduled(let start, let end, let isActive, _, _):
                 stored.type = .scheduled(startTime: start, endTime: end, isActive: isActive, isPaused: false)
                 try await blockItemPersistenceManager.editBlockItem(blockItem: stored)
             case .duration(let duration, _, _, let endDate):

@@ -24,7 +24,7 @@ final class BlockItem {
     
     var isActive: Bool {
         switch type {
-        case .scheduled(_, _, let isActive, _):
+        case .scheduled(_, _, let isActive, _, _):
             isActive
         case .duration(_, _, _, let endDate):
             endDate != nil
@@ -33,7 +33,7 @@ final class BlockItem {
     
     var isPaused: Bool {
         switch type {
-        case .scheduled(_, _, _, let isPaused):
+        case .scheduled(_, _, _, let isPaused, _):
             isPaused
         case .duration(_, let suspendedAt, _, _):
             suspendedAt != nil

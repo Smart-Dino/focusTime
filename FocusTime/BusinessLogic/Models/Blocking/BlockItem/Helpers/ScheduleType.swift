@@ -12,7 +12,8 @@ enum ScheduleType: Codable, Hashable {
         startTime: TimeComponents,
         endTime: TimeComponents,
         isActive: Bool = false,
-        isPaused: Bool = false
+        isPaused: Bool = false,
+        suspendedUntil: Date? = nil
     )
     case duration(
         _ duration: DurationComponents,
@@ -24,7 +25,7 @@ enum ScheduleType: Codable, Hashable {
     
     var description: String {
         switch self {
-        case .scheduled(let startTime, let endTime, _, _):
+        case .scheduled(let startTime, let endTime, _, _, _):
             startTime.description + " - " + endTime.description
         case .duration(let duration, _, _, _):
             PeriodConverter.localizedConciseTimeString(
@@ -37,7 +38,7 @@ enum ScheduleType: Codable, Hashable {
     
     func secondsToIntervalEndIfShouldBeRunning(now: Date = .now) -> Int? {
         switch self {
-        case .scheduled(let startTime, let endTime, _, _):
+        case .scheduled(let startTime, let endTime, _, _, _):
             let currentSecondsFromMidnight = Date.secondsSinceMidnight(now: now)
             
             let timeSinceStart = currentSecondsFromMidnight - startTime.localizedSecondsSinceMidnight

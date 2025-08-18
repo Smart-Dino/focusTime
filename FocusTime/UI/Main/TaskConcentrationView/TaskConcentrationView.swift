@@ -36,14 +36,22 @@ struct TaskConcentrationView: View {
                                 isPaused ? pausedTitle : runningTitle,
                                 systemImage: isPaused ? pausedIcon : runningIcon
                             ) {
-                                viewModel.setTimerIsPaused(!isPaused)
+                                Task {
+                                    await viewModel.toggleTimerIsPaused()
+                                }
                             }
                         }, endSessionAction: {
                             // No action for now.
                         }
                     )
                 case .breakTransition(let title, let subtitle):
-                    makeBreakTransitionView(title: title, subtitle: subtitle)
+                    CongratulatoryTransitionView(
+                        title: title,
+                        subtitle: subtitle,
+                        onFinished: {
+                            viewModel.moveTo(.breakTime)
+                        }
+                    )
                 case .breakTime(let title, let subtitle, let timerTitle, let buttonTitle):
                     StandardPhaseView(
                         title: title,
@@ -59,7 +67,7 @@ struct TaskConcentrationView: View {
                         },
                         primaryButton: {
                             Button(buttonTitle) {
-#warning("No implementation")
+                                viewModel.startTimerPauseTimer()
                             }
                         }, endSessionAction: {
                             // No action for now.
@@ -87,8 +95,14 @@ struct TaskConcentrationView: View {
                         }
                     )
                     
-                case .finished(let title, let buttonTitle):
-                    EmptyView()
+                case .finished(let title, let subtitle):
+                    CongratulatoryTransitionView(
+                        title: title,
+                        subtitle: subtitle,
+                        onFinished: {
+                            // Dismiss view.
+                        }
+                    )
                 }
             }
         }
@@ -104,40 +118,6 @@ struct TaskConcentrationView: View {
             message: { Text(viewModel.state.error?.localizedDescription ?? "") }
         )
     }
-    
-    var lottieConfetti: some View {
-        LottieView(
-            animation: .filepath(
-                Bundle.main.url(forResource: "Confetti", withExtension: "json")!.relativePath
-            )
-        )
-        .playbackMode(
-            .playing(
-                .fromProgress(0,
-                              toProgress: 1,
-                              loopMode: .playOnce)
-            )
-        )
-        .animationDidFinish { _ in
-            viewModel.moveTo(.breakTime)
-        }
-        .containerRelativeFrame([.vertical]) { size, axes in
-            size / 3
-        }
-    }
-    
-    // MARK: - Reusable View Builders
-    private func makeBreakTransitionView(title: String, subtitle: String) -> some View {
-        VStack {
-            lottieConfetti
-            Text(title)
-                .font(.title3.bold())
-            Text(subtitle)
-                .foregroundStyle(.ftGray3Light)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal)
-        }
-    }
 }
 
 #Preview {
@@ -145,7 +125,8 @@ struct TaskConcentrationView: View {
     let viewModel = TaskConcentrationViewModel(
         state: .init(item: ProtectedBlockItem.mock),
         timer: timer,
-        deviceActivityRegistrar: PreviewData.mockActivityRegistrar
+        deviceActivityRegistrar: PreviewData.mockActivityRegistrar,
+        blockItemPersistenceManager: PreviewData.mockBlockItemPersistenceManager
     )
     NavigationStack {
         TaskConcentrationView(viewModel: viewModel)

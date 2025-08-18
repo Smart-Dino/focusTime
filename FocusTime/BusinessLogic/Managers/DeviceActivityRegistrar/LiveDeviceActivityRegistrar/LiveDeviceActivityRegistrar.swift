@@ -37,7 +37,7 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         try await AuthorizationCenter.shared.requestAuthorization(for: .individual)
 
         switch blockItem.type {
-        case .scheduled(let startTime, let endTime, _, _):
+        case .scheduled(let startTime, let endTime, _, _, _):
             do {
                 try await registerRegularActivity(for: blockItem, startTime: startTime, endTime: endTime)
             } catch {
@@ -71,7 +71,7 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         var stored = try await blockItemPersistenceManager.fetch(by: persistentModelID)
 
         switch stored.type {
-        case .scheduled(let startTime, let endTime, let isActive, _):
+        case .scheduled(let startTime, let endTime, let isActive, _, _):
             stored.type = .scheduled(startTime: startTime, endTime: endTime, isActive: isActive, isPaused: true)
             try await blockItemPersistenceManager.editBlockItem(blockItem: stored)
             
@@ -100,7 +100,7 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         var stored = try await blockItemPersistenceManager.fetch(by: persistentModelID)
 
         switch stored.type {
-        case .scheduled(let startTime, let endTime, let isActive, _):
+        case .scheduled(let startTime, let endTime, let isActive, _, _):
             stored.type = .scheduled(startTime: startTime, endTime: endTime, isActive: isActive, isPaused: false)
             try await blockItemPersistenceManager.editBlockItem(blockItem: stored)
             

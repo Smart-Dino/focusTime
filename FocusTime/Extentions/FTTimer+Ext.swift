@@ -10,11 +10,19 @@ import FocusTimeUI
 
 extension FTTimer {
     func startTimer(for blockItem: ProtectedBlockItem) {
+        let deadline: Date?
+        switch blockItem.type {
+        case .duration(_, _, let suspendedUntil, _):
+            deadline = suspendedUntil
+        case .scheduled(_, _, _, _, let suspendedUntil):
+            deadline = suspendedUntil
+        }
+        
         guard let timeLeft = blockItem.type.secondsToIntervalEndIfShouldBeRunning(),
               timeLeft >= 1 && blockItem.isActive else { return }
         
         self.start(
-            deadline: .now.addingTimeInterval(TimeInterval(timeLeft)),
+            deadline: deadline ?? Date.now.addingTimeInterval(TimeInterval(timeLeft)),
             isInitiallyPaused: blockItem.isPaused
         )
     }

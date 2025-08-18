@@ -140,7 +140,8 @@ final class HomeViewModel {
         return TaskConcentrationViewModel(
             state: .init(item: upcomingOrRunningItem),
             timer: timer,
-            deviceActivityRegistrar: deviceActivityRegistrar
+            deviceActivityRegistrar: deviceActivityRegistrar,
+            blockItemPersistenceManager: blockItemPersistenceManager
         )
     }
 }

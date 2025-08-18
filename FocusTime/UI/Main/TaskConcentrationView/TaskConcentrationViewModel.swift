@@ -40,7 +40,7 @@ final class TaskConcentrationViewModel {
             )
             case finished(
                 title: String,
-                buttonTitle: String
+                subtitle: String
             )
         }
 
@@ -48,25 +48,42 @@ final class TaskConcentrationViewModel {
         var item: ProtectedBlockItem
         var timerIsPaused: Bool = true
         
-        var breakTimer: FTTimer? = nil
         var phase: Phase = .focus
     }
     
     private(set) var state: State
     let timer: FTTimer
     private let deviceActivityRegistrar: DeviceActivityRegistrar
+    private let blockItemPersistenceManager: BlockItemPersistenceManager
+    
+    private var dbChangesNotificationTask: Task<Void, Never>?
     
     init(
         state: State,
         timer: FTTimer,
-        deviceActivityRegistrar: DeviceActivityRegistrar
+        deviceActivityRegistrar: DeviceActivityRegistrar,
+        blockItemPersistenceManager: BlockItemPersistenceManager
     ) {
         self.state = state
         self.timer = timer
         self.deviceActivityRegistrar = deviceActivityRegistrar
+        self.blockItemPersistenceManager = blockItemPersistenceManager
         
         self.timer.delegate = self
         self.state.timerIsPaused = timer.isPaused
+
+        Task {
+            subscribeToDB()
+        }
+    }
+    
+    func subscribeToDB() {
+        dbChangesNotificationTask = Task {
+            for await _ in await blockItemPersistenceManager.contextChangesStream() {
+                try? await Task.sleep(for: SharedAppValues.debounceAfterDBRefreshed)
+                #warning("Empty implementation")
+            }
+        }
     }
     
     func setErrorVisibility(_ isVisible: Bool) {
@@ -75,38 +92,45 @@ final class TaskConcentrationViewModel {
         }
     }
     
-    func setTimerIsPaused(_ pause: Bool) {
-        if pause {
-            timer.pause()
+    func toggleTimerIsPaused() async {
+        if timer.isPaused {
+            await resumeFromBreak()
+            moveTo(.focus)
         } else {
-                // Since duration blocking updates it's deadline after resumption we need to recreate the timer.
-            timer.startTimer(for: state.item)
-            timer.resume()
-
+            await startABreak()
+            moveTo(.breakTransition)
         }
     }
     
-    // MARK: - Navigation
     func moveTo(_ phase: State.Phase) {
         withAnimation {
             state.phase = phase
         }
     }
     
-    func startABreak(for seconds: Int = SharedAppValues.breakTimeDuration) {
-        
-    }
-    
-    func pauseSession() {
-        #warning("Notify DeviceActivityRegistrar of pausing")
-        timer.pause()
-        // Delegation will set the state.
-    }
-    
-    func resumeSession() {
-        #warning("Notify DeviceActivityRegistrar of resumption")
+    func startTimerPauseTimer() {
         timer.resume()
-        // Delegation will set the state.
+    }
+    
+    func startABreak(for seconds: Int = SharedAppValues.breakTimeDuration) async {
+        do {
+            try await deviceActivityRegistrar.suspendActivity(for: state.item, forSeconds: seconds)
+            timer.startTimer(for: state.item)
+            timer.pause()
+        } catch {
+            state.error = error
+        }
+    }
+    
+    func resumeFromBreak() async {
+        do {
+            // Since duration blocking updates it's deadline after resumption we need to recreate the timer.
+            try await deviceActivityRegistrar.cancelScheduledResume(for: state.item)
+            timer.startTimer(for: state.item)
+            timer.resume()
+        } catch {
+            state.error = error
+        }
     }
     
     func endSession() {
@@ -116,22 +140,10 @@ final class TaskConcentrationViewModel {
 }
 
 extension TaskConcentrationViewModel: FTTimerDelegate {
-    func didUpdateIsPaused(_ pause: Bool) {
-        Task {
-            do {
-                pause
-                ? try await deviceActivityRegistrar.suspendActivity(for: state.item)
-                : try await deviceActivityRegistrar.resumeActivity(for: state.item)
-
-                self.state.timerIsPaused = pause
-            } catch {
-                state.error = error
-            }
-        }
-    }
+    func didUpdateIsPaused(_ pause: Bool) { }
     
     func didFinishCountdown() {
         timer.cancel()
-        moveTo(.breakTransition)
+        moveTo(.finished)
     }
 }

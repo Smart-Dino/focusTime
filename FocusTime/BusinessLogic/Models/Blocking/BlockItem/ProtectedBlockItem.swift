@@ -24,7 +24,7 @@ struct ProtectedBlockItem: ProtectedModel {
     
     var isActive: Bool {
         switch type {
-        case .scheduled(_, _, let isActive, _):
+        case .scheduled(_, _, let isActive, _, _):
             isActive
         case .duration(_, let suspendedAt, _, let endDate):
             (endDate != nil) || (suspendedAt != nil)
@@ -33,7 +33,7 @@ struct ProtectedBlockItem: ProtectedModel {
     
     var isPaused: Bool {
         switch type {
-        case .scheduled(_, _, _, let isPaused):
+        case .scheduled(_, _, _, let isPaused, _):
             isPaused
         case .duration(_, let suspendedAt, _, _):
             suspendedAt != nil

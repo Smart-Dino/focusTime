@@ -59,7 +59,7 @@ extension TaskConcentrationViewModel.State.Phase {
     )
     
     static let finished = Phase.finished(
-        title: "Finished",
-        buttonTitle: "Done"
+        title: "Well done!",
+        subtitle: "You’ve successfully completed your focus session. Stay consistent, and every small win will bring you closer to big results."
     )
 }
