@@ -22,7 +22,8 @@
             "value" : "📋 Lack of structure"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "quiz_onboarding_option_mental_fatigue" : {
       "extractionState" : "manual",
@@ -33,7 +34,8 @@
             "value" : "🧘 Mental fatigue"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "quiz_onboarding_option_notifications" : {
       "extractionState" : "manual",
@@ -44,7 +46,8 @@
             "value" : "📩 Notifications and messages"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "quiz_onboarding_option_social_media" : {
       "extractionState" : "manual",
@@ -55,7 +58,8 @@
             "value" : "📱 Social media"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "quiz_onboarding_option_work_distractions" : {
       "extractionState" : "manual",
@@ -66,7 +70,8 @@
             "value" : "💻 Work distractions"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "quiz_onboarding_subtitle" : {
       "comment" : "Subtitle text displayed in the onboarding screen to explain the purpose of the quiz.",
