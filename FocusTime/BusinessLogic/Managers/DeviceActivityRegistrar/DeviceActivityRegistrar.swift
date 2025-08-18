@@ -11,12 +11,12 @@ protocol DeviceActivityRegistrar: Actor {
     // MARK: - Properties
     var monitoredIdentifiers: Set<UUID> { get }
     // MARK: - Methods
-    func registerActivity(during schedule: ProtectedSchedule) async throws
-    func unregisterActivity(during schedule: ProtectedSchedule) async throws
+    func registerActivity(during blockItem: ProtectedBlockItem) async throws
+    func unregisterActivity(during blockItem: ProtectedBlockItem) async throws
     
-    func suspendActivity(for schedule: ProtectedSchedule) async throws
-    func resumeActivity(for schedule: ProtectedSchedule) async throws
-    func isActivityRegistered(for schedule: ProtectedSchedule) throws -> Bool
+    func suspendActivity(for blockItem: ProtectedBlockItem) async throws
+    func resumeActivity(for blockItem: ProtectedBlockItem) async throws
+    func isActivityRegistered(for blockItem: ProtectedBlockItem) throws -> Bool
     
     func unregisterAll()
 }

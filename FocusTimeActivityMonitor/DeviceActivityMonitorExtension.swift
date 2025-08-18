@@ -19,6 +19,7 @@ final class DeviceActivityMonitorExtension: DeviceActivityMonitor {
         category: String(describing: DeviceActivityMonitorExtension.self)
     )
     let handler = DeviceActivityHandler(
+        logger: DeviceActivityMonitorExtension.logger,
         container: DeviceActivityMonitorExtension.container,
         shieldManager: LiveShieldManager(isRunningInExtension: true)
     )
@@ -42,11 +43,11 @@ final class DeviceActivityMonitorExtension: DeviceActivityMonitor {
     }
     
     static var container: ModelContainer {
-        let schema = Schema([Schedule.self, BlockItem.self])
+        let schema = Schema([BlockItem.self])
         let configurations = [
             ModelConfiguration(
                 allowsSave: false,
-                groupContainer: .identifier(AppValues.appGroupIdentifier)
+                groupContainer: .identifier(SharedAppValues.appGroupIdentifier)
             )
         ]
         

@@ -28,8 +28,8 @@ final class SubscriptionUtilityLinksViewModel {
         self.flowDelegate = flowDelegate
     }
     
-    func keepShowingError(showError: Bool) {
-        if !showError {
+    func setErrorVisibility(_ isVisible: Bool) {
+        if !isVisible {
             state.error = nil
         }
     }

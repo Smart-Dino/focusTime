@@ -15,42 +15,36 @@ final class BlockItem {
     var id: UUID
     var name: String
     var emoji: String
+    // Schedule.
+    var days: Set<Weekday>
+    var type: ScheduleType
+    // Blocked apps.
     var blockedContent: ProtectedActivitySelection
-    
-    // MARK: Relationship
-    var schedules: [Schedule]?
-    
-    // MARK: - Computed properties
-    var schedulesDescription: String {
-        guard let schedules, schedules.count >= 1 else { return "No schedules" }
-        
-        if schedules.count == 1 {
-            guard let first = schedules.first else { return "No schedules" }
-            return "\(first.days.description), \(first.type.description)"
-        } else {
-            return "\(schedules.count) schedules"
-        }
-    }
-    
     
     init(
         id: UUID = UUID(),
         name: String,
         emoji: String,
-        blockedContent: ProtectedActivitySelection,
-        schedules: [Schedule]? = nil
+        days: Set<Weekday>,
+        type: ScheduleType,
+        blockedContent: ProtectedActivitySelection
     ) {
         self.id = id
         self.name = name
         self.emoji = emoji
+        self.days = days
+        self.type = type
         self.blockedContent = blockedContent
-        self.schedules = schedules
     }
     
     convenience init(from item: ProtectedBlockItem) {
-        self.init(id: item.id,
-                  name: item.name,
-                  emoji: item.emoji,
-                  blockedContent: item.blockedContent)
+        self.init(
+            id: item.id,
+            name: item.name,
+            emoji: item.emoji,
+            days: item.days,
+            type: item.type,
+            blockedContent: item.blockedContent
+        )
     }
 }

@@ -11,22 +11,34 @@ import Observation
 @MainActor
 @Observable
 final class QuizOnboardingViewModel {
-
     struct State {
-        var selectionStates: Set<QuizOnboardingView.Constants.QuizOption> = []
+        var selection: Set<QuizOnboardingView.Constants.QuizOption> = []
         
         func isOptionSelected(_ option: QuizOnboardingView.Constants.QuizOption) -> Bool {
-            selectionStates.contains(option)
+            selection.contains(option)
         }
     }
     
-    private(set) var state = State()
+    private(set) var state: State
+    weak var delegate: QuizOnboardingDelegate?
+    
+    init(
+        state: State = State(),
+        delegate: QuizOnboardingDelegate?
+    ) {
+        self.state = state
+        self.delegate = delegate
+    }
+    
+    func finishQuiz() {
+        delegate?.didFinishQuiz(with: state.selection)
+    }
     
     func toggleSelection(for option: QuizOnboardingView.Constants.QuizOption) {
-        if state.selectionStates.contains(option) {
-            state.selectionStates.remove(option)
+        if state.selection.contains(option) {
+            state.selection.remove(option)
         } else {
-            state.selectionStates.insert(option)
+            state.selection.insert(option)
         }
     }
 }

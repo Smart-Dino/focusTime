@@ -12,7 +12,7 @@ enum PreviewData {
     static let memoryOnlyModelContainer: ModelContainer = {
         do {
             return try ModelContainer(
-                for: .init([BlockItem.self, Schedule.self]),
+                for: .init([BlockItem.self]),
                 configurations: [
                     .init(isStoredInMemoryOnly: true)
                 ]
@@ -21,5 +21,4 @@ enum PreviewData {
             fatalError("Failed to create preview ModelContainer: \(error)")
         }
     }()
-    static let relationshipCoordinator = RelationshipCoordinator(modelContainer: Self.memoryOnlyModelContainer)
 }

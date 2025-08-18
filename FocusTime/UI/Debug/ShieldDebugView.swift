@@ -19,34 +19,9 @@ struct ShieldDebugView: View {
             // Important: All bugs related to this view can only be replicated on a Simulator, so avoid using it
             // altogether!
             DeviceActivityReport(
-                .totalActivity,
-                filter: DeviceActivityFilter(
-                    segment: .daily(during: DateInterval(
-                                    start: Calendar.current.startOfDay(for: .now),
-                                    duration: 86400)),
-                    users: .all,
-                    devices: .init([.iPhone])
-                )
+                Constants.ActivityConfiguration.context,
+                filter: Constants.ActivityConfiguration.filter
             )
-            // MARK: - Schedule list
-            VStack {
-                ScrollView(.vertical) {
-                    ForEach(viewModel.state.schedules) { schedule in
-                        HStack {
-                            Text(schedule.emoji)
-                            VStack(alignment: .leading) {
-                                HStack {
-                                    Text(schedule.name)
-                                    Text(schedule.type.description)
-                                        .font(.footnote)
-                                }
-                                Text("Id: " + schedule.id.uuidString)
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
-                    }
-                }
-            }
             
             // MARK: - BlockItem list
             VStack {
@@ -56,7 +31,7 @@ struct ShieldDebugView: View {
                             Text(blockItem.emoji)
                             VStack(alignment: .leading) {
                                 Text(blockItem.name)
-                                Text("Id: " + blockItem.id.uuidString)
+                                Text(Constants.Strings.blockItemIdPrefix + blockItem.id.uuidString)
                                     .foregroundStyle(.secondary)
                             }
                         }
@@ -64,32 +39,32 @@ struct ShieldDebugView: View {
                 }
             }
             
-            Button("Erase all data", role: .destructive) {
-                Task {
-                    await viewModel.eraseAllData()
-                }
+            Button(Constants.Strings.eraseAllData, role: .destructive) {
+                viewModel.eraseAllData()
             }
             .buttonBorderShape(.capsule)
             .buttonStyle(.borderedProminent)
             
             // MARK: - Status
-            sectionSeparator(sectionName: "Status")
+            sectionSeparator(sectionName: Constants.Strings.statusSection)
             VStack(alignment: .leading) {
-                Text("Apps chosen: \(viewModel.state.selection.applicationTokens.count)")
-                Text("Categories chosen: \(viewModel.state.selection.categoryTokens.count)")
+                Text(Constants.Strings.appsChosen + "\(viewModel.state.selection.applicationTokens.count)")
+                Text(Constants.Strings.categoriesChosen + "\(viewModel.state.selection.categoryTokens.count)")
             }
             
             // MARK: - Selection
-            sectionSeparator(sectionName: "Selection")
+            sectionSeparator(sectionName: Constants.Strings.selectionSection)
             
-            Picker("Block Type", selection: Binding(
+            Picker(Constants.Strings.blockTypePicker, selection: Binding(
                 get: { viewModel.state.scheduleType },
                 set: { newValue in
                     viewModel.setScheduleType(newValue)
                 })
             ) {
-                Text("Scheduled").tag(ShieldDebugViewModel.State.ScheduleType.scheduled)
-                Text("One-time").tag(ShieldDebugViewModel.State.ScheduleType.duration)
+                Text(Constants.Strings.scheduledType)
+                    .tag(ShieldDebugViewModel.State.ScheduleType.scheduled)
+                Text(Constants.Strings.durationType)
+                    .tag(ShieldDebugViewModel.State.ScheduleType.duration)
             }
             .pickerStyle(.segmented)
             
@@ -99,48 +74,39 @@ struct ShieldDebugView: View {
             case .duration: durationTimePicker
             }
             
-            Button("Toggle selection sheet") {
+            Button(Constants.Strings.toggleSelectionSheet) {
                 Task {
                     await viewModel.toggleSelectionSheet()
                 }
             }
             
-            Button("Create schedule") {
-                Task {
-                    await viewModel.addScheduleToDB()
-                }
+            Button(Constants.Strings.createSchedule) {
+                viewModel.addScheduleToDB()
             }
             
             Button(viewModel.state.scheduleType.buttonTitle) {
-                Task {
-                    await viewModel.appendBlockItemToSchedule()
-                    await viewModel.blockSelectionDuringSchedule()
-                }
+                    viewModel.blockSelectionDuringSchedule()
             }
             
             HStack {
-                Button("Suspend") {
-                    Task {
-                        await viewModel.suspendSession()
-                    }
+                Button(Constants.Strings.suspend) {
+                    viewModel.suspendSession()
                 }
-                Button("Resume") {
-                    Task {
-                        await viewModel.resumeSession()
-                    }
+                Button(Constants.Strings.resume) {
+                    viewModel.resumeSession()
                 }
             }
             
             // MARK: - Controls
-            sectionSeparator(sectionName: "Controls")
+            sectionSeparator(sectionName: Constants.Strings.controlsSection)
             VStack {
-                Button("Start block") {
+                Button(Constants.Strings.startBlock) {
                     Task {
                         await viewModel.blockSelection()
                     }
                 }
                 .buttonStyle(.borderedProminent)
-                Button("End block", role: .destructive) {
+                Button(Constants.Strings.endBlock, role: .destructive) {
                     Task {
                         await viewModel.unblockSelection()
                     }
@@ -150,7 +116,7 @@ struct ShieldDebugView: View {
             .frame(maxWidth: .infinity)
             .buttonBorderShape(.capsule)
         }
-        .padding()
+        .padding(.horizontal, Constants.Layout.horizontalPadding)
         .familyActivityPicker(
             isPresented: Binding(get: {
                 viewModel.state.isAppSelectionPresented
@@ -164,7 +130,7 @@ struct ShieldDebugView: View {
             })
         )
         .alert(
-            "There was an error",
+            SharedConstants.Strings.errorHeader,
             isPresented: Binding(get: {
                 viewModel.state.error != nil
             }, set: { bool in
@@ -180,18 +146,15 @@ struct ShieldDebugView: View {
                 }
             }
         )
-        .task {
-            await viewModel.fetchAllItems()
-        }
         .onAppear {
-            print(DeviceActivityCenter().activities)
+            viewModel.fetchAllItems()
         }
     }
     
     var scheduleTimePicker: some View {
         HStack {
             DatePicker(
-                "Select start time",
+                Constants.Strings.selectStartTime,
                 selection:
                     Binding(get: {
                         viewModel.state.startTime
@@ -202,7 +165,7 @@ struct ShieldDebugView: View {
             )
             .datePickerStyle(.compact)
             DatePicker(
-                "Select end time",
+                Constants.Strings.selectEndTime,
                 selection:
                     Binding(get: {
                         viewModel.state.endTime
@@ -216,14 +179,14 @@ struct ShieldDebugView: View {
     
     var durationTimePicker: some View {
         VStack(alignment: .leading) {
-            Text("Block duration (minutes)")
+            Text(Constants.Strings.blockDuration)
             Stepper(value: Binding(
                 get: { viewModel.state.duration },
                 set: { newValue in
                     viewModel.setDuration(newValue)
                 }
             ), in: 1...240) {
-                Text("\(viewModel.state.duration) minutes")
+                Text("\(viewModel.state.duration) " + Constants.Strings.blockDurationSuffix)
             }
         }
     }
@@ -249,3 +212,4 @@ struct ShieldDebugView: View {
         )
     )
 }
+

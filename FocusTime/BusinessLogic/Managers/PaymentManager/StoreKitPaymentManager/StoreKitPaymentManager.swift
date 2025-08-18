@@ -34,6 +34,7 @@ actor StoreKitPaymentManager: PaymentManager {
     var continuation: AsyncStream<Bool>.Continuation?
     
     init(productIdentifiers: [String] = StoreKitProductIdentifiers.allCases.map { $0.id }) async {
+
         // FTProducts
         self.products = []
         self.purchasedProducts = []
