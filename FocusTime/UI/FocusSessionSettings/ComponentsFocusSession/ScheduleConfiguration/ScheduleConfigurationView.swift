@@ -83,8 +83,8 @@ struct ScheduleConfigurationView: View {
             
             if viewModel.state.scheduleConfiguration.scheduleForLater {
                 Menu {
-                    ForEach(Weekday.allCases.sorted()) { day in
-                        Toggle(LocalizedStringKey(day.rawValue.capitalized), isOn: .binding(
+                    ForEach(Weekday.allCases) { day in
+                        Toggle(day.fullName, isOn: .binding(
                             get: viewModel.state.scheduleConfiguration.scheduledDays.contains(day),
                             set: { isSelected in
                                 viewModel.setScheduledDay(day, isSelected: isSelected)

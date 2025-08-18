@@ -54,7 +54,7 @@ final class ScheduleConfigurationViewModel {
                 return String(localized: "Weekdays", table: "SessionLocalizable", comment: "Scheduled for weekdays")
             }
             
-            let sortedDays = scheduleConfiguration.scheduledDays.sorted()
+            let sortedDays = scheduleConfiguration.scheduledDays.sorted(by: <)
             return sortedDays.map { $0.fullName }.joined(separator: ", ")
         }
         
