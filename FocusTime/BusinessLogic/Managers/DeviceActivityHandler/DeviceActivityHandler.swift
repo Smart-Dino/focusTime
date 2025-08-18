@@ -52,7 +52,7 @@ nonisolated struct DeviceActivityHandler: Sendable {
             case .fallback, .regular:
                 await handleDurationUnblocking(for: blockItem, store: store)
             case .resumption:
-                handleResumptionBlocking(for: blockItem, store: store)
+                await handleResumptionBlocking(for: blockItem, store: store)
             }
             // We don't need to handle the end of the interval anymore.
             DeviceActivityCenter().stopMonitoring([activity])
