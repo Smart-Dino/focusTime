@@ -76,13 +76,13 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
             try await blockItemPersistenceManager.editBlockItem(blockItem: stored)
             
             try await shieldManager.unblock()
-        case .duration(let duration, let startedAt, _, let endDate):
-            guard let startedAt else {
+        case .duration(let duration, _, _, let endDate):
+            guard let endDate else {
                 throw DeviceActivityRegistrarError.couldNotExtractDatePoints
             }
 
             // Store suspension moment and keep endDate unchanged.
-            stored.type = .duration(duration, startedAt: startedAt, suspendedAt: suspensionDate, endDate: endDate)
+            stored.type = .duration(duration, suspendedAt: suspensionDate, suspendedUntil: nil, endDate: endDate)
             try await blockItemPersistenceManager.editBlockItem(blockItem: stored)
 
             try await shieldManager.unblock()
@@ -106,12 +106,13 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
             
             try await shieldManager.block(specific: stored.blockedContent)
 
-        case .duration(let duration, _, let suspendedAt, let endDate):
+        case .duration(let duration, let suspendedAt, _, let endDate):
+            guard let endDate else { throw DeviceActivityRegistrarError.activityNotFound }
             // If suspended, slide the end date forward by pause duration so remaining time stays consistent.
             let adjustedEndDate = Self.adjustedEndDate(endDate: endDate, suspendedAt: suspendedAt, resumedAt: resumptionDate)
             let remainingSeconds = max(0, Int(adjustedEndDate.timeIntervalSince(resumptionDate)))
 
-            stored.type = .duration(duration, startedAt: resumptionDate, suspendedAt: nil, endDate: adjustedEndDate)
+            stored.type = .duration(duration, suspendedAt: nil, suspendedUntil: nil, endDate: adjustedEndDate)
             try await blockItemPersistenceManager.editBlockItem(blockItem: stored)
 
             // Re-register device activity for the remaining duration.

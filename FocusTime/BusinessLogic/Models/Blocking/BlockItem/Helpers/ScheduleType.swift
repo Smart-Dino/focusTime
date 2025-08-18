@@ -14,11 +14,13 @@ enum ScheduleType: Codable, Hashable {
         isActive: Bool = false,
         isPaused: Bool = false
     )
-    case duration(_ duration: DurationComponents,
-                 // Suspension helper properties.
-                 startedAt: Date?,
-                 suspendedAt: Date?,
-                 endDate: Date) // absolute Date representing supposed end-time
+    case duration(
+        _ duration: DurationComponents,
+        // Suspension helper properties.
+        suspendedAt: Date? = nil,
+        suspendedUntil: Date? = nil,
+        endDate: Date? = nil
+    )
     
     var description: String {
         switch self {
@@ -31,20 +33,6 @@ enum ScheduleType: Codable, Hashable {
                 unitsStyle: .abbreviated
             )
         }
-    }
-    
-    static func duration(_ duration: DurationComponents,
-                         startedAt: Date? = nil,
-                         suspendedAt: Date? = nil,
-                         endDate: Date? = nil) -> ScheduleType {
-        // If caller provides explicit end Date, use it.
-        // Otherwise, compute end Date from startedAt (if present) or now.
-        let start = startedAt ?? Date()
-        let computedEnd = endDate ?? start.addingTimeInterval(TimeInterval(duration.rawValue))
-        return .duration(duration,
-                         startedAt: startedAt,
-                         suspendedAt: suspendedAt,
-                         endDate: computedEnd)
     }
     
     func secondsToIntervalEndIfShouldBeRunning(now: Date = .now) -> Int? {
@@ -61,9 +49,9 @@ enum ScheduleType: Codable, Hashable {
                 return nil
             }
             
-        case .duration(_, let startedAt, let suspendedAt, let endDate):
-            // If there's no startedAt, duration isn't running.
-            guard let _ = startedAt else { return nil }
+        case .duration(_, let suspendedAt, _, let endDate):
+            // If there's no endDate, duration isn't running.
+            guard let endDate else { return nil }
             
             if let suspendedAt {
                 // If suspended, freeze remaining seconds as of suspension time.
@@ -76,5 +64,5 @@ enum ScheduleType: Codable, Hashable {
             }
         }
     }
-
+    
 }

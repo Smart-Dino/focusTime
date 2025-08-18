@@ -210,8 +210,8 @@ struct ShieldDebugView: View {
                     switch blockItem.type {
                     case .scheduled(_, _, let isActive, _):
                         isActive.description
-                    case .duration(_, let startedAt, _, _):
-                        (startedAt != nil).description
+                    case .duration(_, _, _, let endDate):
+                        (endDate != nil).description
                     }
                 }())
                 

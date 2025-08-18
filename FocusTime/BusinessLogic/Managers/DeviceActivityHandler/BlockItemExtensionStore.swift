@@ -45,9 +45,9 @@ nonisolated final class BlockItemExtensionStore {
             } else {
                 blockItem.type = .duration(
                     duration,
-                    startedAt: nil,
                     suspendedAt: nil,
-                    endDate: endDate
+                    suspendedUntil: nil,
+                    endDate: nil
                 )
             }
         }

@@ -39,7 +39,7 @@ extension LiveDeviceActivityRegistrar {
         let endDate = startTime.addingTimeInterval(TimeInterval(max(0, actualTimeBeforeEnd)))
 
         var copy = blockItem
-        copy.type = .duration(originalDuration, startedAt: startTime, suspendedAt: nil, endDate: endDate)
+        copy.type = .duration(originalDuration, suspendedAt: nil, suspendedUntil: nil, endDate: endDate)
         try await blockItemPersistenceManager.editBlockItem(blockItem: copy)
     }
 

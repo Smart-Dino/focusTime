@@ -32,8 +32,8 @@ extension LiveDeviceActivityRegistrar {
         case .scheduled(let startTime, let endTime, let isActive, _):
             stored.type = .scheduled(startTime: startTime, endTime: endTime, isActive: isActive, isPaused: true)
             try await blockItemPersistenceManager.editBlockItem(blockItem: stored)
-        case .duration(let duration, let startedAt, _, let endDate):
-            stored.type = .duration(duration, startedAt: startedAt, suspendedAt: now, endDate: endDate)
+        case .duration(let duration, _, _, let endDate):
+            stored.type = .duration(duration, suspendedAt: now, suspendedUntil: resumeAt, endDate: endDate)
             try await blockItemPersistenceManager.editBlockItem(blockItem: stored)
         }
 
@@ -56,8 +56,8 @@ extension LiveDeviceActivityRegistrar {
             case .scheduled(let start, let end, let isActive, _):
                 stored.type = .scheduled(startTime: start, endTime: end, isActive: isActive, isPaused: false)
                 try await blockItemPersistenceManager.editBlockItem(blockItem: stored)
-            case .duration(let duration, let startedAt, _, let endDate):
-                stored.type = .duration(duration, startedAt: startedAt, suspendedAt: nil, endDate: endDate)
+            case .duration(let duration, _, _, let endDate):
+                stored.type = .duration(duration, suspendedAt: nil, suspendedUntil: nil, endDate: endDate)
                 try await blockItemPersistenceManager.editBlockItem(blockItem: stored)
             }
         }
