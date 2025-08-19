@@ -87,7 +87,10 @@ final class TaskConcentrationViewModel {
                 try? await Task.sleep(for: SharedAppValues.debounceAfterDBRefreshed)
                 
                 print("Ping")
-                guard let newItem = try? await blockItemPersistenceManager.fetchClosestOrRunningCurrentScheduled(now: .now) else { return }
+                guard let newItem = try? await blockItemPersistenceManager.fetchClosestOrRunningCurrentScheduled(now: .now) else {
+                    moveTo(.finished)
+                    return
+                }
                 
                 state.item = newItem
                 timer.startTimer(for: newItem)
@@ -96,7 +99,6 @@ final class TaskConcentrationViewModel {
                 if !state.item.isPaused {
                     moveTo(.focus)
                 }
-                
             }
         }
     }

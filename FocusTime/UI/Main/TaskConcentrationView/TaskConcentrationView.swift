@@ -10,6 +10,7 @@ import SwiftUI
 import FocusTimeUI
 
 struct TaskConcentrationView: View {
+    @Environment(\.dismiss) var dismiss
     @State var viewModel: TaskConcentrationViewModel
     
     var body: some View {
@@ -98,7 +99,7 @@ struct TaskConcentrationView: View {
                         title: title,
                         subtitle: subtitle,
                         onFinished: {
-                            // Dismiss view.
+                            dismiss()
                         }
                     )
                 }
