@@ -39,14 +39,19 @@ nonisolated final class BlockItemExtensionStore {
         switch blockItem.type {
         case .scheduled(let startTime, let endTime, _, _, _):
             blockItem.type = .scheduled(startTime: startTime, endTime: endTime, isActive: isActive)
-        case .duration(let duration, _, _, let endDate):
+        case .duration(let duration, let suspendedAt, let suspendedUntil, let endDate):
             if isActive {
-                break // Duration start time is set in the main app upon duration block start.
-            } else {
                 blockItem.type = .duration(
                     duration,
                     suspendedAt: nil,
                     suspendedUntil: nil,
+                    endDate: endDate
+                )
+            } else {
+                blockItem.type = .duration(
+                    duration,
+                    suspendedAt: suspendedAt,
+                    suspendedUntil: suspendedUntil,
                     endDate: nil
                 )
             }

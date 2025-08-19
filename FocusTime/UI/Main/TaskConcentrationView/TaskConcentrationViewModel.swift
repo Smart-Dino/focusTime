@@ -71,11 +71,33 @@ final class TaskConcentrationViewModel {
         
         self.timer.delegate = self
         self.state.timerIsPaused = timer.isPaused
+        
+        subscribeToDB()
     }
     
     func setErrorVisibility(_ isVisible: Bool) {
         if !isVisible {
             state.error = nil
+        }
+    }
+    
+    func subscribeToDB() {
+        dbChangesNotificationTask = Task {
+            for await _ in await blockItemPersistenceManager.contextChangesStream() {
+                try? await Task.sleep(for: SharedAppValues.debounceAfterDBRefreshed)
+                
+                print("Ping")
+                guard let newItem = try? await blockItemPersistenceManager.fetchClosestOrRunningCurrentScheduled(now: .now) else { return }
+                
+                state.item = newItem
+                timer.startTimer(for: newItem)
+                timer.resume()
+                
+                if !state.item.isPaused {
+                    moveTo(.focus)
+                }
+                
+            }
         }
     }
     
@@ -106,6 +128,7 @@ final class TaskConcentrationViewModel {
     }
     
     func moveTo(_ phase: State.Phase) {
+        guard state.phase != phase else { return }
         withAnimation {
             state.phase = phase
         }
@@ -120,9 +143,6 @@ final class TaskConcentrationViewModel {
     func startABreak(for seconds: Int = SharedAppValues.breakTimeDuration) async {
         do {
             try await deviceActivityRegistrar.suspendActivity(for: state.item, forSeconds: seconds)
-            await setUpcomingItem()
-            timer.startTimer(for: state.item)
-            timer.resume()
         } catch {
             state.error = error
         }
@@ -130,11 +150,7 @@ final class TaskConcentrationViewModel {
     
     func resumeFromBreak() async {
         do {
-            // Since duration blocking updates it's deadline after resumption we need to recreate the timer.
-            try await deviceActivityRegistrar.cancelScheduledResume(for: state.item)
-            await setUpcomingItem()
-            timer.startTimer(for: state.item)
-            timer.resume()
+            try await deviceActivityRegistrar.resumeActivity(for: state.item)
         } catch {
             state.error = error
         }
@@ -151,6 +167,5 @@ extension TaskConcentrationViewModel: FTTimerDelegate {
     
     func didFinishCountdown() {
         timer.cancel()
-        moveTo(.finished)
     }
 }
