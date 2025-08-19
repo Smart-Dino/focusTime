@@ -53,6 +53,7 @@ final class ConcurrencyTimer: FTTimer {
         self.isPaused = isInitiallyPaused
 
         timer?.cancel()
+        ping()
         timer = Task(priority: .utility) { [weak self] in
             guard let self else { return }
             while !Task.isCancelled {

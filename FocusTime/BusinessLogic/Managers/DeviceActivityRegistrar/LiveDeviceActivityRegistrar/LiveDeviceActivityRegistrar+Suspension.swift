@@ -45,16 +45,15 @@ extension LiveDeviceActivityRegistrar {
                 isPaused: true,
                 suspendedUntil: resumeAt
             )
-            try await blockItemPersistenceManager.editBlockItem(blockItem: stored)
-        case .duration(let duration, _, _, let endDate):
+        case .duration(let duration, let suspendedAt, _, let endDate):
             stored.type = .duration(
                 duration,
-                suspendedAt: now,
+                suspendedAt: suspendedAt,
                 suspendedUntil: resumeAt,
                 endDate: endDate
             )
-            try await blockItemPersistenceManager.editBlockItem(blockItem: stored)
         }
+        try await blockItemPersistenceManager.editBlockItem(blockItem: stored)
 
         // 4. register a DeviceActivity interval that starts at resumeAt's minute so the extension will fire.
         try await registerResumeMonitoring(blockItemID: blockItem.id, resumeAt: resumeAt)
@@ -76,11 +75,10 @@ extension LiveDeviceActivityRegistrar {
             switch stored.type {
             case .scheduled(let start, let end, let isActive, _, _):
                 stored.type = .scheduled(startTime: start, endTime: end, isActive: isActive, isPaused: false)
-                try await blockItemPersistenceManager.editBlockItem(blockItem: stored)
             case .duration(let duration, _, _, let endDate):
                 stored.type = .duration(duration, suspendedAt: nil, suspendedUntil: nil, endDate: endDate)
-                try await blockItemPersistenceManager.editBlockItem(blockItem: stored)
             }
+            try await blockItemPersistenceManager.editBlockItem(blockItem: stored)
         }
     }
 

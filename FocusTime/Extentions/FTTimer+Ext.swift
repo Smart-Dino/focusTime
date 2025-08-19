@@ -10,12 +10,24 @@ import FocusTimeUI
 
 extension FTTimer {
     func startTimer(for blockItem: ProtectedBlockItem) {
-        let deadline: Date?
+        var deadline: Date?
         switch blockItem.type {
         case .duration(_, _, let suspendedUntil, _):
             deadline = suspendedUntil
         case .scheduled(_, _, _, _, let suspendedUntil):
             deadline = suspendedUntil
+        }
+        
+        if let checkedDeadline = deadline {
+            let timeComponents = try? TimeComponents(from: checkedDeadline)
+            if let dateComponents = timeComponents?.dateComponents {
+                deadline = Calendar.current.date(
+                    bySettingHour: dateComponents.hour ?? 0,
+                    minute: dateComponents.minute ?? 0,
+                    second: dateComponents.second ?? 0,
+                    of: checkedDeadline
+                )
+            }
         }
         
         guard let timeLeft = blockItem.type.secondsToIntervalEndIfShouldBeRunning(),

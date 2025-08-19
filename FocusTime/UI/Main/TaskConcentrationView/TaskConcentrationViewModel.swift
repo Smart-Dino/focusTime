@@ -43,7 +43,7 @@ final class TaskConcentrationViewModel {
                 subtitle: String
             )
         }
-
+        
         var error: Error?
         var item: ProtectedBlockItem
         var timerIsPaused: Bool = true
@@ -71,19 +71,6 @@ final class TaskConcentrationViewModel {
         
         self.timer.delegate = self
         self.state.timerIsPaused = timer.isPaused
-
-        Task {
-            subscribeToDB()
-        }
-    }
-    
-    func subscribeToDB() {
-        dbChangesNotificationTask = Task {
-            for await _ in await blockItemPersistenceManager.contextChangesStream() {
-                try? await Task.sleep(for: SharedAppValues.debounceAfterDBRefreshed)
-                #warning("Empty implementation")
-            }
-        }
     }
     
     func setErrorVisibility(_ isVisible: Bool) {
@@ -92,13 +79,29 @@ final class TaskConcentrationViewModel {
         }
     }
     
-    func toggleTimerIsPaused() async {
-        if timer.isPaused {
-            await resumeFromBreak()
-            moveTo(.focus)
-        } else {
-            await startABreak()
-            moveTo(.breakTransition)
+    func setUpcomingItem() async {
+        do {
+            if let newItem = try await blockItemPersistenceManager.fetchClosestOrRunningCurrentScheduled(now: .now) {
+                state.item = newItem
+            }
+        } catch {
+            state.error = error
+        }
+    }
+    
+    func toggleTimerIsPaused() {
+        Task {
+            try await Task.sleep(for: .seconds(1))
+            if timer.isPaused {
+                await resumeFromBreak()
+                moveTo(.focus)
+            } else {
+                timer.start(
+                    deadline: .now.addingTimeInterval(TimeInterval(SharedAppValues.breakTimeDuration)),
+                    isInitiallyPaused: true
+                )
+                moveTo(.breakTransition)
+            }
         }
     }
     
@@ -109,14 +112,17 @@ final class TaskConcentrationViewModel {
     }
     
     func startTimerPauseTimer() {
-        timer.resume()
+        Task {
+            await startABreak()
+        }
     }
     
     func startABreak(for seconds: Int = SharedAppValues.breakTimeDuration) async {
         do {
             try await deviceActivityRegistrar.suspendActivity(for: state.item, forSeconds: seconds)
+            await setUpcomingItem()
             timer.startTimer(for: state.item)
-            timer.pause()
+            timer.resume()
         } catch {
             state.error = error
         }
@@ -126,6 +132,7 @@ final class TaskConcentrationViewModel {
         do {
             // Since duration blocking updates it's deadline after resumption we need to recreate the timer.
             try await deviceActivityRegistrar.cancelScheduledResume(for: state.item)
+            await setUpcomingItem()
             timer.startTimer(for: state.item)
             timer.resume()
         } catch {
@@ -134,7 +141,7 @@ final class TaskConcentrationViewModel {
     }
     
     func endSession() {
-        #warning("Notify DeviceActivityRegistrar of stopping and unregistering the session")
+#warning("Notify DeviceActivityRegistrar of stopping and unregistering the session")
     }
     
 }

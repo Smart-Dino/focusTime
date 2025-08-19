@@ -36,9 +36,7 @@ struct TaskConcentrationView: View {
                                 isPaused ? pausedTitle : runningTitle,
                                 systemImage: isPaused ? pausedIcon : runningIcon
                             ) {
-                                Task {
-                                    await viewModel.toggleTimerIsPaused()
-                                }
+                                viewModel.toggleTimerIsPaused()
                             }
                         }, endSessionAction: {
                             // No action for now.

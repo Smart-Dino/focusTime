@@ -30,6 +30,14 @@ public struct FTFlipClockView: View {
                 },
                 configuration: configuration
             )
+            FTFlipClockComponentView(
+                value: Binding {
+                    timer.payload.seconds
+                } set: { seconds in
+                    timer.setSeconds(seconds)
+                },
+                configuration: configuration
+            )
         }
     }
     
