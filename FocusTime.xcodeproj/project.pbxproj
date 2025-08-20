@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		0C439A272E3249F80031E7EB /* OnboardingKit in Frameworks */ = {isa = PBXBuildFile; productRef = 0C439A262E3249F80031E7EB /* OnboardingKit */; };
 		674241732E27EFBA00500101 /* FocusTimeUI in Frameworks */ = {isa = PBXBuildFile; productRef = 674241722E27EFBA00500101 /* FocusTimeUI */; };
+		67651BD82E538CBE00B08A9B /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 67651BD72E538CBE00B08A9B /* FirebaseAnalytics */; };
 		C66B28102E1825160018E7AC /* FocusTimeActivityMonitor.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E97895A52E0AFCBE00E0AF42 /* FocusTimeActivityMonitor.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C66D93522E29108800452D56 /* FocusTimeUI in Frameworks */ = {isa = PBXBuildFile; productRef = 674241722E27EFBA00500101 /* FocusTimeUI */; };
 		C68617AA2E2976BD00E49BF7 /* ManagedSettings.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C68617A92E2976BD00E49BF7 /* ManagedSettings.framework */; };
@@ -186,6 +187,7 @@
 			files = (
 				0C439A272E3249F80031E7EB /* OnboardingKit in Frameworks */,
 				674241732E27EFBA00500101 /* FocusTimeUI in Frameworks */,
+				67651BD82E538CBE00B08A9B /* FirebaseAnalytics in Frameworks */,
 				C66D93522E29108800452D56 /* FocusTimeUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -295,6 +297,7 @@
 			packageProductDependencies = (
 				674241722E27EFBA00500101 /* FocusTimeUI */,
 				0C439A262E3249F80031E7EB /* OnboardingKit */,
+				67651BD72E538CBE00B08A9B /* FirebaseAnalytics */,
 			);
 			productName = FocusTime;
 			productReference = 674FA6A02DB05ACE0002FDC1 /* FocusTime.app */;
@@ -428,6 +431,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				0C439A252E3249F80031E7EB /* XCRemoteSwiftPackageReference "OnboardingKit" */,
+				67651BD62E538CA400B08A9B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 674FA6A12DB05ACE0002FDC1 /* Products */;
@@ -1037,6 +1041,14 @@
 				minimumVersion = 1.2.0;
 			};
 		};
+		67651BD62E538CA400B08A9B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.1.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1048,6 +1060,11 @@
 		674241722E27EFBA00500101 /* FocusTimeUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = FocusTimeUI;
+		};
+		67651BD72E538CBE00B08A9B /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 67651BD62E538CA400B08A9B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -3,7 +3,6 @@
 *.xcuserdatad
 *.xcuserdata
 xcuserdata/
-project.xcworkspace/
 
 ## Obj-C/Swift specific
 *.hmap
