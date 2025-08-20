@@ -135,7 +135,7 @@ struct ShieldDebugView: View {
             isPresented: Binding(get: {
                 viewModel.state.error != nil
             }, set: { bool in
-                viewModel.removeError(bool)
+                viewModel.setErrorVisibility(bool)
             }),
             actions: {},
             message: {

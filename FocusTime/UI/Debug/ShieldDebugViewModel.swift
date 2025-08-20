@@ -85,8 +85,8 @@ final class ShieldDebugViewModel {
     }
     
     // MARK: - Setters
-    func removeError(_ removeError: Bool) {
-        if removeError {
+    func setErrorVisibility(_ isVisible: Bool) {
+        if !isVisible {
             state.error = nil
         }
     }

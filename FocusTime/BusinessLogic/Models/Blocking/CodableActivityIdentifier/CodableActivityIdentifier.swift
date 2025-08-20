@@ -11,7 +11,6 @@ import DeviceActivity
 struct CodableActivityIdentifier: Codable {
     enum BlockType: Codable {
         case regular
-        case fallback
         case resumption
     }
     

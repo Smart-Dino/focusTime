@@ -22,7 +22,6 @@ nonisolated final class BlockItemExtensionStore {
     }
     
     func fetchBlockItem(id: UUID) -> BlockItem? {
-        // Fetch the schedule.
         let fetchDescriptor = FetchDescriptor<BlockItem>(
             predicate: #Predicate<BlockItem> { $0.id == id }
         )
@@ -30,33 +29,73 @@ nonisolated final class BlockItemExtensionStore {
         do {
             return try context.fetch(fetchDescriptor).first
         } catch {
-            logger?.error("Failed to fetch BlockItem in fetchBlockItem: \(error.localizedDescription)")
+            logger?.error("Failed to fetch BlockItem: \(error.localizedDescription)")
             return nil
         }
     }
     
-    func setSessionIsActive(for blockItem: BlockItem, isActive: Bool) {
+    func updateSessionState(for blockItem: BlockItem, isActive: Bool) {
         switch blockItem.type {
-        case .scheduled(let startTime, let endTime, _, _, _):
-            blockItem.type = .scheduled(startTime: startTime, endTime: endTime, isActive: isActive)
+        case .scheduled(let startTime, let endTime, _, let isPaused, let suspendedUntil):
+            // Only update isActive, keep pause state intact.
+            blockItem.type = .scheduled(
+                startTime: startTime,
+                endTime: endTime,
+                isActive: isActive,
+                isPaused: isPaused,
+                suspendedUntil: suspendedUntil
+            )
         case .duration(let duration, let suspendedAt, let suspendedUntil, let endDate):
-            if isActive {
-                blockItem.type = .duration(
-                    duration,
-                    suspendedAt: nil,
-                    suspendedUntil: nil,
-                    endDate: endDate
-                )
-            } else {
-                blockItem.type = .duration(
-                    duration,
-                    suspendedAt: suspendedAt,
-                    suspendedUntil: suspendedUntil,
-                    endDate: nil
-                )
-            }
+            blockItem.type = .duration(
+                duration,
+                suspendedAt: suspendedAt,
+                suspendedUntil: suspendedUntil,
+                endDate: isActive ? endDate : nil // Set or clear endDate based on activity.
+            )
         }
-        
+        saveContext()
+    }
+    
+    func suspendSession(for blockItem: BlockItem, at suspensionDate: Date, until resumeDate: Date, newEndDate: Date?) {
+        switch blockItem.type {
+        case .scheduled(let startTime, let endTime, let isActive, _, _):
+            blockItem.type = .scheduled(
+                startTime: startTime,
+                endTime: endTime,
+                isActive: isActive,
+                isPaused: true,
+                suspendedUntil: resumeDate
+            )
+        case .duration(let duration, _, _, _):
+            blockItem.type = .duration(
+                duration,
+                suspendedAt: suspensionDate,
+                suspendedUntil: resumeDate,
+                endDate: newEndDate // The end date is extended by the suspension duration.
+            )
+        }
+        saveContext()
+    }
+    
+    func resumeSession(for blockItem: BlockItem) {
+        switch blockItem.type {
+        case .scheduled(let startTime, let endTime, let isActive, _, _):
+            blockItem.type = .scheduled(
+                startTime: startTime,
+                endTime: endTime,
+                isActive: isActive,
+                isPaused: false,
+                suspendedUntil: nil
+            )
+        case .duration(let duration, _, _, let endDate):
+            // When resuming, clear suspension dates and keep the existing endDate.
+            blockItem.type = .duration(
+                duration,
+                suspendedAt: nil,
+                suspendedUntil: nil,
+                endDate: endDate
+            )
+        }
         saveContext()
     }
     
@@ -66,7 +105,6 @@ nonisolated final class BlockItemExtensionStore {
     }
     
     private func saveContext() {
-        // Save changes.
         do {
             try context.save()
         } catch {

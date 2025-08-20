@@ -38,19 +38,8 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
 
         switch blockItem.type {
         case .scheduled(let startTime, let endTime, _, _, _):
-            do {
-                try await registerRegularActivity(for: blockItem, startTime: startTime, endTime: endTime)
-            } catch {
-                switch error {
-                case DeviceActivityCenter.MonitoringError.intervalTooShort:
-                    try await registerFallbackActivity(for: blockItem, startTime: startTime, endTime: endTime)
-                default:
-                    throw error
-                }
-            }
-
+            try await registerRegularActivity(for: blockItem, startTime: startTime, endTime: endTime)
             try await startActivityIfRegisteredDuringIntervalWindow(item: blockItem)
-
         case .duration:
             try await registerDurationActivity(for: blockItem)
         }

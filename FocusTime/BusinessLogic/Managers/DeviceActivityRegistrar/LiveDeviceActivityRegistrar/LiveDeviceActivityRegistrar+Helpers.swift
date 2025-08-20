@@ -55,20 +55,6 @@ extension LiveDeviceActivityRegistrar {
         try await centerManager.startMonitoring(activityName, during: schedule)
     }
 
-    func registerFallbackActivity(for blockItem: ProtectedBlockItem, startTime: TimeComponents, endTime: TimeComponents) async throws {
-        guard blockItem.persistentModelID != nil else { throw DeviceActivityRegistrarError.noPersistentItem }
-
-        // Shift end to satisfy DeviceActivityCenter (workaround)
-        let intervalEnd = endTime.dateComponents.adding(seconds: Self.fallbackIntervalSeconds)
-        let schedule = DeviceActivitySchedule(intervalStart: startTime.dateComponents, intervalEnd: intervalEnd, repeats: true)
-
-        let overlaps = try await overlapsWithAlreadyRegisteredSchedules(schedule, days: blockItem.days)
-        guard overlaps.isEmpty else { throw DeviceActivityRegistrarError.scheduleOverlap(with: overlaps) }
-
-        let activityName = try createActivityName(for: blockItem, actionType: .fallback)
-        try await centerManager.startMonitoring(activityName, during: schedule)
-    }
-
     // MARK: - Utilities & Small helpers
 
     func createActivityName(
