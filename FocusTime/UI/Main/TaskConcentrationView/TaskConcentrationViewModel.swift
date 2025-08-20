@@ -7,7 +7,6 @@
 
 import SwiftUI
 import FocusTimeUI
-
 @MainActor
 @Observable
 final class TaskConcentrationViewModel {
@@ -18,9 +17,7 @@ final class TaskConcentrationViewModel {
                 subtitle: String,
                 timerTitle: String,
                 runningTitle: String,
-                pausedTitle: String,
-                runningIcon: String,
-                pausedIcon: String
+                runningIcon: String
             )
             case breakTransition(
                 title: String,
@@ -45,19 +42,23 @@ final class TaskConcentrationViewModel {
         }
         
         var error: Error?
-        var item: ProtectedBlockItem
-        var timerIsPaused: Bool = true
         
+        var item: ProtectedBlockItem
         var phase: Phase = .focus
+        
+        var timerIsPaused: Bool = true
     }
     
+    // MARK: - Properties
     private(set) var state: State
     let timer: FTTimer
+    
     private let deviceActivityRegistrar: DeviceActivityRegistrar
     private let blockItemPersistenceManager: BlockItemPersistenceManager
     
     private var dbChangesNotificationTask: Task<Void, Never>?
     
+    // MARK: - Initialization
     init(
         state: State,
         timer: FTTimer,
@@ -69,37 +70,14 @@ final class TaskConcentrationViewModel {
         self.deviceActivityRegistrar = deviceActivityRegistrar
         self.blockItemPersistenceManager = blockItemPersistenceManager
         
-        self.timer.delegate = self
-        self.state.timerIsPaused = timer.isPaused
-        
+        setupTimer()
         subscribeToDB()
     }
     
+    // MARK: - Public Methods
     func setErrorVisibility(_ isVisible: Bool) {
         if !isVisible {
             state.error = nil
-        }
-    }
-    
-    func subscribeToDB() {
-        dbChangesNotificationTask = Task {
-            for await _ in await blockItemPersistenceManager.contextChangesStream() {
-                try? await Task.sleep(for: SharedAppValues.debounceAfterDBRefreshed)
-                
-                print("Ping")
-                guard let newItem = try? await blockItemPersistenceManager.fetchClosestOrRunningCurrentScheduled(now: .now) else {
-                    moveTo(.finished)
-                    return
-                }
-                
-                state.item = newItem
-                timer.startTimer(for: newItem)
-                timer.resume()
-                
-                if !state.item.isPaused {
-                    moveTo(.focus)
-                }
-            }
         }
     }
     
@@ -113,36 +91,69 @@ final class TaskConcentrationViewModel {
         }
     }
     
-    func toggleTimerIsPaused() {
-        Task {
-            try await Task.sleep(for: .seconds(1))
-            if timer.isPaused {
-                await resumeFromBreak()
-                moveTo(.focus)
-            } else {
-                timer.start(
-                    deadline: .now.addingTimeInterval(TimeInterval(SharedAppValues.breakTimeDuration)),
-                    isInitiallyPaused: true
-                )
-                moveTo(.breakTransition)
-            }
-        }
-    }
-    
-    func moveTo(_ phase: State.Phase) {
-        guard state.phase != phase else { return }
-        withAnimation {
-            state.phase = phase
-        }
-    }
-    
-    func startTimerPauseTimer() {
+    func startBreakTimer() {
         Task {
             await startABreak()
         }
     }
     
-    func startABreak(for seconds: Int = SharedAppValues.breakTimeDuration) async {
+    func moveToPauseSessionScene() {
+        timer.start(
+            deadline: .now.addingTimeInterval(TimeInterval(SharedAppValues.breakTimeDuration)),
+            isInitiallyPaused: true
+        )
+        moveTo(.breakTransition)
+    }
+    
+    func moveToBreakTime() {
+        moveTo(.breakTime)
+    }
+    
+    func moveToEndSessionAlertScene() {
+        moveTo(.almostDone)
+#warning("Notify DeviceActivityRegistrar of stopping and unregistering the session")
+    }
+    
+    // MARK: - Private Methods
+    private func setupTimer() {
+        timer.delegate = self
+        state.timerIsPaused = timer.isPaused
+    }
+    
+    private func moveTo(_ phase: State.Phase) {
+        guard state.phase != phase else { return }
+        
+        withAnimation {
+            state.phase = phase
+        }
+    }
+    
+    private func subscribeToDB() {
+        dbChangesNotificationTask = Task {
+            for await _ in await blockItemPersistenceManager.contextChangesStream() {
+                try? await Task.sleep(for: SharedAppValues.debounceAfterDBRefreshed)
+                
+                guard let newItem = try? await blockItemPersistenceManager.fetchClosestOrRunningCurrentScheduled(now: .now) else {
+                    moveTo(.finished)
+                    return
+                }
+                
+                updateStateWithNewItem(newItem)
+            }
+        }
+    }
+    
+    private func updateStateWithNewItem(_ newItem: ProtectedBlockItem) {
+        state.item = newItem
+        timer.startTimer(for: newItem)
+        timer.resume()
+        
+        if !state.item.isPaused {
+            moveTo(.focus)
+        }
+    }
+    
+    private func startABreak(for seconds: Int = SharedAppValues.breakTimeDuration) async {
         do {
             try await deviceActivityRegistrar.suspendActivity(for: state.item, forSeconds: seconds)
         } catch {
@@ -150,22 +161,21 @@ final class TaskConcentrationViewModel {
         }
     }
     
-    func resumeFromBreak() async {
+    private func resumeFromBreak() async {
         do {
             try await deviceActivityRegistrar.resumeActivity(for: state.item)
         } catch {
             state.error = error
         }
     }
-    
-    func endSession() {
-#warning("Notify DeviceActivityRegistrar of stopping and unregistering the session")
-    }
-    
 }
 
+// MARK: - FTTimerDelegate
 extension TaskConcentrationViewModel: FTTimerDelegate {
-    func didUpdateIsPaused(_ pause: Bool) { }
+    
+    func didUpdateIsPaused(_ pause: Bool) {
+        // Implementation pending
+    }
     
     func didFinishCountdown() {
         timer.cancel()

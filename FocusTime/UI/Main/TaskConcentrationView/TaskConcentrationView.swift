@@ -17,7 +17,7 @@ struct TaskConcentrationView: View {
         VStack {
             Group {
                 switch viewModel.state.phase {
-                case .focus(let title, let subtitle, let timerTitle, let runningTitle, let pausedTitle, let runningIcon, let pausedIcon):
+                case .focus(let title, let subtitle, let timerTitle, let runningTitle, let runningIcon):
                     let isPaused = viewModel.state.timerIsPaused
                     
                     StandardPhaseView(
@@ -33,14 +33,11 @@ struct TaskConcentrationView: View {
                             }
                         },
                         primaryButton: {
-                            Button(
-                                isPaused ? pausedTitle : runningTitle,
-                                systemImage: isPaused ? pausedIcon : runningIcon
-                            ) {
-                                viewModel.toggleTimerIsPaused()
+                            Button(runningTitle, systemImage: runningIcon) {
+                                viewModel.moveToPauseSessionScene()
                             }
                         }, endSessionAction: {
-                            // No action for now.
+                            viewModel.moveToEndSessionAlertScene()
                         }
                     )
                 case .breakTransition(let title, let subtitle):
@@ -48,7 +45,7 @@ struct TaskConcentrationView: View {
                         title: title,
                         subtitle: subtitle,
                         onFinished: {
-                            viewModel.moveTo(.breakTime)
+                            viewModel.moveToBreakTime()
                         }
                     )
                 case .breakTime(let title, let subtitle, let timerTitle, let buttonTitle):
@@ -66,31 +63,50 @@ struct TaskConcentrationView: View {
                         },
                         primaryButton: {
                             Button(buttonTitle) {
-                                viewModel.startTimerPauseTimer()
+                                viewModel.startBreakTimer()
                             }
                         }, endSessionAction: {
-                            // No action for now.
+                            viewModel.moveToEndSessionAlertScene()
                         }
                     )
                 case .almostDone(let title, let subtitle, let message, let buttonTitle):
                     StandardPhaseView(
                         title: title,
-                        backgroundImage: ImageResource.MainImages.TaskConcentrationImages.taskConcentrationFocus,
+                        backgroundImage: ImageResource.MainImages.TaskConcentrationImages.taskConcentrationAlert,
                         centerView: {
                             // Animation.
-                            EmptyView()
+                            LottieView(
+                                animation: .filepath(
+                                    Bundle.main.url(forResource: "Warning Yellow", withExtension: "json")!.relativePath
+                                )
+                            )
+                            .playbackMode(
+                                .playing(
+                                    .fromProgress(0,
+                                                  toProgress: 1,
+                                                  loopMode: .loop)
+                                )
+                            )
+                            .resizable()
+                            .containerRelativeFrame(.horizontal) { size, _ in
+                                size / 2
+                            }
                             
-                            Text(subtitle)
-                            Text(message)
-                                .foregroundStyle(.ftGray3Light)
+                            VStack {
+                                Text(subtitle)
+                                    .font(.title3)
+                                Text(message)
+                                    .foregroundStyle(.ftGray3Light)
+                                    .multilineTextAlignment(.center)
+                            }
+                            .padding()
                         },
                         primaryButton: {
-                            
                             Button(buttonTitle) {
-#warning("No implementation")
+                                viewModel.moveToPauseSessionScene()
                             }
                         }, endSessionAction: {
-                            // No action for now.
+                            viewModel.moveToEndSessionAlertScene()
                         }
                     )
                     

@@ -34,9 +34,7 @@ extension TaskConcentrationViewModel.State.Phase {
         subtitle: "Concentrate on your task",
         timerTitle: "Focus time",
         runningTitle: "Pause",
-        pausedTitle: "Start",
-        runningIcon: "pause",
-        pausedIcon: "play.fill"
+        runningIcon: "pause"
     )
     
     static let breakTransition = Phase.breakTransition(
