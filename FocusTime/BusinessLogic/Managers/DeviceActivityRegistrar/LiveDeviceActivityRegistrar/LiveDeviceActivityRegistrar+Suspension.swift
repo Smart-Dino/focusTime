@@ -10,32 +10,26 @@ import Foundation
 import DeviceActivity
 
 extension LiveDeviceActivityRegistrar {
-    /// Suspend now and schedule a system-backed resume at `seconds` from now.
-    /// This will persist resumeAt and register a DeviceActivity interval so the extension
-    /// will be launched by the system and re-block when the time arrives.
+    
     func suspendActivity(
         for blockItem: ProtectedBlockItem,
         forSeconds seconds: Int
     ) async throws {
-        guard blockItem.persistentModelID != nil else {
-            throw DeviceActivityRegistrarError.noPersistentItem
+        guard let persistentModelID = blockItem.persistentModelID else {
+            throw DeviceActivityRegistrarError.activityNotFound
         }
         guard let secondsLeft = blockItem.type.secondsToIntervalEndIfShouldBeRunning(),
               secondsLeft > seconds else {
             throw DeviceActivityRegistrarError.cannotSuspend
         }
         
-        // 1. Immediate suspend.
-        try await suspendActivity(for: blockItem)
+        let suspensionDate = await clock.now
+        let suspendedUntil = suspensionDate.addingTimeInterval(TimeInterval(seconds))
+        
 
-        // 2. compute resume date.
-        let now = await clock.now
-        let resumeAt = now.addingTimeInterval(TimeInterval(seconds))
-
-        guard let persistentModelID = blockItem.persistentModelID else { return }
-
-        // 3. persist resumeAt on the stored model so you can check it elsewise.
+        let activity = try await getActivityForSchedule(blockItem)
         var stored = try await blockItemPersistenceManager.fetch(by: persistentModelID)
+
         switch stored.type {
         case .scheduled(let startTime, let endTime, let isActive, _, _):
             stored.type = .scheduled(
@@ -43,28 +37,82 @@ extension LiveDeviceActivityRegistrar {
                 endTime: endTime,
                 isActive: isActive,
                 isPaused: true,
-                suspendedUntil: resumeAt
+                suspendedUntil: suspendedUntil
             )
-        case .duration(let duration, let suspendedAt, _, let endDate):
-            stored.type = .duration(
-                duration,
-                suspendedAt: suspendedAt,
-                suspendedUntil: resumeAt,
-                endDate: endDate
-            )
+            
+            try await blockItemPersistenceManager.editBlockItem(blockItem: stored)
+            try await shieldManager.unblock()
+        case .duration(let duration, _, _, let endDate):
+            guard let endDate else {
+                throw DeviceActivityRegistrarError.couldNotExtractDatePoints
+            }
+            // Store suspension moment and keep endDate unchanged.
+            stored.type = .duration(duration, suspendedAt: suspensionDate, suspendedUntil: suspendedUntil, endDate: endDate)
+            
+            try await blockItemPersistenceManager.editBlockItem(blockItem: stored)
+            try await shieldManager.unblock()
+            
+            await centerManager.stopMonitoring([activity])
         }
-        try await blockItemPersistenceManager.editBlockItem(blockItem: stored)
-
-        // 4. register a DeviceActivity interval that starts at resumeAt's minute so the extension will fire.
-        try await registerResumeMonitoring(blockItemID: blockItem.id, resumeAt: resumeAt)
+        
+        try await registerResumeMonitoring(blockItemID: blockItem.id, resumeAt: suspendedUntil)
     }
     
+    /// Suspend now and schedule a system-backed resume at `seconds` from now.
+    /// This will persist resumeAt and register a DeviceActivity interval so the extension
+    /// will be launched by the system and re-block when the time arrives.
+//    func suspendActivity(
+//        for blockItem: ProtectedBlockItem,
+//        forSeconds seconds: Int
+//    ) async throws {
+//        guard blockItem.persistentModelID != nil else {
+//            throw DeviceActivityRegistrarError.noPersistentItem
+//        }
+//        guard let secondsLeft = blockItem.type.secondsToIntervalEndIfShouldBeRunning(),
+//              secondsLeft > seconds else {
+//            throw DeviceActivityRegistrarError.cannotSuspend
+//        }
+//        
+//        // 1. Immediate suspend.
+//        try await suspendActivity(for: blockItem)
+//
+//        // 2. compute resume date.
+//        let now = await clock.now
+//        let resumeAt = now.addingTimeInterval(TimeInterval(seconds))
+//
+//        guard let persistentModelID = blockItem.persistentModelID else { return }
+//
+//        // 3. persist resumeAt on the stored model so you can check it elsewise.
+//        var stored = try await blockItemPersistenceManager.fetch(by: persistentModelID)
+//        switch stored.type {
+//        case .scheduled(let startTime, let endTime, let isActive, _, _):
+//            stored.type = .scheduled(
+//                startTime: startTime,
+//                endTime: endTime,
+//                isActive: isActive,
+//                isPaused: true,
+//                suspendedUntil: resumeAt
+//            )
+//        case .duration(let duration, let suspendedAt, _, let endDate):
+//            stored.type = .duration(
+//                duration,
+//                suspendedAt: suspendedAt,
+//                suspendedUntil: resumeAt,
+//                endDate: endDate?.addingTimeInterval(seconds)
+//            )
+//        }
+//        try await blockItemPersistenceManager.editBlockItem(blockItem: stored)
+//
+//        // 4. register a DeviceActivity interval that starts at resumeAt's minute so the extension will fire.
+//        try await registerResumeMonitoring(blockItemID: blockItem.id, resumeAt: resumeAt)
+//    }
+//    
     /// When user manually resumes or unregisters, cancel the scheduled resume activity for that block item.
     func cancelScheduledResume(for blockItem: ProtectedBlockItem) async throws {
         guard blockItem.persistentModelID != nil else { throw DeviceActivityRegistrarError.noPersistentItem }
         
         // Build the same DeviceActivityName.
-        let activityIdentifier = CodableActivityIdentifier(blockItemID: blockItem.id, actionType: .resumption)
+        let activityIdentifier = CodableActivityIdentifier(blockItemID: blockItem.id, blockType: .resumption)
         guard let jsonIdentifier = activityIdentifier.jsonString else { return }
         
         let activity = DeviceActivityName(jsonIdentifier)
@@ -87,7 +135,7 @@ extension LiveDeviceActivityRegistrar {
     /// should detect the activity identifier and call `shieldManager.block(...)`.
     private func registerResumeMonitoring(blockItemID: UUID, resumeAt: Date) async throws {
         // Make an identifier with the UUID of the same block item but mark it as a resumption block.
-        let identifier = CodableActivityIdentifier(blockItemID: blockItemID, actionType: .resumption)
+        let identifier = CodableActivityIdentifier(blockItemID: blockItemID, blockType: .resumption)
         
         guard let jsonActivity = identifier.jsonString else { return } // Convert to system name.
         let activityName = DeviceActivityName(jsonActivity)

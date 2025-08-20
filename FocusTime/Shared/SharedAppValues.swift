@@ -18,6 +18,7 @@ enum SharedAppValues {
     static let breakTimeDuration: Int = 300 // 5 minutes.
     #endif
     static let debounceAfterDBRefreshed: Duration = .seconds(0.3)
+    static let activityRegistrarFallbackInterval: Int = 15 * 60
     
     enum DefaultsKeys: String {
         case isOnboardingFinished = "IS_ONBOARDING_FINISHED"

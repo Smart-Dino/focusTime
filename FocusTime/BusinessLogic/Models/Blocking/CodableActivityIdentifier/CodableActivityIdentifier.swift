@@ -9,14 +9,14 @@ import Foundation
 import DeviceActivity
 
 struct CodableActivityIdentifier: Codable {
-    enum ActionType: Codable {
+    enum BlockType: Codable {
         case regular
         case fallback
         case resumption
     }
     
     let blockItemID: UUID
-    let actionType: ActionType
+    let blockType: BlockType
 }
 
 extension CodableActivityIdentifier {

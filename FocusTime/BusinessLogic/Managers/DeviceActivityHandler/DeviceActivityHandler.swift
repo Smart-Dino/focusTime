@@ -42,7 +42,7 @@ nonisolated struct DeviceActivityHandler: Sendable {
         
         switch blockItem.type {
         case .scheduled(_, let endTime, _, _, _):
-            switch activityIdentifier.actionType {
+            switch activityIdentifier.blockType {
             case .fallback, .regular:
                 await handleRegularBlocking(blockItem: blockItem,
                                             activity: activity,
@@ -53,7 +53,7 @@ nonisolated struct DeviceActivityHandler: Sendable {
                 await handleResumptionBlocking(for: blockItem, store: store)
             }
         case .duration:
-            switch activityIdentifier.actionType {
+            switch activityIdentifier.blockType {
             case .fallback, .regular:
                 await handleDurationUnblocking(for: blockItem, store: store)
                 // We don't need to handle the end of the interval anymore.
@@ -71,7 +71,7 @@ nonisolated struct DeviceActivityHandler: Sendable {
             
             // If this is fallback's end - ignore it.
             // Fallback schedules run at blockingStart and finish there respectively.
-            guard activityIdentifier.actionType != .fallback else { return }
+            guard activityIdentifier.blockType != .fallback else { return }
             
             // Create context from scratch because using mainContext in a
             // non-isolated to MainActor environment is not allowed.
@@ -107,7 +107,7 @@ nonisolated struct DeviceActivityHandler: Sendable {
             logger?.error("Failed to block in \(#function): \(error.localizedDescription)")
         }
         
-        if case .fallback = activityIdentifier.actionType {
+        if case .fallback = activityIdentifier.blockType {
             // TimeComponents has an accuracy of a minute.
             // Hence why we are comparing it directly - we have a whole minute to detect the match.
             do {
@@ -148,11 +148,35 @@ nonisolated struct DeviceActivityHandler: Sendable {
         // Block user's selections again.
         let selection = blockItem.blockedContent
         do {
-            try await shieldManager.block(specific: selection)
-            store.setSessionIsActive(for: blockItem, isActive: true)
+            try await registerDurationActivity(for: blockItem, store: store)
         } catch {
             logger?.error("Failed to block in \(#function): \(error.localizedDescription)")
         }
+    }
+    
+    func registerDurationActivity(
+        for blockItem: BlockItem,
+        store: BlockItemExtensionStore
+    ) async throws {
+        guard case let .duration(originalDuration, _, _, endDate) = blockItem.type, let endDate else { return }
+
+        // Start blocking immediately.
+        try await shieldManager.block(specific: blockItem.blockedContent)
+
+        // Build schedule based on seconds. DeviceActivitySchedule requires >= 15 minutes interval.
+        let nowComponents = Calendar.current.dateComponents([.hour, .minute, .second], from: Date.now)
+        let durationSeconds = originalDuration.rawValue
+        let intervalStart = try TimeComponents(from: endDate).dateComponents
+        let intervalEnd = intervalStart.adding(seconds: SharedAppValues.activityRegistrarFallbackInterval)
+
+        let schedule = DeviceActivitySchedule(intervalStart: intervalStart, intervalEnd: intervalEnd, repeats: false)
+
+        guard let activityName = CodableActivityIdentifier(blockItemID: blockItem.id, blockType: .regular).jsonString else { return }
+        let deviceActivityName = DeviceActivityName(activityName)
+        
+        try DeviceActivityCenter().startMonitoring(deviceActivityName, during: schedule)
+
+        store.setSessionIsActive(for: blockItem, isActive: true)
     }
 }
 

@@ -73,11 +73,11 @@ extension LiveDeviceActivityRegistrar {
 
     func createActivityName(
         for blockItem: ProtectedBlockItem,
-        actionType: CodableActivityIdentifier.ActionType
+        actionType: CodableActivityIdentifier.BlockType
     ) throws -> DeviceActivityName {
         guard let identifier = CodableActivityIdentifier(
             blockItemID: blockItem.id,
-            actionType: actionType
+            blockType: actionType
         ).jsonString else {
             throw DeviceActivityRegistrarError.couldNotGenerateIdentifier
         }

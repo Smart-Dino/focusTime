@@ -12,7 +12,7 @@ import FamilyControls
 
 actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
     // MARK: - Constants & Dependencies
-    static let fallbackIntervalSeconds = 15 * 60
+    static let fallbackIntervalSeconds = SharedAppValues.activityRegistrarFallbackInterval
 
     let clock: Clock
     let centerManager: DeviceActivityCenterManager
