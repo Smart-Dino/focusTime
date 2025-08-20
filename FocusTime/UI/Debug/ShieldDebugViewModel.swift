@@ -55,6 +55,7 @@ final class ShieldDebugViewModel {
     
     // Prepare for future async fetching tasks.
     private var fetchTask: Task<Void, Never>? = nil
+    private var dbChangesNotificationTask: Task<Void, Never>?
     
     // MARK: - Initializer
     init(
@@ -70,6 +71,17 @@ final class ShieldDebugViewModel {
             blockItemPersistenceManager: blockItemPersistenceManager,
             shieldManager: shieldManager
         )
+        
+        subscribeToDB()
+    }
+    
+    func subscribeToDB() {
+        dbChangesNotificationTask = Task {
+            for await _ in await blockItemPersistenceManager.contextChangesStream() {
+                try? await Task.sleep(for: SharedAppValues.debounceAfterDBRefreshed)
+                reloadItems()
+            }
+        }
     }
     
     // MARK: - Setters
@@ -116,7 +128,6 @@ final class ShieldDebugViewModel {
         Task {
             do {
                 try await blockItemPersistenceManager.eraseAllData()
-                self.fetchAllItems()
                 await self.activityRegistrar.unregisterAll()
             } catch {
                 self.state.error = error
@@ -156,8 +167,6 @@ final class ShieldDebugViewModel {
                 
                 
                 try await self.blockItemPersistenceManager.insert(blockItem)
-                
-                self.fetchAllItems()
             } catch {
                 await MainActor.run {
                     self.state.error = error
@@ -166,14 +175,16 @@ final class ShieldDebugViewModel {
         }
     }
     
-    func fetchAllItems() {
-        Task {
+    func reloadItems() {
+        fetchTask?.cancel()
+        fetchTask = Task {
             do {
-                let fetchedBlockItems = try await self.blockItemPersistenceManager.fetch(includeTemporary: true)
-                self.state.blockItems = fetchedBlockItems
+                let newItems = try await blockItemPersistenceManager.fetch(includeTemporary: true)
+                state.blockItems = newItems
             } catch {
-                self.state.error = error
+                state.error = error
             }
+            fetchTask = nil
         }
     }
     
@@ -236,6 +247,18 @@ final class ShieldDebugViewModel {
                 let blockItems = try await self.blockItemPersistenceManager.fetch(includeTemporary: true)
                 guard let blockItem = blockItems.first else { return }
                 try await activityRegistrar.resumeActivity(for: blockItem)
+            } catch {
+                self.state.error = error
+            }
+        }
+    }
+    
+    func suspendFor(_ seconds: Int = 60) {
+        Task {
+            do {
+                let blockItems = try await self.blockItemPersistenceManager.fetch(includeTemporary: true)
+                guard let blockItem = blockItems.first else { return }
+                try await activityRegistrar.suspendActivity(for: blockItem, forSeconds: seconds)
             } catch {
                 self.state.error = error
             }

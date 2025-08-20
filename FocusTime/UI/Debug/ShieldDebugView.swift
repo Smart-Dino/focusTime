@@ -85,6 +85,10 @@ struct ShieldDebugView: View {
                 viewModel.blockSelectionDuringSchedule()
             }
             
+            Button("Block for a minute") {
+                viewModel.suspendFor()
+            }
+            
             HStack {
                 Button(Constants.Strings.suspend) {
                     viewModel.suspendSession()
@@ -144,7 +148,7 @@ struct ShieldDebugView: View {
             }
         )
         .onAppear {
-            viewModel.fetchAllItems()
+            viewModel.reloadItems()
         }
     }
     
@@ -202,24 +206,60 @@ struct ShieldDebugView: View {
     }
     
     func makeCard(_ blockItem: ProtectedBlockItem) -> some View {
-        HStack {
+        HStack(alignment: .top, spacing: 12) {
+            // Emoji
             Text(blockItem.emoji)
-            VStack(alignment: .leading) {
-                Text(blockItem.name)
-                Text ({
-                    switch blockItem.type {
-                    case .scheduled(_, _, let isActive, _, _):
-                        isActive.description
-                    case .duration(_, _, _, let endDate):
-                        (endDate != nil).description
-                    }
-                }())
+                .font(.largeTitle)
+                .frame(width: 44, height: 44)
+                .background(Color.gray.opacity(0.1))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+            
+            VStack(alignment: .leading, spacing: 6) {
+                // Title
+                HStack {
+                    Text(blockItem.name)
+                        .font(.headline)
+                    Spacer()
+                    Text(blockItem.isActive ? "Active" : "Inactive")
+                        .font(.caption)
+                        .foregroundStyle(blockItem.isActive ? .green : .red)
+                }
                 
+                // Details depending on type
+                switch blockItem.type {
+                case let .scheduled(startTime, endTime, isActive, isPaused, suspendedUntil):
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Start: \(startTime.description)")
+                        Text("End: \(endTime.description)")
+                        Text("Paused: \(isPaused.description)")
+                        Text("Suspended until: \(suspendedUntil?.formatted() ?? "—")")
+                    }
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    
+                case let .duration(duration, suspendedAt, suspendedUntil, endDate):
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Duration: \(duration.description)")
+                        Text("Suspended at: \(suspendedAt?.formatted() ?? "—")")
+                        Text("Suspended until: \(suspendedUntil?.formatted() ?? "—")")
+                        Text("End date: \(endDate?.formatted() ?? "—")")
+                    }
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                }
+                
+                // BlockItem ID
                 Text(Constants.Strings.blockItemIdPrefix + blockItem.id.uuidString)
+                    .font(.caption2)
                     .foregroundStyle(.secondary)
             }
         }
+        .padding()
+        .background(Color(.systemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
     }
+
 }
 
 #Preview {
