@@ -38,7 +38,7 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
     
     func listenToDatabaseFileChanges() {
         databaseChanges = Task.detached {
-            for await _ in NotificationCenter.default.notifications(named: .NSPersistentStoreRemoteChange) {
+            for await notification in NotificationCenter.default.notifications(named: .NSPersistentStoreRemoteChange) {
                 await self.continuation?.yield(true)
             }
         }

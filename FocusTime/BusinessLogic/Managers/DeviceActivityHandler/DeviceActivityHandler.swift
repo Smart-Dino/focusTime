@@ -71,7 +71,7 @@ nonisolated struct DeviceActivityHandler: Sendable {
             
             // If this is fallback's end - ignore it.
             // Fallback schedules run at blockingStart and finish there respectively.
-            guard activityIdentifier.blockType != .fallback else { return }
+            guard activityIdentifier.blockType == .regular else { return }
             
             // Create context from scratch because using mainContext in a
             // non-isolated to MainActor environment is not allowed.
@@ -146,7 +146,6 @@ nonisolated struct DeviceActivityHandler: Sendable {
     
     private func handleResumptionBlocking(for blockItem: BlockItem, store: BlockItemExtensionStore) async {
         // Block user's selections again.
-        let selection = blockItem.blockedContent
         do {
             try await registerDurationActivity(for: blockItem, store: store)
         } catch {
@@ -164,8 +163,6 @@ nonisolated struct DeviceActivityHandler: Sendable {
         try await shieldManager.block(specific: blockItem.blockedContent)
 
         // Build schedule based on seconds. DeviceActivitySchedule requires >= 15 minutes interval.
-        let nowComponents = Calendar.current.dateComponents([.hour, .minute, .second], from: Date.now)
-        let durationSeconds = originalDuration.rawValue
         let intervalStart = try TimeComponents(from: endDate).dateComponents
         let intervalEnd = intervalStart.adding(seconds: SharedAppValues.activityRegistrarFallbackInterval)
 
