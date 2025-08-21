@@ -1,0 +1,126 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "0m" : {
+      "comment" : "Fallback zero minutes duration\nZero minutes duration"
+    },
+    "App List Picker Screen" : {
+      "comment" : "Accessibility label or destination title for app list picker"
+    },
+    "Apps Blocked" : {
+      "comment" : "Label for the 'Apps Blocked' setting"
+    },
+    "Choose how long you want to stay focused" : {
+      "comment" : "Subtitle for the duration picker sheet"
+    },
+    "Choose Your Focus Preset" : {
+      "comment" : "Title for the focus preset selection grid"
+    },
+    "Creative" : {
+      "comment" : "Focus preset: Creative"
+    },
+    "Duration" : {
+      "comment" : "Label for the duration setting"
+    },
+    "End time" : {
+      "comment" : "Label for the end time setting"
+    },
+    "Error: DurationPickerSheetViewModel not initialized." : {
+      "comment" : "Error message for duration picker"
+    },
+    "Every Day" : {
+      "comment" : "Scheduled for every day"
+    },
+    "Focus Session" : {
+      "comment" : "Default name for a new focus session"
+    },
+    "Focus Setup" : {
+      "comment" : "Navigation title for the focus session setup screen"
+    },
+    "Friday" : {
+      "comment" : "Full name for Friday"
+    },
+    "Hours" : {
+      "comment" : "Label for hours picker in duration sheet"
+    },
+    "List" : {
+      "comment" : "Value indicating the app list is available"
+    },
+    "List name" : {
+      "comment" : "Label for the list name input field"
+    },
+    "Mindfulness" : {
+      "comment" : "Focus preset: Mindfulness"
+    },
+    "Minutes" : {
+      "comment" : "Label for minutes picker in duration sheet"
+    },
+    "Monday" : {
+      "comment" : "Full name for Monday"
+    },
+    "Morning\nRoutine" : {
+      "comment" : "Focus preset: Morning Routine"
+    },
+    "Name" : {
+      "comment" : "Placeholder text for the list name input field"
+    },
+    "Reading" : {
+      "comment" : "Focus preset: Reading"
+    },
+    "Ready-made blocklists to help you stay focused. Choose a preset to quickly block distracting apps." : {
+      "comment" : "Subtitle explaining preset blocklists"
+    },
+    "Saturday" : {
+      "comment" : "Full name for Saturday"
+    },
+    "Schedule for later" : {
+      "comment" : "Label for the 'Schedule for later' toggle"
+    },
+    "Scheduled Days" : {
+      "comment" : "Label for the 'Scheduled Days' setting"
+    },
+    "Session Length" : {
+      "comment" : "Title for the duration picker sheet"
+    },
+    "Social\nDetox" : {
+      "comment" : "Focus preset: Social Detox"
+    },
+    "Start" : {
+      "comment" : "Title for the start button"
+    },
+    "Start time" : {
+      "comment" : "Label for the start time setting"
+    },
+    "Study" : {
+      "comment" : "Focus preset: Study"
+    },
+    "Sunday" : {
+      "comment" : "Full name for Sunday"
+    },
+    "Thursday" : {
+      "comment" : "Full name for Thursday"
+    },
+    "Tuesday" : {
+      "comment" : "Full name for Tuesday"
+    },
+    "Turn on to have this blocklist activate automatically based on your scheduled days and times." : {
+      "comment" : "Informational text about scheduling a blocklist"
+    },
+    "Wednesday" : {
+      "comment" : "Full name for Wednesday"
+    },
+    "Weekdays" : {
+      "comment" : "Scheduled for weekdays"
+    },
+    "Weekends" : {
+      "comment" : "Scheduled for weekends"
+    },
+    "Work\nSprint" : {
+      "comment" : "Focus preset: Work Sprint"
+    },
+    "Zero\nDistraction" : {
+      "comment" : "Focus preset: Zero Distraction"
+    }
+  },
+  "version" : "1.0"
+}

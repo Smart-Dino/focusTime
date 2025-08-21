@@ -23,7 +23,8 @@
             "value" : "📋 Lack of structure"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "quiz_onboarding_option_mental_fatigue" : {
       "comment" : "Localized string for a quiz option.",
@@ -35,7 +36,8 @@
             "value" : "🧘 Mental fatigue"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "quiz_onboarding_option_notifications" : {
       "comment" : "Localized string for a quiz option related to notifications.",
@@ -47,7 +49,8 @@
             "value" : "📩 Notifications and messages"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "quiz_onboarding_option_social_media" : {
       "comment" : "Localized string for a quiz option related to social media use.",
@@ -59,7 +62,8 @@
             "value" : "📱 Social media"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "quiz_onboarding_option_work_distractions" : {
       "comment" : "Option in the quiz onboarding screen that corresponds to work distractions.",
@@ -71,7 +75,8 @@
             "value" : "💻 Work distractions"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "quiz_onboarding_subtitle" : {
       "comment" : "Subtitle text displayed in the onboarding screen to explain the purpose of the quiz.",
