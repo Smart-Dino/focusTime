@@ -38,6 +38,10 @@ struct FTProduct: Identifiable, Equatable, Sendable {
     let subscriptionPeriodDescription: String?
     let trialPeriodDescription: String?
     
+    var offerDescription: String {
+        self.trialPeriodDescription ?? self.priceAndPeriodString ?? self.priceString
+    }
+    
     // MARK: - Initializer
     init(
         id: String = UUID().uuidString,

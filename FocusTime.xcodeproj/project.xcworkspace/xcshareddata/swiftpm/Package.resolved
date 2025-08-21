@@ -1,0 +1,15 @@
+{
+  "originHash" : "33bbb8f6d68ae6219a91c60fa79d6dfe49cfccf7e71f75ed53e84cbe39080ee9",
+  "pins" : [
+    {
+      "identity" : "onboardingkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Smart-Dino/OnboardingKit.git",
+      "state" : {
+        "revision" : "462d84e5c171bd600c3e3397253139203836c894",
+        "version" : "1.3.0"
+      }
+    }
+  ],
+  "version" : 3
+}

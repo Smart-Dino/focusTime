@@ -20,7 +20,7 @@ final class OnboardingPaywallViewModel {
         // Dynamic strings
         static let stringConstants = OnboardingPaywallView.Constants.Strings.self
         var trialPeriodDescription = stringConstants.loadingTitle
-        var purchaseButtonTitle    = stringConstants.tryButtonTitle
+        var purchaseButtonTitle    = stringConstants.subscribeButtonTitle
         
         init(
             requestedProductID: String,
@@ -53,7 +53,7 @@ final class OnboardingPaywallViewModel {
     private func setupView() {
         Task {
             await fetchProducts()
-            selectRequestedProduct()
+            superPaywallVM.selectProductWithID(state.requestedProductID, state: state.superState)
             setupProductInfo()
         }
     }
@@ -79,10 +79,6 @@ final class OnboardingPaywallViewModel {
     func getCurrentFlowDelegate() -> PaywallNavigationDelegate? {
         flowDelegate
     }
-    
-    func selectRequestedProduct() {
-        superPaywallVM.selectProductWithID(state.requestedProductID, state: state.superState)
-    }
 
     func setupProductInfo() {
         guard let product = state.superState.selectedProduct else {
@@ -93,9 +89,12 @@ final class OnboardingPaywallViewModel {
             return
         }
         
-        if let description = product.trialPeriodDescription {
-            state.trialPeriodDescription = description
+        state.purchaseButtonTitle = if product.trialPeriod != nil {
+            State.stringConstants.tryButtonTitle
+        } else {
+            State.stringConstants.subscribeButtonTitle
         }
+        state.trialPeriodDescription = product.offerDescription
     }
     
     private func updateUIBasedOnPurchaseResult() {

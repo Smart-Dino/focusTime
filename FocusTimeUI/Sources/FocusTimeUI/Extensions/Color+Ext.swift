@@ -13,11 +13,17 @@ import SwiftUI
 public extension ShapeStyle where Self == Color {
     // MARK: - Backgrounds
     static var ftBackground: Color { Color("BackgroundColor", bundle: .module) }
-    static var ftBackgroundBlue: Color { Color("BackgroundBlueColor", bundle: .module) }
+    static var ftBackgroundBlueColor: Color { Color("BackgroundBlueColor", bundle: .module) }
+    static var ftQuizSlideOnboardingMaskColor: Color { Color("QuizOnboardingMaskColor", bundle: .module) }
+
+    //MARK: - Onboarding Colors
+    static var ftSlidesTimerStrokeColor: Color { Color("SlidesTimerStrokeColor", bundle: .module) }
+
     // MARK: - Blue
     static var ftDarkBlue: Color { Color("DarkBlueColor", bundle: .module) }
     static var ftMainBlue: Color { Color("MainBlueColor", bundle: .module) }
     static var onboardingPaywallContentPad: Color { Color("OnboardingPaywallContentPadColor", bundle: .module) }
+    static var ftOnboardingImageOverlayColor: Color { Color("OnboardingImageOverlayColor", bundle: .module) }
     // MARK: - Green
     static var ftPaywallPromoGreen: Color { Color("PaywallPromoGreenColor", bundle: .module) }
     // MARK: - UIKit Adapted
@@ -32,6 +38,15 @@ public extension ShapeStyle where Self == Color {
             uiColor: UIColor.systemGray5.resolvedColor(with: .init(userInterfaceStyle: .dark))
         )
     }
+}
+
+public extension Color {
+    static var ftGradientTopColor: Color { Color( "GradientTopColor", bundle: .module) }
+    static var ftGradientBottomColor: Color { Color( "GradientBottomColor", bundle: .module) }
+    static var ftPresetBackgroundColor: Color { Color( "PresetBackgroundColor", bundle: .module) }
+    static var ftPresetSelectedBackgroundColor: Color { Color( "PresetSelectedBackgroundColor", bundle: .module) }
+    static var ftWheelTimePickerBackgroundColor: Color { Color( "WheelTimePickerBackgroundColor", bundle: .module) }
+    static var ftTimePickerActiveColor: Color { Color( "TimePickerActiveColor", bundle: .module) }
 }
 
 // MARK: Private colors
