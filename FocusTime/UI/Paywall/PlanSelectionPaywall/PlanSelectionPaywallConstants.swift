@@ -22,7 +22,7 @@ extension PlanSelectionPaywallView {
             static let loadingTitle = SharedConstants.Strings.loadingTitle
             // Title text for the subscription trial button.
             static let startFreeTrial = String(localized: "plan_selection_paywall_start_free_trial_button", table: "PaywallLocalizable")
-            static let subscribeButtonTitle = SharedConstants.Strings.subscribeButtonTitle
+            static let subscribeButtonTitle = SharedConstants.Strings.subscribeTitle
             static let subscribedTitle = SharedConstants.Strings.subscribedTitle
             static let purchasedTitle = SharedConstants.Strings.purchasedTitle
             
