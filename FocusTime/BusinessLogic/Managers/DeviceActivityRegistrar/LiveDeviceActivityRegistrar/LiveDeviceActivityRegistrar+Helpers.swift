@@ -39,7 +39,7 @@ extension LiveDeviceActivityRegistrar {
         let endDate = startTime.addingTimeInterval(TimeInterval(max(0, actualTimeBeforeEnd)))
 
         var copy = blockItem
-        copy.type = .duration(originalDuration, suspendedAt: nil, suspendedUntil: nil, endDate: endDate)
+        copy.type = .duration(duration: originalDuration, suspendedAt: nil, suspendedUntil: nil, endDate: endDate)
         try await blockItemPersistenceManager.editBlockItem(blockItem: copy)
     }
 
@@ -126,7 +126,7 @@ extension LiveDeviceActivityRegistrar {
             emoji: "⏳",
             name: "temp-" + UUID().uuidString,
             days: item.days,
-            type: .duration(.init(duration: timeLeft)),
+            type: .duration(duration: .init(seconds: timeLeft)),
             isTemporary: true,
             blockedContent: item.blockedContent
         )

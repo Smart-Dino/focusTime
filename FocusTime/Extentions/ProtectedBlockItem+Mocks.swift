@@ -13,7 +13,7 @@ extension ProtectedBlockItem {
         emoji: "🧪",
         name: "Test",
         days: Weekday.weekdays,
-        type: .duration(.init(duration: 120)),
+        type: .duration(duration: .init(seconds: 120)),
         blockedContent: ProtectedActivitySelection(FamilyActivitySelection())
     )
 }

@@ -16,7 +16,7 @@ enum ScheduleType: Codable, Hashable {
         suspendedUntil: Date? = nil
     )
     case duration(
-        _ duration: DurationComponents,
+        duration: DurationComponents,
         // Suspension helper properties.
         suspendedAt: Date? = nil,
         suspendedUntil: Date? = nil,

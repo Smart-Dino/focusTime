@@ -47,7 +47,7 @@ nonisolated final class BlockItemExtensionStore {
             )
         case .duration(let duration, let suspendedAt, let suspendedUntil, let endDate):
             blockItem.type = .duration(
-                duration,
+                duration: duration,
                 suspendedAt: suspendedAt,
                 suspendedUntil: suspendedUntil,
                 endDate: isActive ? endDate : nil // Set or clear endDate based on activity.
@@ -68,7 +68,7 @@ nonisolated final class BlockItemExtensionStore {
             )
         case .duration(let duration, _, _, _):
             blockItem.type = .duration(
-                duration,
+                duration: duration,
                 suspendedAt: suspensionDate,
                 suspendedUntil: resumeDate,
                 endDate: newEndDate // The end date is extended by the suspension duration.
@@ -90,7 +90,7 @@ nonisolated final class BlockItemExtensionStore {
         case .duration(let duration, _, _, let endDate):
             // When resuming, clear suspension dates and keep the existing endDate.
             blockItem.type = .duration(
-                duration,
+                duration: duration,
                 suspendedAt: nil,
                 suspendedUntil: nil,
                 endDate: endDate

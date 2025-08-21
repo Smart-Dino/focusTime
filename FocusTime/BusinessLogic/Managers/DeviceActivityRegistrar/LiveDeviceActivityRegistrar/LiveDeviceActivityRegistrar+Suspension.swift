@@ -48,7 +48,7 @@ extension LiveDeviceActivityRegistrar {
                 throw DeviceActivityRegistrarError.couldNotExtractDatePoints
             }
             updatedBlockItem.type = .duration(
-                duration,
+                duration: duration,
                 suspendedAt: suspensionDate,
                 suspendedUntil: suspendedUntil,
                 endDate: endDate.addingTimeInterval(TimeInterval(seconds))
@@ -74,7 +74,7 @@ extension LiveDeviceActivityRegistrar {
         case .scheduled(let start, let end, let isActive, _, _):
             updatedBlockItem.type = .scheduled(startTime: start, endTime: end, isActive: isActive, isPaused: false)
         case .duration(let duration, _, _, let endDate):
-            updatedBlockItem.type = .duration(duration, suspendedAt: nil, suspendedUntil: nil, endDate: endDate)
+            updatedBlockItem.type = .duration(duration: duration, suspendedAt: nil, suspendedUntil: nil, endDate: endDate)
         }
 
         try await blockItemPersistenceManager.editBlockItem(blockItem: updatedBlockItem)

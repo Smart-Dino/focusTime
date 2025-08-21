@@ -71,7 +71,7 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
             }
 
             // Store suspension moment and keep endDate unchanged.
-            stored.type = .duration(duration, suspendedAt: suspensionDate, suspendedUntil: nil, endDate: endDate)
+            stored.type = .duration(duration: duration, suspendedAt: suspensionDate, suspendedUntil: nil, endDate: endDate)
             try await blockItemPersistenceManager.editBlockItem(blockItem: stored)
 
             try await shieldManager.unblock()
@@ -101,7 +101,7 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
             let adjustedEndDate = Self.adjustedEndDate(endDate: endDate, suspendedAt: suspendedAt, resumedAt: resumptionDate)
             let remainingSeconds = max(0, Int(adjustedEndDate.timeIntervalSince(resumptionDate)))
 
-            stored.type = .duration(duration, suspendedAt: nil, suspendedUntil: nil, endDate: adjustedEndDate)
+            stored.type = .duration(duration: duration, suspendedAt: nil, suspendedUntil: nil, endDate: adjustedEndDate)
             try await blockItemPersistenceManager.editBlockItem(blockItem: stored)
 
             // Re-register device activity for the remaining duration.
