@@ -99,6 +99,11 @@ nonisolated final class BlockItemExtensionStore {
         saveContext()
     }
     
+    func setItemIsCancelled(_ isCancelled: Bool, for blockItem: BlockItem) {
+        blockItem.isCancelled = isCancelled
+        saveContext()
+    }
+    
     func delete(model blockItem: BlockItem) {
         context.delete(blockItem)
         saveContext()

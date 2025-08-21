@@ -7,6 +7,7 @@
 
 import SwiftUI
 import FocusTimeUI
+
 @MainActor
 @Observable
 final class TaskConcentrationViewModel {
@@ -111,7 +112,16 @@ final class TaskConcentrationViewModel {
     
     func moveToEndSessionAlertScene() {
         moveTo(.almostDone)
-#warning("Notify DeviceActivityRegistrar of stopping and unregistering the session")
+    }
+    
+    func endBlock() async throws {
+        do {
+            try await deviceActivityRegistrar.cancelIfRunning(state.item)
+            timer.cancel()
+        } catch {
+            state.error = error
+            throw error // Rethrow so the view does not dismiss.
+        }
     }
     
     // MARK: - Private Methods

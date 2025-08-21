@@ -18,6 +18,7 @@ protocol DeviceActivityRegistrar: Actor {
     func cancelScheduledResume(for blockItem: ProtectedBlockItem) async throws
     
     func isActivityRegistered(for blockItem: ProtectedBlockItem) async throws -> Bool
+    func cancelIfRunning(_ blockItem: ProtectedBlockItem) async throws
     
     func unregisterAll() async
 }

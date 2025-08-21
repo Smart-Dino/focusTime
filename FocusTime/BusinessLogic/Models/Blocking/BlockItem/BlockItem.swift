@@ -18,7 +18,9 @@ final class BlockItem {
     // Schedule.
     var days: Set<Weekday>
     var type: ScheduleType
+    
     var isTemporary: Bool // Signals whether this item will have to be removed after use.
+    var isCancelled: Bool
     // Blocked apps.
     var blockedContent: ProtectedActivitySelection
     
@@ -47,6 +49,7 @@ final class BlockItem {
         days: Set<Weekday>,
         type: ScheduleType,
         isTemporary: Bool = false,
+        isCancelled: Bool = false,
         blockedContent: ProtectedActivitySelection
     ) {
         self.id = id
@@ -55,6 +58,7 @@ final class BlockItem {
         self.days = days
         self.type = type
         self.isTemporary = isTemporary
+        self.isCancelled = isCancelled
         self.blockedContent = blockedContent
     }
     
@@ -66,6 +70,7 @@ final class BlockItem {
             days: item.days,
             type: item.type,
             isTemporary: item.isTemporary,
+            isCancelled: item.isCancelled,
             blockedContent: item.blockedContent
         )
     }

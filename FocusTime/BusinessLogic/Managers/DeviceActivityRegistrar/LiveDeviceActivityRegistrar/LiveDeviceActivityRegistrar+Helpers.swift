@@ -14,10 +14,14 @@ extension LiveDeviceActivityRegistrar {
     func registerDurationActivity(
         for blockItem: ProtectedBlockItem,
         forcedDuration: Int? = nil,
-        isResumption: Bool = false
+        skipOverlapValidation: Bool = false
     ) async throws {
         guard blockItem.persistentModelID != nil else { throw DeviceActivityRegistrarError.noPersistentItem }
         guard case let .duration(originalDuration, _, _, _) = blockItem.type else { return }
+        
+        if !skipOverlapValidation {
+            try await validateNoOverlapForDurationBlocking(proposedDuration: forcedDuration ?? originalDuration.rawValue)
+        }
 
         // Start blocking immediately.
         try await shieldManager.block(specific: blockItem.blockedContent)
@@ -81,6 +85,42 @@ extension LiveDeviceActivityRegistrar {
         }
         throw DeviceActivityRegistrarError.activityNotFound
     }
+    
+    func validateNoOverlapForDurationBlocking(proposedDuration: Int) async throws {
+        let now = await clock.now
+
+        // Fetch the next block. If none exists, there is no possibility of an overlap.
+        guard let nextBlock = try await blockItemPersistenceManager.fetchClosestOrRunningCurrentScheduled(now: now) else {
+            return
+        }
+
+        // Ignore the cancelled block.
+        guard !nextBlock.isCancelled else {
+            return
+        }
+
+        // Determine if an overlap condition is met.
+        let isOverlapping: Bool
+
+        if nextBlock.type.secondsToIntervalEndIfShouldBeRunning(now: now) != nil {
+            // If the block is already running - it will definitely overlap.
+            isOverlapping = true
+        } else if case .scheduled(let startTime, _, _, _, _) = nextBlock.type {
+            // Check if the proposed duration extends beyond the start time of the next scheduled block.
+            let startOfToday = Calendar.current.startOfDay(for: now)
+            let scheduledBlockStartTime = startOfToday.addingTimeInterval(TimeInterval(startTime.localizedSecondsSinceMidnight))
+            let proposedEndTime = now.addingTimeInterval(TimeInterval(proposedDuration))
+            
+            isOverlapping = proposedEndTime > scheduledBlockStartTime
+        } else {
+            isOverlapping = false
+        }
+
+        // If any overlap condition was met - throw error.
+        if isOverlapping {
+            throw DeviceActivityRegistrarError.scheduleOverlap(with: [nextBlock])
+        }
+    }
 
     func overlapsWithAlreadyRegisteredSchedules(
         _ newSchedule: DeviceActivitySchedule,
@@ -119,7 +159,7 @@ extension LiveDeviceActivityRegistrar {
         guard case .scheduled = item.type else { return }
 
         let timeLeftInSeconds = item.type.secondsToIntervalEndIfShouldBeRunning(now: await clock.now)
-        guard let timeLeft = timeLeftInSeconds else { return }
+        guard let timeLeft = timeLeftInSeconds, !item.isCancelled else { return }
 
         // Create temporary duration block and schedule it immediately.
         var temp = ProtectedBlockItem(

@@ -18,8 +18,6 @@ struct TaskConcentrationView: View {
             Group {
                 switch viewModel.state.phase {
                 case .focus(let title, let subtitle, let timerTitle, let runningTitle, let runningIcon):
-                    let isPaused = viewModel.state.timerIsPaused
-                    
                     StandardPhaseView(
                         title: title,
                         subtitle: subtitle,
@@ -106,7 +104,10 @@ struct TaskConcentrationView: View {
                                 viewModel.moveToPauseSessionScene()
                             }
                         }, endSessionAction: {
-                            viewModel.moveToEndSessionAlertScene()
+                            Task {
+                                try await viewModel.endBlock()
+                                dismiss.callAsFunction()
+                            }
                         }
                     )
                     
@@ -115,7 +116,7 @@ struct TaskConcentrationView: View {
                         title: title,
                         subtitle: subtitle,
                         onFinished: {
-                            dismiss()
+                            dismiss.callAsFunction()
                         }
                     )
                 }

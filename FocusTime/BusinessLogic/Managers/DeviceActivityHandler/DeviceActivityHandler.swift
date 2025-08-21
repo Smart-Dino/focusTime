@@ -37,6 +37,11 @@ nonisolated struct DeviceActivityHandler: Sendable {
         
         guard let blockItem = store.fetchBlockItem(id: activityIdentifier.blockItemID) else { return }
         
+        if blockItem.isCancelled {
+            store.setItemIsCancelled(false, for: blockItem)
+            return
+        }
+        
         switch activityIdentifier.blockType {
         case .regular:
             await handleInitialBlocking(for: blockItem, with: activity, in: store)
@@ -52,6 +57,11 @@ nonisolated struct DeviceActivityHandler: Sendable {
         
         let store = BlockItemExtensionStore(logger: logger, context: ModelContext(container))
         guard let blockItem = store.fetchBlockItem(id: activityIdentifier.blockItemID) else { return }
+        
+        if blockItem.isCancelled {
+            store.setItemIsCancelled(false, for: blockItem)
+            return
+        }
         
         await unblockAndDeactivateSession(for: blockItem, in: store)
     }

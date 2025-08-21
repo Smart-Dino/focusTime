@@ -38,7 +38,7 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
     
     func listenToDatabaseFileChanges() {
         databaseChanges = Task.detached {
-            for await notification in NotificationCenter.default.notifications(named: .NSPersistentStoreRemoteChange) {
+            for await _ in NotificationCenter.default.notifications(named: .NSPersistentStoreRemoteChange) {
                 await self.continuation?.yield(true)
             }
         }
@@ -118,14 +118,14 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
             return running
         }
 
-        // 3. Mark scheduled & filter only scheduled ones.
+        // Mark scheduled & filter only scheduled ones.
         let scheduledBlocks = await markScheduled(blocks).filter(\.isScheduled)
 
         guard !scheduledBlocks.isEmpty else {
             return nil
         }
 
-        // 4. Sort by start time.
+        // Sort by start time.
         let sortedByStartTime = scheduledBlocks.sorted {
             guard case .scheduled(let firstStart, _, _, _, _) = $0.type,
                   case .scheduled(let secondStart, _, _, _, _) = $1.type else {
@@ -134,7 +134,7 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
             return firstStart < secondStart
         }
 
-        // 5. Find the closest future schedule.
+        // Find the closest future schedule.
         let currentTimeComponent = try TimeComponents(from: now)
         if let upcoming = sortedByStartTime.first(where: {
             guard case .scheduled(let start, _, _, _, _) = $0.type else { return false }
@@ -143,8 +143,8 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
             return upcoming
         }
 
-        // 6. If no future found, wrap to earliest (next day)
-        return sortedByStartTime.first!
+        // If no future found, wrap to earliest (next day).
+        return sortedByStartTime.first(where: { !$0.isCancelled })
     }
 
     

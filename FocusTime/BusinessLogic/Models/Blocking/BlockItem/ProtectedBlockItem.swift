@@ -18,7 +18,10 @@ struct ProtectedBlockItem: ProtectedModel {
     var name: String
     var days: Set<Weekday>
     var type: ScheduleType
+    
     var isTemporary: Bool
+    var isCancelled: Bool
+    
     var isScheduled: Bool
     var blockedContent: ProtectedActivitySelection
     
@@ -48,6 +51,7 @@ struct ProtectedBlockItem: ProtectedModel {
         days: Set<Weekday>,
         type: ScheduleType,
         isTemporary: Bool = false,
+        isCancelled: Bool = false,
         isScheduled: Bool = false,
         blockedContent: ProtectedActivitySelection
     ) {
@@ -58,6 +62,7 @@ struct ProtectedBlockItem: ProtectedModel {
         self.days = days
         self.type = type
         self.isTemporary = isTemporary
+        self.isCancelled = isCancelled
         self.isScheduled = isScheduled
         self.blockedContent = blockedContent
     }
@@ -71,6 +76,7 @@ struct ProtectedBlockItem: ProtectedModel {
             days: item.days,
             type: item.type,
             isTemporary: item.isTemporary,
+            isCancelled: item.isCancelled,
             blockedContent: item.blockedContent
         )
     }

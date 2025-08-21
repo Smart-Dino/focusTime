@@ -105,13 +105,47 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
             try await blockItemPersistenceManager.editBlockItem(blockItem: stored)
 
             // Re-register device activity for the remaining duration.
-            try await registerDurationActivity(for: stored, forcedDuration: remainingSeconds)
+            try await registerDurationActivity(for: stored, forcedDuration: remainingSeconds, skipOverlapValidation: true)
         }
     }
-
+    
     func isActivityRegistered(for blockItem: ProtectedBlockItem) async throws -> Bool {
         guard blockItem.persistentModelID != nil else { throw DeviceActivityRegistrarError.activityNotFound }
         return (try? await getActivityForSchedule(blockItem)) != nil
+    }
+    
+    func cancelIfRunning(_ blockItem: ProtectedBlockItem) async throws {
+        let now = await clock.now
+        
+        guard blockItem.type.secondsToIntervalEndIfShouldBeRunning(now: now) != nil else {
+            return
+        }
+
+        try await shieldManager.unblock()
+
+        var mutableBlockItem = blockItem
+        
+        mutableBlockItem.isCancelled = true
+        switch mutableBlockItem.type {
+        case .scheduled(let startTime, let endTime, _, let isPaused, let suspendedUntil):
+            // Only update isActive, keep pause state intact.
+            mutableBlockItem.type = .scheduled(
+                startTime: startTime,
+                endTime: endTime,
+                isActive: false,
+                isPaused: isPaused,
+                suspendedUntil: suspendedUntil
+            )
+        case .duration(let duration, let suspendedAt, let suspendedUntil, let endDate):
+            mutableBlockItem.type = .duration(
+                duration: duration,
+                suspendedAt: suspendedAt,
+                suspendedUntil: suspendedUntil,
+                endDate: nil // Set or clear endDate based on activity.
+            )
+        }
+        
+        try await blockItemPersistenceManager.editBlockItem(blockItem: mutableBlockItem)
     }
 
     func unregisterAll() async {
