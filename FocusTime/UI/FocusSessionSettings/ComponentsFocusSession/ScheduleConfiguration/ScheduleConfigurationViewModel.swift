@@ -87,6 +87,7 @@ final class ScheduleConfigurationViewModel {
     
     // MARK: - Properties
     private(set) var state: State
+    var analyticsManager: AnalyticsManagerProtocol = LiveAnalyticsManager()
     
     // MARK: - Initializers
     init(state: State = State()) {
@@ -171,28 +172,38 @@ final class ScheduleConfigurationViewModel {
         state.scheduleConfiguration.selectedPreset = selectedPreset ?? FocusPreset.allCases.randomElement()
         state.scheduleConfiguration.listName = selectedPreset?.name ?? FocusSessionView.Constants.DefaultValues.listName
         state.scheduleConfiguration.customPresetEmoji = String()
+        
+        if let preset = selectedPreset {
+            analyticsManager.logEvent(name: AnalyticsEvent.presetSelected.rawValue, parameters: [
+                AnalyticsParameterKey.presetName: preset.name
+            ])
+        }
     }
-
+    
     // MARK: - Intents (Sheet Presentation)
-
+    
     /// Presents the duration picker sheet by setting the active sheet state.
     func presentDurationPicker() {
         state.activeSheet = .durationPicker
+        analyticsManager.logEvent(name: AnalyticsEvent.durationPickerPresented.rawValue, parameters: nil)
     }
 
     /// Presents the start time picker sheet by setting the active sheet state.
     func presentStartTimePicker() {
         state.activeSheet = .startTimePicker
+        analyticsManager.logEvent(name: AnalyticsEvent.timePickerPresented.rawValue, parameters: ["type": "start_time"])
     }
 
     /// Presents the end time picker sheet by setting the active sheet state.
     func presentEndTimePicker() {
         state.activeSheet = .endTimePicker
+        analyticsManager.logEvent(name: AnalyticsEvent.timePickerPresented.rawValue, parameters: ["type": "end_time"])
     }
 
     /// Presents the app blocker sheet by setting the active sheet state accordingly.
     func presentAppBlockerSheet() {
         state.activeSheet = .appBlockerSheet
+        analyticsManager.logEvent(name: AnalyticsEvent.appBlockerSheetPresented.rawValue, parameters: nil)
     }
 
     /// Dismisses any currently presented sheet by setting the active sheet to nil.

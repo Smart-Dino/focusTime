@@ -29,28 +29,44 @@ final class FocusSessionViewModel {
      
     // MARK: - Properties
     private(set) var state: State
+    private let analyticsManager: AnalyticsManagerProtocol
 
     // MARK: - Initializer
-    init(state: State = State(scheduleConfigurationViewModel: ScheduleConfigurationViewModel())) {
+    init(
+        state: State = State(scheduleConfigurationViewModel: ScheduleConfigurationViewModel()),
+        analyticsManager: AnalyticsManagerProtocol = LiveAnalyticsManager()
+    ) {
         self.state = state
+        self.analyticsManager = analyticsManager
+        self.state.scheduleConfigViewModel.analyticsManager = analyticsManager
     }
      
      // MARK: - Intents for global actions or actions not covered by ScheduleConfigurationViewModel
      func startTapped() {
          print("Start button tapped!")
-         print("Current List Name: \(state.scheduleConfigViewModel.state.scheduleConfiguration.listName)")
-         print("Schedule for Later is: \(state.scheduleConfigViewModel.state.scheduleConfiguration.scheduleForLater)")
-         if let selectedPreset = state.scheduleConfigViewModel.state.scheduleConfiguration.selectedPreset {
+
+         let config = state.scheduleConfigViewModel.state.scheduleConfiguration
+         let parameters: [String: Any] = [
+             AnalyticsParameterKey.presetName: config.selectedPreset?.name ?? "Custom",
+             AnalyticsParameterKey.durationHours: config.selectedHours,
+             AnalyticsParameterKey.durationMinutes: config.selectedMinutes,
+             AnalyticsParameterKey.isScheduled: config.scheduleForLater
+         ]
+         analyticsManager.logEvent(name: AnalyticsEvent.startButtonTapped.rawValue, parameters: parameters)
+
+         print("Current List Name: \(config.listName)")
+         print("Schedule for Later is: \(config.scheduleForLater)")
+         if let selectedPreset = config.selectedPreset {
              print("Selected Preset: \(selectedPreset.name)")
          } else {
              print("No preset selected.")
          }
-         print("Scheduled Days: \(state.scheduleConfigViewModel.state.scheduleConfiguration.scheduledDays)")
-         print("Start Time: \(state.scheduleConfigViewModel.state.scheduleConfiguration.startTime)")
-         print("End Time: \(state.scheduleConfigViewModel.state.scheduleConfiguration.endTime)")
-         print("Selected Hours: \(state.scheduleConfigViewModel.state.scheduleConfiguration.selectedHours)")
-         print("Selected Minutes: \(state.scheduleConfigViewModel.state.scheduleConfiguration.selectedMinutes)")
-         print("Custom Preset Emoji: \(state.scheduleConfigViewModel.state.scheduleConfiguration.customPresetEmoji)")
+         print("Scheduled Days: \(config.scheduledDays)")
+         print("Start Time: \(config.startTime)")
+         print("End Time: \(config.endTime)")
+         print("Selected Hours: \(config.selectedHours)")
+         print("Selected Minutes: \(config.selectedMinutes)")
+         print("Custom Preset Emoji: \(config.customPresetEmoji)")
      }
      
      func setSelectedPreset(selectedPreset: FocusPreset?) {

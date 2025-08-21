@@ -77,7 +77,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		0CE17D132E57506500A70B49 /* AnalyticsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsManager.swift; sourceTree = "<group>"; };
 		674FA6A02DB05ACE0002FDC1 /* FocusTime.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FocusTime.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C68617A82E2976BD00E49BF7 /* FocusTimeShieldConfiguration.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FocusTimeShieldConfiguration.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		C68617A92E2976BD00E49BF7 /* ManagedSettings.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ManagedSettings.framework; path = System/Library/Frameworks/ManagedSettings.framework; sourceTree = SDKROOT; };
@@ -228,14 +227,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		0CE17B7B2E57484200A70B49 /* FocusTimeAnalytics */ = {
-			isa = PBXGroup;
-			children = (
-				0CE17D132E57506500A70B49 /* AnalyticsManager.swift */,
-			);
-			path = FocusTimeAnalytics;
-			sourceTree = "<group>";
-		};
 		6742416F2E27EED600500101 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -246,7 +237,6 @@
 		674FA6972DB05ACE0002FDC1 = {
 			isa = PBXGroup;
 			children = (
-				0CE17B7B2E57484200A70B49 /* FocusTimeAnalytics */,
 				E962077F2DD4D1E5002F037F /* FocusTimeUI */,
 				674FA6A22DB05ACE0002FDC1 /* FocusTime */,
 				C6FE59E72E156D8B003A2199 /* FocusTimeTests */,
