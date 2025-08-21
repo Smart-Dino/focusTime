@@ -35,6 +35,7 @@ extension FreePlanUpgradeView {
                 let formatString = String(localized: "free_plan_upgrade_try_for_price", table: "PaywallLocalizable")
                 return String(format: formatString, localPrice)
             }()
+            static let subscribeButtonTitle = SharedConstants.Strings.subscribeButtonTitle
             
             static let pendingTitle = SharedConstants.Strings.pendingTitle
             static let subscribedTitle = SharedConstants.Strings.subscribedTitle
