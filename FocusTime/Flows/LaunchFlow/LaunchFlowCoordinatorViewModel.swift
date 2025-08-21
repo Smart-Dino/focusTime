@@ -48,12 +48,13 @@ final class LaunchFlowCoordinatorViewModel {
     
     // MARK: - Init
     init(
+        state: State = State(currentFlow: .splash(viewModel: SplashScreenViewModel())),
         defaultsManager: DefaultsManager = LiveDefaultsManager(),
         paymentManagerFactory: PaymentManagerFactory = LivePaymentManagerFactory()
     ) {
+        self.state = state
         self.defaultsManager = defaultsManager
         self.paymentManagerFactory = paymentManagerFactory
-        self.state = State(currentFlow: .splash(viewModel: SplashScreenViewModel()))
         
         Task { await startLaunchSequence() }
     }
