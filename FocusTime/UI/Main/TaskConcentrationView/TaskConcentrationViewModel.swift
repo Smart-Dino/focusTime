@@ -27,8 +27,6 @@ final class TaskConcentrationViewModel {
     ) {
         self.state = state
         self.timer = timer
-        
-        self.timer.delegate = self
     }
     
     func updateUIBasedOnTimerState() {
@@ -67,15 +65,4 @@ final class TaskConcentrationViewModel {
         #warning("Notify DeviceActivityRegistrar of stopping and unregistering the session")
     }
     
-}
-
-extension TaskConcentrationViewModel: FTTimerDelegate {
-    func didFinishCountdown() {
-        #warning("Move to next page")
-    }
-    
-    func didUpdateIsPaused(_ timerIsPaused: Bool) {
-        state.timerIsPaused = timerIsPaused
-        updateUIBasedOnTimerState()
-    }
 }

@@ -28,17 +28,10 @@ public struct FTTimerPayload {
 }
 
 @MainActor
-public protocol FTTimerDelegate: AnyObject {
-    func didUpdateIsPaused(_: Bool)
-    func didFinishCountdown()
-}
-
-@MainActor
 public protocol FTTimer: AnyObject, Observable {
     var payload: FTTimerPayload { get }
     var isPaused: Bool { get }
     var isRunning: Bool { get }
-    var delegate: FTTimerDelegate? { get set }
     
     func setHours(_ hours: Int)
     func setMinutes(_ minutes: Int)

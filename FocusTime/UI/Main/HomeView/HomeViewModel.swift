@@ -46,6 +46,7 @@ final class HomeViewModel {
     weak var delegate: HomeViewDelegate?
     
     private var fetchTask: Task<Void, Never>?
+    private var pauseResumeTask: Task<Void, Never>?
     private var dbChangesNotificationTask: Task<Void, Never>?
     
     init(
@@ -68,10 +69,6 @@ final class HomeViewModel {
         }
     }
     
-    func injectDelegateToTimer() {
-        timer.delegate = self
-    }
-    
     func subscribeToDB() {
         dbChangesNotificationTask = Task {
             for await _ in await blockItemPersistenceManager.contextChangesStream() {
@@ -82,16 +79,39 @@ final class HomeViewModel {
     }
     
     func setTimerIsPaused(_ pause: Bool) {
-        if pause {
-            timer.pause()
-        } else {
-            if let upcomingOrRunningItem = state.upcomingOrRunningItem {
-                // Since duration blocking updates it's deadline after resumption we need to recreate the timer.
-                timer.startTimer(for: upcomingOrRunningItem)
-                timer.resume()
+        // Cancel any previously running pause/resume task
+        pauseResumeTask?.cancel()
+        
+        pauseResumeTask = Task { [weak self] in
+            guard let item = self?.state.upcomingOrRunningItem else { return }
+            
+            do {
+                if pause {
+                    try await self?.pause(item)
+                } else {
+                    try await self?.resume(item)
+                }
+            } catch is CancellationError {
+                // Task was cancelled, safe to ignore.
+            } catch {
+                self?.state.error = error
             }
         }
     }
+
+    private func pause(_ item: ProtectedBlockItem) async throws {
+        timer.pause()
+        try Task.checkCancellation()
+        try await deviceActivityRegistrar.suspendActivity(for: item)
+    }
+
+    private func resume(_ item: ProtectedBlockItem) async throws {
+        try await deviceActivityRegistrar.resumeActivity(for: item)
+        try Task.checkCancellation()
+        timer.startTimer(for: item)
+        timer.resume()
+    }
+
     
     func startTimer(for blockItem: ProtectedBlockItem) {
         timer.startTimer(for: blockItem)
@@ -121,25 +141,5 @@ final class HomeViewModel {
     
     private func makeScheduledFocusViewModel() -> ScheduledBlockItemsViewModel {
         ScheduledBlockItemsViewModel(blockItemPersistenceManager: blockItemPersistenceManager)
-    }
-}
-
-extension HomeViewModel: FTTimerDelegate {
-    func didUpdateIsPaused(_ pause: Bool) {
-        guard let item = state.upcomingOrRunningItem else { return }
-
-        Task {
-            do {
-                pause
-                ? try await deviceActivityRegistrar.suspendActivity(for: item)
-                : try await deviceActivityRegistrar.resumeActivity(for: item)
-            } catch {
-                state.error = error
-            }
-        }
-    }
-    
-    func didFinishCountdown() {
-        timer.cancel()
     }
 }
