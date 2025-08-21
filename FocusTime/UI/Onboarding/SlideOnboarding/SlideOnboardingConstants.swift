@@ -65,7 +65,7 @@ extension SlideOnboardingView {
         }
         
         enum Images {
-            static let onboardingBackgroundImageName = "OnboardingSlideQuizBackground"
+            static let onboardingBackgroundImageName = "OnboardingImages/OnboardingBackground"
         }
     }
 }

@@ -35,8 +35,8 @@ struct AppFlowCoordinatorView: View {
                     FreePlanUpgradeView(viewModel: freePlanPaywallViewModel)
                 case .onboardingPaywall(let onboardingPaywallViewModel):
                     OnboardingPaywallView(viewModel: onboardingPaywallViewModel)
-                case .planSelectionPaywall(let planSelecitonPaywallViewModel):
-                    PlanSelectionPaywallView(viewModel: planSelecitonPaywallViewModel)
+                case .planSelectionPaywall(let planSelectionPaywallViewModel):
+                    PlanSelectionPaywallView(viewModel: planSelectionPaywallViewModel)
                 }
             }
         }

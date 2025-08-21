@@ -8,21 +8,23 @@
 import SwiftUI
 import SwiftData
 
-struct LaunchFlowView: View {
+struct LaunchFlowCoordinatorView: View {
     @State private var viewModel: LaunchFlowCoordinatorViewModel = LaunchFlowCoordinatorViewModel()
     
     var body: some View {
         Group {
-            if let appFlowCoordinatorViewModel = viewModel.state.appFlowCoordinatorViewModel {
+            switch viewModel.state.currentFlow {
+            case .appFlow(let appFlowViewModel):
                 AppFlowCoordinatorView(
-                    viewModel: appFlowCoordinatorViewModel
+                    viewModel: appFlowViewModel
                 )
-            } else {
-                #warning("Implement splash screen")
-                ProgressView()
-                Text("Hang on...")
+            case .splash(let splashScreenViewModel):
+                SplashScreenView(
+                    viewModel: splashScreenViewModel
+                )
             }
         }
+        .transition(.opacity)
         .alert(
             SharedConstants.Strings.errorHeader,
             isPresented: Binding(get: {
@@ -39,5 +41,5 @@ struct LaunchFlowView: View {
 }
 
 #Preview {
-    LaunchFlowView()
+    LaunchFlowCoordinatorView()
 }

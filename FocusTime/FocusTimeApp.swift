@@ -11,8 +11,8 @@ import SwiftUI
 struct FocusTimeApp: App {
     var body: some Scene {
         WindowGroup {
-            LaunchFlowView()
-                .preferredColorScheme(.dark)
+            LaunchFlowCoordinatorView()
+                .preferredColorScheme(.dark) // Inject dark color scheme throughout the app.
         }
     }
 }

@@ -75,7 +75,6 @@ struct MainFlowCoordinatorView: View {
                 }
             }
         }
-        .preferredColorScheme(.dark)
         .dynamicTypeSize(...DynamicTypeSize.accessibility2)
     }
 }

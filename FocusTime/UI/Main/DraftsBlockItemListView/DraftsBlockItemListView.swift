@@ -59,7 +59,6 @@ struct DraftsBlockItemListView: View {
                     .ignoresSafeArea(edges: .bottom)
             }
         }
-        .preferredColorScheme(.dark)
         .dynamicTypeSize(...DynamicTypeSize.accessibility2)
         .alert(
             SharedConstants.Strings.errorHeader,

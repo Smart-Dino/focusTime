@@ -105,7 +105,6 @@ struct HomeView: View {
                     .ignoresSafeArea(edges: .bottom)
             }
         }
-        .preferredColorScheme(.dark)
         .dynamicTypeSize(...DynamicTypeSize.accessibility2)
     }
 }

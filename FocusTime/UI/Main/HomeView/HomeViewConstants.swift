@@ -33,7 +33,7 @@ extension HomeView {
 
         // MARK: - Icons
         enum Icons {
-            static let waveImage = ImageResource.MainImages.homeViewWave
+            static let waveImage = ImageResource.SharedImages.wave
             static let chevronRight = "chevron.right"
             static let hourglass = "hourglass"
         }

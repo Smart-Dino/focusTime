@@ -43,10 +43,10 @@ final class OnboardingFlowCoordinatorViewModel {
     }
     
     private(set) var state: State!
-    weak var delegate: OnboardingFlowNavigationDelegate?
+    weak var appFlowDelegate: OnboardingFlowNavigationDelegate?
     
-    init(delegate: OnboardingFlowNavigationDelegate?) {
-        self.delegate = delegate
+    init(appFlowDelegate: OnboardingFlowNavigationDelegate?) {
+        self.appFlowDelegate = appFlowDelegate
         self.state = State(
             currentFlow: .quiz(
                 viewModel: makeQuizOnboardingViewModel()
@@ -81,6 +81,6 @@ extension OnboardingFlowCoordinatorViewModel: QuizOnboardingDelegate {
 extension OnboardingFlowCoordinatorViewModel: SlideOnboardingDelegate {
     func didFinishOnboardingSlides(skipped: Bool?) {
         #warning("Log results?")
-        delegate?.didFinishOnboarding()
+        appFlowDelegate?.didFinishOnboarding()
     }
 }

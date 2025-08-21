@@ -16,83 +16,74 @@ struct PlanSelectionPaywallView: View {
     // MARK: - Body
     var body: some View {
         // Won't add zero to constants since it will never change
-        ZStack(alignment: .leading) {
-            let selectedImageIndex = Binding {
-                viewModel.state.selectedImageIndex
+        VStack(alignment: .leading, spacing: .zero) {
+            let selectedViewIndex = Binding {
+                viewModel.state.selectedViewIndex
             } set: { index in
-                viewModel.updateSelectedImageIndex(index: index)
+                viewModel.updateSelectedViewIndex(index: index)
             }
             
             VStack {
                 ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: .zero) {
-                        // Could use Array(zip(items.indices, items)
-                        // but that is harder to understand...
-                        ForEach(viewModel.state.backgroundImages.indices, id: \.self) { index in
-                            let imageResource = viewModel.state.backgroundImages[index]
-                            Image(imageResource)
-                                .resizable()
-                                .scaledToFit()
-                                .containerRelativeFrame(.horizontal)
+                    LazyHStack(spacing: .zero) {
+                        Group {
+                            PlanSelectionFirstPromoView().id(0)
+                            PlanSelectionSecondPromoView().id(1)
                         }
+                        .containerRelativeFrame(.horizontal)
                     }
                     .scrollTargetLayout()
                 }
                 .scrollTargetBehavior(.paging)
-                .scrollPosition(id: selectedImageIndex)
-                
-                // The images are behind the bottom VStack
-                // and pushed to the top of the view
-                Spacer()
+                .scrollPosition(id: selectedViewIndex)
             }
-            VStack(alignment: .center) {
-                // The content card is above the images
-                // and pushed to the bottom
-                Spacer()
+            .overlay {
+                VStack {
+                    Spacer()
+                    FTPageControlView(
+                        [0, 1],
+                        selectedItem: selectedViewIndex
+                    )
+                    // Should tell the design team to make it brighter?
+                    .foregroundTint(.ftMainBlue)
+                }
+            }
+            
+            VStack(spacing: .zero) {
+                if viewModel.state.superState.allProducts.isEmpty {
+                    Spacer()
+                    ProgressView()
+                    Spacer()
+                } else {
+                    features
+                }
                 
-                FTPageControlView(
-                    viewModel.state.backgroundImages,
-                    selectedItem: selectedImageIndex
-                )
-                // Should tell the design team to make it brighter?
-                .foregroundTint(.ftMainBlue)
-                
-                VStack(spacing: .zero) {
-                    if viewModel.state.superState.allProducts.isEmpty {
-                        Spacer()
-                        ProgressView()
-                        Spacer()
-                    } else {
-                        features
-                    }
-                    
-                    FTSubscribeButtonView(
-                        terms: viewModel.state.subscribeButtonTerms,
-                        buttonTitle: viewModel.state.primaryButtonTitle,
-                        action: {
-                            Task {
-                                await viewModel.initiatePurchaseWithCurrentProduct()
-                            }
+                FTSubscribeButtonView(
+                    terms: viewModel.state.subscribeButtonTerms,
+                    buttonTitle: viewModel.state.primaryButtonTitle,
+                    action: {
+                        Task {
+                            await viewModel.initiatePurchaseWithCurrentProduct()
                         }
-                    )
-                    .disabled(viewModel.state.superState.isButtonDisabled)
-                    .padding()
-                    
-                    SubscriptionUtilityLinksView(
-                        viewModel: .init(
-                            paymentManager: viewModel.getCurrentPaymentManager(),
-                            flowDelegate: viewModel.getCurrentFlowDelegate()
-                        )
-                    )
-                }
-                .containerRelativeFrame(.vertical, { amount, _ in
-                    amount / 2.5
-                })
+                    }
+                )
+                .disabled(viewModel.state.superState.isButtonDisabled)
                 .padding()
-                .padding(.bottom) // Padding, so we don't hit the safe area
-                .background {
-                    contentCard
-                }
+                
+                SubscriptionUtilityLinksView(
+                    viewModel: .init(
+                        paymentManager: viewModel.getCurrentPaymentManager(),
+                        flowDelegate: viewModel.getCurrentFlowDelegate()
+                    )
+                )
+            }
+            .containerRelativeFrame(.vertical, { amount, _ in
+                amount / 2.5
+            })
+            .padding()
+            .padding(.bottom) // Padding, so we don't hit the safe area
+            .background {
+                contentCard
             }
         }
         .ignoresSafeArea(edges: .vertical)
