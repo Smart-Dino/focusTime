@@ -70,6 +70,10 @@ final class TaskConcentrationViewModel {
 }
 
 extension TaskConcentrationViewModel: FocusSessionTimerModelDelegate {
+    func didFinishCountdown() {
+        //TODO: - add implementation
+    }
+    
     func didUpdateIsPaused(_ timerIsPaused: Bool) {
         state.timerIsPaused = timerIsPaused
         updateUIBasedOnTimerState()
