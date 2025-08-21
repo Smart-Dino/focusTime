@@ -14,11 +14,12 @@ struct ProtectedBlockItem: ProtectedModel {
     var id: UUID
     let persistentModelID: PersistentIdentifier?
     
-    let emoji: String
-    let name: String
-    let days: Set<Weekday>
-    let type: ScheduleType
-    let blockedContent: ProtectedActivitySelection
+    var emoji: String
+    var name: String
+    var days: Set<Weekday>
+    var type: ScheduleType
+    var isTemporary: Bool
+    var blockedContent: ProtectedActivitySelection
     
     init(
         id: UUID = UUID(),
@@ -27,6 +28,7 @@ struct ProtectedBlockItem: ProtectedModel {
         name: String,
         days: Set<Weekday>,
         type: ScheduleType,
+        isTemporary: Bool = false,
         blockedContent: ProtectedActivitySelection
     ) {
         self.id = id
@@ -35,6 +37,7 @@ struct ProtectedBlockItem: ProtectedModel {
         self.name = name
         self.days = days
         self.type = type
+        self.isTemporary = isTemporary
         self.blockedContent = blockedContent
     }
     
@@ -46,6 +49,7 @@ struct ProtectedBlockItem: ProtectedModel {
             name: item.name,
             days: item.days,
             type: item.type,
+            isTemporary: item.isTemporary,
             blockedContent: item.blockedContent
         )
     }

@@ -435,5 +435,80 @@ struct RegistrarHandlerTests {
         }
     }
     
-}
+    @Test(
+        "Activates duration block immediately if now is inside schedule window",
+        arguments: [
+            ("15:00", "16:00", "15:10"),
+            ("10:00", "18:00", "11:11"),
+        ]
+    )
+    func scheduledBlockActivatesIfWithinWindow(
+        start: String,
+        end: String,
+        current: String
+    ) async throws {
+        // MARK: - Time Setup
+        let startTime   = try TimeComponents(from: start)
+        let endTime     = try TimeComponents(from: end)
+        let currentTime = try TimeComponents(from: current)
+        
+        let components = currentTime.dateComponents
+        let hour = try #require(components.hour)
+        let minute = try #require(components.minute)
+        
+        let now = try #require(
+            Calendar.current.date(bySettingHour: hour, minute: minute, second: 0, of: .now)
+        )
+        let testClock = TestClock(startingAt: now)
 
+        // Create a ProtectedBlockItem scheduled from startTime to endTime.
+        let blockItem = ProtectedBlockItem(
+            emoji: "🛑",
+            name: "WindowTest",
+            days: Set(Weekday.allCases),
+            type: .scheduled(startTime: startTime, endTime: endTime),
+            blockedContent: ProtectedActivitySelection(FamilyActivitySelection())
+        )
+        let blockItemModelID = try await blockItemStore.insert(blockItem)
+        let fetchedBlockItem = try await blockItemStore.fetch(id: blockItemModelID)
+
+        // Instantiate a LiveDeviceActivityRegistrar with the test clock.
+        let registrar = LiveDeviceActivityRegistrar(
+            center: DeviceActivityCenter(),
+            clock: testClock,
+            modelContainer: container,
+            shieldManager: shieldManager
+        )
+
+        // Register the activity.
+        try await registrar.registerActivity(during: fetchedBlockItem)
+
+        // Assert that at least two activities are now registered (original + temp duration if inside window).
+        let activities = await registrar.monitoredIdentifiers
+        #expect(activities.count >= 2, "There should be two registered activities: original and temporary")
+        
+        // Assert that a temporary duration block item is present in the database and has name prefix "temp-" and is marked temporary.
+        let tempBlocks = try await blockItemStore.fetch().filter {
+            $0.isTemporary && $0.name.hasPrefix("temp-")
+        }
+        #expect(tempBlocks.count > 0, "A temporary duration block should have been created and registered")
+        
+        // Assert the duration of a temporary block is calculated right.
+        let endTimeInSeconds = endTime.localizedSecondsSinceMidnight
+        let currentTimeInSeconds = currentTime.localizedSecondsSinceMidnight
+        let difference = endTimeInSeconds - currentTimeInSeconds
+        if case .duration(let duration, _, _, _) = tempBlocks.first?.type {
+            #expect(
+                difference == duration.rawValue,
+                "The difference in seconds between the end and current time should match the duration of the temp block"
+            )
+        }
+        
+        // Assert that this temporary block is also registered as an activity.
+        let tempBlockRegistered = activities.contains(where: { activity in
+            tempBlocks.contains(where: { $0.id == activity } )
+        })
+        #expect(tempBlockRegistered, "Temporary block should be registered as activity")
+    }
+    
+}

@@ -18,6 +18,7 @@ final class BlockItem {
     // Schedule.
     var days: Set<Weekday>
     var type: ScheduleType
+    var isTemporary: Bool // Signals whether this item will have to be removed after use.
     // Blocked apps.
     var blockedContent: ProtectedActivitySelection
     
@@ -27,6 +28,7 @@ final class BlockItem {
         emoji: String,
         days: Set<Weekday>,
         type: ScheduleType,
+        isTemporary: Bool = false,
         blockedContent: ProtectedActivitySelection
     ) {
         self.id = id
@@ -34,6 +36,7 @@ final class BlockItem {
         self.emoji = emoji
         self.days = days
         self.type = type
+        self.isTemporary = isTemporary
         self.blockedContent = blockedContent
     }
     
@@ -44,6 +47,7 @@ final class BlockItem {
             emoji: item.emoji,
             days: item.days,
             type: item.type,
+            isTemporary: item.isTemporary,
             blockedContent: item.blockedContent
         )
     }

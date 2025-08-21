@@ -57,6 +57,7 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
                     throw error
                 }
             }
+            try await startActivityIfRegisteredDuringIntervalWindow(item: blockItem)
         case .duration(let duration, _, _, _):
             try await registerDurationActivity(for: blockItem, duration: duration.rawValue)
         }
@@ -65,16 +66,13 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
     // Schedule an event like this: startTime - 15 minutes - endTime.
     // The startTime will be triggered with user's duration.
     // So if user sets duration of 1800 - 30 mins - then our startTime will be now + 30 mins.
-    func registerDurationActivity(
+    private func registerDurationActivity(
         for blockItem: ProtectedBlockItem,
         duration: Int
     ) async throws {
         guard let persistentModelID = blockItem.persistentModelID else {
             throw DeviceActivityRegistrarError.noPersistentItem
         }
-        
-        // Copy values to avoid capturing self in the Tasks.
-        let shieldManager = self.shieldManager
         
         // Block starts from now.
         try await shieldManager.block(specific: blockItem.blockedContent)
@@ -101,6 +99,7 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         try center.startMonitoring(activityName, during: deviceActivitySchedule)
         
         // Log when the activity was started for proper suspension handling.
+        // Important: We only do this if our BlockItem was originally saved as duration block.
         let startTime = await clock.now
         try await blockItemStore.updateFields(id: persistentModelID) { blockItem in
             switch blockItem.type {
@@ -224,6 +223,32 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
             }
         }
         return overlappingSchedules
+    }
+    
+    private func startActivityIfRegisteredDuringIntervalWindow(item: ProtectedBlockItem) async throws {
+        // Make sure we deal with a scheduled block,
+        // because duration block does not have a set time window in a day,
+        // and it is requested on-demand.
+        guard case .scheduled = item.type else { return }
+        
+        let timeLeftInSeconds = item.type.secondsToIntervalEndIfShouldBeRunning(now: await clock.now)
+        
+        if let timeLeftInSeconds {
+            // No, we cannot just copy item and edit it's values, we need new PersistentIdentifiers and UUIDs.
+            let tempItemCopy = ProtectedBlockItem(
+                emoji: "⏳",
+                name: "temp-" + UUID().uuidString,
+                days: item.days,
+                type: .duration(.init(duration: timeLeftInSeconds)),
+                isTemporary: true,
+                blockedContent: item.blockedContent
+            )
+            
+            let tempItemID = try await blockItemStore.insert(tempItemCopy)
+            let newDurationItem = try await blockItemStore.fetch(id: tempItemID)
+            
+            try await registerDurationActivity(for: newDurationItem, duration: timeLeftInSeconds)
+        }
     }
     
     func unregisterActivity(during blockItem: ProtectedBlockItem) async throws {

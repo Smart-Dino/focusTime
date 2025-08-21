@@ -60,18 +60,25 @@ struct DeviceActivityHandler: Sendable {
             logger?.error("Failed to unblock in handleDurationUnblocking: \(error.localizedDescription)")
         }
         
-        // Reset duration values.
+        // Reset duration values if this BlockItem was created as duration block.
         guard case .duration(let duration, _, _, _) = blockItem.type else { return }
-        blockItem.type = .duration(
-            duration,
-            startedAt: nil,
-            suspendedAt: nil,
-            timeLeft: duration
-        )
+        let modelContext = ModelContext(container)
+        
+        // If it is temporary then we just delete it.
+        if !blockItem.isTemporary {
+            blockItem.type = .duration(
+                duration,
+                startedAt: nil,
+                suspendedAt: nil,
+                timeLeft: duration
+            )
+        } else {
+            modelContext.delete(blockItem)
+        }
         
         // Save changes.
         do {
-            try ModelContext(container).save()
+            try modelContext.save()
         } catch {
             logger?.error("Failed to save ModelContext in handleDurationUnblocking: \(error.localizedDescription)")
         }
@@ -98,10 +105,9 @@ struct DeviceActivityHandler: Sendable {
         let stringActivityName = activity.rawValue
         
         if activityIdentifier.isFallback {
-            Task {
-                // TimeComponents has an accuraccy of a minute.
-                // Hence why we are comparing it direclty - we have a whole minute to detect the match.
-                do {
+            // TimeComponents has an accuracy of a minute.
+            // Hence why we are comparing it directly - we have a whole minute to detect the match.
+            do {
                 while try TimeComponents(from: .now) != endTimeComponent {
                     try await Task.sleep(nanoseconds: 5_000_000_000)
                 } // Unfortunately sleeping task for a long time causes extension to close before unblock.
@@ -112,9 +118,8 @@ struct DeviceActivityHandler: Sendable {
                     .stopMonitoring(
                         [DeviceActivityName(stringActivityName)]
                     )
-                } catch {
-                    logger?.error("Failed to unblock in handleRegularBlocking fallback handling: \(error.localizedDescription)")
-                }
+            } catch {
+                logger?.error("Failed to unblock in handleRegularBlocking fallback handling: \(error.localizedDescription)")
             }
             
         }
