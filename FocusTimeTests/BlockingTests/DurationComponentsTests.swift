@@ -23,7 +23,7 @@ struct DurationComponentsTests {
     @Test("Initializer from hour/minute matches from duration")
     func testInitFromDuration() {
         let a = DurationComponents(hour: 2, minute: 30)
-        let b = DurationComponents(duration: 2 * 3600 + 30 * 60)
+        let b = DurationComponents(seconds: 2 * 3600 + 30 * 60)
         #expect(a == b)
     }
     
