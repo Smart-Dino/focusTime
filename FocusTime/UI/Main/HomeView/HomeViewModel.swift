@@ -107,6 +107,9 @@ final class HomeViewModel {
         fetchTask = Task {
             do {
                 state.upcomingOrRunningItem = try await blockItemPersistenceManager.fetchClosestOrRunningCurrentScheduled(now: .now)
+                if let item = state.upcomingOrRunningItem {
+                    startTimer(for: item)
+                }
             } catch {
                 state.error = error
             }

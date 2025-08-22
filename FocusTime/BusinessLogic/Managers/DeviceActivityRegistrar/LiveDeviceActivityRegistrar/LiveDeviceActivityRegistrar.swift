@@ -40,7 +40,8 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         case .scheduled(let startTime, let endTime, _, _, _):
             try await registerRegularActivity(for: blockItem, startTime: startTime, endTime: endTime)
             try await startActivityIfRegisteredDuringIntervalWindow(item: blockItem)
-        case .duration:
+        case .duration(let duration, _, _, _):
+            try await validateNoOverlapForDurationBlocking(proposedDuration: duration.rawValue)
             try await registerDurationActivity(for: blockItem)
         }
     }
@@ -105,7 +106,7 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
             try await blockItemPersistenceManager.editBlockItem(blockItem: stored)
 
             // Re-register device activity for the remaining duration.
-            try await registerDurationActivity(for: stored, forcedDuration: remainingSeconds, skipOverlapValidation: true)
+            try await registerDurationActivity(for: stored, forcedDuration: remainingSeconds)
         }
     }
     

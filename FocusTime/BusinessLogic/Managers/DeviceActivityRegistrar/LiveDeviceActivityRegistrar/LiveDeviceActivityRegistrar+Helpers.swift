@@ -13,15 +13,10 @@ extension LiveDeviceActivityRegistrar {
 
     func registerDurationActivity(
         for blockItem: ProtectedBlockItem,
-        forcedDuration: Int? = nil,
-        skipOverlapValidation: Bool = false
+        forcedDuration: Int? = nil
     ) async throws {
         guard blockItem.persistentModelID != nil else { throw DeviceActivityRegistrarError.noPersistentItem }
         guard case let .duration(originalDuration, _, _, _) = blockItem.type else { return }
-        
-        if !skipOverlapValidation {
-            try await validateNoOverlapForDurationBlocking(proposedDuration: forcedDuration ?? originalDuration.rawValue)
-        }
 
         // Start blocking immediately.
         try await shieldManager.block(specific: blockItem.blockedContent)
