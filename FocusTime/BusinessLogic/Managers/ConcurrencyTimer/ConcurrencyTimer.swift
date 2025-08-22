@@ -13,7 +13,6 @@ final class ConcurrencyTimer: FTTimer {
     @ObservationIgnored private var timer: Task<Void, Never>?
     @ObservationIgnored private var deadline: Date?
     
-    @ObservationIgnored weak var delegate: FTTimerDelegate?
     private(set) var isPaused = false
     var isRunning: Bool {
         timer != nil
@@ -31,7 +30,6 @@ final class ConcurrencyTimer: FTTimer {
         payload.formatted = String(format: "%02d:%02d:%02d", payload.hours, payload.minutes, payload.seconds)
 
         if remaining <= 0 {
-            delegate?.didFinishCountdown()
             cancel()
         }
     }
@@ -67,12 +65,10 @@ final class ConcurrencyTimer: FTTimer {
 
     func pause() {
         isPaused = true
-        delegate?.didUpdateIsPaused(true)
     }
 
     func resume() {
         isPaused = false
-        delegate?.didUpdateIsPaused(false)
     }
 
     func cancel() {

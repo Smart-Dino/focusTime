@@ -83,10 +83,6 @@ final class HomeViewModel {
         }
     }
     
-    func injectDelegateToTimer() {
-        timer.delegate = self
-    }
-    
     func subscribeToDB() {
         dbChangesNotificationTask = Task {
             for await _ in await blockItemPersistenceManager.contextChangesStream() {
@@ -132,16 +128,16 @@ final class HomeViewModel {
                 return
             }
         }
-            
-            if isPauseAction {
-                if let viewModel = makeTaskConcentrationViewModel(with: .breakTransition) {
-                    state.nextNavigationScreen = .taskConcentration(viewModel)
-                }
-            } else {
-                if let viewModel = makeTaskConcentrationViewModel(with: .focus) {
-                    state.nextNavigationScreen = .taskConcentration(viewModel)
-                }
+        
+        if isPauseAction {
+            if let viewModel = makeTaskConcentrationViewModel(with: .breakTransition) {
+                state.nextNavigationScreen = .taskConcentration(viewModel)
             }
+        } else {
+            if let viewModel = makeTaskConcentrationViewModel(with: .focus) {
+                state.nextNavigationScreen = .taskConcentration(viewModel)
+            }
+        }
     }
     
     private func makeScheduledFocusViewModel() -> ScheduledBlockItemsViewModel {
@@ -157,25 +153,5 @@ final class HomeViewModel {
             deviceActivityRegistrar: deviceActivityRegistrar,
             blockItemPersistenceManager: blockItemPersistenceManager
         )
-    }
-}
-
-extension HomeViewModel: FTTimerDelegate {
-    func didUpdateIsPaused(_ pause: Bool) {
-        guard let item = state.upcomingOrRunningItem else { return }
-        
-        Task {
-            do {
-                pause
-                ? try await deviceActivityRegistrar.suspendActivity(for: item)
-                : try await deviceActivityRegistrar.resumeActivity(for: item)
-            } catch {
-                state.error = error
-            }
-        }
-    }
-    
-    func didFinishCountdown() {
-        timer.cancel()
     }
 }

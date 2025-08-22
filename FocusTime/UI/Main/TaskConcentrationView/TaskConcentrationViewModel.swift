@@ -129,7 +129,6 @@ final class TaskConcentrationViewModel {
     
     // MARK: - Private Methods
     private func setupTimer() {
-        timer.delegate = self
         state.timerIsPaused = timer.isPaused
     }
     
@@ -180,17 +179,5 @@ final class TaskConcentrationViewModel {
         } catch {
             state.error = error
         }
-    }
-}
-
-// MARK: - FTTimerDelegate
-extension TaskConcentrationViewModel: FTTimerDelegate {
-    
-    func didUpdateIsPaused(_ pause: Bool) {
-        // Implementation pending
-    }
-    
-    func didFinishCountdown() {
-        timer.cancel()
     }
 }

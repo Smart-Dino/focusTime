@@ -128,11 +128,10 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         try await shieldManager.unblock()
 
         var mutableBlockItem = blockItem
-        
-        mutableBlockItem.isCancelled = true
         switch mutableBlockItem.type {
         case .scheduled(let startTime, let endTime, _, let isPaused, let suspendedUntil):
             // Only update isActive, keep pause state intact.
+            mutableBlockItem.isCancelled = true
             mutableBlockItem.type = .scheduled(
                 startTime: startTime,
                 endTime: endTime,
@@ -147,9 +146,12 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
                 suspendedUntil: suspendedUntil,
                 endDate: nil // Set or clear endDate based on activity.
             )
+            
+            try await unregisterActivity(during: mutableBlockItem)
         }
         
         try await blockItemPersistenceManager.editBlockItem(blockItem: mutableBlockItem)
+        try await cancelScheduledResume(for: mutableBlockItem)
     }
 
     func unregisterAll() async {
