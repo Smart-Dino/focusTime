@@ -15,18 +15,21 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
     static let fallbackIntervalSeconds = SharedAppValues.activityRegistrarFallbackInterval
 
     let clock: Clock
+    let calendar: Calendar
     let centerManager: DeviceActivityCenterManager
     let shieldManager: ShieldManager
     let blockItemPersistenceManager: BlockItemPersistenceManager
 
     init(
-        centerManager: DeviceActivityCenterManager = LiveDeviceActivityCenterManager(),
         clock: Clock = SystemClock(),
+        calendar: Calendar = .current,
+        centerManager: DeviceActivityCenterManager = LiveDeviceActivityCenterManager(),
         blockItemPersistenceManager: BlockItemPersistenceManager,
         shieldManager: ShieldManager
     ) {
-        self.centerManager = centerManager
         self.clock = clock
+        self.calendar = calendar
+        self.centerManager = centerManager
         self.blockItemPersistenceManager = blockItemPersistenceManager
         self.shieldManager = shieldManager
     }
@@ -137,7 +140,7 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
                 isPaused: isPaused,
                 suspendedUntil: suspendedUntil
             )
-        case .duration(let duration, let suspendedAt, let suspendedUntil, let endDate):
+        case .duration(let duration, let suspendedAt, let suspendedUntil, _):
             mutableBlockItem.type = .duration(
                 duration: duration,
                 suspendedAt: suspendedAt,

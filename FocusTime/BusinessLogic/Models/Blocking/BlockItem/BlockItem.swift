@@ -9,6 +9,19 @@ import Foundation
 import SwiftData
 import FamilyControls
 
+enum BlockState {
+    case running, inactive, suspended, suspendedIndefinitely
+    
+    var isActive: Bool {
+        switch self {
+        case .running: true
+        case .inactive: false
+        case .suspended: true
+        case .suspendedIndefinitely: true
+        }
+    }
+}
+
 @Model
 final class BlockItem {
     // Brought back the custom identifier for easier access across targets.
@@ -24,24 +37,26 @@ final class BlockItem {
     // Blocked apps.
     var blockedContent: ProtectedActivitySelection
     
-    var isActive: Bool {
+    var state: BlockState {
         switch type {
-        case .scheduled(_, _, let isActive, _, _):
-            isActive
-        case .duration(_, _, _, let endDate):
-            endDate != nil
+        case let .scheduled(_, _, isActive, isPaused, suspendedUntil):
+            switch (isPaused, suspendedUntil, isActive) {
+            case (true, .some, _):    return .suspended
+            case (true, .none, _):    return .suspendedIndefinitely
+            case (_, _, true):        return .running
+            default:                  return .inactive
+            }
+
+        case let .duration(_, suspendedAt, suspendedUntil, endDate):
+            switch (suspendedAt, suspendedUntil, endDate) {
+            case (.some, .some, _):   return .suspended
+            case (.some, .none, _):   return .suspendedIndefinitely
+            case (_, _, .some):       return .running
+            default:                  return .inactive
+            }
         }
     }
-    
-    var isPaused: Bool {
-        switch type {
-        case .scheduled(_, _, _, let isPaused, _):
-            isPaused
-        case .duration(_, let suspendedAt, _, _):
-            suspendedAt != nil
-        }
-    }
-    
+
     init(
         id: UUID = UUID(),
         name: String,

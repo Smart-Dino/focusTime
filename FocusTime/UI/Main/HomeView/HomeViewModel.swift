@@ -40,6 +40,16 @@ final class HomeViewModel {
         var error: Error? = nil
         
         var upcomingOrRunningItem: ProtectedBlockItem?
+        var isPaused: Bool {
+            guard let upcomingOrRunningItem else { return true }
+            
+            if upcomingOrRunningItem.state == .running {
+                return false
+            } else {
+                return true
+            }
+        }
+        
         var nextNavigationScreen: HomeViewNavigationRoute?
     }
     
@@ -86,18 +96,6 @@ final class HomeViewModel {
         }
     }
     
-    func setTimerIsPaused(_ pause: Bool) {
-        if pause {
-            timer.pause()
-        } else {
-            if let upcomingOrRunningItem = state.upcomingOrRunningItem {
-                // Since duration blocking updates it's deadline after resumption we need to recreate the timer.
-                timer.startTimer(for: upcomingOrRunningItem)
-                timer.resume()
-            }
-        }
-    }
-    
     func startTimer(for blockItem: ProtectedBlockItem) {
         timer.startTimer(for: blockItem)
     }
@@ -127,21 +125,34 @@ final class HomeViewModel {
         state.nextNavigationScreen = .scheduledFocusList(makeScheduledFocusViewModel())
     }
     
-    func showTaskConcentrationView() {
-        if let viewModel = makeTaskConcentrationViewModel() {
-            state.nextNavigationScreen = .taskConcentration(viewModel)
+    func showTaskConcentrationView(isPauseAction: Bool) {
+        if state.isPaused {
+            if let viewModel = makeTaskConcentrationViewModel(with: .breakTime) {
+                state.nextNavigationScreen = .taskConcentration(viewModel)
+                return
+            }
         }
+            
+            if isPauseAction {
+                if let viewModel = makeTaskConcentrationViewModel(with: .breakTransition) {
+                    state.nextNavigationScreen = .taskConcentration(viewModel)
+                }
+            } else {
+                if let viewModel = makeTaskConcentrationViewModel(with: .focus) {
+                    state.nextNavigationScreen = .taskConcentration(viewModel)
+                }
+            }
     }
     
     private func makeScheduledFocusViewModel() -> ScheduledBlockItemsViewModel {
         ScheduledBlockItemsViewModel(blockItemPersistenceManager: blockItemPersistenceManager)
     }
     
-    private func makeTaskConcentrationViewModel() -> TaskConcentrationViewModel? {
+    private func makeTaskConcentrationViewModel(with phase: TaskConcentrationViewModel.State.Phase) -> TaskConcentrationViewModel? {
         guard let upcomingOrRunningItem = state.upcomingOrRunningItem else { return nil }
         
         return TaskConcentrationViewModel(
-            state: .init(item: upcomingOrRunningItem),
+            state: .init(item: upcomingOrRunningItem, phase: phase),
             timer: timer,
             deviceActivityRegistrar: deviceActivityRegistrar,
             blockItemPersistenceManager: blockItemPersistenceManager
@@ -152,7 +163,7 @@ final class HomeViewModel {
 extension HomeViewModel: FTTimerDelegate {
     func didUpdateIsPaused(_ pause: Bool) {
         guard let item = state.upcomingOrRunningItem else { return }
-
+        
         Task {
             do {
                 pause

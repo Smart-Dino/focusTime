@@ -22,7 +22,7 @@ extension LiveDeviceActivityRegistrar {
         try await shieldManager.block(specific: blockItem.blockedContent)
 
         // Build schedule based on seconds. DeviceActivitySchedule requires >= 15 minutes interval.
-        let nowComponents = Calendar.current.dateComponents([.hour, .minute, .second], from: await clock.now)
+        let nowComponents = calendar.dateComponents([.hour, .minute, .second], from: await clock.now)
         let durationSeconds = forcedDuration ?? originalDuration.rawValue
         let intervalStart = nowComponents.adding(seconds: durationSeconds)
         let intervalEnd = intervalStart.adding(seconds: Self.fallbackIntervalSeconds)
@@ -102,7 +102,7 @@ extension LiveDeviceActivityRegistrar {
             isOverlapping = true
         } else if case .scheduled(let startTime, _, _, _, _) = nextBlock.type {
             // Check if the proposed duration extends beyond the start time of the next scheduled block.
-            let startOfToday = Calendar.current.startOfDay(for: now)
+            let startOfToday = calendar.startOfDay(for: now)
             let scheduledBlockStartTime = startOfToday.addingTimeInterval(TimeInterval(startTime.localizedSecondsSinceMidnight))
             let proposedEndTime = now.addingTimeInterval(TimeInterval(proposedDuration))
             
@@ -119,8 +119,7 @@ extension LiveDeviceActivityRegistrar {
 
     func overlapsWithAlreadyRegisteredSchedules(
         _ newSchedule: DeviceActivitySchedule,
-        days: Set<Weekday>,
-        on calendar: Calendar = .current
+        days: Set<Weekday>
     ) async throws -> [ProtectedBlockItem] {
         var overlapping: [ProtectedBlockItem] = []
         let activities = await centerManager.activities

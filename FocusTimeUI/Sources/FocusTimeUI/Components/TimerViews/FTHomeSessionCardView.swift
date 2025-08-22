@@ -12,9 +12,10 @@ public struct FTHomeSessionCardView: View {
     private let description: String
     private let isActive: Bool
     
-    @Binding var isPaused: Bool
+    var isPaused: Bool
     
     let action: (() -> Void)?
+    let pauseAction: (() -> Void)?
     
     public var body: some View {
         HStack(spacing: 15) {
@@ -36,14 +37,12 @@ public struct FTHomeSessionCardView: View {
                     .stroke(gradient, lineWidth: 1.2)
             }
         }
-        .contentShape(.rect)
-        .onTapGesture(perform: action ?? {})
         .overlay {
             if isActive {
                 HStack {
                     Spacer()
                     Button {
-                        isPaused.toggle()
+                        pauseAction?()
                     } label: {
                         isPaused
                         ? Image(systemName: "play.circle").foregroundStyle(.blue)
@@ -54,6 +53,8 @@ public struct FTHomeSessionCardView: View {
                 }
             }
         }
+        .contentShape(.rect)
+        .onTapGesture(perform: action ?? {})
     }
     
     var gradient: LinearGradient {
@@ -68,14 +69,16 @@ public struct FTHomeSessionCardView: View {
         title: String,
         description: String,
         isActive: Bool,
-        isPaused: Binding<Bool>,
-        action: (() -> Void)?
+        isPaused: Bool,
+        action: (() -> Void)?,
+        pauseAction: (() -> Void)?
     ) {
         self.title = title
         self.description = description
         self.isActive = isActive
-        self._isPaused = isPaused
+        self.isPaused = isPaused
         self.action = action
+        self.pauseAction = pauseAction
     }
     
 }
@@ -85,8 +88,9 @@ public struct FTHomeSessionCardView: View {
         title: "Work time",
         description: "00:00:01",
         isActive: true,
-        isPaused: .constant(true),
-        action: nil
+        isPaused: true,
+        action: nil,
+        pauseAction: nil
     )
     .preferredColorScheme(.dark)
 }

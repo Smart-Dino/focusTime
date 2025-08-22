@@ -25,21 +25,23 @@ struct ProtectedBlockItem: ProtectedModel {
     var isScheduled: Bool
     var blockedContent: ProtectedActivitySelection
     
-    var isActive: Bool {
+    var state: BlockState {
         switch type {
-        case .scheduled(_, _, let isActive, _, _):
-            isActive
-        case .duration(_, let suspendedAt, _, let endDate):
-            (endDate != nil) || (suspendedAt != nil)
-        }
-    }
-    
-    var isPaused: Bool {
-        switch type {
-        case .scheduled(_, _, _, let isPaused, _):
-            isPaused
-        case .duration(_, let suspendedAt, _, _):
-            suspendedAt != nil
+        case let .scheduled(_, _, isActive, isPaused, suspendedUntil):
+            switch (isPaused, suspendedUntil, isActive) {
+            case (true, .some, _):    return .suspended
+            case (true, .none, _):    return .suspendedIndefinitely
+            case (_, _, true):        return .running
+            default:                  return .inactive
+            }
+
+        case let .duration(_, suspendedAt, suspendedUntil, endDate):
+            switch (suspendedAt, suspendedUntil, endDate) {
+            case (.some, .some, _):   return .suspended
+            case (.some, .none, _):   return .suspendedIndefinitely
+            case (_, _, .some):       return .running
+            default:                  return .inactive
+            }
         }
     }
     

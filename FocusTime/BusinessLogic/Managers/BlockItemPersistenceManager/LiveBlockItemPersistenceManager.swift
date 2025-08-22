@@ -110,11 +110,11 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
         // 1. Fetch all monitored blocks.
         let blocks = try await store.fetch()
         let runningOrScheduledBlocks = blocks.filter(
-            { $0.isActive || identifiers.contains($0.id) }
+            { $0.state.isActive || identifiers.contains($0.id) }
         )
 
         // 2. Return running if found.
-        if let running = runningOrScheduledBlocks.first(where: { $0.isActive }) {
+        if let running = runningOrScheduledBlocks.first(where: { $0.state.isActive }) {
             return running
         }
 

@@ -85,7 +85,7 @@ struct HomeView: View {
         // MARK: - Bottom floating button
         .safeAreaInset(edge: .bottom) {
             Button(Constants.Strings.bottomButtonTitle, systemImage: Constants.Icons.hourglass) {
-#warning("Action is empty")
+                #warning("Action is empty")
             }
             .buttonStyle(.ftPrimary)
             .padding()
@@ -127,7 +127,7 @@ struct HomeView: View {
     }
     
     func makeSessionViewForItem(_ item: ProtectedBlockItem) -> some View {
-        let isActive = item.isActive
+        let isActive = item.state.isActive
         
         return Group {
             if isActive {
@@ -135,11 +135,9 @@ struct HomeView: View {
                     title: item.name,
                     description: viewModel.timer.payload.formatted,
                     isActive: isActive,
-                    isPaused: .init(
-                        get: { viewModel.timer.isPaused },
-                        set: { viewModel.setTimerIsPaused($0) }
-                    ),
-                    action: viewModel.showTaskConcentrationView
+                    isPaused: viewModel.state.isPaused,
+                    action: { viewModel.showTaskConcentrationView(isPauseAction: false) },
+                    pauseAction: { viewModel.showTaskConcentrationView(isPauseAction: true) }
                 )
                 .onAppear {
                     viewModel.startTimer(for: item)
@@ -149,8 +147,9 @@ struct HomeView: View {
                     title: item.name,
                     description: item.type.description,
                     isActive: isActive,
-                    isPaused: .constant(true),
-                    action: nil
+                    isPaused: true,
+                    action: nil,
+                    pauseAction: nil
                 )
             }
         }

@@ -105,7 +105,7 @@ struct DraftsBlockItemListView: View {
     
     @ViewBuilder
     private func sessionCard(for block: ProtectedBlockItem) -> some View {
-        if block.isActive {
+        if block.state.isActive {
             FTSessionDraftRowView(
                 emoji: block.emoji,
                 title: block.name,

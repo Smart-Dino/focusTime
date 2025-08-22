@@ -46,6 +46,9 @@ struct TaskConcentrationView: View {
                             viewModel.moveToBreakTime()
                         }
                     )
+                    .onAppear {
+                        viewModel.replaceTimerWithSuspensionTimer()
+                    }
                 case .breakTime(let title, let subtitle, let timerTitle, let buttonTitle):
                     StandardPhaseView(
                         title: title,
@@ -139,7 +142,7 @@ struct TaskConcentrationView: View {
 #Preview {
     @Previewable @State var timer = ConcurrencyTimer()
     let viewModel = TaskConcentrationViewModel(
-        state: .init(item: ProtectedBlockItem.mock),
+        state: .init(item: ProtectedBlockItem.mock, phase: .focus),
         timer: timer,
         deviceActivityRegistrar: PreviewData.mockActivityRegistrar,
         blockItemPersistenceManager: PreviewData.mockBlockItemPersistenceManager

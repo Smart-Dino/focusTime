@@ -45,7 +45,7 @@ final class TaskConcentrationViewModel {
         var error: Error?
         
         var item: ProtectedBlockItem
-        var phase: Phase = .focus
+        var phase: Phase
         
         var timerIsPaused: Bool = true
     }
@@ -99,10 +99,6 @@ final class TaskConcentrationViewModel {
     }
     
     func moveToPauseSessionScene() {
-        timer.start(
-            deadline: .now.addingTimeInterval(TimeInterval(SharedAppValues.breakTimeDuration)),
-            isInitiallyPaused: true
-        )
         moveTo(.breakTransition)
     }
     
@@ -112,6 +108,13 @@ final class TaskConcentrationViewModel {
     
     func moveToEndSessionAlertScene() {
         moveTo(.almostDone)
+    }
+    
+    func replaceTimerWithSuspensionTimer() {
+        timer.start(
+            deadline: .now.addingTimeInterval(TimeInterval(SharedAppValues.breakTimeDuration)),
+            isInitiallyPaused: true
+        )
     }
     
     func endBlock() async throws {
@@ -158,7 +161,7 @@ final class TaskConcentrationViewModel {
         timer.startTimer(for: newItem)
         timer.resume()
         
-        if !state.item.isPaused {
+        if state.item.state == .running {
             moveTo(.focus)
         }
     }

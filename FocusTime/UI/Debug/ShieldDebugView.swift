@@ -220,9 +220,9 @@ struct ShieldDebugView: View {
                     Text(blockItem.name)
                         .font(.headline)
                     Spacer()
-                    Text(blockItem.isActive ? "Active" : "Inactive")
+                    Text(blockItem.state.isActive ? "Active" : "Inactive")
                         .font(.caption)
-                        .foregroundStyle(blockItem.isActive ? .green : .red)
+                        .foregroundStyle(blockItem.state.isActive ? .green : .red)
                 }
                 
                 // Details depending on type

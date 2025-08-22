@@ -31,11 +31,17 @@ extension FTTimer {
         }
         
         guard let timeLeft = blockItem.type.secondsToIntervalEndIfShouldBeRunning(),
-              timeLeft >= 1 && blockItem.isActive else { return }
+              timeLeft >= 1 && blockItem.state.isActive else {
+            self.start(
+                deadline: Date.now,
+                isInitiallyPaused: true
+            )
+            return
+        }
         
         self.start(
             deadline: deadline ?? Date.now.addingTimeInterval(TimeInterval(timeLeft)),
-            isInitiallyPaused: blockItem.isPaused
+            isInitiallyPaused: blockItem.state == .suspendedIndefinitely
         )
     }
 }
