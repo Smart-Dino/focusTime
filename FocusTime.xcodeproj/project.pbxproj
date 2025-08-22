@@ -117,6 +117,7 @@
 				BusinessLogic/Managers/ShieldManager/LiveShieldManager.swift,
 				BusinessLogic/Managers/ShieldManager/ShieldManager.swift,
 				BusinessLogic/Models/Blocking/BlockItem/BlockItem.swift,
+				BusinessLogic/Models/Blocking/BlockItem/Helpers/BlockState.swift,
 				BusinessLogic/Models/Blocking/BlockItem/Helpers/DurationComponents.swift,
 				BusinessLogic/Models/Blocking/BlockItem/Helpers/ProtectedActivitySelection.swift,
 				BusinessLogic/Models/Blocking/BlockItem/Helpers/ScheduleType.swift,

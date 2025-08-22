@@ -93,7 +93,7 @@ final class HomeViewModel {
     }
     
     func startTimer(for blockItem: ProtectedBlockItem) {
-        timer.startTimer(for: blockItem)
+        timer.startTimer(for: blockItem, withSuspensionCountdown: true)
     }
     
     func setUpcomingItem() {

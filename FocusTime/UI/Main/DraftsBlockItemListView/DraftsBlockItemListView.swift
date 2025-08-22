@@ -114,6 +114,7 @@ struct DraftsBlockItemListView: View {
             .onAppear {
                 viewModel.startTimer(for: block)
             }
+            .id(viewModel.state.items) // Force refresh.
         } else {
             if block.isScheduled {
                 FTSessionScheduledRowView(

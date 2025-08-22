@@ -40,7 +40,7 @@ final class DraftsBlockItemListViewModel {
     }
     
     func startTimer(for blockItem: ProtectedBlockItem) {
-        timer.startTimer(for: blockItem)
+        timer.startTimer(for: blockItem, withSuspensionCountdown: false)
     }
     
     private func reloadItems() {

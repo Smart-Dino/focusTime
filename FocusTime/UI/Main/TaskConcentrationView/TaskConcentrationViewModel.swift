@@ -81,16 +81,6 @@ final class TaskConcentrationViewModel {
         }
     }
     
-    func setUpcomingItem() async {
-        do {
-            if let newItem = try await blockItemPersistenceManager.fetchClosestOrRunningCurrentScheduled(now: .now) {
-                state.item = newItem
-            }
-        } catch {
-            state.error = error
-        }
-    }
-    
     func startBreakTimer() {
         Task {
             await startABreak()
@@ -144,7 +134,8 @@ final class TaskConcentrationViewModel {
             for await _ in await blockItemPersistenceManager.contextChangesStream() {
                 try? await Task.sleep(for: SharedAppValues.debounceAfterDBRefreshed)
                 
-                guard let newItem = try? await blockItemPersistenceManager.fetchClosestOrRunningCurrentScheduled(now: .now) else {
+                guard let newItem = try? await blockItemPersistenceManager.fetchClosestOrRunningCurrentScheduled(now: .now),
+                      newItem.state.isActive else {
                     moveTo(.finished)
                     return
                 }
@@ -156,7 +147,7 @@ final class TaskConcentrationViewModel {
     
     private func updateStateWithNewItem(_ newItem: ProtectedBlockItem) {
         state.item = newItem
-        timer.startTimer(for: newItem)
+        timer.startTimer(for: newItem, withSuspensionCountdown: true)
         timer.resume()
         
         if state.item.state == .running {

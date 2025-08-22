@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum ScheduleType: Codable, Hashable {
+enum ScheduleType: Codable, Hashable, Equatable {
     case scheduled(
         startTime: TimeComponents,
         endTime: TimeComponents,
@@ -33,6 +33,13 @@ enum ScheduleType: Codable, Hashable {
                 allowedUnits: [.hour, .minute],
                 unitsStyle: .abbreviated
             )
+        }
+    }
+    
+    var suspensionEndDate: Date? {
+        switch self {
+        case .duration(_, _, let suspendedUntil, _): suspendedUntil
+        case .scheduled(_, _, _, _, let suspendedUntil): suspendedUntil
         }
     }
     

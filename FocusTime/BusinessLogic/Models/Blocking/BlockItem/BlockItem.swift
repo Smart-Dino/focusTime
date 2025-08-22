@@ -9,19 +9,6 @@ import Foundation
 import SwiftData
 import FamilyControls
 
-enum BlockState {
-    case running, inactive, suspended, suspendedIndefinitely
-    
-    var isActive: Bool {
-        switch self {
-        case .running: true
-        case .inactive: false
-        case .suspended: true
-        case .suspendedIndefinitely: true
-        }
-    }
-}
-
 @Model
 final class BlockItem {
     // Brought back the custom identifier for easier access across targets.

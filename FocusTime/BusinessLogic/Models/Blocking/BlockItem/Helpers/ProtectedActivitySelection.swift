@@ -8,10 +8,18 @@
 import Foundation
 import FamilyControls
 
-struct ProtectedActivitySelection: Codable, @unchecked Sendable {
+struct ProtectedActivitySelection: Codable, Equatable, @unchecked Sendable {
     let selection: FamilyActivitySelection
     
     init(_ activitySelection: FamilyActivitySelection) {
         self.selection = activitySelection
+    }
+}
+
+extension ProtectedActivitySelection: Hashable {
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(selection.categoryTokens)
+        hasher.combine(selection.applicationTokens)
+        hasher.combine(selection.webDomainTokens)
     }
 }

@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 import FamilyControls
 
-struct ProtectedBlockItem: ProtectedModel {
+struct ProtectedBlockItem: ProtectedModel, Hashable, Equatable {
     
     var id: UUID
     let persistentModelID: PersistentIdentifier?
