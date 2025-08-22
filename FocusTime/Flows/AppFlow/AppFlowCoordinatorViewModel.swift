@@ -90,23 +90,19 @@ final class AppFlowCoordinatorViewModel {
     private var superPaywallVM: SuperPaywallViewModel?
     
     init(
+        state: State = State(currentFlow: .splash(viewModel: SplashScreenViewModel())),
         shieldManager: ShieldManager = LiveShieldManager(),
         defaultsManager: LiveDefaultsManager = LiveDefaultsManager(),
         paymentManagerFactory: PaymentManagerFactory = LivePaymentManagerFactory(),
         persistenceStoreFactory: PersistenceStoreFactory = LivePersistenceStoreFactory()
     ) {
-        self.state = State(currentFlow: .none)
+        self.state = state
         self.shieldManager = shieldManager
         self.defaultsManager = defaultsManager
         self.paymentManagerFactory = paymentManagerFactory
         self.persistenceStoreFactory = persistenceStoreFactory
         
-        showSplashScreen()
-        Task {
-            await setupAsyncDependencies()
-            try? await Task.sleep(for: .seconds(SharedAppValues.splashScreenDuration))
-            setupInitialAppState()
-        }
+        Task { await startLaunchSequence() }
     }
     
     func setErrorVisibility(_ isVisible: Bool) {
@@ -128,10 +124,6 @@ final class AppFlowCoordinatorViewModel {
         }
     }
     
-    func showSplashScreen() {
-        state.currentFlow = .splash(viewModel: makeSplashScreenViewModel())
-    }
-    
     func showFreePlanCoverIfNeeded() async {
         guard let paymentManager else { return }
         
@@ -148,19 +140,38 @@ final class AppFlowCoordinatorViewModel {
         }
     }
     
-    private func setupAsyncDependencies() async {
-        // Async init dependencies.
+    // MARK: - Launch Sequence
+    private func startLaunchSequence() async {
+        async let splashDelay: Void = delayIfNeeded()
+        async let dependencies: Void = setupDependencies()
+        _ = await (splashDelay, dependencies)
+        
+        setupInitialAppState()
+    }
+    
+    private func delayIfNeeded() async {
+        guard defaultsManager.getValue(for: .isOnboardingFinished) != true else { return }
+        try? await Task.sleep(for: .seconds(SharedAppValues.splashScreenDuration))
+    }
+    
+    private func setupDependencies() async {
+        // Prepare async initializations in parallel.
         async let paymentManager = paymentManagerFactory.makePaymentManager()
-        async let blockItemPersistenceManager = LiveBlockItemPersistenceManager(
+        async let persistenceManager = LiveBlockItemPersistenceManager(
             blockItemStore: persistenceStoreFactory.makeBlockItemStore(),
             deviceActivityCenterManager: LiveDeviceActivityCenterManager()
         )
-        // Await init.
-        self.paymentManager = await paymentManager
-        self.superPaywallVM = await SuperPaywallViewModel(paymentManager: paymentManager)
-        self.blockItemPersistenceManager = await blockItemPersistenceManager
+
+        // Resolve dependencies.
+        let resolvedPaymentManager = await paymentManager
+        let resolvedPersistenceManager = await persistenceManager
+
+        // Assign to properties.
+        self.paymentManager = resolvedPaymentManager
+        self.superPaywallVM = SuperPaywallViewModel(paymentManager: resolvedPaymentManager)
+        self.blockItemPersistenceManager = resolvedPersistenceManager
         self.deviceActivityRegistrar = LiveDeviceActivityRegistrar(
-            blockItemPersistenceManager: await blockItemPersistenceManager,
+            blockItemPersistenceManager: resolvedPersistenceManager,
             shieldManager: shieldManager
         )
     }
@@ -176,11 +187,6 @@ final class AppFlowCoordinatorViewModel {
         if let viewModel = makeMainFlowCoordinatorViewModel() {
             setStateFlow(to: .main(viewModel: viewModel))
         }
-    }
-    
-    // MARK: - Factory methods
-    func makeSplashScreenViewModel() -> SplashScreenViewModel {
-        SplashScreenViewModel()
     }
     
     private func makeOnboardingFlowCoordinatorViewModel() -> OnboardingFlowCoordinatorViewModel {
