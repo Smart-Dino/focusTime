@@ -66,6 +66,8 @@ struct TaskConcentrationView: View {
                             Button(buttonTitle) {
                                 viewModel.startBreakTimer()
                             }
+                            .opacity(viewModel.timer.isPaused ? 1 : 0)
+                            .animation(.easeInOut, value: viewModel.timer.isPaused)
                         }, endSessionAction: {
                             viewModel.moveToEndSessionAlertScene()
                         }
