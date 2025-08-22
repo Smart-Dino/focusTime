@@ -78,11 +78,7 @@ struct TaskConcentrationView: View {
                         backgroundImage: ImageResource.MainImages.TaskConcentrationImages.taskConcentrationAlert,
                         centerView: {
                             // Animation.
-                            LottieView(
-                                animation: .filepath(
-                                    Bundle.main.url(forResource: "Warning Yellow", withExtension: "json")!.relativePath
-                                )
-                            )
+                            LottieView(animation: Constants.Animations.warningAnimation)
                             .playbackMode(
                                 .playing(
                                     .fromProgress(0,
@@ -136,7 +132,7 @@ struct TaskConcentrationView: View {
                 set: { viewModel.setErrorVisibility($0) }
             ),
             actions: { /* OK dismissal button by default */ },
-            message: { Text(viewModel.state.error?.localizedDescription ?? "") }
+            message: { Text(viewModel.state.error?.localizedDescription ?? String()) }
         )
     }
 }

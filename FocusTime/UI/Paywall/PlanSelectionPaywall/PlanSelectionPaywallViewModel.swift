@@ -21,7 +21,7 @@ final class PlanSelectionPaywallViewModel {
         // MARK: Other
         static let stringConstants = PlanSelectionPaywallView.Constants.Strings.self
         var primaryButtonTitle: String = stringConstants.loadingTitle
-        var subscribeButtonTerms: String = ""
+        var subscribeButtonTerms: String = String()
         
         init(superState: SuperPaywallViewModel.State = .init()) {
             self.superState = superState

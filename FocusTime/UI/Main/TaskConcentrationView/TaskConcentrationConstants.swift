@@ -5,6 +5,7 @@
 //  Created by Maksym Horobets on 04.08.2025.
 //
 
+import Lottie
 import SwiftUI
 
 extension TaskConcentrationView {
@@ -21,6 +22,16 @@ extension TaskConcentrationView {
             static let background = ImageResource.MainImages.TaskConcentrationImages.taskConcentrationFocus
             static let play = "play.fill"
             static let pause = "pause"
+        }
+        
+        enum Animations {
+            // Animations.
+            static let warningAnimation: LottieAnimation? = .filepath(
+                Bundle.main.url(forResource: "Warning Yellow", withExtension: "json")?.relativePath ?? String()
+            )
+            static let confettiAnimation: LottieAnimation? = .filepath(
+                Bundle.main.url(forResource: "Confetti", withExtension: "json")?.relativePath ?? String()
+            )
         }
     }
 }

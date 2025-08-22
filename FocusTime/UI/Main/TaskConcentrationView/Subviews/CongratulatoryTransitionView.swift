@@ -15,11 +15,7 @@ struct CongratulatoryTransitionView: View {
 
     var body: some View {
         VStack {
-            LottieView(
-                animation: .filepath(
-                    Bundle.main.url(forResource: "Confetti", withExtension: "json")!.relativePath
-                )
-            )
+            LottieView(animation: TaskConcentrationView.Constants.Animations.confettiAnimation)
             .playbackMode(
                 .playing(
                     .fromProgress(0,

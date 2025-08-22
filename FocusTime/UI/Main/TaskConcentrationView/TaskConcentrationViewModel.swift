@@ -41,7 +41,6 @@ final class TaskConcentrationViewModel {
                 subtitle: String
             )
         }
-        
         var error: Error?
         
         var item: ProtectedBlockItem

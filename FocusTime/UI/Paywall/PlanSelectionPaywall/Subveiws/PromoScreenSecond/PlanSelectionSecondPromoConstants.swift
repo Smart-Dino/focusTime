@@ -12,7 +12,7 @@ extension PlanSelectionSecondPromoView {
         enum Strings {
             static let headline = String(localized: "plan_selection_second_promo_headline", table: "PaywallLocalizable")
             static let subtitle: String = {
-                let appName = SharedAppValues.appName ?? ""
+                let appName = SharedAppValues.appName ?? String()
                 let format = String(localized: "plan_selection_second_promo_subtitle", table: "PaywallLocalizable")
                 return String(format: format, appName)
             }()

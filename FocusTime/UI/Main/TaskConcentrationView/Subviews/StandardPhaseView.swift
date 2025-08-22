@@ -55,7 +55,7 @@ struct StandardPhaseView<CenterContent: View, PrimaryButtonContent: View>: View 
                     .buttonStyle(.ftPrimary)
                 
                 // End session button.
-                Button("End session", action: endSessionAction)
+                Button(TaskConcentrationView.Constants.Strings.endSessionButtonTitle, action: endSessionAction)
                     .padding(.vertical)
             }
             .padding(.horizontal)

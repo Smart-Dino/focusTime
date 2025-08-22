@@ -69,7 +69,7 @@ struct DraftsBlockItemListView: View {
             }), actions: {
                 // OK dismissal button by default
             }, message: {
-                Text(viewModel.state.error?.localizedDescription ?? "")
+                Text(viewModel.state.error?.localizedDescription ?? String())
             }
         )
         .onAppear {
