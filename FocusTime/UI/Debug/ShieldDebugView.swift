@@ -85,7 +85,7 @@ struct ShieldDebugView: View {
                 viewModel.blockSelectionDuringSchedule()
             }
             
-            Button("Suspend for a minute") {
+            Button(Constants.Strings.suspendForAMinute) {
                 viewModel.suspendFor()
             }
             
@@ -220,29 +220,29 @@ struct ShieldDebugView: View {
                     Text(blockItem.name)
                         .font(.headline)
                     Spacer()
-                    Text(blockItem.state.isActive ? "Active" : "Inactive")
+                    Text(blockItem.state.isActive ? Constants.Strings.cardActive : Constants.Strings.cardInactive)
                         .font(.caption)
                         .foregroundStyle(blockItem.state.isActive ? .green : .red)
                 }
                 
                 // Details depending on type
                 switch blockItem.type {
-                case let .scheduled(startTime, endTime, isActive, isPaused, suspendedUntil):
+                case let .scheduled(startTime, endTime, _, isPaused, suspendedUntil):
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Start: \(startTime.description)")
-                        Text("End: \(endTime.description)")
-                        Text("Paused: \(isPaused.description)")
-                        Text("Suspended until: \(suspendedUntil?.formatted() ?? "—")")
+                        Text(String.localizedStringWithFormat(Constants.Strings.cardStart, startTime.description))
+                        Text(String.localizedStringWithFormat(Constants.Strings.cardEnd, endTime.description))
+                        Text(String.localizedStringWithFormat(Constants.Strings.cardPaused, isPaused.description))
+                        Text(String.localizedStringWithFormat(Constants.Strings.cardSuspendedUntil, suspendedUntil?.formatted() ?? "—"))
                     }
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     
                 case let .duration(duration, suspendedAt, suspendedUntil, endDate):
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Duration: \(duration.description)")
-                        Text("Suspended at: \(suspendedAt?.formatted() ?? "—")")
-                        Text("Suspended until: \(suspendedUntil?.formatted() ?? "—")")
-                        Text("End date: \(endDate?.formatted() ?? "—")")
+                        Text(String.localizedStringWithFormat(Constants.Strings.cardDuration, duration.description))
+                        Text(String.localizedStringWithFormat(Constants.Strings.cardSuspendedAt, suspendedAt?.formatted() ?? "—"))
+                        Text(String.localizedStringWithFormat(Constants.Strings.cardSuspendedUntil, suspendedUntil?.formatted() ?? "—"))
+                        Text(String.localizedStringWithFormat(Constants.Strings.cardEndDate, endDate?.formatted() ?? "—"))
                     }
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
@@ -271,4 +271,3 @@ struct ShieldDebugView: View {
         viewModel: .init(blockItemPersistenceManager: manager)
     )
 }
-

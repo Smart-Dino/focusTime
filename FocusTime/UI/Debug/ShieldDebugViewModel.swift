@@ -23,9 +23,9 @@ final class ShieldDebugViewModel {
             var buttonTitle: String {
                 switch self {
                 case .scheduled:
-                    "Activate scheduled block"
+                    ShieldDebugView.Constants.Strings.activateScheduledBlock
                 case .duration:
-                    "Start duration block"
+                    ShieldDebugView.Constants.Strings.startDurationBlock
                 }
             }
         }
@@ -160,8 +160,8 @@ final class ShieldDebugViewModel {
                 }
                 
                 let blockItem = ProtectedBlockItem(emoji: "❌",
-                                                   name: "Block",
-                                                    days: state.daySelection,
+                                                   name: ShieldDebugView.Constants.Strings.defaultBlockItemName,
+                                                   days: state.daySelection,
                                                    type: type,
                                                    blockedContent: protectedSelection)
                 
@@ -266,4 +266,3 @@ final class ShieldDebugViewModel {
     }
     
 }
-

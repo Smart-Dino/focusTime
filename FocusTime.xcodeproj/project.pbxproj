@@ -231,13 +231,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		6742416F2E27EED600500101 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		674FA6972DB05ACE0002FDC1 = {
 			isa = PBXGroup;
 			children = (
@@ -248,7 +241,6 @@
 				C68617AD2E2976BD00E49BF7 /* FocusTimeShieldConfiguration */,
 				C6A8A0B62E327781004B0D75 /* FocusTimeActivityReport */,
 				E97895A62E0AFCBE00E0AF42 /* Frameworks */,
-				6742416F2E27EED600500101 /* Frameworks */,
 				674FA6A12DB05ACE0002FDC1 /* Products */,
 			);
 			sourceTree = "<group>";

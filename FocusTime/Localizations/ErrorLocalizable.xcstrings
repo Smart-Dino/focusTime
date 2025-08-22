@@ -74,10 +74,24 @@
       }
     },
     "device_activity_registrar_cannot_suspend_description" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cannot suspend this activity due to it being shorter than the suspension length."
+          }
+        }
+      }
     },
     "device_activity_registrar_cannot_suspend_reason" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The suspension length is bigger than the rest of the activity."
+          }
+        }
+      }
     },
     "device_activity_registrar_could_not_check_overlap_description" : {
       "comment" : "A description provided when an error occurs while checking if a schedule overlaps with existing activities.",
