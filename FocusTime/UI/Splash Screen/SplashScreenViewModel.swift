@@ -14,9 +14,9 @@ import SwiftUI
 final class SplashScreenViewModel {
     struct State {
         var viewOpacity: Double = .zero
+        var player: AVPlayer?
     }
     private(set) var state: State
-    private(set) var player: AVPlayer?
     private let logger: Logger
     @ObservationIgnored var playerNotificationTask: Task<Void, Never>? = nil
     
@@ -32,7 +32,7 @@ final class SplashScreenViewModel {
         self.logger = logger
 
         if let videoURL {
-            self.player = AVPlayer(url: videoURL)
+            self.state.player = AVPlayer(url: videoURL)
             subscribeToPlayer()
         } else {
             self.logger.warning(
@@ -53,18 +53,18 @@ final class SplashScreenViewModel {
         playerNotificationTask = Task.detached { [weak self] in
             let notifications = await NotificationCenter.default.notifications(
                 named: .AVPlayerItemDidPlayToEndTime,
-                object: self?.player?.currentItem
+                object: self?.state.player?.currentItem
             )
             
             for await _ in notifications {
-                await self?.player?.seek(to: .zero)
-                await self?.player?.play()
+                await self?.state.player?.seek(to: .zero)
+                await self?.state.player?.play()
             }
         }
     }
     
     func playMedia() {
-        player?.play()
+        state.player?.play()
     }
     
     func startIncreaseOpacityAnimation() {

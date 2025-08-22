@@ -61,6 +61,7 @@ final class HomeViewModel {
     weak var delegate: HomeViewDelegate?
     
     private var fetchTask: Task<Void, Never>?
+    private var pauseResumeTask: Task<Void, Never>?
     private var dbChangesNotificationTask: Task<Void, Never>?
     
     init(
@@ -92,6 +93,18 @@ final class HomeViewModel {
         }
     }
     
+    func setTimerIsPaused(_ pause: Bool) {
+        if pause {
+            timer.pause()
+        } else {
+            if let upcomingOrRunningItem = state.upcomingOrRunningItem {
+                // Since duration blocking updates it's deadline after resumption we need to recreate the timer.
+                timer.startTimer(for: upcomingOrRunningItem)
+                timer.resume()
+            }
+        }
+    }
+    
     func startTimer(for blockItem: ProtectedBlockItem) {
         timer.startTimer(for: blockItem, withSuspensionCountdown: true)
     }
@@ -119,6 +132,25 @@ final class HomeViewModel {
     
     func showScheduledFocusView() {
         state.nextNavigationScreen = .scheduledFocusList(makeScheduledFocusViewModel())
+    }
+    
+    func showTaskConcentrationView(isPauseAction: Bool) {
+        if state.isPaused {
+            if let viewModel = makeTaskConcentrationViewModel(with: .breakTime) {
+                state.nextNavigationScreen = .taskConcentration(viewModel)
+                return
+            }
+        }
+        
+        if isPauseAction {
+            if let viewModel = makeTaskConcentrationViewModel(with: .breakTransition) {
+                state.nextNavigationScreen = .taskConcentration(viewModel)
+            }
+        } else {
+            if let viewModel = makeTaskConcentrationViewModel(with: .focus) {
+                state.nextNavigationScreen = .taskConcentration(viewModel)
+            }
+        }
     }
     
     func showTaskConcentrationView(isPauseAction: Bool) {

@@ -19,5 +19,5 @@ protocol QuizOnboardingDelegate: AnyObject {
 
 @MainActor
 protocol SlideOnboardingDelegate: AnyObject {
-    func didFinishOnboardingSlides(skipped: Bool)
+    func didFinishOnboardingSlides(skipped: Bool?)
 }

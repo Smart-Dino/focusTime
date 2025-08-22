@@ -81,6 +81,7 @@ extension OnboardingPaywallView {
         enum Strings {
             // Purchase button states
             static let tryButtonTitle = String(localized: "onboarding_paywall_try_free_and_subscribe_button", table: "PaywallLocalizable")
+            static let subscribeButtonTitle = SharedConstants.Strings.subscribeTitle
             static let pendingTitle = SharedConstants.Strings.pendingTitle
             static let subscribedTitle = SharedConstants.Strings.subscribedTitle
             

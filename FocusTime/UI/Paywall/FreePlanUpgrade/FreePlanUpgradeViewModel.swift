@@ -55,7 +55,7 @@ final class FreePlanUpgradeViewModel {
     func setupView() {
         Task {
             await fetchProducts()
-            selectRequestedProduct()
+            superPaywallVM.selectProductWithID(state.requestedProductID, state: state.superState)
             setupProductInfo()
         }
     }
@@ -75,10 +75,6 @@ final class FreePlanUpgradeViewModel {
         state.superState.isButtonDisabled = false
     }
     
-    func selectRequestedProduct() {
-        superPaywallVM.selectProductWithID(state.requestedProductID, state: state.superState)
-    }
-    
     func getCurrentPaymentManager() -> PaymentManager {
         superPaywallVM.getCurrentPaymentManager()
     }
@@ -92,9 +88,12 @@ final class FreePlanUpgradeViewModel {
             return
         }
         
-        if let description = product.trialPeriodDescription {
-            state.trialPeriodDescription = description
+        state.purchaseButtonTitle = if product.trialPeriod != nil {
+            State.stringConstants.tryButtonTitle
+        } else {
+            State.stringConstants.subscribeButtonTitle
         }
+        state.trialPeriodDescription = product.offerDescription
     }
     
     private func updateUIBasedOnPurchaseResult() {
