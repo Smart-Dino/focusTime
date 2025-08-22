@@ -129,8 +129,8 @@
 				BusinessLogic/Models/Blocking/BlockItem/ProtectedBlockItem.swift,
 				BusinessLogic/Models/Blocking/CodableActivityIdentifier/CodableActivityIdentifier.swift,
 				BusinessLogic/Stores/Protocols/ProtectedModel.swift,
-				"Extentions/Date+Ext.swift",
-				"Extentions/DateComponents+Ext.swift",
+				"Extensions/Date+Ext.swift",
+				"Extensions/DateComponents+Ext.swift",
 				Shared/SharedAppValues.swift,
 			);
 			target = E97895A42E0AFCBE00E0AF42 /* FocusTimeActivityMonitor */;
@@ -1042,23 +1042,20 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		C689F2332E533B780090BB82 /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/airbnb/lottie-spm";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 4.5.2;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCRemoteSwiftPackageReference section */
 		0C439A252E3249F80031E7EB /* XCRemoteSwiftPackageReference "OnboardingKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Smart-Dino/OnboardingKit.git";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 1.2.0;
+			};
+		};
+		C689F2332E533B780090BB82 /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/airbnb/lottie-spm";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.5.2;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

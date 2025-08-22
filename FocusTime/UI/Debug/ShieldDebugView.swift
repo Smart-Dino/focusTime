@@ -85,7 +85,7 @@ struct ShieldDebugView: View {
                 viewModel.blockSelectionDuringSchedule()
             }
             
-            Button("Block for a minute") {
+            Button("Suspend for a minute") {
                 viewModel.suspendFor()
             }
             

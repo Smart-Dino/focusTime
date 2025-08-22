@@ -5,6 +5,7 @@
 //  Created by Keto Nioradze on 04.08.25.
 //
 
+#if DEBUG
 import SwiftUI
 
 // MARK: - Test exstension!!!
@@ -24,4 +25,5 @@ extension View {
         }
     }
 }
+#endif
 
