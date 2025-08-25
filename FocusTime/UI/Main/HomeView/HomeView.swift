@@ -128,24 +128,17 @@ struct HomeView: View {
         
         return Group {
             if isActive {
-                FTHomeSessionCardView(
+                FTActiveHomeSessionCardView(
                     title: item.name,
-                    description: viewModel.timer.payload.formatted,
-                    isActive: isActive,
-                    isPaused: .init(
-                        get: { viewModel.timer.isPaused },
-                        set: { viewModel.setTimerIsPaused($0) }
-                    )
+                    timer: viewModel.getTimer(for: item),
+                    isPaused: viewModel.state.isPaused,
+                    action: {}, // This will show timer detail view but it is not ready in this branch.
+                    pauseAction: viewModel.togglePause
                 )
-                .onAppear {
-                    viewModel.startTimer(for: item)
-                }
             } else {
                 FTHomeSessionCardView(
                     title: item.name,
-                    description: item.type.description,
-                    isActive: isActive,
-                    isPaused: .constant(true)
+                    description: item.type.description
                 )
             }
         }

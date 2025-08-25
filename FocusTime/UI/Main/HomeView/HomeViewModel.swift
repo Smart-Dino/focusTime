@@ -35,10 +35,20 @@ final class HomeViewModel {
         var error: Error? = nil
         
         var upcomingOrRunningItem: ProtectedBlockItem?
+        var isPaused: Bool {
+            guard let upcomingOrRunningItem else { return true }
+            
+            if !upcomingOrRunningItem.isPaused {
+                return false
+            } else {
+                return true
+            }
+        }
+        
         var nextNavigationScreen: HomeViewNavigationRoute?
     }
     
-    let timer: FTTimer
+    private let timer: FTTimer
     private(set) var state: State
     
     private let deviceActivityRegistrar: DeviceActivityRegistrar
@@ -78,7 +88,13 @@ final class HomeViewModel {
         }
     }
     
-    func setTimerIsPaused(_ pause: Bool) {
+    func togglePause() {
+        let pause = !state.isPaused
+        
+        setTimerIsPaused(pause)
+    }
+    
+    private func setTimerIsPaused(_ pause: Bool) {
         // Cancel any previously running pause/resume task
         pauseResumeTask?.cancel()
         
@@ -113,8 +129,9 @@ final class HomeViewModel {
     }
 
     
-    func startTimer(for blockItem: ProtectedBlockItem) {
+    func getTimer(for blockItem: ProtectedBlockItem) -> FTTimer {
         timer.startTimer(for: blockItem)
+        return timer
     }
     
     func setUpcomingItem() {

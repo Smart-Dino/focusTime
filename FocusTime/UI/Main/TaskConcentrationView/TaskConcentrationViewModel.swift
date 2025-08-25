@@ -19,7 +19,7 @@ final class TaskConcentrationViewModel {
     }
     
     private(set) var state: State
-    let timer: FTTimer
+    private let timer: FTTimer
     
     init(
         state: State = State(),
@@ -27,6 +27,10 @@ final class TaskConcentrationViewModel {
     ) {
         self.state = state
         self.timer = timer
+    }
+    
+    func getTimer() -> FTTimer {
+        timer
     }
     
     func updateUIBasedOnTimerState() {

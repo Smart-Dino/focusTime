@@ -106,14 +106,11 @@ struct DraftsBlockItemListView: View {
     @ViewBuilder
     private func sessionCard(for block: ProtectedBlockItem) -> some View {
         if block.isActive {
-            FTSessionDraftRowView(
+            FTActiveSessionDraftRowView(
                 emoji: block.emoji,
                 title: block.name,
-                description: viewModel.timer.payload.formatted
+                timer: viewModel.getTimer(for: block)
             )
-            .onAppear {
-                viewModel.startTimer(for: block)
-            }
         } else {
             if block.isScheduled {
                 FTSessionScheduledRowView(

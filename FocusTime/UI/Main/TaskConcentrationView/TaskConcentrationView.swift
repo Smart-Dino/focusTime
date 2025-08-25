@@ -32,7 +32,7 @@ struct TaskConcentrationView: View {
                 // Timer.
                 FTFlipClockView(
                     configuration: .init(),
-                    timer: viewModel.timer
+                    timer: viewModel.getTimer()
                 )
                 .padding([.top, .horizontal])
                 Text(Constants.Strings.timerTitle)

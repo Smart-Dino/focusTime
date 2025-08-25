@@ -68,7 +68,7 @@ final class MainFlowCoordinatorViewModel {
     }
     
     private(set) var state: State
-    let timer: FTTimer
+    private let timer: FTTimer
     
     private let deviceActivityRegistrar: DeviceActivityRegistrar
     private let blockItemPersistenceManager: BlockItemPersistenceManager
