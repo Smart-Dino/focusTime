@@ -26,10 +26,12 @@ extension FocusSessionView.Constants {
         
         enum Layout {
             static let mainSpacing: CGFloat = 16
-            static let gridHSpacing: CGFloat = 20
+            static let gridHSpacing: CGFloat = 1
             static let minimumCellWidth: CGFloat = 80
             static let gridVSpacing: CGFloat = 20
-            static var gridColumns: [GridItem] { [GridItem(.adaptive(minimum: minimumCellWidth), spacing: gridHSpacing)] }
+            static var gridColumns: [GridItem] {
+                [GridItem(.adaptive(minimum: minimumCellWidth), spacing: gridHSpacing)]
+            }
         }
     }
     
