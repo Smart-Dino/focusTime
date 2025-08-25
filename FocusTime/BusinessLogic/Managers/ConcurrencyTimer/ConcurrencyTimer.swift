@@ -58,7 +58,7 @@ final class ConcurrencyTimer: FTTimer {
                 if !isPaused {
                     ping()
                 }
-                try? await Task.sleep(for: .seconds(1), tolerance: .milliseconds(100))
+                try? await Task.sleep(for: .seconds(1), tolerance: SharedAppValues.timerLeeway)
             }
         }
     }
