@@ -25,10 +25,10 @@ final class ScheduleConfigurationViewModel {
     struct State: Equatable {
         var blockItem: ProtectedBlockItem = .default
         
-        var durationHours: Int = FocusSessionView.Constants.Configuration.DefaultValues.durationHours
-        var durationMinutes: Int = FocusSessionView.Constants.Configuration.DefaultValues.durationMinutes
-        var startTime: Date = FocusSessionView.Constants.Configuration.DefaultValues.startTime
-        var endTime: Date = FocusSessionView.Constants.Configuration.DefaultValues.endTime
+        var durationHours: Int = FocusSessionView.Constants.DefaultValues.durationHours
+        var durationMinutes: Int = FocusSessionView.Constants.DefaultValues.durationMinutes
+        var startTime: Date = FocusSessionView.Constants.DefaultValues.startTime
+        var endTime: Date = FocusSessionView.Constants.DefaultValues.endTime
         
         var isScheduledForLater: Bool = false
         

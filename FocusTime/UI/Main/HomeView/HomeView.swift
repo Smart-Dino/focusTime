@@ -80,7 +80,7 @@ struct HomeView: View {
                 .frame(minHeight: 130) // Used so that the screen time value stays in the same place
             }
         }
-        .background { MainBackgroundGradientView() }
+        .background { FTBackgroundGradientView() }
         .dynamicTypeSize(...DynamicTypeSize.accessibility2)
         // MARK: - Bottom floating button
         .safeAreaInset(edge: .bottom) {

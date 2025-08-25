@@ -15,14 +15,14 @@ struct ScheduleConfigurationView: View {
     
     // MARK: - Body
     var body: some View {
-        VStack(alignment: .leading, spacing: FocusSessionView.Constants.Configuration.Layout.mainSpacing) {
-            HStack(spacing: FocusSessionView.Constants.Configuration.Layout.listIconSpacing) {
+        VStack(alignment: .leading, spacing: Constants.Layout.mainSpacing) {
+            HStack(spacing: Constants.Layout.listIconSpacing) {
                 Group {
                 HStack {
-                    Text(FocusSessionView.Constants.Configuration.Strings.listName)
+                    Text(Constants.Strings.listName)
                     Spacer()
                     TextField(
-                        FocusSessionView.Constants.Configuration.Strings.listNamePlaceholder,
+                        Constants.Strings.listNamePlaceholder,
                         text: .binding(
                             get: viewModel.state.blockItem.name,
                             set: viewModel.setListName(listName:)
@@ -55,23 +55,23 @@ struct ScheduleConfigurationView: View {
                 .rowStyle()
             }
             
-            VStack(alignment: .leading, spacing: FocusSessionView.Constants.Configuration.Layout.scheduleSectionSpacing) {
+            VStack(alignment: .leading, spacing: Constants.Layout.scheduleSectionSpacing) {
                 HStack {
-                    Text(FocusSessionView.Constants.Configuration.Strings.scheduleForLater)
+                    Text(Constants.Strings.scheduleForLater)
                     Spacer()
                     Toggle(
-                        FocusSessionView.Constants.Configuration.Strings.scheduleForLater,
+                        Constants.Strings.scheduleForLater,
                         isOn: .binding(
                             get: viewModel.state.isScheduledForLater,
                             set: viewModel.setScheduleForLater(isOn:)
                         )
                     )
                     .labelsHidden()
-                    .tint(FocusSessionView.Constants.Configuration.Colors.toggleTint)
+                    .tint(Constants.Colors.toggleTint)
                 }
                 .rowStyle()
                 
-                Text(FocusSessionView.Constants.Configuration.Strings.scheduleInfo)
+                Text(Constants.Strings.scheduleInfo)
                     .font(.caption)
                     .multilineTextAlignment(.leading)
             }
@@ -88,10 +88,10 @@ struct ScheduleConfigurationView: View {
                     }
                 } label: {
                     HStack {
-                        Text(FocusSessionView.Constants.Configuration.Strings.scheduledDays)
+                        Text(Constants.Strings.scheduledDays)
                         Spacer()
-                        Image(systemName: FocusSessionView.Constants.Symbols.navigationChevron)
-                            .foregroundStyle(FocusSessionView.Constants.Colors.chevronColor)
+                        Image(systemName: Constants.Symbols.navigationChevron)
+                            .foregroundStyle(Constants.Colors.chevronColor)
                     }
                 }
                 .menuActionDismissBehavior(.disabled)
@@ -106,12 +106,12 @@ struct ScheduleConfigurationView: View {
                     viewModel.presentStartTimePicker()
                 } label: {
                     HStack {
-                        Text(FocusSessionView.Constants.Configuration.Strings.startTime)
+                        Text(Constants.Strings.startTime)
                         Spacer()
                         Text(viewModel.state.blockItem.type.structuredDescription.startTime ?? String())
                             .foregroundStyle(.white)
-                        Image(systemName: FocusSessionView.Constants.Symbols.navigationChevron)
-                            .foregroundStyle(FocusSessionView.Constants.Colors.chevronColor)
+                        Image(systemName: Constants.Symbols.navigationChevron)
+                            .foregroundStyle(Constants.Colors.chevronColor)
                     }
                 }
                 .rowStyle()
@@ -120,12 +120,12 @@ struct ScheduleConfigurationView: View {
                     viewModel.presentEndTimePicker()
                 } label: {
                     HStack {
-                        Text(FocusSessionView.Constants.Configuration.Strings.endTime)
+                        Text(Constants.Strings.endTime)
                         Spacer()
                         Text(viewModel.state.blockItem.type.structuredDescription.endTime ?? String())
                             .foregroundStyle(.white)
-                        Image(systemName: FocusSessionView.Constants.Symbols.navigationChevron)
-                            .foregroundStyle(FocusSessionView.Constants.Colors.chevronColor)
+                        Image(systemName: Constants.Symbols.navigationChevron)
+                            .foregroundStyle(Constants.Colors.chevronColor)
                     }
                 }
                 .rowStyle()
@@ -134,12 +134,12 @@ struct ScheduleConfigurationView: View {
                     viewModel.presentDurationPicker()
                 } label: {
                     HStack {
-                        Text(FocusSessionView.Constants.Configuration.Strings.duration)
+                        Text(Constants.Strings.duration)
                         Spacer()
                         Text(viewModel.state.blockItem.type.structuredDescription.duration ?? String())
                             .foregroundStyle(.white)
-                        Image(systemName: FocusSessionView.Constants.Symbols.navigationChevron)
-                            .foregroundStyle(FocusSessionView.Constants.Colors.chevronColor)
+                        Image(systemName: Constants.Symbols.navigationChevron)
+                            .foregroundStyle(Constants.Colors.chevronColor)
                     }
                 }
                 .rowStyle()
@@ -149,11 +149,11 @@ struct ScheduleConfigurationView: View {
                 viewModel.presentAppBlockerSheet()
             } label: {
                 HStack {
-                    Text(FocusSessionView.Constants.Configuration.Strings.appsBlocked)
+                    Text(Constants.Strings.appsBlocked)
                     Spacer()
-                    Text(FocusSessionView.Constants.Configuration.Strings.appsBlockedList)
-                    Image(systemName: FocusSessionView.Constants.Symbols.navigationChevron)
-                        .foregroundStyle(FocusSessionView.Constants.Colors.chevronColor)
+                    Text(Constants.Strings.appsBlockedList)
+                    Image(systemName: Constants.Symbols.navigationChevron)
+                        .foregroundStyle(Constants.Colors.chevronColor)
                 }
             }
             .rowStyle()
@@ -180,7 +180,9 @@ struct ScheduleConfigurationView: View {
                     minutes: .binding(
                         get: viewModel.state.durationMinutes,
                         set: viewModel.setMinutes(minutes:)
-                    )
+                    ),
+                    title: Constants.Strings.durationPickerTitle,
+                    subtitle: Constants.Strings.durationPickerSubtitle
                 )
                 .presentationDetents([.height(FocusSessionView.Constants.Layout.sheetHeight)])
                 
@@ -190,8 +192,9 @@ struct ScheduleConfigurationView: View {
                         get: viewModel.state.startTime,
                         set: viewModel.setStartTime(startTime:)
                     ),
-                    title: TimePickerConstants.Strings.startTimeTitle,
-                    subtitle: TimePickerConstants.Strings.startTimeSubtitle
+                    title: Constants.Strings.startTimeTitle,
+                    subtitle: Constants.Strings.startTimeSubtitle,
+                    minuteInterval: Constants.DefaultValues.minuteInterval
                 )
                 .presentationDetents([.height(FocusSessionView.Constants.Layout.sheetHeight)])
                 
@@ -201,8 +204,9 @@ struct ScheduleConfigurationView: View {
                         get: viewModel.state.endTime,
                         set: viewModel.setEndTime(endTime:)
                     ),
-                    title: TimePickerConstants.Strings.endTimeTitle,
-                    subtitle: TimePickerConstants.Strings.endTimeSubtitle
+                    title: Constants.Strings.endTimeTitle,
+                    subtitle: Constants.Strings.endTimeSubtitle,
+                    minuteInterval: Constants.DefaultValues.minuteInterval
                 )
                 .presentationDetents([.height(FocusSessionView.Constants.Layout.sheetHeight)])
                 

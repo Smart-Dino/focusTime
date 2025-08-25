@@ -7,9 +7,9 @@
 
 import SwiftUI
 
-extension FocusSessionView.Constants {
+extension ScheduleConfigurationView {
     // MARK: - Constants for ScheduleConfigurationView
-    enum Configuration {
+    enum Constants {
         enum Strings {
             static let listName = String(
                 localized: "List name",
@@ -66,6 +66,40 @@ extension FocusSessionView.Constants {
                 table: "SessionLocalizable",
                 comment: "Label for the end time setting"
             )
+            
+            // Schedule picker.
+            static let startTimeTitle = String(
+                localized: "Start Time",
+                table: "Localizable",
+                comment: "Title for start time"
+            )
+            static let startTimeSubtitle = String(
+                localized: "Choose when the session starts",
+                table: "Localizable",
+                comment: "Title for start session subtitle"
+            )
+            static let endTimeTitle = String(
+                localized: "End Time",
+                table: "Localizable",
+                comment: "Title for end time"
+            )
+            static let endTimeSubtitle = String(
+                localized: "Choose when the session ends",
+                table: "Localizable",
+                comment: "Title for end session subtitle"
+            )
+            
+            // Duration picker.
+            static let durationPickerTitle = String(
+                localized: "Session Length",
+                table: "SessionLocalizable",
+                comment: "Title for the duration picker sheet"
+            )
+            static let durationPickerSubtitle = String(
+                localized: "Choose how long you want to stay focused",
+                table: "SessionLocalizable",
+                comment: "Subtitle for the duration picker sheet"
+            )
         }
         
         enum Layout {
@@ -78,13 +112,15 @@ extension FocusSessionView.Constants {
         
         enum Colors {
             static let toggleTint = Color.green
+            static let chevronColor = Color.blue
+        }
+        
+        enum Symbols {
+            static let navigationChevron = "chevron.right"
         }
         
         enum DefaultValues {
-            static let durationHours = 0
-            static let durationMinutes = 30
-            static let startTime: Date = Calendar.current.date(from: DateComponents(hour: 9, minute: 0))!
-            static let endTime: Date = Calendar.current.date(from: DateComponents(hour: 17, minute: 0))!
+            public static let minuteInterval: Int = 15
         }
     }
 }

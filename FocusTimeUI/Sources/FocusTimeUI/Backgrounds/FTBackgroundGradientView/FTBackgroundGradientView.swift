@@ -1,5 +1,5 @@
 //
-//  MainBackgroundGradientView.swift
+//  FTBackgroundGradientView.swift
 //  FocusTime
 //
 //  Created by Maksym Horobets on 17.06.2025.
@@ -7,8 +7,8 @@
 
 import SwiftUI
 
-struct MainBackgroundGradientView: View {
-    var body: some View {
+public struct FTBackgroundGradientView: View {
+    public var body: some View {
         ZStack {
             Color.ftBackground
                 .ignoresSafeArea()
@@ -27,5 +27,5 @@ struct MainBackgroundGradientView: View {
 }
 
 #Preview {
-    MainBackgroundGradientView()
+    FTBackgroundGradientView()
 }

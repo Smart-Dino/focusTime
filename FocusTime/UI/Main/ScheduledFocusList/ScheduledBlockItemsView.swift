@@ -32,7 +32,7 @@ struct ScheduledBlockItemsView: View {
             }
             .padding(.horizontal)
         }
-        .background { MainBackgroundGradientView() }
+        .background { FTBackgroundGradientView() }
         // MARK: - Bottom floating button
         .safeAreaInset(edge: .bottom) {
             Button(

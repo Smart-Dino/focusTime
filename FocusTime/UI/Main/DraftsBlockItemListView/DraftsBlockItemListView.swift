@@ -42,7 +42,7 @@ struct DraftsBlockItemListView: View {
             }
             .padding(.horizontal)
         }
-        .background { MainBackgroundGradientView() }
+        .background { FTBackgroundGradientView() }
         // MARK: - Bottom floating button
         .safeAreaInset(edge: .bottom) {
             Button(

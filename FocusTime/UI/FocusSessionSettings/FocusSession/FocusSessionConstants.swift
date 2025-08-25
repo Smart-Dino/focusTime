@@ -42,15 +42,16 @@ extension FocusSessionView {
             static let floatingButtonHorizontalPadding: CGFloat = 20
         }
         
-        // MARK: - General Colors
-        enum Colors {
-            static let chevronColor = Color.blue
-        }
-        
         // MARK: - Symbols
         enum Symbols {
             static let startButtonIcon = "hourglass"
-            static let navigationChevron = "chevron.right"
+        }
+        
+        enum DefaultValues {
+            static let durationHours = 0
+            static let durationMinutes = 30
+            static let startTime: Date = Calendar.current.date(from: DateComponents(hour: 9, minute: 0))!
+            static let endTime: Date = Calendar.current.date(from: DateComponents(hour: 17, minute: 0))!
         }
     }
 }
