@@ -22,16 +22,6 @@ extension FocusSessionView {
                 table: "SessionLocalizable",
                 comment: "Title for the start button"
             )
-            static let durationPickerSheetErrorTitle = String(
-                localized: "Error: DurationPickerSheetViewModel not initialized.",
-                table: "SessionLocalizable",
-                comment: "Error message for duration picker"
-            )
-            static let defaultListName = String(
-                localized: "Focus Session",
-                table: "SessionLocalizable",
-                comment: "Default name for a new focus session"
-            )
         }
         
         // MARK: - General Layout

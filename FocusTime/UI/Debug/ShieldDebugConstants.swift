@@ -60,8 +60,6 @@ extension ShieldDebugView {
         
         // MARK: - Layout
         enum Layout {
-            static let sectionVerticalSpacing: CGFloat = 24
-            static let buttonVerticalSpacing: CGFloat = 12
             static let horizontalPadding: CGFloat = 16
         }
         

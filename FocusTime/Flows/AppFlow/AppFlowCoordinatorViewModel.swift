@@ -72,7 +72,6 @@ final class AppFlowCoordinatorViewModel {
         
         var currentFlow: AppScreen
         var screenCover: AppFullScreenCover?
-        var error: Error?
         
         init(currentFlow: AppScreen) {
             self.currentFlow = currentFlow
@@ -105,12 +104,6 @@ final class AppFlowCoordinatorViewModel {
         self.persistenceStoreFactory = persistenceStoreFactory
         
         Task { await startLaunchSequence() }
-    }
-    
-    func setErrorVisibility(_ isVisible: Bool) {
-        if !isVisible {
-            state.error = nil
-        }
     }
     
     func setStateFlow(to screen: State.AppScreen?) {

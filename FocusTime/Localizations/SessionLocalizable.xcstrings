@@ -1,9 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "App List Picker Screen" : {
-      "comment" : "Accessibility label or destination title for app list picker"
-    },
     "Apps Blocked" : {
       "comment" : "Label for the 'Apps Blocked' setting"
     },
@@ -18,12 +15,6 @@
     },
     "Duration" : {
       "comment" : "Label for the duration setting"
-    },
-    "End time" : {
-      "comment" : "Label for the end time setting"
-    },
-    "Error: DurationPickerSheetViewModel not initialized." : {
-      "comment" : "Error message for duration picker"
     },
     "Focus Session" : {
       "comment" : "Default name for a new focus session"
@@ -72,9 +63,6 @@
     },
     "Start" : {
       "comment" : "Title for the start button"
-    },
-    "Start time" : {
-      "comment" : "Label for the start time setting"
     },
     "Study" : {
       "comment" : "Focus preset: Study"

@@ -106,7 +106,7 @@ struct ScheduleConfigurationView: View {
                     viewModel.presentStartTimePicker()
                 } label: {
                     HStack {
-                        Text(Constants.Strings.startTime)
+                        Text(Constants.Strings.startTimeTitle)
                         Spacer()
                         Text(viewModel.state.blockItem.type.structuredDescription.startTime ?? String())
                             .foregroundStyle(.white)
@@ -120,7 +120,7 @@ struct ScheduleConfigurationView: View {
                     viewModel.presentEndTimePicker()
                 } label: {
                     HStack {
-                        Text(Constants.Strings.endTime)
+                        Text(Constants.Strings.endTimeTitle)
                         Spacer()
                         Text(viewModel.state.blockItem.type.structuredDescription.endTime ?? String())
                             .foregroundStyle(.white)

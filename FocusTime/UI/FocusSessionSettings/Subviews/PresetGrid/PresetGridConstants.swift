@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import FocusTimeUI
 
 extension FocusSessionView.Constants {
     // MARK: - Constants for FocusPresetGridView

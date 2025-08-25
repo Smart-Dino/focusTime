@@ -33,9 +33,5 @@ extension DurationPickerSheetView {
             static let containerHeight: CGFloat = 213
             static let containerCornerRadius: CGFloat = 13
         }
-        
-        enum Colors {
-            static let pickerBackground = Color(.darkGray).opacity(0.1)
-        }
     }
 }

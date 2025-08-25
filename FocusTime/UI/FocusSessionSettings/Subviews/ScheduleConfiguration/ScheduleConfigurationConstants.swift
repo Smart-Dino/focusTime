@@ -46,25 +46,10 @@ extension ScheduleConfigurationView {
                 table: "SessionLocalizable",
                 comment: "Value indicating the app list is available"
             )
-            static let appListPickerDestination = String(
-                localized: "App List Picker Screen",
-                table: "SessionLocalizable",
-                comment: "Accessibility label or destination title for app list picker"
-            )
             static let scheduledDays = String(
                 localized: "Scheduled Days",
                 table: "SessionLocalizable",
                 comment: "Label for the 'Scheduled Days' setting"
-            )
-            static let startTime = String(
-                localized: "Start time",
-                table: "SessionLocalizable",
-                comment: "Label for the start time setting"
-            )
-            static let endTime = String(
-                localized: "End time",
-                table: "SessionLocalizable",
-                comment: "Label for the end time setting"
             )
             
             // Schedule picker.
@@ -106,8 +91,6 @@ extension ScheduleConfigurationView {
             static let mainSpacing: CGFloat = 16
             static let scheduleSectionSpacing: CGFloat = 8
             static let listIconSpacing: CGFloat = 12
-            static let selectedIconSize: CGFloat = 36
-            static let scheduledDaysTextPadding: CGFloat = 16
         }
         
         enum Colors {
