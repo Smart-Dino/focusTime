@@ -17,12 +17,12 @@ extension DurationPickerSheetView {
         
         enum Strings {
             static let hoursPickerTitle = String(
-                localized: "Hours",
+                localized: "duration_picker_sheet_view_hours_picker_title",
                 table: "SessionLocalizable",
                 comment: "Label for hours picker in duration sheet"
             )
             static let minutesPickerTitle = String(
-                localized: "Minutes",
+                localized: "duration_picker_sheet_view_minutes_picker_title",
                 table: "SessionLocalizable",
                 comment: "Label for minutes picker in duration sheet"
             )

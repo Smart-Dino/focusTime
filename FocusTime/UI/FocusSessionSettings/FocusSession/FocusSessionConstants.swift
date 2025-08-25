@@ -1,5 +1,5 @@
 //
-//  SessionSettingConstants.swift
+//  FocusSessionConstants.swift
 //  FocusTime
 //
 //  Created by Keto Nioradze on 18.06.25.
@@ -13,12 +13,12 @@ extension FocusSessionView {
         // MARK: - General Strings
         enum Strings {
             static let navigationTitle = String(
-                localized: "Focus Setup",
+                localized: "focus_session_view_navigation_title",
                 table: "SessionLocalizable",
                 comment: "Navigation title for the focus session setup screen"
             )
             static let startButtonTitle = String(
-                localized: "Start",
+                localized: "focus_session_view_start_button_title",
                 table: "SessionLocalizable",
                 comment: "Title for the start button"
             )

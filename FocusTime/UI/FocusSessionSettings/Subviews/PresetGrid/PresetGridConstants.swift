@@ -12,12 +12,12 @@ extension FocusSessionView.Constants {
     enum PresetGrid {
         enum Strings {
             static let title = String(
-                localized: "Choose Your Focus Preset",
+                localized: "focus_session_view_preset_grid_title",
                 table: "SessionLocalizable",
                 comment: "Title for the focus preset selection grid"
             )
             static let subtitle = String(
-                localized: "Ready-made blocklists to help you stay focused. Choose a preset to quickly block distracting apps.",
+                localized: "focus_session_view_preset_grid_subtitle",
                 table: "SessionLocalizable",
                 comment: "Subtitle explaining preset blocklists"
             )

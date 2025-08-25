@@ -23,42 +23,42 @@ enum FocusPreset: String, CaseIterable, Identifiable {
     var name: String {
         switch self {
         case .morningRoutine: return String(
-            localized: "Morning\nRoutine",
+            localized: "focus_preset_morning_routine",
             table: "SessionLocalizable",
             comment: "Focus preset: Morning Routine"
         )
         case .socialDetox: return String(
-            localized: "Social\nDetox",
+            localized: "focus_preset_social_detox",
             table: "SessionLocalizable",
             comment: "Focus preset: Social Detox"
         )
         case .workSprint: return String(
-            localized: "Work\nSprint",
+            localized: "focus_preset_work_sprint",
             table: "SessionLocalizable",
             comment: "Focus preset: Work Sprint"
         )
         case .zeroDistraction: return String(
-            localized: "Zero\nDistraction",
+            localized: "focus_preset_zero_distraction",
             table: "SessionLocalizable",
             comment: "Focus preset: Zero Distraction"
         )
         case .study: return String(
-            localized: "Study",
+            localized: "focus_preset_study",
             table: "SessionLocalizable",
             comment: "Focus preset: Study"
         )
         case .creative: return String(
-            localized: "Creative",
+            localized: "focus_preset_creative",
             table: "SessionLocalizable",
             comment: "Focus preset: Creative"
         )
         case .mindfulness: return String(
-            localized: "Mindfulness",
+            localized: "focus_preset_mindfulness",
             table: "SessionLocalizable",
             comment: "Focus preset: Mindfulness"
         )
         case .reading: return String(
-            localized: "Reading",
+            localized: "focus_preset_reading",
             table: "SessionLocalizable",
             comment: "Focus preset: Reading"
         )

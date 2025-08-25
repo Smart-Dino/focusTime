@@ -12,76 +12,76 @@ extension ScheduleConfigurationView {
     enum Constants {
         enum Strings {
             static let listName = String(
-                localized: "List name",
+                localized: "schedule_configuration_view_list_name",
                 table: "SessionLocalizable",
                 comment: "Label for the list name input field"
             )
             static let listNamePlaceholder = String(
-                localized: "Name",
+                localized: "schedule_configuration_view_list_name_placeholder",
                 table: "SessionLocalizable",
                 comment: "Placeholder text for the list name input field"
             )
             static let scheduleForLater = String(
-                localized: "Schedule for later",
+                localized: "schedule_configuration_view_schedule_for_later",
                 table: "SessionLocalizable",
                 comment: "Label for the 'Schedule for later' toggle"
             )
             static let scheduleInfo = String(
-                localized: "Turn on to have this blocklist activate automatically based on your scheduled days and times.",
+                localized: "schedule_configuration_view_schedule_info",
                 table: "SessionLocalizable",
                 comment: "Informational text about scheduling a blocklist"
             )
             static let duration = String(
-                localized: "Duration",
+                localized: "schedule_configuration_view_duration",
                 table: "SessionLocalizable",
                 comment: "Label for the duration setting"
             )
             static let appsBlocked = String(
-                localized: "Apps Blocked",
+                localized: "schedule_configuration_view_apps_blocked",
                 table: "SessionLocalizable",
                 comment: "Label for the 'Apps Blocked' setting"
             )
             static let appsBlockedList = String(
-                localized: "List",
+                localized: "schedule_configuration_view_apps_blocked_list",
                 table: "SessionLocalizable",
                 comment: "Value indicating the app list is available"
             )
             static let scheduledDays = String(
-                localized: "Scheduled Days",
+                localized: "schedule_configuration_view_scheduled_days",
                 table: "SessionLocalizable",
                 comment: "Label for the 'Scheduled Days' setting"
             )
             
             // Schedule picker.
             static let startTimeTitle = String(
-                localized: "Start Time",
+                localized: "schedule_configuration_view_start_time_title",
                 table: "Localizable",
                 comment: "Title for start time"
             )
             static let startTimeSubtitle = String(
-                localized: "Choose when the session starts",
+                localized: "schedule_configuration_view_start_time_subtitle",
                 table: "Localizable",
                 comment: "Title for start session subtitle"
             )
             static let endTimeTitle = String(
-                localized: "End Time",
+                localized: "schedule_configuration_view_end_time_title",
                 table: "Localizable",
                 comment: "Title for end time"
             )
             static let endTimeSubtitle = String(
-                localized: "Choose when the session ends",
+                localized: "schedule_configuration_view_end_time_subtitle",
                 table: "Localizable",
                 comment: "Title for end session subtitle"
             )
             
             // Duration picker.
             static let durationPickerTitle = String(
-                localized: "Session Length",
+                localized: "schedule_configuration_view_duration_picker_title",
                 table: "SessionLocalizable",
                 comment: "Title for the duration picker sheet"
             )
             static let durationPickerSubtitle = String(
-                localized: "Choose how long you want to stay focused",
+                localized: "schedule_configuration_view_duration_picker_subtitle",
                 table: "SessionLocalizable",
                 comment: "Subtitle for the duration picker sheet"
             )

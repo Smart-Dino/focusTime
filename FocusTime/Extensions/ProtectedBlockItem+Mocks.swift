@@ -20,7 +20,7 @@ extension ProtectedBlockItem {
     static let `default` = Self.init(
         emoji: FocusPreset.allCases.first?.emoji ?? "☀️",
         name: String(
-            localized: "Focus Session",
+            localized: "focus_session_default_name",
             table: "SessionLocalizable"
         ),
         days: Set(Weekday.allCases),
