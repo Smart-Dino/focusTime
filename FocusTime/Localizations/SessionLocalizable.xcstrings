@@ -37,9 +37,6 @@
     "Focus Setup" : {
       "comment" : "Navigation title for the focus session setup screen"
     },
-    "Friday" : {
-      "comment" : "Full name for Friday"
-    },
     "Hours" : {
       "comment" : "Label for hours picker in duration sheet"
     },
@@ -55,9 +52,6 @@
     "Minutes" : {
       "comment" : "Label for minutes picker in duration sheet"
     },
-    "Monday" : {
-      "comment" : "Full name for Monday"
-    },
     "Morning\nRoutine" : {
       "comment" : "Focus preset: Morning Routine"
     },
@@ -69,9 +63,6 @@
     },
     "Ready-made blocklists to help you stay focused. Choose a preset to quickly block distracting apps." : {
       "comment" : "Subtitle explaining preset blocklists"
-    },
-    "Saturday" : {
-      "comment" : "Full name for Saturday"
     },
     "Schedule for later" : {
       "comment" : "Label for the 'Schedule for later' toggle"
@@ -94,20 +85,8 @@
     "Study" : {
       "comment" : "Focus preset: Study"
     },
-    "Sunday" : {
-      "comment" : "Full name for Sunday"
-    },
-    "Thursday" : {
-      "comment" : "Full name for Thursday"
-    },
-    "Tuesday" : {
-      "comment" : "Full name for Tuesday"
-    },
     "Turn on to have this blocklist activate automatically based on your scheduled days and times." : {
       "comment" : "Informational text about scheduling a blocklist"
-    },
-    "Wednesday" : {
-      "comment" : "Full name for Wednesday"
     },
     "Weekdays" : {
       "comment" : "Scheduled for weekdays"

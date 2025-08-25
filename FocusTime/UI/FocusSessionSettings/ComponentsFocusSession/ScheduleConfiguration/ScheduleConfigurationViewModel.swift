@@ -55,7 +55,7 @@ final class ScheduleConfigurationViewModel {
             }
             
             let sortedDays = scheduleConfiguration.scheduledDays.sorted(by: <)
-            return sortedDays.map { $0.fullName }.joined(separator: ", ")
+            return sortedDays.map { $0.description }.joined(separator: ", ")
         }
         
         /// DateFormatter for displaying time.

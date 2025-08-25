@@ -55,9 +55,7 @@ struct ScheduleConfigurationView: View {
                         }
                     }
                 }
-                .frame(width: FocusSessionView.Constants.Row.height, height: FocusSessionView.Constants.Row.height)
-                .background(Color.ftPresetBackgroundColor)
-                .cornerRadius(FocusSessionView.Constants.Row.cornerRadius)
+                .rowStyle()
             }
             
             VStack(alignment: .leading, spacing: FocusSessionView.Constants.Configuration.Layout.scheduleSectionSpacing) {
@@ -84,7 +82,7 @@ struct ScheduleConfigurationView: View {
             if viewModel.state.scheduleConfiguration.scheduleForLater {
                 Menu {
                     ForEach(Weekday.allCases) { day in
-                        Toggle(day.fullName, isOn: .binding(
+                        Toggle(day.description, isOn: .binding(
                             get: viewModel.state.scheduleConfiguration.scheduledDays.contains(day),
                             set: { isSelected in
                                 viewModel.setScheduledDay(day, isSelected: isSelected)
@@ -218,4 +216,9 @@ struct ScheduleConfigurationView: View {
             }
         }
     }
+}
+
+#Preview {
+    ScheduleConfigurationView(viewModel: ScheduleConfigurationViewModel())
+        .preferredColorScheme(.dark)
 }
