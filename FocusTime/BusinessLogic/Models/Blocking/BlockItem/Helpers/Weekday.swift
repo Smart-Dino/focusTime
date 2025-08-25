@@ -53,14 +53,14 @@ enum Weekday: Int, Codable, CaseIterable, Identifiable, Hashable, Equatable {
     }
     
     /// Returns the days of the week reordered to start with the user's locale preference.
-    static var allCases: [Weekday] {
+    static let allCases: [Weekday] = {
         let start = Calendar.current.firstWeekday
         return [.sunday, .monday, .tuesday, .wednesday, .thursday, .friday, .saturday].sorted {
             let lhsOffset = ($0.rawValue - start + 7) % 7
             let rhsOffset = ($1.rawValue - start + 7) % 7
             return lhsOffset < rhsOffset
         }
-    }
+    }()
     
     /// Human-readable name of the weekday.
     var description: String {

@@ -22,67 +22,17 @@ final class ScheduleConfigurationViewModel {
     }
     
     // MARK: - State
-    struct State {
-        var scheduleConfiguration: ScheduleConfiguration
-        var activeSheet: ScheduleSheetType?
-        @FocusState var isEmojiTextFieldFocused: Bool
+    struct State: Equatable {
+        var blockItem: ProtectedBlockItem = .default
         
-        // MARK: - Computed Properties
-        /// Formatted string representing the selected duration (hours and minutes).
-        var formattedDuration: String {
-            let formatter = DateComponentsFormatter()
-            formatter.unitsStyle = .abbreviated
-            formatter.allowedUnits = [.hour, .minute]
-            formatter.zeroFormattingBehavior = .dropAll
-            
-            if scheduleConfiguration.selectedHours == 0 && scheduleConfiguration.selectedMinutes == 0 {
-                return String(localized: "0m", table: "SessionLocalizable", comment: "Zero minutes duration")
-            }
-            
-            return formatter.string(from: TimeInterval(scheduleConfiguration.selectedHours * 3600 + scheduleConfiguration.selectedMinutes * 60)) ?? String(localized: "0m", table: "SessionLocalizable", comment: "Fallback zero minutes duration")
-        }
+        var durationHours: Int = FocusSessionView.Constants.Configuration.DefaultValues.durationHours
+        var durationMinutes: Int = FocusSessionView.Constants.Configuration.DefaultValues.durationMinutes
+        var startTime: Date = FocusSessionView.Constants.Configuration.DefaultValues.startTime
+        var endTime: Date = FocusSessionView.Constants.Configuration.DefaultValues.endTime
         
-        /// Formatted string representing the selected scheduled days.
-        var formattedFullScheduledDays: String {
-            if scheduleConfiguration.scheduledDays.count == Weekday.allCases.count {
-                return String(localized: "Every Day", table: "SessionLocalizable", comment: "Scheduled for every day")
-            }
-            if scheduleConfiguration.scheduledDays == Set([.saturday, .sunday]) {
-                return String(localized: "Weekends", table: "SessionLocalizable", comment: "Scheduled for weekends")
-            }
-            if scheduleConfiguration.scheduledDays == Set([.monday, .tuesday, .wednesday, .thursday, .friday]) {
-                return String(localized: "Weekdays", table: "SessionLocalizable", comment: "Scheduled for weekdays")
-            }
-            
-            let sortedDays = scheduleConfiguration.scheduledDays.sorted(by: <)
-            return sortedDays.map { $0.description }.joined(separator: ", ")
-        }
+        var isScheduledForLater: Bool = false
         
-        /// DateFormatter for displaying time.
-        private let timeFormatter: DateFormatter = {
-            let formatter = DateFormatter()
-            formatter.dateFormat = nil
-            formatter.timeStyle = .short
-            return formatter
-        }()
-        
-        /// Formatted string representing the selected start time.
-        var formattedStartTime: String {
-            timeFormatter.string(from: scheduleConfiguration.startTime)
-        }
-        
-        /// Formatted string representing the selected end time.
-        var formattedEndTime: String {
-            timeFormatter.string(from: scheduleConfiguration.endTime)
-        }
-        
-        init(
-            scheduleConfiguration: ScheduleConfiguration = .default,
-            activeSheet: ScheduleSheetType? = nil
-        ) {
-            self.scheduleConfiguration = scheduleConfiguration
-            self.activeSheet = activeSheet
-        }
+        var activeSheet: ScheduleSheetType? = nil
     }
     
     // MARK: - Properties
@@ -97,13 +47,33 @@ final class ScheduleConfigurationViewModel {
     /// Sets the list name in the state.
     /// - Parameter listName: The new list name.
     func setListName(listName: String) {
-        state.scheduleConfiguration.listName = listName
+        state.blockItem.name = listName
     }
 
     /// Toggles the 'schedule for later' setting.
     /// - Parameter isOn: A boolean indicating whether scheduling for later is active.
     func setScheduleForLater(isOn: Bool) {
-        state.scheduleConfiguration.scheduleForLater = isOn
+        state.isScheduledForLater = isOn
+    }
+    
+    func refreshBlockItem() {
+        if state.isScheduledForLater {
+            let startTime = try? TimeComponents(from: state.startTime)
+            let endTime = try? TimeComponents(from: state.endTime)
+            
+            state.blockItem.type = .scheduled(
+                startTime: startTime ?? .default,
+                endTime: endTime ?? .default
+            )
+        } else {
+            let hoursAsSeconds = state.durationHours * 60 * 60
+            let minutesAsSeconds = state.durationMinutes * 60
+            let totalSeconds = hoursAsSeconds + minutesAsSeconds
+            
+            state.blockItem.type = .duration(
+                duration: DurationComponents(seconds: totalSeconds)
+            )
+        }
     }
 
     /// Toggles the selection of a specific weekday for scheduling.
@@ -112,55 +82,40 @@ final class ScheduleConfigurationViewModel {
     ///   - isSelected: A boolean indicating whether the day should be selected.
     func setScheduledDay(_ day: Weekday, isSelected: Bool) {
         if isSelected {
-            state.scheduleConfiguration.scheduledDays.insert(day)
+            state.blockItem.days.insert(day)
         } else {
-            state.scheduleConfiguration.scheduledDays.remove(day)
+            state.blockItem.days.remove(day)
         }
-    }
-
-    /// Handles the tap gesture on the emoji preset icon, clearing the selected preset and allowing custom emoji input.
-    func handlePresetIconTap() {
-        state.scheduleConfiguration.selectedPreset = nil
-        state.isEmojiTextFieldFocused = true
     }
 
     /// Sets the custom preset emoji.
     /// - Parameter emoji: The custom emoji string. Only the first character is kept.
     func setCustomPresetEmoji(emoji: String) {
-        state.scheduleConfiguration.customPresetEmoji = String(emoji.prefix(1))
-        if !emoji.isEmpty {
-            state.scheduleConfiguration.selectedPreset = nil
-        }
+        state.blockItem.emoji = emoji
     }
-
-    /// Updates the focus state of the emoji text field.
-    /// - Parameter focused: The new focus state.
-    func setEmojiTextFieldFocus(to focused: Bool) {
-        state.isEmojiTextFieldFocused = focused
-    }
-
+    
     /// Updates the selected hours in the schedule configuration.
     /// - Parameter hours: The number of hours to set for the focus session duration.
     func setHours(hours: Int) {
-        state.scheduleConfiguration.selectedHours = hours
+        state.durationHours = hours
     }
 
     /// Updates the selected minutes value in the schedule configuration.
     /// - Parameter minutes: The number of minutes to set for the scheduled duration.
     func setMinutes(minutes: Int) {
-        state.scheduleConfiguration.selectedMinutes = minutes
+        state.durationMinutes = minutes
     }
 
     /// Updates the start time in the current schedule configuration.
     /// - Parameter startTime: The new start time to set.
     func setStartTime(startTime: Date) {
-        state.scheduleConfiguration.startTime = startTime
+        state.startTime = startTime
     }
 
     /// Updates the end time in the current schedule configuration.
     /// - Parameter endTime: The new end time to set.
     func setEndTime(endTime: Date) {
-        state.scheduleConfiguration.endTime = endTime
+        state.endTime = endTime
     }
 
     /// Updates the selected focus preset in the schedule configuration.
@@ -168,9 +123,9 @@ final class ScheduleConfigurationViewModel {
     /// to update the child's state based on preset grid selection.
     /// - Parameter selectedPreset: The focus preset to select, or nil triggers a random preset selection.
     func setSelectedPreset(selectedPreset: FocusPreset?) {
-        state.scheduleConfiguration.selectedPreset = selectedPreset ?? FocusPreset.allCases.randomElement()
-        state.scheduleConfiguration.listName = selectedPreset?.name ?? FocusSessionView.Constants.DefaultValues.listName
-        state.scheduleConfiguration.customPresetEmoji = String()
+        guard let selectedPreset else { return }
+        state.blockItem.name = selectedPreset.name
+        state.blockItem.emoji = selectedPreset.emoji
     }
 
     // MARK: - Intents (Sheet Presentation)

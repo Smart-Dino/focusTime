@@ -52,15 +52,5 @@ extension FocusSessionView {
             static let startButtonIcon = "hourglass"
             static let navigationChevron = "chevron.right"
         }
-        
-        // MARK: - Default Values for ViewModel
-        enum DefaultValues {
-            static let listName = Constants.Strings.defaultListName
-            static let durationHours = 0
-            static let durationMinutes = 30
-            static let startTime: Date = Calendar.current.date(from: DateComponents(hour: 9, minute: 0))!
-            static let endTime: Date = Calendar.current.date(from: DateComponents(hour: 17, minute: 0))!
-            static let initialFocusPreset: FocusPreset? = FocusPreset.allCases.randomElement()
-        }
     }
 }

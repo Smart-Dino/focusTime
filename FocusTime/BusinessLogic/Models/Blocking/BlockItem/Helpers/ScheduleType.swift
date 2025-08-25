@@ -36,6 +36,30 @@ enum ScheduleType: Codable, Hashable, Equatable {
         }
     }
     
+    /// Structured description with components as strings.
+    /// - If `.scheduled`: returns `(startTime, endTime, nil)`.
+    /// - If `.duration`: returns `(nil, nil, durationString)`.
+    var structuredDescription: (startTime: String?, endTime: String?, duration: String?) {
+        switch self {
+        case .scheduled(let startTime, let endTime, _, _, _):
+            return (
+                startTime: startTime.description,
+                endTime: endTime.description,
+                duration: nil
+            )
+        case .duration(let duration, _, _, _):
+            return (
+                startTime: nil,
+                endTime: nil,
+                duration: PeriodConverter.localizedConciseTimeString(
+                    from: duration.rawValue,
+                    allowedUnits: [.hour, .minute],
+                    unitsStyle: .abbreviated
+                )
+            )
+        }
+    }
+    
     var suspensionEndDate: Date? {
         switch self {
         case .duration(_, _, let suspendedUntil, _): suspendedUntil

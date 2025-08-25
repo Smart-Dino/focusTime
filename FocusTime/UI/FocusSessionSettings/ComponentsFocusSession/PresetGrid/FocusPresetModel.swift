@@ -65,7 +65,7 @@ enum FocusPreset: String, CaseIterable, Identifiable {
         }
     }
     
-    var iconName: String {
+    var emoji: String {
         switch self {
         case .morningRoutine: return "☀️"
         case .socialDetox: return "📴"
@@ -77,4 +77,11 @@ enum FocusPreset: String, CaseIterable, Identifiable {
         case .reading: return "📖"
         }
     }
+    
+    static func getPreset(for name: String, emoji: String) -> FocusPreset? {
+        allCases.first { preset in
+            preset.name == name && preset.emoji == emoji
+        }
+    }
+    
 }

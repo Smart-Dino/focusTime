@@ -1,9 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "0m" : {
-      "comment" : "Fallback zero minutes duration\nZero minutes duration"
-    },
     "App List Picker Screen" : {
       "comment" : "Accessibility label or destination title for app list picker"
     },
@@ -27,9 +24,6 @@
     },
     "Error: DurationPickerSheetViewModel not initialized." : {
       "comment" : "Error message for duration picker"
-    },
-    "Every Day" : {
-      "comment" : "Scheduled for every day"
     },
     "Focus Session" : {
       "comment" : "Default name for a new focus session"
@@ -87,12 +81,6 @@
     },
     "Turn on to have this blocklist activate automatically based on your scheduled days and times." : {
       "comment" : "Informational text about scheduling a blocklist"
-    },
-    "Weekdays" : {
-      "comment" : "Scheduled for weekdays"
-    },
-    "Weekends" : {
-      "comment" : "Scheduled for weekends"
     },
     "Work\nSprint" : {
       "comment" : "Focus preset: Work Sprint"

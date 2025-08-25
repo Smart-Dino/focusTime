@@ -104,3 +104,22 @@ struct TimeComponents: Equatable, Codable, Hashable {
         self.secondsSinceMidnight = secondsSinceMidnight
     }
 }
+
+// MARK: - Extensions
+extension TimeComponents: Comparable {
+    static func < (lhs: TimeComponents, rhs: TimeComponents) -> Bool {
+        lhs.localizedSecondsSinceMidnight < rhs.localizedSecondsSinceMidnight
+    }
+}
+
+extension TimeComponents {
+    /// Initializes a `TimeComponents` instance from a string in "HH:mm" format.
+    /// - Parameter string: Time string like "08:30" or "23:45".
+    init(from string: String) throws {
+        let parts = string.split(separator: ":").compactMap { Int($0) }
+        guard parts.count == 2 else {
+            throw Error.invalidTime
+        }
+        try self.init(hour: parts[0], minute: parts[1])
+    }
+}

@@ -16,4 +16,15 @@ extension ProtectedBlockItem {
         type: .duration(duration: .init(seconds: 120)),
         blockedContent: ProtectedActivitySelection(FamilyActivitySelection())
     )
+    
+    static let `default` = Self.init(
+        emoji: FocusPreset.allCases.first?.emoji ?? "☀️",
+        name: String(
+            localized: "Focus Session",
+            table: "SessionLocalizable"
+        ),
+        days: Set(Weekday.allCases),
+        type: .duration(duration: .init(hour: 0, minute: 30)),
+        blockedContent: ProtectedActivitySelection(FamilyActivitySelection())
+    )
 }

@@ -79,5 +79,12 @@ extension FocusSessionView.Constants {
         enum Colors {
             static let toggleTint = Color.green
         }
+        
+        enum DefaultValues {
+            static let durationHours = 0
+            static let durationMinutes = 30
+            static let startTime: Date = Calendar.current.date(from: DateComponents(hour: 9, minute: 0))!
+            static let endTime: Date = Calendar.current.date(from: DateComponents(hour: 17, minute: 0))!
+        }
     }
 }

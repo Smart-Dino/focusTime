@@ -26,7 +26,7 @@ struct FocusSessionView: View {
                 FocusPresetGridView(
                     presets: viewModel.state.presets,
                     selectedPreset: .binding(
-                        get: viewModel.state.scheduleConfigViewModel.state.scheduleConfiguration.selectedPreset,
+                        get: viewModel.state.selectedPreset,
                         set: viewModel.setSelectedPreset(selectedPreset:)
                     )
                 )

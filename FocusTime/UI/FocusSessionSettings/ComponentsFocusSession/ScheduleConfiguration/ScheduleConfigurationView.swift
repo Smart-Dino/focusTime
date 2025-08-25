@@ -17,42 +17,39 @@ struct ScheduleConfigurationView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: FocusSessionView.Constants.Configuration.Layout.mainSpacing) {
             HStack(spacing: FocusSessionView.Constants.Configuration.Layout.listIconSpacing) {
+                Group {
                 HStack {
                     Text(FocusSessionView.Constants.Configuration.Strings.listName)
                     Spacer()
                     TextField(
                         FocusSessionView.Constants.Configuration.Strings.listNamePlaceholder,
                         text: .binding(
-                            get: viewModel.state.scheduleConfiguration.listName,
+                            get: viewModel.state.blockItem.name,
                             set: viewModel.setListName(listName:)
                         )
                     )
                     .multilineTextAlignment(.trailing)
                     .foregroundStyle(.white)
                 }
-                .rowStyle()
                 
-                Group {
-                    if let selectedPreset = viewModel.state.scheduleConfiguration.selectedPreset {
-                        Text(selectedPreset.iconName)
-                            .font(.title)
-                            .onTapGesture {
-                                viewModel.handlePresetIconTap()
-                            }
-                    } else {
-                        TextField("", text: .binding(
-                            get: viewModel.state.scheduleConfiguration.customPresetEmoji,
-                            set: viewModel.setCustomPresetEmoji(emoji:)
-                        ))
-                        .font(.title)
-                        .multilineTextAlignment(.center)
-                        .focused(viewModel.state.$isEmojiTextFieldFocused)
-                        .submitLabel(.done)
-                        .onAppear {
-                            if viewModel.state.scheduleConfiguration.customPresetEmoji.isEmpty && !viewModel.state.isEmojiTextFieldFocused {
-                                viewModel.state.isEmojiTextFieldFocused = true
-                            }
-                        }
+                    TextField(String(), text: .binding(
+                        get: viewModel.state.blockItem.emoji,
+                        set: viewModel.setCustomPresetEmoji(emoji:)
+                    ))
+                    .font(.title)
+                    .multilineTextAlignment(.center)
+                    .aspectRatio(1, contentMode: .fit)
+                    .submitLabel(.done)
+                    .onChange(of: viewModel.state.blockItem.emoji) {
+                        // Getting value straight from the viewModel is safer
+                        // than using newValue if there is a vast amount of input happening.
+                        
+                        // No, filtering inside the setter method does not work.
+                        // We need to react to change with onChange and only then replace string to
+                        // the emoji.
+                        viewModel.setCustomPresetEmoji(
+                            emoji: viewModel.state.blockItem.emoji.filterToFirstEmoji()
+                        )
                     }
                 }
                 .rowStyle()
@@ -65,7 +62,7 @@ struct ScheduleConfigurationView: View {
                     Toggle(
                         FocusSessionView.Constants.Configuration.Strings.scheduleForLater,
                         isOn: .binding(
-                            get: viewModel.state.scheduleConfiguration.scheduleForLater,
+                            get: viewModel.state.isScheduledForLater,
                             set: viewModel.setScheduleForLater(isOn:)
                         )
                     )
@@ -79,11 +76,11 @@ struct ScheduleConfigurationView: View {
                     .multilineTextAlignment(.leading)
             }
             
-            if viewModel.state.scheduleConfiguration.scheduleForLater {
+            if viewModel.state.isScheduledForLater {
                 Menu {
                     ForEach(Weekday.allCases) { day in
                         Toggle(day.description, isOn: .binding(
-                            get: viewModel.state.scheduleConfiguration.scheduledDays.contains(day),
+                            get: viewModel.state.blockItem.days.contains(day),
                             set: { isSelected in
                                 viewModel.setScheduledDay(day, isSelected: isSelected)
                             }
@@ -100,8 +97,8 @@ struct ScheduleConfigurationView: View {
                 .menuActionDismissBehavior(.disabled)
                 .rowStyle()
                 
-                if !viewModel.state.scheduleConfiguration.scheduledDays.isEmpty {
-                    Text(viewModel.state.formattedFullScheduledDays)
+                if !viewModel.state.blockItem.days.isEmpty {
+                    Text(viewModel.state.blockItem.days.description)
                         .font(.caption)
                 }
                 
@@ -111,7 +108,7 @@ struct ScheduleConfigurationView: View {
                     HStack {
                         Text(FocusSessionView.Constants.Configuration.Strings.startTime)
                         Spacer()
-                        Text(viewModel.state.formattedStartTime)
+                        Text(viewModel.state.blockItem.type.structuredDescription.startTime ?? String())
                             .foregroundStyle(.white)
                         Image(systemName: FocusSessionView.Constants.Symbols.navigationChevron)
                             .foregroundStyle(FocusSessionView.Constants.Colors.chevronColor)
@@ -125,7 +122,7 @@ struct ScheduleConfigurationView: View {
                     HStack {
                         Text(FocusSessionView.Constants.Configuration.Strings.endTime)
                         Spacer()
-                        Text(viewModel.state.formattedEndTime)
+                        Text(viewModel.state.blockItem.type.structuredDescription.endTime ?? String())
                             .foregroundStyle(.white)
                         Image(systemName: FocusSessionView.Constants.Symbols.navigationChevron)
                             .foregroundStyle(FocusSessionView.Constants.Colors.chevronColor)
@@ -139,7 +136,7 @@ struct ScheduleConfigurationView: View {
                     HStack {
                         Text(FocusSessionView.Constants.Configuration.Strings.duration)
                         Spacer()
-                        Text(viewModel.state.formattedDuration)
+                        Text(viewModel.state.blockItem.type.structuredDescription.duration ?? String())
                             .foregroundStyle(.white)
                         Image(systemName: FocusSessionView.Constants.Symbols.navigationChevron)
                             .foregroundStyle(FocusSessionView.Constants.Colors.chevronColor)
@@ -162,8 +159,8 @@ struct ScheduleConfigurationView: View {
             .rowStyle()
         }
         .padding(.horizontal)
-        .onChange(of: viewModel.state.isEmojiTextFieldFocused) { _, newValue in
-            viewModel.setEmojiTextFieldFocus(to: newValue)
+        .onChange(of: viewModel.state) {
+            viewModel.refreshBlockItem()
         }
         
         // MARK: - Sheet Presentation
@@ -177,11 +174,11 @@ struct ScheduleConfigurationView: View {
             case .durationPicker:
                 DurationPickerSheetView(
                     hours: .binding(
-                        get: viewModel.state.scheduleConfiguration.selectedHours,
+                        get: viewModel.state.durationHours,
                         set: viewModel.setHours(hours:)
                     ),
                     minutes: .binding(
-                        get: viewModel.state.scheduleConfiguration.selectedMinutes,
+                        get: viewModel.state.durationMinutes,
                         set: viewModel.setMinutes(minutes:)
                     )
                 )
@@ -190,7 +187,7 @@ struct ScheduleConfigurationView: View {
             case .startTimePicker:
                 TimePickerSheetView(
                     selectedDate: .binding(
-                        get: viewModel.state.scheduleConfiguration.startTime,
+                        get: viewModel.state.startTime,
                         set: viewModel.setStartTime(startTime:)
                     ),
                     title: TimePickerConstants.Strings.startTimeTitle,
@@ -201,7 +198,7 @@ struct ScheduleConfigurationView: View {
             case .endTimePicker:
                 TimePickerSheetView(
                     selectedDate: .binding(
-                        get: viewModel.state.scheduleConfiguration.endTime,
+                        get: viewModel.state.endTime,
                         set: viewModel.setEndTime(endTime:)
                     ),
                     title: TimePickerConstants.Strings.endTimeTitle,
