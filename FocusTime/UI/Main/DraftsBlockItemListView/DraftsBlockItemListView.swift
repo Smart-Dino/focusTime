@@ -138,4 +138,5 @@ struct DraftsBlockItemListView: View {
             blockItemPersistenceManager: manager
         )
     )
+    .preferredColorScheme(.dark)
 }

@@ -11,7 +11,9 @@ public struct FTSessionSelectionRowView: View {
     private let emoji: String
     private let title: String
     private let description: String
+    
     @Binding private var isToggled: Bool
+    private let onTapAction: () -> Void
     
     public var body: some View {
         HStack(spacing: 20) {
@@ -19,23 +21,28 @@ public struct FTSessionSelectionRowView: View {
                 Text("Toggle schedule")
             }
             .toggleStyle(.ftCheckbox.labelsHidden())
-            HStack(spacing: 15) {
-                Text(emoji)
-                    .font(.title2)
-                VStack(alignment: .leading) {
-                    Text(title)
-                    Text(description)
-                        .foregroundStyle(.ftGray3Light)
+            Button {
+                onTapAction()
+            } label: {
+                HStack(spacing: 15) {
+                    Text(emoji)
+                        .font(.title2)
+                    VStack(alignment: .leading) {
+                        Text(title)
+                        Text(description)
+                            .foregroundStyle(.ftGray3Light)
+                    }
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .foregroundStyle(.blue)
                 }
-                Spacer()
-                Image(systemName: "chevron.right")
-                    .foregroundStyle(.blue)
+                .padding()
+                .background {
+                    FocusSessionBackgroundShape()
+                        .stroke(.primary.opacity(0.15), lineWidth: 1.2)
+                }
             }
-            .padding()
-            .background {
-                FocusSessionBackgroundShape()
-                    .stroke(.primary.opacity(0.15), lineWidth: 1.2)
-            }
+            .buttonStyle(.plain)
         }
     }
     
@@ -43,14 +50,16 @@ public struct FTSessionSelectionRowView: View {
         emoji: String,
         title: String,
         description: String,
-        isToggled: Binding<Bool>
+        isToggled: Binding<Bool>,
+        onTapAction: @escaping () -> Void
     ) {
         self.emoji = emoji
         self.title = title
         self.description = description
         self._isToggled = isToggled
+        self.onTapAction = onTapAction
     }
-    
+
 }
 
 #Preview(traits: .sizeThatFitsLayout) {
@@ -59,7 +68,8 @@ public struct FTSessionSelectionRowView: View {
         emoji: "😎",
         title: "Cool",
         description: "This is a cool view huh?",
-        isToggled: $isToggled
+        isToggled: $isToggled,
+        onTapAction: {}
     )
     .padding()
     .preferredColorScheme(.dark)

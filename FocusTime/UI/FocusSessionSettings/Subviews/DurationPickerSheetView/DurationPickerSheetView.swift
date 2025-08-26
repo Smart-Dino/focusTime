@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FocusTimeUI
 
 struct DurationPickerSheetView: View {
     // MARK: - Properties
@@ -17,14 +18,14 @@ struct DurationPickerSheetView: View {
     
     // MARK: - Body
     var body: some View {
-        VStack() {
+        VStack {
             Text(title)
-                .font(.title2.bold())
-                .foregroundStyle(.blue)
+                .font(.title3.bold())
+                .foregroundStyle(.ftMainBlue)
             
             Text(subtitle)
                 .font(.subheadline)
-                .foregroundStyle(.gray)
+                .foregroundStyle(.ftGray3Light)
                 .padding(.bottom)
             
             durationPicker

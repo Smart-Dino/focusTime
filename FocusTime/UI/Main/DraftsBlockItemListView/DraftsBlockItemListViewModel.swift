@@ -23,7 +23,7 @@ final class DraftsBlockItemListViewModel {
         var error: Error? = nil
         
         var page = 0
-        let amountPerPage = 100
+        let amountPerPage = SharedAppValues.amountOfItemsPerPage
         var items = [ProtectedBlockItem]()
     }
     
@@ -107,7 +107,7 @@ final class DraftsBlockItemListViewModel {
          }
      }
     
-    func hasReachEndOfList(blockItem: ProtectedBlockItem){
+    func hasReachEndOfList(blockItem: ProtectedBlockItem) {
         if blockItem.id == state.items.last?.id {
             fetchNextPage()
         }

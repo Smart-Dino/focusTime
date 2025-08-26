@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FocusTimeUI
 
 struct TimePickerSheetView: View {
     @Binding var selectedDate: Date
@@ -16,12 +17,12 @@ struct TimePickerSheetView: View {
     var body: some View {
         VStack {
             Text(title)
-                .font(.headline)
-                .foregroundStyle(.blue)
+                .font(.title3.bold())
+                .foregroundStyle(.ftMainBlue)
             
             Text(subtitle)
                 .font(.subheadline)
-                .foregroundStyle(.gray)
+                .foregroundStyle(.ftGray3Light)
                 .padding(.bottom)
             
             timePicker
@@ -63,14 +64,5 @@ struct TimePickerSheetView: View {
         self.minuteInterval = minuteInterval
     }
     
-}
-
-extension UIDatePicker {
-    open override var intrinsicContentSize: CGSize {
-        CGSize(
-            width: UIView.noIntrinsicMetric,
-            height: super.intrinsicContentSize.height
-        )
-    }
 }
 
