@@ -99,14 +99,14 @@ final class ScheduleConfigurationViewModel {
     /// - Parameter listName: The new list name.
     func setListName(listName: String) {
         state.scheduleConfiguration.listName = listName
-        analyticsManager.logEvent(name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.setListName.rawValue, parameters: ["List_name" : listName])
+        analyticsManager.logEvent(name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.setListName.rawValue, parameters: [FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.listname : listName])
     }
 
     /// Toggles the 'schedule for later' setting.
     /// - Parameter isOn: A boolean indicating whether scheduling for later is active.
     func setScheduleForLater(isOn: Bool) {
         state.scheduleConfiguration.scheduleForLater = isOn
-        analyticsManager.logEvent(name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.scheduledForLaterToggled.rawValue, parameters: ["Schedule_for_later" : isOn])
+        analyticsManager.logEvent(name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.scheduledForLaterToggled.rawValue, parameters: [FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.scheduleForLater : isOn])
     }
 
     /// Toggles the selection of a specific weekday for scheduling.
@@ -116,10 +116,10 @@ final class ScheduleConfigurationViewModel {
     func setScheduledDay(_ day: Weekday, isSelected: Bool) {
         if isSelected {
             state.scheduleConfiguration.scheduledDays.insert(day)
-            analyticsManager.logEvent(name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.scheduledDayAdded.rawValue, parameters: ["Day" : day])
+            analyticsManager.logEvent(name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.scheduledDayAdded.rawValue, parameters: [FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.scheduledDay : day])
         } else {
             state.scheduleConfiguration.scheduledDays.remove(day)
-            analyticsManager.logEvent(name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.scheduledDayRemoved.rawValue, parameters: ["Day" : day])
+            analyticsManager.logEvent(name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.scheduledDayRemoved.rawValue, parameters: [FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.scheduledDay : day])
         }
     }
 
@@ -137,7 +137,7 @@ final class ScheduleConfigurationViewModel {
             state.scheduleConfiguration.selectedPreset = nil
         }
         
-        analyticsManager.logEvent(name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.setCustomEmoji.rawValue, parameters: ["Emoji" : emoji])
+        analyticsManager.logEvent(name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.setCustomEmoji.rawValue, parameters: [FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.customEmoji : emoji])
     }
 
     /// Updates the focus state of the emoji text field.
@@ -150,28 +150,28 @@ final class ScheduleConfigurationViewModel {
     /// - Parameter hours: The number of hours to set for the focus session duration.
     func setHours(hours: Int) {
         state.scheduleConfiguration.selectedHours = hours
-        analyticsManager.logEvent(name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.setHours.rawValue, parameters: ["Hours" : hours])
+        analyticsManager.logEvent(name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.setHours.rawValue, parameters: [FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.setHours : hours])
     }
 
     /// Updates the selected minutes value in the schedule configuration.
     /// - Parameter minutes: The number of minutes to set for the scheduled duration.
     func setMinutes(minutes: Int) {
         state.scheduleConfiguration.selectedMinutes = minutes
-        analyticsManager.logEvent(name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.setMinutes.rawValue, parameters: ["Minutes" : minutes])
+        analyticsManager.logEvent(name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.setMinutes.rawValue, parameters: [FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.setMinutes : minutes])
     }
 
     /// Updates the start time in the current schedule configuration.
     /// - Parameter startTime: The new start time to set.
     func setStartTime(startTime: Date) {
         state.scheduleConfiguration.startTime = startTime
-        analyticsManager.logEvent(name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.startButtonTapped.rawValue, parameters: ["Start_Time" : startTime])
+        analyticsManager.logEvent(name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.startButtonTapped.rawValue, parameters: [FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.startTime : startTime])
     }
 
     /// Updates the end time in the current schedule configuration.
     /// - Parameter endTime: The new end time to set.
     func setEndTime(endTime: Date) {
         state.scheduleConfiguration.endTime = endTime
-        analyticsManager.logEvent(name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.endButtonTapped.rawValue, parameters: ["End_Time" : endTime])
+        analyticsManager.logEvent(name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.endButtonTapped.rawValue, parameters: [FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.endTime : endTime])
     }
 
     /// Updates the selected focus preset in the schedule configuration.
@@ -201,13 +201,13 @@ final class ScheduleConfigurationViewModel {
     /// Presents the start time picker sheet by setting the active sheet state.
     func presentStartTimePicker() {
         state.activeSheet = .startTimePicker
-        analyticsManager.logEvent(name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.timePickerPresented.rawValue, parameters: ["type": "start_time"])
+        analyticsManager.logEvent(name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.timePickerPresented.rawValue, parameters: [FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.timePickerType : FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.startTime])
     }
 
     /// Presents the end time picker sheet by setting the active sheet state.
     func presentEndTimePicker() {
         state.activeSheet = .endTimePicker
-        analyticsManager.logEvent(name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.timePickerPresented.rawValue, parameters: ["type": "end_time"])
+        analyticsManager.logEvent(name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.timePickerPresented.rawValue, parameters: [FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.timePickerType : FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.endTime])
     }
 
     /// Presents the app blocker sheet by setting the active sheet state accordingly.

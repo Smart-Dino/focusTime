@@ -97,10 +97,20 @@ extension FocusSessionView.Constants {
         case scheduledDayAdded = "scheduled_day_added"
         case scheduledDayRemoved = "scheduled_day_removed"
         case dismissSheet = "sheet_dismissed"
+        
     }
     
     struct ScheduleSessionAnalyticsParameterKey {
         static let presetName = "preset_name"
+        static let listname = "listname"
+        static let scheduleForLater = "schedule_for_later"
+        static let scheduledDay = "scheduled_day"
+        static let customEmoji = "emoji"
+        static let setHours = "hours"
+        static let setMinutes = "minutes"
+        static let startTime = "start_time"
+        static let endTime = "end_time"
+        static let timePickerType = "time_picker_type"
         static let durationHours = "duration_hours"
         static let durationMinutes = "duration_minutes"
         static let isScheduled = "is_scheduled"
