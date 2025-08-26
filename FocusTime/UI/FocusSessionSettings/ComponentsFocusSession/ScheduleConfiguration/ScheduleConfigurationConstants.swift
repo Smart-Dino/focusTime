@@ -80,4 +80,29 @@ extension FocusSessionView.Constants {
             static let toggleTint = Color.green
         }
     }
+    
+    enum ScheduleSessionAnalyticsKeys: String {
+        case setListName = "setted_list_name"
+        case presetSelected = "preset_selected"
+        case startButtonTapped = "start_button_tapped"
+        case endButtonTapped = "end_button_tapped"
+        case setMinutes = "set_minutes"
+        case setHours = "set_hours"
+        case scheduledForLaterToggled = "scheduled_for_later_toggled"
+        case durationPickerPresented = "duration_picker_presented"
+        case timePickerPresented = "time_picker_presented"
+        case appBlockerSheetPresented = "app_blocker_sheet_presented"
+        case setCustomEmoji = "custom_emoji_selected"
+        case presetIconTapped = "preset_icon_tapped"
+        case scheduledDayAdded = "scheduled_day_added"
+        case scheduledDayRemoved = "scheduled_day_removed"
+        case dismissSheet = "sheet_dismissed"
+    }
+    
+    struct ScheduleSessionAnalyticsParameterKey {
+        static let presetName = "preset_name"
+        static let durationHours = "duration_hours"
+        static let durationMinutes = "duration_minutes"
+        static let isScheduled = "is_scheduled"
+    }
 }

@@ -89,6 +89,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		0C61D7232E5B45AB000CD3F6 /* Exceptions for "FocusTime" folder in "FocusTime" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 674FA69F2DB05ACE0002FDC1 /* FocusTime */;
+		};
 		C64C07892E329BEF00350A45 /* Exceptions for "FocusTimeActivityReport" folder in "FocusTime" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -144,6 +151,7 @@
 		674FA6A22DB05ACE0002FDC1 /* FocusTime */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
+				0C61D7232E5B45AB000CD3F6 /* Exceptions for "FocusTime" folder in "FocusTime" target */,
 				E977C59E2E0B0AF40035A6AF /* Exceptions for "FocusTime" folder in "FocusTimeActivityMonitor" target */,
 			);
 			path = FocusTime;
@@ -686,6 +694,7 @@
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 242HT6L8AJ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FocusTime/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -721,6 +730,7 @@
 				ENABLE_PREVIEWS = YES;
 				GCC_OPTIMIZATION_LEVEL = s;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FocusTime/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

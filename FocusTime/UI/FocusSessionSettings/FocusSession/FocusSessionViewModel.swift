@@ -29,16 +29,13 @@ final class FocusSessionViewModel {
      
     // MARK: - Properties
     private(set) var state: State
-    private let analyticsManager: AnalyticsManagerProtocol
+    private var analyticsManager: AnalyticsManagerProtocol = LiveAnalyticsManager()
 
     // MARK: - Initializer
     init(
-        state: State = State(scheduleConfigurationViewModel: ScheduleConfigurationViewModel()),
-        analyticsManager: AnalyticsManagerProtocol = LiveAnalyticsManager()
+        state: State = State(scheduleConfigurationViewModel: ScheduleConfigurationViewModel())
     ) {
         self.state = state
-        self.analyticsManager = analyticsManager
-        self.state.scheduleConfigViewModel.analyticsManager = analyticsManager
     }
      
      // MARK: - Intents for global actions or actions not covered by ScheduleConfigurationViewModel
@@ -47,12 +44,12 @@ final class FocusSessionViewModel {
 
          let config = state.scheduleConfigViewModel.state.scheduleConfiguration
          let parameters: [String: Any] = [
-             AnalyticsParameterKey.presetName: config.selectedPreset?.name ?? "Custom",
-             AnalyticsParameterKey.durationHours: config.selectedHours,
-             AnalyticsParameterKey.durationMinutes: config.selectedMinutes,
-             AnalyticsParameterKey.isScheduled: config.scheduleForLater
+            FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.presetName: config.selectedPreset?.name ?? "Custom",
+            FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.durationHours: config.selectedHours,
+            FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.durationMinutes: config.selectedMinutes,
+            FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.isScheduled: config.scheduleForLater
          ]
-         analyticsManager.logEvent(name: AnalyticsEvent.startButtonTapped.rawValue, parameters: parameters)
+         analyticsManager.logEvent(name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.startButtonTapped.rawValue, parameters: parameters)
 
          print("Current List Name: \(config.listName)")
          print("Schedule for Later is: \(config.scheduleForLater)")

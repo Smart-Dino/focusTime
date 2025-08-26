@@ -23,6 +23,6 @@ final class LiveAnalyticsManager: AnalyticsManagerProtocol {
     ///   - parameters: A dictionary of event parameters.
     func logEvent(name: String, parameters: [String: Any]?) {
         Analytics.logEvent(name, parameters: parameters)
-        print("Logged event: \(name) with parameters: \(parameters ?? [:])")
+        print("Logged event: \(name); parameters: \(parameters ?? [:])")
     }
 }

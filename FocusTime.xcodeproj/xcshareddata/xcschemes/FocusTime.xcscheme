@@ -77,6 +77,12 @@
             ReferencedContainer = "container:FocusTime.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <CommandLineArguments>
+         <CommandLineArgument
+            argument = "-FIRAnalyticsDebugEnabled"
+            isEnabled = "YES">
+         </CommandLineArgument>
+      </CommandLineArguments>
       <StoreKitConfigurationFileReference
          identifier = "../../FocusTime/BusinessLogic/Configurations/StoreKitConfig.storekit">
       </StoreKitConfigurationFileReference>

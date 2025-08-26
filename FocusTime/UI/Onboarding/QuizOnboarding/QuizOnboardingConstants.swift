@@ -49,5 +49,15 @@ extension QuizOnboardingView {
                 }
             }
         }
+        
+        enum QuizOnboardingAnalyticsKeys: String {
+            case onboardingQuizOptionToggled = "onboarding_quiz_option_toggled"
+            case onboardingQuizFinished = "onboarding_quiz_finished"
+        }
+        
+        struct QuizOnboardingAnalyticsParameterKeys {
+            static let quizOption = "quiz_option"
+            static let quizOptionsSelected = "quiz_options_selected"
+        }
     }
 }
