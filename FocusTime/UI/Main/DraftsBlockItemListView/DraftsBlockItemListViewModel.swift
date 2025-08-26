@@ -22,7 +22,7 @@ final class DraftsBlockItemListViewModel {
     }
     
     private(set) var state: State
-    let timer: FTTimer // There can only be one schedule running at a time.
+    private let timer: FTTimer // There can only be one schedule running at a time.
     
     private let blockItemPersistenceManager: BlockItemPersistenceManager
     
@@ -39,8 +39,9 @@ final class DraftsBlockItemListViewModel {
         self.blockItemPersistenceManager = blockItemPersistenceManager
     }
     
-    func startTimer(for blockItem: ProtectedBlockItem) {
-        timer.startTimer(for: blockItem, withSuspensionCountdown: false)
+    func getTimer(for blockItem: ProtectedBlockItem) -> FTTimer {
+        timer.startTimer(for: blockItem)
+        return timer
     }
     
     private func reloadItems() {

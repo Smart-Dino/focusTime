@@ -51,7 +51,7 @@ final class TaskConcentrationViewModel {
     
     // MARK: - Properties
     private(set) var state: State
-    let timer: FTTimer
+    private let timer: FTTimer
     
     private let deviceActivityRegistrar: DeviceActivityRegistrar
     private let blockItemPersistenceManager: BlockItemPersistenceManager
@@ -79,6 +79,10 @@ final class TaskConcentrationViewModel {
         if !isVisible {
             state.error = nil
         }
+    }
+
+    func getTimer() -> FTTimer {
+        timer
     }
     
     func startBreakTimer() {

@@ -75,8 +75,8 @@ final class SuperPaywallViewModel {
         #if DEBUG
         // Very important debug info.
         // Make sure this ViewModel does not get created multiple times,
-        // or esle it will lead to some very messy results.
-        print(String(describing: self) + " " + ObjectIdentifier(self).debugDescription)
+        // or else it will lead to some very messy results.
+        print("\(self) - \(ObjectIdentifier(self))")
         #endif
         subscriptionTask?.cancel()
         

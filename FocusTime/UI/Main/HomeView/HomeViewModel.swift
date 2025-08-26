@@ -53,7 +53,7 @@ final class HomeViewModel {
         var nextNavigationScreen: HomeViewNavigationRoute?
     }
     
-    let timer: FTTimer
+    private let timer: FTTimer
     private(set) var state: State
     
     private let deviceActivityRegistrar: DeviceActivityRegistrar
@@ -92,8 +92,9 @@ final class HomeViewModel {
         }
     }
     
-    func startTimer(for blockItem: ProtectedBlockItem) {
-        timer.startTimer(for: blockItem, withSuspensionCountdown: true)
+    func getTimer(for blockItem: ProtectedBlockItem) -> FTTimer {
+        timer.startTimer(for: blockItem)
+        return timer
     }
     
     func setUpcomingItem() {

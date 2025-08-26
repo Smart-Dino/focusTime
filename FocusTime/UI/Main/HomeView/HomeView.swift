@@ -130,10 +130,9 @@ struct HomeView: View {
         
         return Group {
             if isActive {
-                FTHomeSessionCardView(
+                FTActiveHomeSessionCardView(
                     title: item.name,
-                    description: viewModel.timer.payload.formatted,
-                    isActive: isActive,
+                    timer: viewModel.getTimer(for: item),
                     isPaused: viewModel.state.isPaused,
                     action: { viewModel.showTaskConcentrationView(isPauseAction: false) },
                     pauseAction: { viewModel.showTaskConcentrationView(isPauseAction: true) }
@@ -144,11 +143,7 @@ struct HomeView: View {
             } else {
                 FTHomeSessionCardView(
                     title: item.name,
-                    description: item.type.description,
-                    isActive: isActive,
-                    isPaused: true,
-                    action: nil,
-                    pauseAction: nil
+                    description: item.type.description
                 )
             }
         }

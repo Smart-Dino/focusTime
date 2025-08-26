@@ -109,11 +109,8 @@ struct DraftsBlockItemListView: View {
             FTSessionDraftRowView(
                 emoji: block.emoji,
                 title: block.name,
-                description: viewModel.timer.payload.formatted
+                timer: viewModel.getTimer(for: block)
             )
-            .onAppear {
-                viewModel.startTimer(for: block)
-            }
             .id(viewModel.state.items) // Force refresh.
         } else {
             if block.isScheduled {

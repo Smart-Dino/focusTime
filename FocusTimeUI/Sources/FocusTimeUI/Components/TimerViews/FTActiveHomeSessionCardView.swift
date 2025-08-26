@@ -1,5 +1,5 @@
 //
-//  FTHomeSessionCardView.swift
+//  FTActiveHomeSessionCardView.swift
 //  FocusTimeUI
 //
 //  Created by Maksym Horobets on 19.06.2025.
@@ -7,21 +7,20 @@
 
 import SwiftUI
 
-public struct FTHomeSessionCardView: View {
+public struct FTActiveHomeSessionCardView: View {
     private let title: String
-    private let description: String
+    private let isPaused: Bool
+    
+    @State private var timer: FTTimer
+    
+    let action: (() -> Void)?
+    let pauseAction: (() -> Void)?
     
     public var body: some View {
         HStack(spacing: 15) {
             VStack(alignment: .leading) {
                 Text(title)
-                Text(description)
-                    .foregroundStyle(.ftGray3Light)
-            }
-            Spacer()
-            VStack(alignment: .leading) {
-                Text(title)
-                Text(description)
+                Text(timer.payload.formatted)
                     .foregroundStyle(.ftGray3Light)
             }
             Spacer()
@@ -38,19 +37,17 @@ public struct FTHomeSessionCardView: View {
             }
         }
         .overlay {
-            if isActive {
-                HStack {
-                    Spacer()
-                    Button {
-                        pauseAction?()
-                    } label: {
-                        isPaused
-                        ? Image(systemName: "play.circle").foregroundStyle(.blue)
-                        : Image(systemName: "pause.circle").foregroundStyle(.red)
-                    }
-                    .font(.title2)
-                    .padding(.horizontal)
+            HStack {
+                Spacer()
+                Button {
+                    pauseAction?()
+                } label: {
+                    isPaused
+                    ? Image(systemName: "play.circle").foregroundStyle(.blue)
+                    : Image(systemName: "pause.circle").foregroundStyle(.red)
                 }
+                .font(.title2)
+                .padding(.horizontal)
             }
         }
         .contentShape(.rect)
@@ -67,18 +64,16 @@ public struct FTHomeSessionCardView: View {
     
     public init(
         title: String,
-        description: String,
+        timer: FTTimer,
+        isPaused: Bool,
+        action: (() -> Void)?,
+        pauseAction: (() -> Void)?
     ) {
         self.title = title
-        self.description = description
+        self.timer = timer
+        self.isPaused = isPaused
+        self.action = action
+        self.pauseAction = pauseAction
     }
     
-}
-
-#Preview("Scheduled", traits: .sizeThatFitsLayout) {
-    FTHomeSessionCardView(
-        title: "Work time",
-        description: "00:00:01"
-    )
-    .preferredColorScheme(.dark)
 }
