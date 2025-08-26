@@ -32,7 +32,7 @@ struct TaskConcentrationView: View {
                 // Timer.
                 FTFlipClockView(
                     configuration: .init(),
-                    viewModel: viewModel.timerModel
+                    timer: viewModel.getTimer()
                 )
                 .padding([.top, .horizontal])
                 Text(Constants.Strings.timerTitle)
@@ -63,14 +63,17 @@ struct TaskConcentrationView: View {
 }
 
 #Preview {
-    let timerModel = FocusSessionTimerModel(
-        state: .init(isPaused: true),
-        deadline: .now.addingTimeInterval(70)
-    )
-    let viewModel = TaskConcentrationViewModel(timerModel: timerModel)
+    @Previewable @State var timer = ConcurrencyTimer()
+    let viewModel = TaskConcentrationViewModel(timer: timer)
     NavigationStack {
         TaskConcentrationView(viewModel: viewModel)
             .preferredColorScheme(.dark)
+            .onAppear {
+                timer.start(
+                    deadline: .now.addingTimeInterval(70),
+                    isInitiallyPaused: false
+                )
+            }
     }
 }
 

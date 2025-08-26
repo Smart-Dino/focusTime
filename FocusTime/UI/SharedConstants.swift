@@ -24,6 +24,8 @@ enum SharedConstants {
         static let subscribeTitle = String(localized: "shared_subscribe_title", table: "SharedLocalizable")
         static let subscribedTitle = String(localized: "shared_subscribed_title", table: "SharedLocalizable")
         static let purchasedTitle = String(localized: "shared_purchased_title", table: "SharedLocalizable")
+        
+        static let simulatorUnavailability = String(localized: "shared_simulator_unavailable", table: "SharedLocalizable")
     }
     
     // MARK: - Typography

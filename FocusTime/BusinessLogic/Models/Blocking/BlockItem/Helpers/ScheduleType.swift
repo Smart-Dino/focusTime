@@ -8,65 +8,73 @@
 import Foundation
 
 enum ScheduleType: Codable, Hashable {
-    case scheduled(startTime: TimeComponents, endTime: TimeComponents)
+    case scheduled(
+        startTime: TimeComponents,
+        endTime: TimeComponents,
+        isActive: Bool = false,
+        isPaused: Bool = false
+    )
     case duration(_ duration: DurationComponents,
                  // Suspension helper properties.
                  startedAt: Date?,
                  suspendedAt: Date?,
-                 timeLeft: DurationComponents)
+                 endDate: Date) // absolute Date representing supposed end-time
     
     var description: String {
         switch self {
-        case .scheduled(let startTime, let endTime):
-            startTime.description + " " + endTime.description
+        case .scheduled(let startTime, let endTime, _, _):
+            startTime.description + " - " + endTime.description
         case .duration(let duration, _, _, _):
-            PeriodConverter.localizedConciseTimeString(from: duration.rawValue)
+            PeriodConverter.localizedConciseTimeString(
+                from: duration.rawValue,
+                allowedUnits: [.hour, .minute],
+                unitsStyle: .abbreviated
+            )
         }
     }
     
     static func duration(_ duration: DurationComponents,
-                        startedAt: Date? = nil,
-                        suspendedAt: Date? = nil,
-                        timeLeft: DurationComponents? = nil) -> ScheduleType {
+                         startedAt: Date? = nil,
+                         suspendedAt: Date? = nil,
+                         endDate: Date? = nil) -> ScheduleType {
+        // If caller provides explicit end Date, use it.
+        // Otherwise, compute end Date from startedAt (if present) or now.
+        let start = startedAt ?? Date()
+        let computedEnd = endDate ?? start.addingTimeInterval(TimeInterval(duration.rawValue))
         return .duration(duration,
-                        startedAt: startedAt,
-                        suspendedAt: suspendedAt,
-                        timeLeft: timeLeft ?? duration)
+                         startedAt: startedAt,
+                         suspendedAt: suspendedAt,
+                         endDate: computedEnd)
     }
     
-    var secondsToIntervalEndIfShouldBeRunning: Int? {
-        secondsToIntervalEndIfShouldBeRunning(now: .now)
-    }
-    
-    func secondsToIntervalEndIfShouldBeRunning(now: Date) -> Int? {
+    func secondsToIntervalEndIfShouldBeRunning(now: Date = .now) -> Int? {
         switch self {
-        case .scheduled(let startTime, let endTime):
-            guard let currentTimeComponent = try? TimeComponents(from: now) else { return nil }
+        case .scheduled(let startTime, let endTime, _, _):
+            let currentSecondsFromMidnight = Date.secondsSinceMidnight(now: now)
             
-            let timeSinceStart = currentTimeComponent.localizedSecondsSinceMidnight - startTime.localizedSecondsSinceMidnight
-            let timeLeftInSeconds = endTime.localizedSecondsSinceMidnight - currentTimeComponent.localizedSecondsSinceMidnight
+            let timeSinceStart = currentSecondsFromMidnight - startTime.localizedSecondsSinceMidnight
+            let timeLeftInSeconds = endTime.localizedSecondsSinceMidnight - currentSecondsFromMidnight
             
-            if timeLeftInSeconds > 60 && timeSinceStart > 0 {
+            if timeSinceStart >= 0 {
                 return timeLeftInSeconds
             } else {
                 return nil
             }
-        case .duration(let initialDuration, let startedAt, let suspendedAt, let timeLeft):
-            guard let startedAt else { return nil }
-
-            let durationInSeconds = initialDuration.rawValue
-            let timeLeftInSeconds = timeLeft.rawValue
-
-            // If it's suspended, timeLeft is the actual value
-            if suspendedAt != nil {
-                return timeLeftInSeconds > 0 ? timeLeftInSeconds : nil
+            
+        case .duration(_, let startedAt, let suspendedAt, let endDate):
+            // If there's no startedAt, duration isn't running.
+            guard let _ = startedAt else { return nil }
+            
+            if let suspendedAt {
+                // If suspended, freeze remaining seconds as of suspension time.
+                let remainingAtSuspension = max(0, Int(endDate.timeIntervalSince(suspendedAt)))
+                return remainingAtSuspension
+            } else {
+                // Not suspended — remaining is based on "now".
+                let remaining = max(0, Int(endDate.timeIntervalSince(now)))
+                return remaining
             }
-
-            // If not suspended, subtract elapsed time from the original duration
-            let elapsed = now.timeIntervalSince(startedAt)
-            let remaining = Int(durationInSeconds - Int(elapsed))
-
-            return remaining
         }
     }
+
 }

@@ -19,16 +19,18 @@ final class TaskConcentrationViewModel {
     }
     
     private(set) var state: State
-    let timerModel: FocusSessionTimerModel
+    private let timer: FTTimer
     
     init(
         state: State = State(),
-        timerModel: FocusSessionTimerModel
+        timer: FTTimer
     ) {
         self.state = state
-        self.timerModel = timerModel
-        
-        timerModel.delegate = self
+        self.timer = timer
+    }
+    
+    func getTimer() -> FTTimer {
+        timer
     }
     
     func updateUIBasedOnTimerState() {
@@ -53,13 +55,13 @@ final class TaskConcentrationViewModel {
     
     func pauseSession() {
         #warning("Notify DeviceActivityRegistrar of pausing")
-        timerModel.setIsPaused(true)
+        timer.pause()
         // Delegation will set the state.
     }
     
     func resumeSession() {
         #warning("Notify DeviceActivityRegistrar of resumption")
-        timerModel.setIsPaused(false)
+        timer.resume()
         // Delegation will set the state.
     }
     
@@ -67,15 +69,4 @@ final class TaskConcentrationViewModel {
         #warning("Notify DeviceActivityRegistrar of stopping and unregistering the session")
     }
     
-}
-
-extension TaskConcentrationViewModel: FocusSessionTimerModelDelegate {
-    func didFinishCountdown() {
-        //TODO: - add implementation
-    }
-    
-    func didUpdateIsPaused(_ timerIsPaused: Bool) {
-        state.timerIsPaused = timerIsPaused
-        updateUIBasedOnTimerState()
-    }
 }

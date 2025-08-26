@@ -9,16 +9,36 @@ import SwiftData
 import Foundation
 
 enum PreviewData {
-    static let memoryOnlyModelContainer: ModelContainer = {
+    static let memoryOnlyBlockItemStore: BlockItemStore = {
         do {
-            return try ModelContainer(
+            let container = try ModelContainer(
                 for: .init([BlockItem.self]),
                 configurations: [
                     .init(isStoredInMemoryOnly: true)
                 ]
             )
+            
+            let store = BlockItemStore(modelContainer: container)
+            
+            return store
         } catch {
             fatalError("Failed to create preview ModelContainer: \(error)")
         }
     }()
+    
+    static let mockBlockItemPersistenceManager = {
+        return LiveBlockItemPersistenceManager(
+            blockItemStore: PreviewData.memoryOnlyBlockItemStore,
+            deviceActivityCenterManager: LiveDeviceActivityCenterManager()
+        )
+    }()
+    
+    
+    static let mockActivityRegistrar = {
+        return LiveDeviceActivityRegistrar(
+            blockItemPersistenceManager: mockBlockItemPersistenceManager,
+            shieldManager: LiveShieldManager()
+        )
+    }()
+    
 }

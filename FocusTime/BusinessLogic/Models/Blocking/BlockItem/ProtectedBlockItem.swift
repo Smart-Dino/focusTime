@@ -19,7 +19,26 @@ struct ProtectedBlockItem: ProtectedModel {
     var days: Set<Weekday>
     var type: ScheduleType
     var isTemporary: Bool
+    var isScheduled: Bool
     var blockedContent: ProtectedActivitySelection
+    
+    var isActive: Bool {
+        switch type {
+        case .scheduled(_, _, let isActive, _):
+            isActive
+        case .duration(_, let startedAt, let suspendedAt, _):
+            (startedAt != nil) || (suspendedAt != nil)
+        }
+    }
+    
+    var isPaused: Bool {
+        switch type {
+        case .scheduled(_, _, _, let isPaused):
+            isPaused
+        case .duration(_, _, let suspendedAt, _):
+            suspendedAt != nil
+        }
+    }
     
     init(
         id: UUID = UUID(),
@@ -29,6 +48,7 @@ struct ProtectedBlockItem: ProtectedModel {
         days: Set<Weekday>,
         type: ScheduleType,
         isTemporary: Bool = false,
+        isScheduled: Bool = false,
         blockedContent: ProtectedActivitySelection
     ) {
         self.id = id
@@ -38,6 +58,7 @@ struct ProtectedBlockItem: ProtectedModel {
         self.days = days
         self.type = type
         self.isTemporary = isTemporary
+        self.isScheduled = isScheduled
         self.blockedContent = blockedContent
     }
     

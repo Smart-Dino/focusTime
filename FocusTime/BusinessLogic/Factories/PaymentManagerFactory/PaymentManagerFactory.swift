@@ -7,7 +7,6 @@
 
 import Foundation
 
-@MainActor
-protocol PaymentManagerFactory {
+protocol PaymentManagerFactory: Sendable {
     func makePaymentManager() async -> PaymentManager
 }

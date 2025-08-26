@@ -24,28 +24,40 @@ struct RegistrarHandlerTests {
     let activityHandler: DeviceActivityHandler
     // Stores.
     let blockItemStore: BlockItemStore
-    let container: ModelContainer
+    let blockItemPersistenceManager: BlockItemPersistenceManager
     
     init() async {
-        // Native managers.
-        self.store = ManagedSettingsStore()
-        self.center = DeviceActivityCenter()
+        // Native managers
+        store  = ManagedSettingsStore()
+        center = DeviceActivityCenter()
         
-        // Custom.
-        let container = SharedTestHelpers.generateTestModelContainer()
-        self.container = container
-        self.shieldManager = LiveShieldManager()
-        self.activityHandler = DeviceActivityHandler(logger: nil, container: container, shieldManager: shieldManager)
+        // Persistence layer.
+        blockItemStore = await MockPersistenceStoreFactory().makeBlockItemStore()
+        let mockContainer = blockItemStore.modelContainer
+        blockItemPersistenceManager = LiveBlockItemPersistenceManager(
+            blockItemStore: blockItemStore,
+            deviceActivityCenterManager: LiveDeviceActivityCenterManager()
+        )
         
-        // Stores.
-        self.blockItemStore = BlockItemStore(modelContainer: container)
-        //  Activity registrar.
-        self.activityRegistrar = LiveDeviceActivityRegistrar(modelContainer: container, shieldManager: shieldManager)
+        // Shield & activity handling.
+        shieldManager   = LiveShieldManager()
+        activityHandler = DeviceActivityHandler(
+            logger: nil,
+            container: mockContainer,
+            shieldManager: shieldManager
+        )
         
-        // Reset.
+        // Device activity registrar.
+        activityRegistrar = LiveDeviceActivityRegistrar(
+            blockItemPersistenceManager: blockItemPersistenceManager,
+            shieldManager: shieldManager
+        )
+        
+        // Cleanup / reset state.
         resetDeviceActivityCenter()
         resetManagedSettingsStore()
     }
+
     
     func resetDeviceActivityCenter() {
         center.stopMonitoring()
@@ -147,7 +159,7 @@ struct RegistrarHandlerTests {
         )
         
         // Simulate ending the interval.
-        await activityHandler.handleBlockingEnd()
+        await activityHandler.handleBlockingEnd(for: activityName)
         
         #expect(
             store.shield.applications == nil &&
@@ -395,10 +407,10 @@ struct RegistrarHandlerTests {
     @Test("Correct time left after 4 minutes of suspension")
     func suspensionTimeAccounting() async throws {
         let testClock = TestClock(startingAt: Date())
+        print(await testClock.now)
         let registrar = LiveDeviceActivityRegistrar(
-            center: DeviceActivityCenter(),
             clock: testClock,
-            modelContainer: container,
+            blockItemPersistenceManager: blockItemPersistenceManager,
             shieldManager: shieldManager
         )
 
@@ -422,12 +434,20 @@ struct RegistrarHandlerTests {
         await testClock.advance(by: 4 * 60)
         try await registrar.resumeActivity(for: fetchedBlockItem)
         
+        // Calculate expected date (6 minutes left after resume).
+        let now = await testClock.now
+        let calendar = Calendar.current
+        let expectedDate = try #require(calendar.date(byAdding: .minute, value: 6, to: now))
+        
+        let expectedTimeComponent = try TimeComponents(from: expectedDate)
+
         // Fetch the schedule from your store and check the updated state.
         let resumedBlockItem = try await blockItemStore.fetch(id: blockItemModelID)
         if case let ScheduleType.duration(_, _, _, timeLeft) = resumedBlockItem.type {
             // The time left should be 10 minutes - 4 minutes = 6 minutes (360 seconds).
+            let timeLeftComponents = try TimeComponents(from: timeLeft)
             #expect(
-                timeLeft.rawValue == 360,
+                timeLeftComponents == expectedTimeComponent,
                 "Should have 6 minutes left since 4 minutes elapsed and 4 minutes suspension after do not count against timeLeft"
             )
         } else {
@@ -473,10 +493,11 @@ struct RegistrarHandlerTests {
         let fetchedBlockItem = try await blockItemStore.fetch(id: blockItemModelID)
 
         // Instantiate a LiveDeviceActivityRegistrar with the test clock.
+        let centerManager = LiveDeviceActivityCenterManager()
         let registrar = LiveDeviceActivityRegistrar(
-            center: DeviceActivityCenter(),
+            centerManager: centerManager,
             clock: testClock,
-            modelContainer: container,
+            blockItemPersistenceManager: blockItemPersistenceManager,
             shieldManager: shieldManager
         )
 
@@ -484,7 +505,7 @@ struct RegistrarHandlerTests {
         try await registrar.registerActivity(during: fetchedBlockItem)
 
         // Assert that at least two activities are now registered (original + temp duration if inside window).
-        let activities = await registrar.monitoredIdentifiers
+        let activities = await centerManager.activities
         #expect(activities.count >= 2, "There should be two registered activities: original and temporary")
         
         // Assert that a temporary duration block item is present in the database and has name prefix "temp-" and is marked temporary.
@@ -506,7 +527,7 @@ struct RegistrarHandlerTests {
         
         // Assert that this temporary block is also registered as an activity.
         let tempBlockRegistered = activities.contains(where: { activity in
-            tempBlocks.contains(where: { $0.id == activity } )
+            tempBlocks.contains(where: { $0.id == CodableActivityIdentifier(from: activity)?.blockItemID } )
         })
         #expect(tempBlockRegistered, "Temporary block should be registered as activity")
     }

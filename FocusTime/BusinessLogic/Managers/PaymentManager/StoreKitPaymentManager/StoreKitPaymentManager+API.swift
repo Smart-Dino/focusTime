@@ -70,38 +70,3 @@ extension StoreKitPaymentManager {
         }
     }
 }
-
-// MARK: - AsyncStream
-extension StoreKitPaymentManager {
-    func isProUserChangesStream() -> AsyncStream<Bool> {
-        let stream = AsyncStream<Bool> { continuation in
-            self.continuation = continuation
-        }
-        
-        self.continuation?.onTermination = { @Sendable reason in
-            Task { await self.handleTermination(reason) }
-        }
-        
-        return stream
-    }
-    
-    func sendStreamUpdate(isPro: Bool) {
-        guard let cont = continuation else {
-            // Either: nobody’s listening yet, or they already cancelled.
-            return
-        }
-        cont.yield(isPro)
-    }
-    
-    private func handleTermination(_ reason: AsyncStream<Bool>.Continuation.Termination) {
-        // Swift marked the stream as terminated,
-        // finishing the continuation.
-        continuation?.finish()
-        continuation = nil
-        
-        // switch reason {
-        //   case .cancelled:   …
-        //   case .finished:    …
-        // }
-    }
-}

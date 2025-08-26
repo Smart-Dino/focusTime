@@ -7,7 +7,7 @@
 
 import SwiftUI
 import SwiftData
-import Foundation
+import FocusTimeUI
 
 enum HomeViewNavigationRoute: Equatable, Hashable {
     case scheduledFocusList(_ viewModel: ScheduledBlockItemsViewModel)
@@ -32,21 +32,118 @@ enum HomeViewNavigationRoute: Equatable, Hashable {
 @Observable
 final class HomeViewModel {
     struct State {
+        var error: Error? = nil
+        
+        var upcomingOrRunningItem: ProtectedBlockItem?
+        var isPaused: Bool {
+            guard let upcomingOrRunningItem else { return true }
+            
+            if !upcomingOrRunningItem.isPaused {
+                return false
+            } else {
+                return true
+            }
+        }
+        
         var nextNavigationScreen: HomeViewNavigationRoute?
     }
     
+    private let timer: FTTimer
     private(set) var state: State
-    private let modelContainer: ModelContainer
+    
+    private let deviceActivityRegistrar: DeviceActivityRegistrar
+    private let blockItemPersistenceManager: BlockItemPersistenceManager
     weak var delegate: HomeViewDelegate?
+    
+    private var fetchTask: Task<Void, Never>?
+    private var pauseResumeTask: Task<Void, Never>?
+    private var dbChangesNotificationTask: Task<Void, Never>?
     
     init(
         state: State = State(),
-        modelContainer: ModelContainer,
+        timer: FTTimer,
+        deviceActivityRegistrar: DeviceActivityRegistrar,
+        blockItemPersistenceManager: BlockItemPersistenceManager,
         delegate: HomeViewDelegate?
     ) {
         self.state = state
-        self.modelContainer = modelContainer
+        self.timer = timer
+        self.deviceActivityRegistrar = deviceActivityRegistrar
+        self.blockItemPersistenceManager = blockItemPersistenceManager
         self.delegate = delegate
+    }
+    
+    func setErrorVisibility(_ isVisible: Bool) {
+        if !isVisible {
+            state.error = nil
+        }
+    }
+    
+    func subscribeToDB() {
+        dbChangesNotificationTask = Task {
+            for await _ in await blockItemPersistenceManager.contextChangesStream() {
+                try? await Task.sleep(for: SharedAppValues.debounceAfterDBRefreshed)
+                setUpcomingItem()
+            }
+        }
+    }
+    
+    func togglePause() {
+        let pause = !state.isPaused
+        
+        setTimerIsPaused(pause)
+    }
+    
+    private func setTimerIsPaused(_ pause: Bool) {
+        // Cancel any previously running pause/resume task
+        pauseResumeTask?.cancel()
+        
+        pauseResumeTask = Task { [weak self] in
+            guard let item = self?.state.upcomingOrRunningItem else { return }
+            
+            do {
+                if pause {
+                    try await self?.pause(item)
+                } else {
+                    try await self?.resume(item)
+                }
+            } catch is CancellationError {
+                // Task was cancelled, safe to ignore.
+            } catch {
+                self?.state.error = error
+            }
+        }
+    }
+
+    private func pause(_ item: ProtectedBlockItem) async throws {
+        timer.pause()
+        try Task.checkCancellation()
+        try await deviceActivityRegistrar.suspendActivity(for: item)
+    }
+
+    private func resume(_ item: ProtectedBlockItem) async throws {
+        try await deviceActivityRegistrar.resumeActivity(for: item)
+        try Task.checkCancellation()
+        timer.startTimer(for: item)
+        timer.resume()
+    }
+
+    
+    func getTimer(for blockItem: ProtectedBlockItem) -> FTTimer {
+        timer.startTimer(for: blockItem)
+        return timer
+    }
+    
+    func setUpcomingItem() {
+        guard fetchTask == nil else { return }
+        fetchTask = Task {
+            do {
+                state.upcomingOrRunningItem = try await blockItemPersistenceManager.fetchClosestOrRunningCurrentScheduled(now: .now)
+            } catch {
+                state.error = error
+            }
+            fetchTask = nil
+        }
     }
     
     func setNextNavigationScreen(_ showing: Bool) {
@@ -60,6 +157,6 @@ final class HomeViewModel {
     }
     
     private func makeScheduledFocusViewModel() -> ScheduledBlockItemsViewModel {
-        ScheduledBlockItemsViewModel(modelContainer: modelContainer)
+        ScheduledBlockItemsViewModel(blockItemPersistenceManager: blockItemPersistenceManager)
     }
 }

@@ -50,24 +50,23 @@ public extension Color {
 }
 
 // MARK: Private colors
-    internal extension ShapeStyle where Self == Color {
-        // MARK: AppBlocking Colors
-        static var leadingSummaryCard: Color {
-            Color("LeadingSummaryCardColor", bundle: .module)
-        }
-        static var trailingSummaryCard: Color {
-            Color("TrailingSummaryCardColor", bundle: .module)
-        }
-        // MARK: ScheduledFocus Colors
-        static var leadingScheduledFocus: Color {
-            Color("LeadingScheduledFocusColor", bundle: .module)
-        }
-        static var trailingScheduledFocus: Color {
-            Color("TrailingScheduledFocusColor", bundle: .module)
-        }
-        static var backgroundScheduledFocus: Color {
-            Color("BackgroundScheduledFocusColor", bundle: .module)
-        }
+internal extension ShapeStyle where Self == Color {
+    // MARK: AppBlocking Colors
+    static var leadingSummaryCard: Color {
+        Color("LeadingSummaryCardColor", bundle: .module)
     }
-
+    static var trailingSummaryCard: Color {
+        Color("TrailingSummaryCardColor", bundle: .module)
+    }
+    // MARK: ScheduledFocus Colors
+    static var leadingScheduledFocus: Color {
+        Color("LeadingScheduledFocusColor", bundle: .module)
+    }
+    static var trailingScheduledFocus: Color {
+        Color("TrailingScheduledFocusColor", bundle: .module)
+    }
+    static var sessionRowBlue: Color {
+        Color("SessionRowBlueColor", bundle: .module)
+    }
+}
 

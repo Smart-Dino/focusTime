@@ -49,7 +49,7 @@ struct DraftsBlockItemListView: View {
                 Constants.Strings.newBlocklistButtonTitle,
                 systemImage: "plus.circle"
             ) {
-                #warning("No implementation")
+#warning("No implementation")
             }
             .buttonStyle(.ftPrimary)
             .padding()
@@ -72,23 +72,10 @@ struct DraftsBlockItemListView: View {
                 Text(viewModel.state.error?.localizedDescription ?? "")
             }
         )
-    }
-    
-    var blockListView: some View {
-        ScrollView(.vertical) {
-            LazyVStack {
-                ForEach(viewModel.state.items) { block in
-                    FTSessionSummaryCardView(
-                        emoji: block.emoji,
-                        title: block.name,
-                        description: block.type.description,
-                    )
-                    .padding(1)
-                    .onAppear { viewModel.hasReachEndOfList(blockItem: block) }
-                }
-            }
+        .onAppear {
+            viewModel.loadData()
+            viewModel.subscribeToDB()
         }
-        .padding(.top)
     }
     
     var noBlockListView: some View {
@@ -102,8 +89,55 @@ struct DraftsBlockItemListView: View {
             Spacer()
         }
     }
+    
+    var blockListView: some View {
+        ScrollView(.vertical) {
+            LazyVStack {
+                ForEach(viewModel.state.items) { block in
+                    sessionCard(for: block)
+                        .padding(1)
+                        .onAppear { viewModel.hasReachEndOfList(blockItem: block) }
+                }
+            }
+        }
+        .padding(.top)
+    }
+    
+    @ViewBuilder
+    private func sessionCard(for block: ProtectedBlockItem) -> some View {
+        if block.isActive {
+            FTActiveSessionDraftRowView(
+                emoji: block.emoji,
+                title: block.name,
+                timer: viewModel.getTimer(for: block)
+            )
+        } else {
+            if block.isScheduled {
+                FTSessionScheduledRowView(
+                    emoji: block.emoji,
+                    title: block.name,
+                    description: block.type.description
+                )
+            } else {
+                FTSessionDraftRowView(
+                    emoji: block.emoji,
+                    title: block.name,
+                    description: block.type.description
+                )
+            }
+        }
+    }
+    
 }
 
 #Preview {
-    DraftsBlockItemListView(viewModel: .init(modelContainer: PreviewData.memoryOnlyModelContainer))
+    let factory = MockPersistenceStoreFactory()
+    let manager = PreviewData.mockBlockItemPersistenceManager
+    
+    DraftsBlockItemListView(
+        viewModel: .init(
+            timer: ConcurrencyTimer(),
+            blockItemPersistenceManager: manager
+        )
+    )
 }
