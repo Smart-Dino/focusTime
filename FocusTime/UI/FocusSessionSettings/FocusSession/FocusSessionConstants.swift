@@ -30,7 +30,7 @@ extension FocusSessionView {
             static let mainVStackSpacing: CGFloat = 40
             static let sheetHeight: CGFloat = 400
             static let sheetCornerRadius: CGFloat = 25
-            static let floatingButtonHorizontalPadding: CGFloat = 20
+            static let floatingButtonPadding: CGFloat = 20
         }
         
         // MARK: - Symbols
