@@ -13,9 +13,8 @@ struct FocusTimeApp: App {
     
     var body: some Scene {
         WindowGroup {
-//            AppFlowCoordinatorView(viewModel: appFlowViewModel)
-//                .preferredColorScheme(.dark) // Inject dark color scheme throughout the app.
-            FocusSessionView(viewModel: .init())
+            AppFlowCoordinatorView(viewModel: appFlowViewModel)
+                .preferredColorScheme(.dark) // Inject dark color scheme throughout the app.
         }
     }
     
