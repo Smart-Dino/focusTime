@@ -220,6 +220,28 @@
         }
       }
     },
+    "schedule_configuration_view_end_time_subtitle" : {
+      "comment" : "Title for end session subtitle",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Defines when your focus session will end"
+          }
+        }
+      }
+    },
+    "schedule_configuration_view_end_time_title" : {
+      "comment" : "Title for end time",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "End Time"
+          }
+        }
+      }
+    },
     "schedule_configuration_view_list_name" : {
       "comment" : "Label for the list name input field",
       "localizations" : {
@@ -271,6 +293,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Scheduled Days"
+          }
+        }
+      }
+    },
+    "schedule_configuration_view_start_time_subtitle" : {
+      "comment" : "Title for start session subtitle",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Defines when your focus session will start"
+          }
+        }
+      }
+    },
+    "schedule_configuration_view_start_time_title" : {
+      "comment" : "Title for start time",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start Time"
           }
         }
       }
