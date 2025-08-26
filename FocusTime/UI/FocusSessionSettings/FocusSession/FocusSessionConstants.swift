@@ -12,6 +12,7 @@ extension FocusSessionView {
     enum Constants {
         // MARK: - General Strings
         enum Strings {
+            static let emojis = ["☕️", "⏳", "📖", "🌿", "💪", "💻", "🚀", "⚡️"]
             static let navigationTitle = String(
                 localized: "focus_session_view_navigation_title",
                 table: "SessionLocalizable",

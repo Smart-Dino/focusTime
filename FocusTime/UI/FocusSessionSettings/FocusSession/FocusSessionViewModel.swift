@@ -10,49 +10,67 @@ import SwiftUI
 @Observable
 @MainActor
 final class FocusSessionViewModel {
-
+    
     @MainActor
-     struct State {
-         let presets: [FocusPreset] = FocusPreset.allCases
-         var scheduleConfigViewModel: ScheduleConfigurationViewModel
-         
-         var selectedPreset: FocusPreset? {
-             let name = scheduleConfigViewModel.state.blockItem.name
-             let emoji = scheduleConfigViewModel.state.blockItem.emoji
-             
-             return FocusPreset.getPreset(for: name, emoji: emoji)
-         }
-
-         var isStartButtonEnabled: Bool {
-             !scheduleConfigViewModel.state.blockItem.name
-                 .trimmingCharacters(in: .whitespaces).isEmpty
-         }
-         
-         init(
+    struct State {
+        let presets: [FocusPreset] = FocusPreset.allCases
+        
+        var emojiFieldIsFocused = false
+        
+        var selectedPreset: FocusPreset? {
+            let name = scheduleConfigViewModel.state.blockItem.name
+            let emoji = scheduleConfigViewModel.state.blockItem.emoji
+            
+            return FocusPreset.getPreset(for: name, emoji: emoji)
+        }
+        
+        var isStartButtonEnabled: Bool {
+            !scheduleConfigViewModel.state.blockItem.name
+                .trimmingCharacters(in: .whitespaces).isEmpty
+        }
+        
+        var scheduleConfigViewModel: ScheduleConfigurationViewModel
+        var selectedEmoji: String {
+            scheduleConfigViewModel.state.blockItem.emoji
+        }
+        
+        init(
             scheduleConfigurationViewModel: ScheduleConfigurationViewModel,
-         ) {
-             self.scheduleConfigViewModel = scheduleConfigurationViewModel
-         }
-     }
-     
+        ) {
+            self.scheduleConfigViewModel = scheduleConfigurationViewModel
+        }
+    }
+    
     // MARK: - Properties
     private(set) var state: State
-
+    
     // MARK: - Initializer
     init(state: State = State(scheduleConfigurationViewModel: ScheduleConfigurationViewModel())) {
         self.state = state
+        
+        state.scheduleConfigViewModel.delegate = self
     }
-     
-     // MARK: - Intents for global actions or actions not covered by ScheduleConfigurationViewModel
-     func startTapped() {
-         if let selectedPreset = state.selectedPreset {
-             print("Selected Preset: \(selectedPreset.name)")
-         } else {
-             print("No preset selected.")
-         }
-     }
-     
-     func setSelectedPreset(selectedPreset: FocusPreset?) {
-         state.scheduleConfigViewModel.setSelectedPreset(selectedPreset: selectedPreset)
-     }
- }
+    
+    // MARK: - Intents for global actions or actions not covered by ScheduleConfigurationViewModel
+    func startTapped() {
+        if let selectedPreset = state.selectedPreset {
+            print("Selected Preset: \(selectedPreset.name)")
+        } else {
+            print("No preset selected.")
+        }
+    }
+    
+    func setSelectedEmoji(_ emoji: String) {
+        state.scheduleConfigViewModel.setCustomPresetEmoji(emoji: emoji)
+    }
+    
+    func setSelectedPreset(selectedPreset: FocusPreset?) {
+        state.scheduleConfigViewModel.setSelectedPreset(selectedPreset: selectedPreset)
+    }
+}
+
+extension FocusSessionViewModel: ScheduleConfigurationDelegate {
+    func didChangeEmojiFieldFocusState(isFocused: Bool) {
+        state.emojiFieldIsFocused = isFocused
+    }
+}

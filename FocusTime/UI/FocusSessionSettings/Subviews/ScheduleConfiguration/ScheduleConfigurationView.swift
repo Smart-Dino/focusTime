@@ -11,6 +11,7 @@ import FocusTimeUI
 
 struct ScheduleConfigurationView: View {
     // MARK: - Properties
+    @FocusState var isFocusedEmojiField
     @State var viewModel: ScheduleConfigurationViewModel
     
     // MARK: - Body
@@ -37,6 +38,7 @@ struct ScheduleConfigurationView: View {
                         set: viewModel.setCustomPresetEmoji(emoji:)
                     ))
                     .font(.title)
+                    .focused($isFocusedEmojiField)
                     .multilineTextAlignment(.center)
                     .aspectRatio(1, contentMode: .fit)
                     .submitLabel(.done)
@@ -50,6 +52,9 @@ struct ScheduleConfigurationView: View {
                         viewModel.setCustomPresetEmoji(
                             emoji: viewModel.state.blockItem.emoji.filterToFirstEmoji()
                         )
+                    }
+                    .onChange(of: isFocusedEmojiField) {
+                        viewModel.updateDelegateEmojiFocusStateStatus(with: isFocusedEmojiField)
                     }
                 }
                 .rowStyle()

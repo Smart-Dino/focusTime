@@ -7,13 +7,13 @@
 
 import SwiftUI
 
-struct FTEmojiPicker: View {
+public struct FTEmojiPicker: View {
     @Binding var selectedEmoji: String
     private let emojis: [String]
     
     private let backgroundShape = RoundedRectangle(cornerRadius: 25)
     
-    var body: some View {
+    public var body: some View {
         ScrollView(.horizontal) {
             HStack {
                 ForEach(emojis, id: \.self) { emoji in

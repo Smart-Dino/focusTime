@@ -37,14 +37,24 @@ struct FocusSessionView: View {
         .navigationTitle(Constants.Strings.navigationTitle)
         .navigationBarTitleDisplayMode(.inline)
         .safeAreaInset(edge: .bottom) {
-            Button {
-                viewModel.startTapped()
-            } label: {
-                Label(Constants.Strings.startButtonTitle, systemImage: Constants.Symbols.startButtonIcon)
+            if viewModel.state.emojiFieldIsFocused {
+                FTEmojiPicker(
+                    selectedEmoji: .binding(
+                        get: viewModel.state.selectedEmoji,
+                        set: viewModel.setSelectedEmoji(_:)
+                    ),
+                    emojis: Constants.Strings.emojis
+                )
+            } else {
+                Button {
+                    viewModel.startTapped()
+                } label: {
+                    Label(Constants.Strings.startButtonTitle, systemImage: Constants.Symbols.startButtonIcon)
+                }
+                .buttonStyle(FTPrimaryButtonStyle())
+                .padding(.horizontal, Constants.Layout.floatingButtonHorizontalPadding)
+                .disabled(!viewModel.state.isStartButtonEnabled)
             }
-            .buttonStyle(FTPrimaryButtonStyle())
-            .padding(.horizontal, Constants.Layout.floatingButtonHorizontalPadding)
-            .disabled(!viewModel.state.isStartButtonEnabled)
         }
         .preferredColorScheme(.dark)
     }

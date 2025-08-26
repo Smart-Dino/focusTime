@@ -7,6 +7,11 @@
 
 import SwiftUI
 
+@MainActor
+protocol ScheduleConfigurationDelegate: AnyObject {
+    func didChangeEmojiFieldFocusState(isFocused: Bool)
+}
+
 @Observable
 @MainActor
 final class ScheduleConfigurationViewModel {
@@ -37,6 +42,7 @@ final class ScheduleConfigurationViewModel {
     
     // MARK: - Properties
     private(set) var state: State
+    weak var delegate: ScheduleConfigurationDelegate?
     
     // MARK: - Initializers
     init(state: State = State()) {
@@ -74,6 +80,10 @@ final class ScheduleConfigurationViewModel {
                 duration: DurationComponents(seconds: totalSeconds)
             )
         }
+    }
+    
+    func updateDelegateEmojiFocusStateStatus(with isFocused: Bool) {
+        delegate?.didChangeEmojiFieldFocusState(isFocused: isFocused)
     }
 
     /// Toggles the selection of a specific weekday for scheduling.
