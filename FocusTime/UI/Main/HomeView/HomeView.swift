@@ -132,7 +132,7 @@ struct HomeView: View {
             if isActive {
                 FTActiveHomeSessionCardView(
                     title: item.name,
-                    timer: viewModel.getTimer(for: item),
+                    timerPayload: viewModel.state.timerPayload,
                     isPaused: viewModel.state.isPaused,
                     action: { viewModel.showTaskConcentrationView(isPauseAction: false) },
                     pauseAction: { viewModel.showTaskConcentrationView(isPauseAction: true) }
@@ -156,7 +156,7 @@ struct HomeView: View {
         let registrar = PreviewData.mockActivityRegistrar
         HomeView(
             viewModel: .init(
-                timer: ConcurrencyTimer(),
+                state: .init(timer: ConcurrencyTimer()),
                 deviceActivityRegistrar: registrar,
                 blockItemPersistenceManager: manager,
                 delegate: nil

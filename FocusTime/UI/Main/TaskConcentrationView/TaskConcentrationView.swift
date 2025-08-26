@@ -26,9 +26,9 @@ struct TaskConcentrationView: View {
                             VStack {
                                 FTFlipClockView(
                                     configuration: .init(),
-                                    timer: viewModel.getTimer()
+                                    timerPayload: viewModel.state.timerPayload
                                 )
-                                    .padding([.top, .horizontal])
+                                .padding([.top, .horizontal])
                                 Text(timerTitle)
                                     .foregroundStyle(.ftGray3Light)
                             }
@@ -61,9 +61,9 @@ struct TaskConcentrationView: View {
                             VStack {
                                 FTFlipClockView(
                                     configuration: .init(),
-                                    timer: viewModel.getTimer()
+                                    timerPayload: viewModel.state.timerPayload
                                 )
-                                    .padding([.top, .horizontal])
+                                .padding([.top, .horizontal])
                                 Text(timerTitle)
                                     .foregroundStyle(.ftGray3Light)
                             }
@@ -85,17 +85,17 @@ struct TaskConcentrationView: View {
                         centerView: {
                             // Animation.
                             LottieView(animation: Constants.Animations.warningAnimation)
-                            .playbackMode(
-                                .playing(
-                                    .fromProgress(0,
-                                                  toProgress: 1,
-                                                  loopMode: .loop)
+                                .playbackMode(
+                                    .playing(
+                                        .fromProgress(0,
+                                                      toProgress: 1,
+                                                      loopMode: .loop)
+                                    )
                                 )
-                            )
-                            .resizable()
-                            .containerRelativeFrame(.horizontal) { size, _ in
-                                size / 2
-                            }
+                                .resizable()
+                                .containerRelativeFrame(.horizontal) { size, _ in
+                                    size / 2
+                                }
                             
                             VStack {
                                 Text(subtitle)
@@ -146,8 +146,7 @@ struct TaskConcentrationView: View {
 #Preview {
     @Previewable @State var timer = ConcurrencyTimer()
     let viewModel = TaskConcentrationViewModel(
-        state: .init(item: ProtectedBlockItem.mock, phase: .focus),
-        timer: timer,
+        state: .init(timer: timer, item: ProtectedBlockItem.mock, phase: .focus),
         deviceActivityRegistrar: PreviewData.mockActivityRegistrar,
         blockItemPersistenceManager: PreviewData.mockBlockItemPersistenceManager
     )

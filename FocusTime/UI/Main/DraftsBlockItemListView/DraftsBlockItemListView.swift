@@ -12,7 +12,6 @@ struct DraftsBlockItemListView: View {
     @State var viewModel: DraftsBlockItemListViewModel
     
     var body: some View {
-        let _ = Self._printChanges()
         ZStack {
             // MARK: - Wave image
             VStack {
@@ -107,10 +106,11 @@ struct DraftsBlockItemListView: View {
     @ViewBuilder
     private func sessionCard(for block: ProtectedBlockItem) -> some View {
         if block.state.isActive {
+
             FTActiveSessionDraftRowView(
                 emoji: block.emoji,
                 title: block.name,
-                timer: viewModel.getTimer(for: block)
+                timerPayload: viewModel.state.timerPayload
             )
         } else {
             if block.isScheduled {
@@ -137,7 +137,7 @@ struct DraftsBlockItemListView: View {
     
     DraftsBlockItemListView(
         viewModel: .init(
-            timer: ConcurrencyTimer(),
+            state: .init(timer: ConcurrencyTimer()),
             blockItemPersistenceManager: manager
         )
     )

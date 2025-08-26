@@ -10,31 +10,31 @@ import SwiftUI
 public struct FTFlipClockView: View {
     let configuration: FTFlipClockConfiguration
     
-    private let timer: FTTimer // Indeed does work with no @State.
+    private let timerPayload: FTTimerPayload // Indeed does work with no @State.
     
     public var body: some View {
         HStack {
             FTFlipClockComponentView(
                 value: Binding {
-                    timer.payload.hours
+                    timerPayload.hours
                 } set: { hours in
-                    timer.setHours(hours)
+                    timerPayload.setHours(hours)
                 },
                 configuration: configuration
             )
             FTFlipClockComponentView(
                 value: Binding {
-                    timer.payload.minutes
+                    timerPayload.minutes
                 } set: { minutes in
-                    timer.setMinutes(minutes)
+                    timerPayload.setMinutes(minutes)
                 },
                 configuration: configuration
             )
             FTFlipClockComponentView(
                 value: Binding {
-                    timer.payload.seconds
+                    timerPayload.seconds
                 } set: { seconds in
-                    timer.setSeconds(seconds)
+                    timerPayload.setSeconds(seconds)
                 },
                 configuration: configuration
             )
@@ -43,17 +43,17 @@ public struct FTFlipClockView: View {
     
     public init(
         configuration: FTFlipClockConfiguration,
-        timer: FTTimer
+        timerPayload: FTTimerPayload
     ) {
         self.configuration = configuration
-        self.timer = timer
+        self.timerPayload = timerPayload
     }
 }
 
-//#Preview {
-//    FTFlipClockView(
-//        configuration: .init(),
-//        viewModel: ...
-//    )
-//    .preferredColorScheme(.dark)
-//}
+#Preview {
+    FTFlipClockView(
+        configuration: .init(),
+        timerPayload: .init(hours: 1, minutes: 30, seconds: 0)
+    )
+    .preferredColorScheme(.dark)
+}
