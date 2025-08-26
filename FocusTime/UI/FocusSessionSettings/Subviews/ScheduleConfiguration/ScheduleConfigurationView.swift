@@ -19,20 +19,20 @@ struct ScheduleConfigurationView: View {
         VStack(alignment: .leading, spacing: Constants.Layout.mainSpacing) {
             HStack(spacing: Constants.Layout.listIconSpacing) {
                 Group {
-                HStack {
-                    Text(Constants.Strings.listName)
-                    Spacer()
-                    TextField(
-                        Constants.Strings.listNamePlaceholder,
-                        text: .binding(
-                            get: viewModel.state.blockItem.name,
-                            set: viewModel.setListName(listName:)
+                    HStack {
+                        Text(Constants.Strings.listName)
+                        Spacer()
+                        TextField(
+                            Constants.Strings.listNamePlaceholder,
+                            text: .binding(
+                                get: viewModel.state.blockItem.name,
+                                set: viewModel.setListName(listName:)
+                            )
                         )
-                    )
-                    .multilineTextAlignment(.trailing)
-                    .foregroundStyle(.white)
-                }
-                
+                        .multilineTextAlignment(.trailing)
+                        .foregroundStyle(.white)
+                    }
+                    
                     TextField(String(), text: .binding(
                         get: viewModel.state.blockItem.emoji,
                         set: viewModel.setCustomPresetEmoji(emoji:)
@@ -53,10 +53,10 @@ struct ScheduleConfigurationView: View {
                             emoji: viewModel.state.blockItem.emoji.filterToFirstEmoji()
                         )
                     }
-                    .simultaneousGesture(TapGesture().onEnded {
-                        viewModel.clearEmoji()
-                    })
                     .onChange(of: isFocusedEmojiField) {
+                        let isFocusedEmojiField = isFocusedEmojiField
+                        
+                        viewModel.clearEmoji(isTextFieldFocused: isFocusedEmojiField)
                         viewModel.updateDelegateEmojiFocusStateStatus(with: isFocusedEmojiField)
                     }
                 }
@@ -167,9 +167,9 @@ struct ScheduleConfigurationView: View {
             .rowStyle()
         }
         .padding(.horizontal)
-//        .onChange(of: viewModel.state) {
-//            viewModel.refreshBlockItem()
-//        }
+        .onChange(of: viewModel.state) {
+            viewModel.refreshBlockItem()
+        }
         
         // MARK: - Sheet Presentation
         .sheet(

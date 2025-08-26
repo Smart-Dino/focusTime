@@ -27,7 +27,7 @@ final class ScheduleConfigurationViewModel {
     }
     
     // MARK: - State
-    struct State {
+    struct State: Equatable {
         var blockItem: ProtectedBlockItem = .default
         
         var durationHours: Int = FocusSessionView.Constants.DefaultValues.durationHours
@@ -147,18 +147,23 @@ final class ScheduleConfigurationViewModel {
     
     // MARK: - Logic
     
-    /// Clears the emoji associated with the current `BlockItem`.
-    /// - Note: A small asynchronous delay is introduced before clearing
-    ///   because the `TextField` binding updates its value immediately
-    ///   on tap gesture, which would otherwise override this change.
-    func clearEmoji() {
+    /// Clears the emoji associated with the current `BlockItem` if the given
+    /// `TextField` is focused.
+    ///
+    /// - Parameter isTextFieldFocused: A Boolean value indicating whether
+    ///   the `TextField` currently has focus. If `false`, the emoji will not
+    ///   be cleared.
+    /// - Note: A short asynchronous delay is introduced before clearing to
+    ///   avoid conflicts with the `TextField`’s binding, which updates its
+    ///   value immediately on tap gestures.
+    func clearEmoji(isTextFieldFocused: Bool) {
+        guard isTextFieldFocused else { return }
         Task {
-            // Delay the removal of the emoji because TextField binding
-            // seems to be setting values on tap gesture immediately.
             try? await Task.sleep(for: .milliseconds(1))
             state.blockItem.emoji = String()
         }
     }
+
 
     /// Updates the `blockItem` type based on the current scheduling state.
     /// - If `isScheduledForLater` is `true`, the block item will be updated
