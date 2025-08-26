@@ -103,15 +103,12 @@ struct DraftsBlockItemListView: View {
     @ViewBuilder
     private func sessionCard(for block: ProtectedBlockItem) -> some View {
         if block.state.isActive {
-            FTSessionDraftRowView(
+
+            FTActiveSessionDraftRowView(
                 emoji: block.emoji,
                 title: block.name,
-                description: viewModel.timer.payload.formatted
+                timerPayload: viewModel.state.timerPayload
             )
-            .onAppear {
-                viewModel.startTimer(for: block)
-            }
-            .id(viewModel.state.items) // Force refresh.
         } else {
             if block.isScheduled {
                 FTSessionScheduledRowView(
@@ -137,7 +134,7 @@ struct DraftsBlockItemListView: View {
     
     DraftsBlockItemListView(
         viewModel: .init(
-            timer: ConcurrencyTimer(),
+            state: .init(timer: ConcurrencyTimer()),
             blockItemPersistenceManager: manager
         )
     )

@@ -36,7 +36,13 @@ enum HomeViewNavigationRoute: Equatable, Hashable {
 @MainActor
 @Observable
 final class HomeViewModel {
+    @MainActor
     struct State {
+        let timer: FTTimer
+        var timerPayload: FTTimerPayload {
+            timer.payload
+        }
+        
         var error: Error? = nil
         
         var upcomingOrRunningItem: ProtectedBlockItem?
@@ -53,7 +59,6 @@ final class HomeViewModel {
         var nextNavigationScreen: HomeViewNavigationRoute?
     }
     
-    let timer: FTTimer
     private(set) var state: State
     
     private let deviceActivityRegistrar: DeviceActivityRegistrar
@@ -64,14 +69,12 @@ final class HomeViewModel {
     private var dbChangesNotificationTask: Task<Void, Never>?
     
     init(
-        state: State = State(),
-        timer: FTTimer,
+        state: State,
         deviceActivityRegistrar: DeviceActivityRegistrar,
         blockItemPersistenceManager: BlockItemPersistenceManager,
         delegate: HomeViewDelegate?
     ) {
         self.state = state
-        self.timer = timer
         self.deviceActivityRegistrar = deviceActivityRegistrar
         self.blockItemPersistenceManager = blockItemPersistenceManager
         self.delegate = delegate
@@ -92,24 +95,24 @@ final class HomeViewModel {
         }
     }
     
-    func startTimer(for blockItem: ProtectedBlockItem) {
-        timer.startTimer(for: blockItem, withSuspensionCountdown: true)
-    }
-    
     func setUpcomingItem() {
         guard fetchTask == nil else { return }
         fetchTask = Task {
             do {
                 state.upcomingOrRunningItem = try await blockItemPersistenceManager.fetchClosestOrRunningCurrentScheduled(now: .now)
-                if let item = state.upcomingOrRunningItem {
-                    startTimer(for: item)
-                }
+                setupTimerForActiveItem()
             } catch {
                 state.error = error
             }
             fetchTask = nil
         }
     }
+    
+    private func setupTimerForActiveItem() {
+        if let activeItem = state.upcomingOrRunningItem, activeItem.state.isActive {
+            state.timer.startTimer(for: activeItem, withSuspensionCountdown: false)
+         }
+     }
     
     func setNextNavigationScreen(_ showing: Bool) {
         if !showing {
@@ -148,8 +151,7 @@ final class HomeViewModel {
         guard let upcomingOrRunningItem = state.upcomingOrRunningItem else { return nil }
         
         return TaskConcentrationViewModel(
-            state: .init(item: upcomingOrRunningItem, phase: phase),
-            timer: timer,
+            state: .init(timer: state.timer, item: upcomingOrRunningItem, phase: phase),
             deviceActivityRegistrar: deviceActivityRegistrar,
             blockItemPersistenceManager: blockItemPersistenceManager
         )

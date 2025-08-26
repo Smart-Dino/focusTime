@@ -127,25 +127,17 @@ struct HomeView: View {
         
         return Group {
             if isActive {
-                FTHomeSessionCardView(
+                FTActiveHomeSessionCardView(
                     title: item.name,
-                    description: viewModel.timer.payload.formatted,
-                    isActive: isActive,
+                    timerPayload: viewModel.state.timerPayload,
                     isPaused: viewModel.state.isPaused,
                     action: { viewModel.showTaskConcentrationView(isPauseAction: false) },
                     pauseAction: { viewModel.showTaskConcentrationView(isPauseAction: true) }
                 )
-                .onAppear {
-                    viewModel.startTimer(for: item)
-                }
             } else {
                 FTHomeSessionCardView(
                     title: item.name,
-                    description: item.type.description,
-                    isActive: isActive,
-                    isPaused: true,
-                    action: nil,
-                    pauseAction: nil
+                    description: item.type.description
                 )
             }
         }
@@ -161,7 +153,7 @@ struct HomeView: View {
         let registrar = PreviewData.mockActivityRegistrar
         HomeView(
             viewModel: .init(
-                timer: ConcurrencyTimer(),
+                state: .init(timer: ConcurrencyTimer()),
                 deviceActivityRegistrar: registrar,
                 blockItemPersistenceManager: manager,
                 delegate: nil

@@ -1,27 +1,29 @@
 //
-//  FTHomeSessionCardView.swift
+//  FTActiveSessionDraftRowView.swift
 //  FocusTimeUI
 //
-//  Created by Maksym Horobets on 19.06.2025.
+//  Created by Maksym Horobets on 25.08.2025.
 //
 
 import SwiftUI
 
-public struct FTHomeSessionCardView: View {
+public struct FTActiveSessionDraftRowView: View {
+    private let emoji: String
     private let title: String
-    private let description: String
+    private let timerPayload: FTTimerPayload
     
     public var body: some View {
         HStack(spacing: 15) {
+            Text(emoji)
+                .font(.title2)
             VStack(alignment: .leading) {
                 Text(title)
-                Text(description)
+                Text(timerPayload.formatted)
                     .foregroundStyle(.ftGray3Light)
             }
             Spacer()
         }
-        .padding(.horizontal)
-        .padding(.vertical, 10)
+        .padding()
         .background {
             let shape = FocusSessionBackgroundShape()
             ZStack {
@@ -31,30 +33,26 @@ public struct FTHomeSessionCardView: View {
                     .stroke(gradient, lineWidth: 1.2)
             }
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(emoji), \(title), \(timerPayload.formatted)")
     }
     
     var gradient: LinearGradient {
         LinearGradient(
-            colors: [.leadingScheduledFocus, .trailingScheduledFocus],
+            colors: [.leadingSummaryCard, .trailingSummaryCard],
             startPoint: .leading,
             endPoint: .trailing
         )
     }
     
     public init(
+        emoji: String,
         title: String,
-        description: String,
+        timerPayload: FTTimerPayload
     ) {
+        self.emoji = emoji
         self.title = title
-        self.description = description
+        self.timerPayload = timerPayload
     }
     
-}
-
-#Preview("Scheduled", traits: .sizeThatFitsLayout) {
-    FTHomeSessionCardView(
-        title: "Work time",
-        description: "00:00:01"
-    )
-    .preferredColorScheme(.dark)
 }
