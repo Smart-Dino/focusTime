@@ -40,7 +40,7 @@ final class DraftsBlockItemListViewModel {
     }
     
     func getTimer(for blockItem: ProtectedBlockItem) -> FTTimer {
-        timer.startTimer(for: blockItem)
+        timer.startTimer(for: blockItem, withSuspensionCountdown: false)
         return timer
     }
     

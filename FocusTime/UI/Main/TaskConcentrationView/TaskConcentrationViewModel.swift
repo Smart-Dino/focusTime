@@ -45,8 +45,6 @@ final class TaskConcentrationViewModel {
         
         var item: ProtectedBlockItem
         var phase: Phase
-        
-        var timerIsPaused: Bool = true
     }
     
     // MARK: - Properties
@@ -70,7 +68,6 @@ final class TaskConcentrationViewModel {
         self.deviceActivityRegistrar = deviceActivityRegistrar
         self.blockItemPersistenceManager = blockItemPersistenceManager
         
-        setupTimer()
         subscribeToDB()
     }
     
@@ -121,9 +118,6 @@ final class TaskConcentrationViewModel {
     }
     
     // MARK: - Private Methods
-    private func setupTimer() {
-        state.timerIsPaused = timer.isPaused
-    }
     
     private func moveTo(_ phase: State.Phase) {
         guard state.phase != phase else { return }

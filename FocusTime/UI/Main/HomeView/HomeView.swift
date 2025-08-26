@@ -137,9 +137,6 @@ struct HomeView: View {
                     action: { viewModel.showTaskConcentrationView(isPauseAction: false) },
                     pauseAction: { viewModel.showTaskConcentrationView(isPauseAction: true) }
                 )
-                .onAppear {
-                    viewModel.startTimer(for: item)
-                }
             } else {
                 FTHomeSessionCardView(
                     title: item.name,

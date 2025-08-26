@@ -19,12 +19,6 @@ public struct FTHomeSessionCardView: View {
                     .foregroundStyle(.ftGray3Light)
             }
             Spacer()
-            VStack(alignment: .leading) {
-                Text(title)
-                Text(description)
-                    .foregroundStyle(.ftGray3Light)
-            }
-            Spacer()
         }
         .padding(.horizontal)
         .padding(.vertical, 10)
@@ -37,24 +31,6 @@ public struct FTHomeSessionCardView: View {
                     .stroke(gradient, lineWidth: 1.2)
             }
         }
-        .overlay {
-            if isActive {
-                HStack {
-                    Spacer()
-                    Button {
-                        pauseAction?()
-                    } label: {
-                        isPaused
-                        ? Image(systemName: "play.circle").foregroundStyle(.blue)
-                        : Image(systemName: "pause.circle").foregroundStyle(.red)
-                    }
-                    .font(.title2)
-                    .padding(.horizontal)
-                }
-            }
-        }
-        .contentShape(.rect)
-        .onTapGesture(perform: action ?? {})
     }
     
     var gradient: LinearGradient {

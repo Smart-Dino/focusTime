@@ -24,7 +24,10 @@ struct TaskConcentrationView: View {
                         backgroundImage: ImageResource.MainImages.TaskConcentrationImages.taskConcentrationFocus,
                         centerView: {
                             VStack {
-                                FTFlipClockView(configuration: .init(), timer: viewModel.timer)
+                                FTFlipClockView(
+                                    configuration: .init(),
+                                    timer: viewModel.getTimer()
+                                )
                                     .padding([.top, .horizontal])
                                 Text(timerTitle)
                                     .foregroundStyle(.ftGray3Light)
@@ -56,7 +59,10 @@ struct TaskConcentrationView: View {
                         backgroundImage: ImageResource.MainImages.TaskConcentrationImages.taskConcentrationPause,
                         centerView: {
                             VStack {
-                                FTFlipClockView(configuration: .init(), timer: viewModel.timer)
+                                FTFlipClockView(
+                                    configuration: .init(),
+                                    timer: viewModel.getTimer()
+                                )
                                     .padding([.top, .horizontal])
                                 Text(timerTitle)
                                     .foregroundStyle(.ftGray3Light)
@@ -66,8 +72,8 @@ struct TaskConcentrationView: View {
                             Button(buttonTitle) {
                                 viewModel.startBreakTimer()
                             }
-                            .opacity(viewModel.timer.isPaused ? 1 : 0)
-                            .animation(.easeInOut, value: viewModel.timer.isPaused)
+                            .opacity(viewModel.state.item.state == .running ? 1 : 0)
+                            .animation(.easeInOut, value: viewModel.state.item.state)
                         }, endSessionAction: {
                             viewModel.moveToEndSessionAlertScene()
                         }

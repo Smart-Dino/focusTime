@@ -93,7 +93,7 @@ final class HomeViewModel {
     }
     
     func getTimer(for blockItem: ProtectedBlockItem) -> FTTimer {
-        timer.startTimer(for: blockItem)
+        timer.startTimer(for: blockItem, withSuspensionCountdown: true)
         return timer
     }
     
@@ -102,9 +102,6 @@ final class HomeViewModel {
         fetchTask = Task {
             do {
                 state.upcomingOrRunningItem = try await blockItemPersistenceManager.fetchClosestOrRunningCurrentScheduled(now: .now)
-                if let item = state.upcomingOrRunningItem {
-                    startTimer(for: item)
-                }
             } catch {
                 state.error = error
             }

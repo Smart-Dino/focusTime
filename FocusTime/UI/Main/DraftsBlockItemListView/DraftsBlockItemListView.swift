@@ -12,6 +12,7 @@ struct DraftsBlockItemListView: View {
     @State var viewModel: DraftsBlockItemListViewModel
     
     var body: some View {
+        let _ = Self._printChanges()
         ZStack {
             // MARK: - Wave image
             VStack {
@@ -106,12 +107,11 @@ struct DraftsBlockItemListView: View {
     @ViewBuilder
     private func sessionCard(for block: ProtectedBlockItem) -> some View {
         if block.state.isActive {
-            FTSessionDraftRowView(
+            FTActiveSessionDraftRowView(
                 emoji: block.emoji,
                 title: block.name,
                 timer: viewModel.getTimer(for: block)
             )
-            .id(viewModel.state.items) // Force refresh.
         } else {
             if block.isScheduled {
                 FTSessionScheduledRowView(
