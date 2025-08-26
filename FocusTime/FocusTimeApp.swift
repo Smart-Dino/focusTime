@@ -19,11 +19,16 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 @main
 struct FocusTimeApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+    let appFlowViewModel: AppFlowCoordinatorViewModel
     
     var body: some Scene {
         WindowGroup {
-            LaunchFlowCoordinatorView()
+            AppFlowCoordinatorView(viewModel: appFlowViewModel)
                 .preferredColorScheme(.dark) // Inject dark color scheme throughout the app.
         }
+    }
+    
+    init() {
+        self.appFlowViewModel = AppFlowCoordinatorViewModel()
     }
 }

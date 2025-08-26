@@ -18,6 +18,9 @@ struct AppFlowCoordinatorView: View {
             case .main(let mainFlowViewModel):
                 MainFlowCoordinatorView(viewModel: mainFlowViewModel)
                     .task { await viewModel.showFreePlanCoverIfNeeded() }
+            case .splash(let viewModel):
+                SplashScreenView(viewModel: viewModel)
+            default: Text("There was an error figuring out the screen to show:(")
             }
         }
         .fullScreenCover(
@@ -45,11 +48,16 @@ struct AppFlowCoordinatorView: View {
 
 #Preview {
     let defaultsManager = LiveDefaultsManager()
+    let mockPaymentManagerFactory = MockPaymentManagerFactory()
+    let mockPersistenceStoreFactory = MockPersistenceStoreFactory()
+    
+    let viewModel = AppFlowCoordinatorViewModel(
+        defaultsManager: defaultsManager,
+        paymentManagerFactory: mockPaymentManagerFactory,
+        persistenceStoreFactory: mockPersistenceStoreFactory
+    )
+    
     AppFlowCoordinatorView(
-        viewModel: .init(
-            defaultsManager: defaultsManager,
-            modelContainer: PreviewData.memoryOnlyModelContainer,
-            paymentManager: MockPaymentManagerWithPurchaseError()
-        )
+        viewModel: viewModel
     )
 }

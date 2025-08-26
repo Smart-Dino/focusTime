@@ -26,7 +26,7 @@ actor StoreKitPaymentManager: PaymentManager {
     
     // Async updates
     private var updateListenerTask: Task<Void, Error>? = nil
-    var continuation: AsyncStream<Bool>.Continuation?
+    private(set) var continuation: AsyncStream<Bool>.Continuation?
     
     // Logger
     let logger: Logger
@@ -38,7 +38,7 @@ actor StoreKitPaymentManager: PaymentManager {
             category: String(describing: StoreKitPaymentManager.self)
         )
     ) async {
-
+        
         // FTProducts
         self.products = []
         self.purchasedProducts = []
@@ -63,6 +63,39 @@ actor StoreKitPaymentManager: PaymentManager {
         let task = listenForTransactions()
         self.updateListenerTask = task
     }
+    
+    // MARK: - AsyncStream
+    func isProUserChangesStream() -> AsyncStream<Bool> {
+        let stream = AsyncStream<Bool> { continuation in
+            self.continuation = continuation
+        }
+        
+        self.continuation?.onTermination = { @Sendable reason in
+            Task { await self.handleTermination(reason) }
+        }
+        
+        return stream
+    }
+    
+    func sendStreamUpdate(isPro: Bool) {
+        guard let cont = continuation else {
+            // Either: nobody’s listening yet, or they already cancelled.
+            return
+        }
+        cont.yield(isPro)
+    }
+    
+    private func handleTermination(_ reason: AsyncStream<Bool>.Continuation.Termination) {
+        // Swift marked the stream as terminated,
+        // finishing the continuation.
+        continuation?.finish()
+        continuation = nil
+        
+        // switch reason {
+        //   case .cancelled:   …
+        //   case .finished:    …
+        // }
+    }
 }
 
 // MARK: - Internal Helpers
@@ -72,7 +105,7 @@ extension StoreKitPaymentManager {
     func skProduct(for ftProduct: FTProduct) -> Product? {
         skProducts.first(where: { $0.id == ftProduct.id })
     }
-
+    
     func checkVerified<T>(_ result: VerificationResult<T>) throws(PaymentError) -> T {
         // Check whether the JWS passes StoreKit verification.
         switch result {
@@ -84,7 +117,7 @@ extension StoreKitPaymentManager {
             return safe
         }
     }
-
+    
     func updateCustomerProductStatus() async {
         var purchasedProducts: [Product] = []
         
@@ -115,7 +148,7 @@ extension StoreKitPaymentManager {
         isPro = status
         sendStreamUpdate(isPro: status)
     }
-
+    
     func listenForTransactions() -> Task<Void, Error> {
         return Task {
             //Iterate through any transactions that don't come from a direct call to `purchase()`.
@@ -136,7 +169,7 @@ extension StoreKitPaymentManager {
             }
         }
     }
-
+    
     func getProducts() async throws {
         // Request products from the App Store.
         let storeProducts = try await Product.products(for: productIdentifiers)
@@ -150,7 +183,7 @@ extension StoreKitPaymentManager {
             "Successfully retrieved and converted \(storeProducts.count.description) StoreKit products into FTProducts"
         )
         
-//        try? await Task.sleep(for: .seconds(3)) // Simulate loading.
+        //        try? await Task.sleep(for: .seconds(3)) // Simulate loading.
         // Set the values.
         self.products = ftProducts.sorted()
         self.skProducts = storeProducts

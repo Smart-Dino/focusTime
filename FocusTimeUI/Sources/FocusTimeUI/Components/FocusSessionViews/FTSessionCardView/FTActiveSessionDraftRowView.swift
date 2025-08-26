@@ -1,16 +1,16 @@
 //
-//  FTScheduledFocusRowView.swift
+//  FTActiveSessionDraftRowView.swift
 //  FocusTimeUI
 //
-//  Created by Maksym Horobets on 18.06.2025.
+//  Created by Maksym Horobets on 25.08.2025.
 //
 
 import SwiftUI
 
-public struct FTScheduledFocusRowView: View {
+public struct FTActiveSessionDraftRowView: View {
     private let emoji: String
     private let title: String
-    private let description: String
+    @State private var timer: FTTimer
     
     public var body: some View {
         HStack(spacing: 15) {
@@ -18,31 +18,28 @@ public struct FTScheduledFocusRowView: View {
                 .font(.title2)
             VStack(alignment: .leading) {
                 Text(title)
-                Text(description)
+                Text(timer.payload.formatted)
                     .foregroundStyle(.ftGray3Light)
             }
             Spacer()
-            Image(systemName: "hourglass.bottomhalf.filled")
-                .font(.title3)
-                .foregroundStyle(.blue)
         }
         .padding()
         .background {
             let shape = FocusSessionBackgroundShape()
             ZStack {
                 shape
-                    .fill(.backgroundScheduledFocus)
+                    .fill(.sessionRowBlue)
                 shape
                     .stroke(gradient, lineWidth: 1.2)
             }
         }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(emoji), \(title), \(description)")
+        .accessibilityLabel("\(emoji), \(title), \(timer.payload.formatted)")
     }
     
     var gradient: LinearGradient {
         LinearGradient(
-            colors: [.leadingScheduledFocus, .trailingScheduledFocus],
+            colors: [.leadingSummaryCard, .trailingSummaryCard],
             startPoint: .leading,
             endPoint: .trailing
         )
@@ -51,21 +48,11 @@ public struct FTScheduledFocusRowView: View {
     public init(
         emoji: String,
         title: String,
-        description: String
+        timer: FTTimer
     ) {
         self.emoji = emoji
         self.title = title
-        self.description = description
+        self.timer = timer
     }
     
-}
-
-#Preview(traits: .sizeThatFitsLayout) {
-    FTScheduledFocusRowView(
-        emoji: "😎",
-        title: "Cool",
-        description: "This is a cool view huh?"
-    )
-    .padding()
-    .preferredColorScheme(.dark)
 }

@@ -59,19 +59,22 @@ struct ScheduledBlockItemsView: View {
                 Text(viewModel.state.error?.localizedDescription ?? "")
             }
         )
+        .onAppear {
+            viewModel.loadData()
+        }
     }
     
     var schedulesView: some View {
         ScrollView(.vertical) {
             LazyVStack {
-                ForEach(viewModel.state.items) { schedule in
-                    FTScheduledFocusRowView(
-                        emoji: schedule.emoji,
-                        title: schedule.name,
-                        description: schedule.days.description
+                ForEach(viewModel.state.items) { block in
+                    FTSessionScheduledRowView(
+                        emoji: block.emoji,
+                        title: block.name,
+                        description: block.type.description
                     )
                     .padding(1)
-                    .onAppear { viewModel.hasReachEndOfList(blockItem: schedule) }
+                    .onAppear { viewModel.hasReachEndOfList(blockItem: block) }
                 }
             }
         }
@@ -93,8 +96,10 @@ struct ScheduledBlockItemsView: View {
 
 #Preview {
     NavigationStack {
+        let manager = PreviewData.mockBlockItemPersistenceManager
+        
         ScheduledBlockItemsView(
-            viewModel: .init(modelContainer: PreviewData.memoryOnlyModelContainer)
+            viewModel: .init(blockItemPersistenceManager: manager)
         )
     }
 }

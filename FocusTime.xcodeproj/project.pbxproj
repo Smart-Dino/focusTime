@@ -121,6 +121,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				BusinessLogic/Helpers/PeriodConverter.swift,
+				BusinessLogic/Managers/DeviceActivityHandler/BlockItemExtensionStore.swift,
 				BusinessLogic/Managers/DeviceActivityHandler/DeviceActivityHandler.swift,
 				BusinessLogic/Managers/ShieldManager/LiveShieldManager.swift,
 				BusinessLogic/Managers/ShieldManager/ShieldManager.swift,
@@ -134,6 +135,7 @@
 				BusinessLogic/Models/Blocking/BlockItem/ProtectedBlockItem.swift,
 				BusinessLogic/Models/Blocking/CodableActivityIdentifier/CodableActivityIdentifier.swift,
 				BusinessLogic/Stores/Protocols/ProtectedModel.swift,
+				"Extentions/Date+Ext.swift",
 				Shared/SharedAppValues.swift,
 			);
 			target = E97895A42E0AFCBE00E0AF42 /* FocusTimeActivityMonitor */;
@@ -695,6 +697,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FocusTime/Info.plist;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -731,6 +734,7 @@
 				GCC_OPTIMIZATION_LEVEL = s;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FocusTime/Info.plist;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

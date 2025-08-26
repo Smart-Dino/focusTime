@@ -36,11 +36,15 @@ struct HomeView: View {
                 
                 // Timer
                 VStack {
+#if targetEnvironment(simulator)
+                    Text(SharedConstants.Strings.simulatorUnavailability)
+#else
                     DeviceActivityReport(
                         Constants.ActivityConfiguration.context,
                         filter: Constants.ActivityConfiguration.filter
                     )
                     .frame(height: Constants.Layout.activityReportSceneHeight)
+#endif
                     Text(Constants.Strings.timerSubtitle)
                         .font(.callout)
                         .foregroundStyle(.ftGray3Light)
@@ -68,30 +72,16 @@ struct HomeView: View {
                     .buttonStyle(.plain)
                     .padding(.horizontal)
                     // MARK: - Schedule
-#warning("Placeholder")
-                    if true {
-                        FTHomeSessionCardView(
-                            title: "Work time",
-                            mode: .scheduled(timeRange: "6 AM - 7:30 PM")
-                        )
-                        .padding(.horizontal)
-                        .padding(.vertical, 5)
+                    if let item = viewModel.state.upcomingOrRunningItem {
+                        makeSessionViewForItem(item)
                     }
+                    
                 }
                 .frame(minHeight: 130) // Used so that the screen time value stays in the same place
             }
         }
         .background { MainBackgroundGradientView() }
-        .navigationDestination(isPresented: .init(
-            get: { viewModel.state.nextNavigationScreen != nil },
-            set: { viewModel.setNextNavigationScreen($0) }
-        )) {
-            switch viewModel.state.nextNavigationScreen {
-            case .scheduledFocusList(let viewModel):
-                ScheduledBlockItemsView(viewModel: viewModel)
-            case .none: Text("No view")
-            }
-        }
+        .dynamicTypeSize(...DynamicTypeSize.accessibility2)
         // MARK: - Bottom floating button
         .safeAreaInset(edge: .bottom) {
             Button(Constants.Strings.bottomButtonTitle, systemImage: Constants.Icons.hourglass) {
@@ -105,15 +95,68 @@ struct HomeView: View {
                     .ignoresSafeArea(edges: .bottom)
             }
         }
-        .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+        .navigationDestination(isPresented: .init(
+            get: { viewModel.state.nextNavigationScreen != nil },
+            set: { viewModel.setNextNavigationScreen($0) }
+        )) {
+            switch viewModel.state.nextNavigationScreen {
+            case .scheduledFocusList(let viewModel):
+                ScheduledBlockItemsView(viewModel: viewModel)
+            case .none: Text("No view")
+            }
+        }
+        .alert(
+            SharedConstants.Strings.errorHeader,
+            isPresented: Binding(get: {
+                viewModel.state.error != nil
+            }, set: { isVisible in
+                viewModel.setErrorVisibility(isVisible)
+            }), actions: {
+                // OK dismissal button by default
+            }, message: {
+                Text(viewModel.state.error?.localizedDescription ?? "")
+            }
+        )
+        .onAppear {
+            viewModel.setUpcomingItem()
+            viewModel.subscribeToDB()
+        }
+    }
+    
+    func makeSessionViewForItem(_ item: ProtectedBlockItem) -> some View {
+        let isActive = item.isActive
+        
+        return Group {
+            if isActive {
+                FTActiveHomeSessionCardView(
+                    title: item.name,
+                    timer: viewModel.getTimer(for: item),
+                    isPaused: viewModel.state.isPaused,
+                    action: {}, // This will show timer detail view but it is not ready in this branch.
+                    pauseAction: viewModel.togglePause
+                )
+            } else {
+                FTHomeSessionCardView(
+                    title: item.name,
+                    description: item.type.description
+                )
+            }
+        }
+        .padding(.horizontal)
+        .padding(.vertical, 5)
+        .id(viewModel.state.upcomingOrRunningItem?.id) // Force refresh on blockItem.id change.
     }
 }
 
 #Preview {
     NavigationStack {
+        let manager = PreviewData.mockBlockItemPersistenceManager
+        let registrar = PreviewData.mockActivityRegistrar
         HomeView(
             viewModel: .init(
-                modelContainer: PreviewData.memoryOnlyModelContainer,
+                timer: ConcurrencyTimer(),
+                deviceActivityRegistrar: registrar,
+                blockItemPersistenceManager: manager,
                 delegate: nil
             )
         )

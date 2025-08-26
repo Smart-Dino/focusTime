@@ -5,8 +5,9 @@
 //  Created by Maksym Horobets on 17.06.2025.
 //
 
-import Foundation
 import SwiftData
+import Foundation
+import FocusTimeUI
 import FamilyControls
 
 @MainActor
@@ -16,20 +17,73 @@ final class DraftsBlockItemListViewModel {
         var error: Error? = nil
         
         var page = 0
+        let amountPerPage = 100
         var items = [ProtectedBlockItem]()
     }
     
     private(set) var state: State
-    private let modelContainer: ModelContainer
+    private let timer: FTTimer // There can only be one schedule running at a time.
+    
+    private let blockItemPersistenceManager: BlockItemPersistenceManager
     
     private var fetchTask: Task<Void, Never>?
+    private var dbChangesNotificationTask: Task<Void, Never>?
     
     init(
         state: State = State(),
-        modelContainer: ModelContainer
+        timer: FTTimer,
+        blockItemPersistenceManager: BlockItemPersistenceManager
     ) {
         self.state = state
-        self.modelContainer = modelContainer
+        self.timer = timer
+        self.blockItemPersistenceManager = blockItemPersistenceManager
+    }
+    
+    func getTimer(for blockItem: ProtectedBlockItem) -> FTTimer {
+        timer.startTimer(for: blockItem)
+        return timer
+    }
+    
+    private func reloadItems() {
+        fetchTask?.cancel()
+        fetchTask = Task {
+            do {
+                let newItems = try await blockItemPersistenceManager.reloadPaginatedData(
+                    totalCount: state.items.count,
+                    packSize: state.amountPerPage
+                )
+                state.items = newItems
+            } catch {
+                state.error = error
+            }
+            fetchTask = nil
+        }
+    }
+    
+    private func fetchNextPage() {
+        guard fetchTask == nil else { return }
+        fetchTask = Task {
+            do {
+                let newItems = try await blockItemPersistenceManager.fetchPaginated(
+                    page: state.page,
+                    amountPerPage: state.amountPerPage
+                )
+                state.items.append(contentsOf: newItems)
+                state.page += 1
+            } catch {
+                state.error = error
+            }
+            fetchTask = nil
+        }
+    }
+    
+    func subscribeToDB() {
+        dbChangesNotificationTask = Task {
+            for await _ in await blockItemPersistenceManager.contextChangesStream() {
+                try? await Task.sleep(for: SharedAppValues.debounceAfterDBRefreshed)
+                reloadItems()
+            }
+        }
     }
     
     func setErrorVisibility(_ isVisible: Bool) {
@@ -38,27 +92,12 @@ final class DraftsBlockItemListViewModel {
         }
     }
     
-    #warning("Unfinished ViewModel")
-    private func fetchNextPage() {
-        guard fetchTask == nil else { return }
-        
-        self.fetchTask = Task.detached(priority: .userInitiated) {
-            do {
-                let blockItemStore = BlockItemStore(modelContainer: self.modelContainer)
-                
-                let insertedItems = try await blockItemStore.fetch(page: self.state.page)
-                await MainActor.run {
-                    self.state.items.append(contentsOf: insertedItems)
-                    self.state.page += 1
-                    self.state.error = nil
-                    self.fetchTask = nil
-                }
-            } catch {
-                await MainActor.run {
-                    self.state.error = error
-                    self.fetchTask = nil
-                }
-            }
+    func loadData() {
+        if state.items.isEmpty {
+            state.page = 0
+            fetchNextPage()
+        } else {
+            reloadItems()
         }
     }
     

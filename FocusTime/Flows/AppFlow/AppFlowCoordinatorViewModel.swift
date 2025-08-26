@@ -9,27 +9,6 @@ import SwiftUI
 import SwiftData
 import Foundation
 
-// MARK: - Screens
-enum AppScreen: Equatable, Hashable {
-    case onboarding(viewModel: OnboardingFlowCoordinatorViewModel)
-    case main(viewModel: MainFlowCoordinatorViewModel)
-    
-    static func == (lhs: AppScreen, rhs: AppScreen) -> Bool {
-        switch (lhs, rhs) {
-        case (.onboarding, .onboarding): true
-        case (.main, .main):             true
-        default:                         false
-        }
-    }
-    
-    func hash(into hasher: inout Hasher) {
-        switch self {
-        case .onboarding: hasher.combine(0)
-        case .main: hasher.combine(1)
-        }
-    }
-}
-
 // MARK: - FullScreenCovers
 enum AppFullScreenCover: Identifiable, Equatable {
     case freePlanPaywall(viewModel: FreePlanUpgradeViewModel)
@@ -62,62 +41,84 @@ enum AppFullScreenCover: Identifiable, Equatable {
 @Observable
 final class AppFlowCoordinatorViewModel {
     struct State {
+        // MARK: - Screens
+        enum AppScreen: Equatable, Hashable {
+            case onboarding(viewModel: OnboardingFlowCoordinatorViewModel)
+            case main(viewModel: MainFlowCoordinatorViewModel)
+            case splash(viewModel: SplashScreenViewModel)
+            case none
+            
+            static func == (lhs: AppScreen, rhs: AppScreen) -> Bool {
+                switch (lhs, rhs) {
+                case (.onboarding, .onboarding): true
+                case (.main, .main):             true
+                case (.splash, .splash):         true
+                case (.none, .none):             true
+                default:                         false
+                }
+            }
+            
+            func hash(into hasher: inout Hasher) {
+                switch self {
+                case .onboarding: hasher.combine(0)
+                case .main: hasher.combine(1)
+                case .splash: hasher.combine(2)
+                case .none: hasher.combine(3)
+                }
+            }
+        }
+        
         var currentFlow: AppScreen
         var screenCover: AppFullScreenCover?
+        var error: Error?
         
         init(currentFlow: AppScreen) {
             self.currentFlow = currentFlow
         }
     }
     
-    private(set) var state: State!
+    private(set) var state: State
+    private let shieldManager: ShieldManager
     private let defaultsManager: DefaultsManager
-    private let modelContainer: ModelContainer
-    private let paymentManager: PaymentManager
-    private let superPaywallVM: SuperPaywallViewModel
+    private let persistenceStoreFactory: PersistenceStoreFactory
+    private let paymentManagerFactory: PaymentManagerFactory
+    
+    // Async.
+    private var deviceActivityRegistrar: DeviceActivityRegistrar?
+    private var blockItemPersistenceManager: BlockItemPersistenceManager?
+    private var paymentManager: PaymentManager?
+    private var superPaywallVM: SuperPaywallViewModel?
     
     init(
-        defaultsManager: DefaultsManager,
-        modelContainer: ModelContainer,
-        paymentManager: PaymentManager
+        shieldManager: ShieldManager = LiveShieldManager(),
+        defaultsManager: LiveDefaultsManager = LiveDefaultsManager(),
+        paymentManagerFactory: PaymentManagerFactory = LivePaymentManagerFactory(),
+        persistenceStoreFactory: PersistenceStoreFactory = LivePersistenceStoreFactory()
     ) {
+        self.state = State(currentFlow: .none)
+        self.shieldManager = shieldManager
         self.defaultsManager = defaultsManager
-        self.modelContainer = modelContainer
-        self.paymentManager = paymentManager
-        self.superPaywallVM = SuperPaywallViewModel(paymentManager: paymentManager)
+        self.paymentManagerFactory = paymentManagerFactory
+        self.persistenceStoreFactory = persistenceStoreFactory
         
-        setupInitialAppState()
-    }
-    
-    func setupInitialAppState() {
-        let isOnboardingFinished: Bool = defaultsManager.getValue(for: .isOnboardingFinished) ?? false
-        
-        if !isOnboardingFinished {
-            setStateFlow(to: .onboarding(viewModel: makeOnboardingFlowCoordinatorViewModel()))
-            return
+        showSplashScreen()
+        Task {
+            await setupAsyncDependencies()
+            try? await Task.sleep(for: .seconds(SharedAppValues.splashScreenDuration))
+            setupInitialAppState()
         }
-        
-        setStateFlow(to: .main(viewModel: makeMainFlowCoordinatorViewModel()))
     }
     
-    func showFreePlanCoverIfNeeded() async {
-        guard await !paymentManager.isPro && state.screenCover == nil else { return }
-        
-        let viewModel = makeFreePlanUpgradeViewModel(
-            requestedProductID: StoreKitProductIdentifiers.trialableWeekly.id
-        )
-        
-        setScreenCover(to: .freePlanPaywall(viewModel: viewModel))
+    func setErrorVisibility(_ isVisible: Bool) {
+        if !isVisible {
+            state.error = nil
+        }
     }
     
-    func setStateFlow(to screen: AppScreen?) {
+    func setStateFlow(to screen: State.AppScreen?) {
         guard let screen else { return }
-        if state == nil {
-            state = State(currentFlow: screen)
-        } else {
-            withAnimation {
-                state.currentFlow = screen
-            }
+        withAnimation {
+            state.currentFlow = screen
         }
     }
     
@@ -127,56 +128,125 @@ final class AppFlowCoordinatorViewModel {
         }
     }
     
+    func showSplashScreen() {
+        state.currentFlow = .splash(viewModel: makeSplashScreenViewModel())
+    }
+    
+    func showFreePlanCoverIfNeeded() async {
+        guard let paymentManager else { return }
+        
+        guard await !paymentManager.isPro && state.screenCover == nil else {
+            return
+        }
+        
+        let viewModel = makeFreePlanUpgradeViewModel(
+            requestedProductID: StoreKitProductIdentifiers.trialableWeekly.id
+        )
+        
+        if let viewModel {
+            setScreenCover(to: .freePlanPaywall(viewModel: viewModel))
+        }
+    }
+    
+    private func setupAsyncDependencies() async {
+        // Async init dependencies.
+        async let paymentManager = paymentManagerFactory.makePaymentManager()
+        async let blockItemPersistenceManager = LiveBlockItemPersistenceManager(
+            blockItemStore: persistenceStoreFactory.makeBlockItemStore(),
+            deviceActivityCenterManager: LiveDeviceActivityCenterManager()
+        )
+        // Await init.
+        self.paymentManager = await paymentManager
+        self.superPaywallVM = await SuperPaywallViewModel(paymentManager: paymentManager)
+        self.blockItemPersistenceManager = await blockItemPersistenceManager
+        self.deviceActivityRegistrar = LiveDeviceActivityRegistrar(
+            blockItemPersistenceManager: await blockItemPersistenceManager,
+            shieldManager: shieldManager
+        )
+    }
+    
+    private func setupInitialAppState() {
+        let isOnboardingFinished: Bool = defaultsManager.getValue(for: .isOnboardingFinished) ?? false
+        
+        if !isOnboardingFinished {
+            setStateFlow(to: .onboarding(viewModel: makeOnboardingFlowCoordinatorViewModel()))
+            return
+        }
+        
+        if let viewModel = makeMainFlowCoordinatorViewModel() {
+            setStateFlow(to: .main(viewModel: viewModel))
+        }
+    }
+    
     // MARK: - Factory methods
+    func makeSplashScreenViewModel() -> SplashScreenViewModel {
+        SplashScreenViewModel()
+    }
+    
     private func makeOnboardingFlowCoordinatorViewModel() -> OnboardingFlowCoordinatorViewModel {
         OnboardingFlowCoordinatorViewModel(appFlowDelegate: self)
     }
     
-    private func makeMainFlowCoordinatorViewModel() -> MainFlowCoordinatorViewModel {
-        MainFlowCoordinatorViewModel(modelContainer: modelContainer, appFlowDelegate: self)
+    private func makeMainFlowCoordinatorViewModel() -> MainFlowCoordinatorViewModel? {
+        guard let blockItemPersistenceManager, let deviceActivityRegistrar else { return nil }
+        
+        return MainFlowCoordinatorViewModel(
+            deviceActivityRegistrar: deviceActivityRegistrar,
+            blockItemPersistenceManager: blockItemPersistenceManager,
+            appFlowDelegate: self,
+        )
     }
     
     // Paywalls
-    private func makeFreePlanUpgradeViewModel(requestedProductID: String) -> FreePlanUpgradeViewModel {
-        FreePlanUpgradeViewModel(
+    private func makeFreePlanUpgradeViewModel(requestedProductID: String) -> FreePlanUpgradeViewModel? {
+        guard let superPaywallVM else { return nil }
+        
+        return FreePlanUpgradeViewModel(
             state: .init(requestedProductID: requestedProductID),
             superPaywallVM: superPaywallVM,
             flowDelegate: self
         )
     }
     
-    private func makeOnboardingPaywallViewModel(requestedProductID: String) -> OnboardingPaywallViewModel {
-        OnboardingPaywallViewModel(
+    private func makeOnboardingPaywallViewModel(requestedProductID: String) -> OnboardingPaywallViewModel? {
+        guard let superPaywallVM else { return nil }
+        
+        return OnboardingPaywallViewModel(
             state: .init(requestedProductID: requestedProductID),
             superPaywallVM: superPaywallVM,
             flowDelegate: self
         )
     }
     
-    private func makePlanSelectionPaywallViewModel() -> PlanSelectionPaywallViewModel {
-        PlanSelectionPaywallViewModel(
+    private func makePlanSelectionPaywallViewModel() -> PlanSelectionPaywallViewModel? {
+        guard let superPaywallVM else { return nil }
+        
+        return PlanSelectionPaywallViewModel(
             superPaywallVM: superPaywallVM,
             flowDelegate: self
         )
     }
-    
 }
 
 // MARK: - MainFlowNavigationDelegate
 extension AppFlowCoordinatorViewModel: MainFlowDelegate {
     // MARK: Paywall
     func didRequestPaywallPlanSelection() {
-        setScreenCover(to: .planSelectionPaywall(viewModel: makePlanSelectionPaywallViewModel()))
+        if let viewModel = makePlanSelectionPaywallViewModel() {
+            setScreenCover(to: .planSelectionPaywall(viewModel: viewModel))
+        }
     }
     
     func didRequestPaywallFreePlan() {
-        setScreenCover(
-            to: .freePlanPaywall(
-                viewModel: makeFreePlanUpgradeViewModel(
-                    requestedProductID: StoreKitProductIdentifiers.trialableWeekly.id
+        if let viewModel = makeFreePlanUpgradeViewModel(
+            requestedProductID: StoreKitProductIdentifiers.trialableWeekly.id
+        ) {
+            setScreenCover(
+                to: .freePlanPaywall(
+                    viewModel: viewModel
                 )
             )
-        )
+        }
     }
     
     // MARK: Onboarding
@@ -186,7 +256,9 @@ extension AppFlowCoordinatorViewModel: MainFlowDelegate {
     
     // MARK: Main Flow
     func didRequestMainFlow() {
-        setStateFlow(to: .main(viewModel: makeMainFlowCoordinatorViewModel()))
+        if let viewModel = makeMainFlowCoordinatorViewModel() {
+            setStateFlow(to: .main(viewModel: viewModel))
+        }
     }
 }
 
@@ -194,13 +266,16 @@ extension AppFlowCoordinatorViewModel: MainFlowDelegate {
 extension AppFlowCoordinatorViewModel: OnboardingFlowNavigationDelegate {
     func didFinishOnboarding() {
         defaultsManager.setValue(for: .isOnboardingFinished, to: true)
-        let mainVM = makeMainFlowCoordinatorViewModel()
-        setStateFlow(to: .main(viewModel: mainVM))
-        setScreenCover(
-            to: .onboardingPaywall(
-                viewModel: makeOnboardingPaywallViewModel(requestedProductID: StoreKitProductIdentifiers.trialableWeekly.id)
-            )
-        )
+        if let mainVM = makeMainFlowCoordinatorViewModel() {
+            setStateFlow(to: .main(viewModel: mainVM))
+            if let onboardingPaywallVM = makeOnboardingPaywallViewModel(requestedProductID: StoreKitProductIdentifiers.trialableWeekly.id) {
+                setScreenCover(
+                    to: .onboardingPaywall(
+                        viewModel: onboardingPaywallVM
+                    )
+                )
+            }
+        }
     }
 }
 
@@ -217,7 +292,9 @@ extension AppFlowCoordinatorViewModel: PaywallNavigationDelegate {
     }
     
     func paywallDidRequestPlanSelection() {
-        setScreenCover(to: .planSelectionPaywall(viewModel: makePlanSelectionPaywallViewModel()))
+        if let viewModel = makePlanSelectionPaywallViewModel() {
+            setScreenCover(to: .planSelectionPaywall(viewModel: viewModel))
+        }
     }
     
     func paywallDidRequestDismissal() {

@@ -18,23 +18,20 @@ struct ShieldDebugView: View {
             // This view causes DeviceActivityMonitorExtension unblock to fail on Simulator only.
             // Important: All bugs related to this view can only be replicated on a Simulator, so avoid using it
             // altogether!
+#if targetEnvironment(simulator)
+            Text(SharedConstants.Strings.simulatorUnavailability)
+#else
             DeviceActivityReport(
                 Constants.ActivityConfiguration.context,
                 filter: Constants.ActivityConfiguration.filter
             )
+#endif
             
             // MARK: - BlockItem list
             VStack {
                 ScrollView(.vertical) {
                     ForEach(viewModel.state.blockItems) { blockItem in
-                        HStack {
-                            Text(blockItem.emoji)
-                            VStack(alignment: .leading) {
-                                Text(blockItem.name)
-                                Text(Constants.Strings.blockItemIdPrefix + blockItem.id.uuidString)
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
+                        makeCard(blockItem)
                     }
                 }
             }
@@ -85,7 +82,7 @@ struct ShieldDebugView: View {
             }
             
             Button(viewModel.state.scheduleType.buttonTitle) {
-                    viewModel.blockSelectionDuringSchedule()
+                viewModel.blockSelectionDuringSchedule()
             }
             
             HStack {
@@ -203,13 +200,35 @@ struct ShieldDebugView: View {
             Divider()
         }
     }
+    
+    func makeCard(_ blockItem: ProtectedBlockItem) -> some View {
+        HStack {
+            Text(blockItem.emoji)
+            VStack(alignment: .leading) {
+                Text(blockItem.name)
+                Text ({
+                    switch blockItem.type {
+                    case .scheduled(_, _, let isActive, _):
+                        isActive.description
+                    case .duration(_, let startedAt, _, _):
+                        (startedAt != nil).description
+                    }
+                }())
+                
+                Text(Constants.Strings.blockItemIdPrefix + blockItem.id.uuidString)
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
 }
 
 #Preview {
+    let centerManager = LiveDeviceActivityCenterManager()
+    let factory = MockPersistenceStoreFactory()
+    let manager = PreviewData.mockBlockItemPersistenceManager
+    
     ShieldDebugView(
-        viewModel: .init(
-            modelContainer: PreviewData.memoryOnlyModelContainer
-        )
+        viewModel: .init(blockItemPersistenceManager: manager)
     )
 }
 

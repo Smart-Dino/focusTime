@@ -13,7 +13,7 @@ import DeviceActivity
 // This handler is used in the DeviceActivityMonitorExtension.
 // This is why it is structured the way it is.
 // It has to inherit the caller's execution context - hence why it is not an actor.
-// But it cannot be a class due to Task sendability issues.
+// MARK: Do not isolate this declaration to any actor.
 struct DeviceActivityHandler: Sendable {
     private let logger: Logger?
     private let container: ModelContainer
@@ -31,56 +31,50 @@ struct DeviceActivityHandler: Sendable {
     
     func handleBlockingStart(for activity: DeviceActivityName) async {
         guard let activityIdentifier = CodableActivityIdentifier(from: activity) else { return }
+        // Create context from scratch because using mainContext in a
+        // non-isolated to MainActor environment is not allowed.
+        let store = BlockItemExtensionStore(logger: logger, context: ModelContext(container))
         
-        let blockItem = fetchBlockItem(id: activityIdentifier.blockItemID)
+        let blockItem = store.fetchBlockItem(id: activityIdentifier.blockItemID)
         
-        // Make sure we have our schedule.
+        // Make sure we have our block item.
         guard let blockItem else { return }
         
         switch blockItem.type {
-        case .scheduled(_, let endTime):
+        case .scheduled(_, let endTime, _, _):
             await handleRegularBlocking(blockItem: blockItem,
                                         activity: activity,
                                         activityIdentifier: activityIdentifier,
-                                        endTime: endTime)
+                                        endTime: endTime,
+                                        store: store)
         case .duration:
-            await handleDurationUnblocking(for: blockItem)
+            await handleDurationUnblocking(for: blockItem, store: store)
             // We don't need to handle the end of the interval anymore.
             DeviceActivityCenter().stopMonitoring([activity])
         }
         
     }
     
-    /// Called when a one-time blocking interval ends.
-    private func handleDurationUnblocking(for blockItem: BlockItem) async {
-        // Unblock.
+    func handleBlockingEnd(for activity: DeviceActivityName) async {
         do {
+            guard let activityIdentifier = CodableActivityIdentifier(from: activity) else { return }
+            
+            // If this is fallback's end - ignore it.
+            // Fallback schedules run at blockingStart and finish there respectively.
+            guard !activityIdentifier.isFallback else { return }
+            
+            // Create context from scratch because using mainContext in a
+            // non-isolated to MainActor environment is not allowed.
+            let store = BlockItemExtensionStore(logger: logger, context: ModelContext(container))
+            
+            let blockItem = store.fetchBlockItem(id: activityIdentifier.blockItemID)
+            
             try await shieldManager.unblock()
+            
+            guard let blockItem else { return }
+            store.setSessionIsActive(for: blockItem, isActive: false)
         } catch {
-            logger?.error("Failed to unblock in handleDurationUnblocking: \(error.localizedDescription)")
-        }
-        
-        // Reset duration values if this BlockItem was created as duration block.
-        guard case .duration(let duration, _, _, _) = blockItem.type else { return }
-        let modelContext = ModelContext(container)
-        
-        // If it is temporary then we just delete it.
-        if !blockItem.isTemporary {
-            blockItem.type = .duration(
-                duration,
-                startedAt: nil,
-                suspendedAt: nil,
-                timeLeft: duration
-            )
-        } else {
-            modelContext.delete(blockItem)
-        }
-        
-        // Save changes.
-        do {
-            try modelContext.save()
-        } catch {
-            logger?.error("Failed to save ModelContext in handleDurationUnblocking: \(error.localizedDescription)")
+            logger?.error("Failure in \(#function): \(error.localizedDescription)")
         }
     }
     
@@ -88,7 +82,8 @@ struct DeviceActivityHandler: Sendable {
         blockItem: BlockItem,
         activity: DeviceActivityName,
         activityIdentifier: CodableActivityIdentifier,
-        endTime endTimeComponent: TimeComponents
+        endTime endTimeComponent: TimeComponents,
+        store: BlockItemExtensionStore
     ) async {
         // Make sure the current day is the block day.
         guard blockItem.days.contains(Weekday.currentDay) else { return }
@@ -97,12 +92,10 @@ struct DeviceActivityHandler: Sendable {
         let selection = blockItem.blockedContent
         do {
             try await shieldManager.block(specific: selection)
+            store.setSessionIsActive(for: blockItem, isActive: true)
         } catch {
-            logger?.error("Failed to block in handleRegularBlocking: \(error.localizedDescription)")
+            logger?.error("Failed to block in \(#function): \(error.localizedDescription)")
         }
-        
-        // Sendability workaround since DeviceActivityName is not sendable.
-        let stringActivityName = activity.rawValue
         
         if activityIdentifier.isFallback {
             // TimeComponents has an accuracy of a minute.
@@ -113,41 +106,31 @@ struct DeviceActivityHandler: Sendable {
                 } // Unfortunately sleeping task for a long time causes extension to close before unblock.
                 
                 try await shieldManager.unblock()
-                
-                DeviceActivityCenter()
-                    .stopMonitoring(
-                        [DeviceActivityName(stringActivityName)]
-                    )
+                store.setSessionIsActive(for: blockItem, isActive: false)
             } catch {
-                logger?.error("Failed to unblock in handleRegularBlocking fallback handling: \(error.localizedDescription)")
+                logger?.error("Failed to unblock in \(#function) while handling fallback: \(error.localizedDescription)")
             }
             
         }
     }
     
-    func handleBlockingEnd() async {
+    /// Called when a one-time blocking interval ends.
+    private func handleDurationUnblocking(for blockItem: BlockItem, store: BlockItemExtensionStore) async {
+        // Unblock.
         do {
             try await shieldManager.unblock()
         } catch {
-            logger?.error("Failed to unblock in handleBlockingEnd: \(error.localizedDescription)")
+            logger?.error("Failed to unblock in handleDurationUnblocking: \(error.localizedDescription)")
         }
-    }
-    
-    private func fetchBlockItem(id: UUID) -> BlockItem? {
-        // Create context from scratch because using mainContext in a
-        // non-isolated to MainActor environment is not allowed.
-        let context = ModelContext(container)
         
-        // Fetch the schedule.
-        let fetchDescriptor = FetchDescriptor<BlockItem>(
-            predicate: #Predicate<BlockItem> { $0.id == id }
-        )
+        // Reset duration values if this BlockItem was created as duration block.
+        guard case .duration = blockItem.type else { return }
         
-        do {
-            return try context.fetch(fetchDescriptor).first
-        } catch {
-            logger?.error("Failed to fetch BlockItem in fetchBlockItem: \(error.localizedDescription)")
-            return nil
+        // If it is temporary then we just delete it.
+        if !blockItem.isTemporary {
+            store.setSessionIsActive(for: blockItem, isActive: false)
+        } else {
+            store.delete(model: blockItem)
         }
     }
 }
