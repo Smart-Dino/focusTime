@@ -9,7 +9,8 @@ import os.log
 import SwiftData
 import Foundation
 
-nonisolated final class BlockItemExtensionStore {
+// MARK: Do not isolate this declaration to any actor.
+final class BlockItemExtensionStore {
     private let logger: Logger?
     let context: ModelContext
     

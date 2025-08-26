@@ -13,8 +13,8 @@ import DeviceActivity
 // This handler is used in the DeviceActivityMonitorExtension.
 // This is why it is structured the way it is.
 // It has to inherit the caller's execution context - hence why it is not an actor.
-// But it cannot be a class due to Task sendability issues.
-nonisolated struct DeviceActivityHandler: Sendable {
+// MARK: Do not isolate this declaration to any actor.
+struct DeviceActivityHandler: Sendable {
     private let logger: Logger?
     private let container: ModelContainer
     private let shieldManager: ShieldManager

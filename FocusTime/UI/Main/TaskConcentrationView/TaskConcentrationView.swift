@@ -24,8 +24,11 @@ struct TaskConcentrationView: View {
                         backgroundImage: ImageResource.MainImages.TaskConcentrationImages.taskConcentrationFocus,
                         centerView: {
                             VStack {
-                                FTFlipClockView(configuration: .init(), timer: viewModel.timer)
-                                    .padding([.top, .horizontal])
+                                FTFlipClockView(
+                                    configuration: .init(),
+                                    timerPayload: viewModel.state.timerPayload
+                                )
+                                .padding([.top, .horizontal])
                                 Text(timerTitle)
                                     .foregroundStyle(.ftGray3Light)
                             }
@@ -56,8 +59,11 @@ struct TaskConcentrationView: View {
                         backgroundImage: ImageResource.MainImages.TaskConcentrationImages.taskConcentrationPause,
                         centerView: {
                             VStack {
-                                FTFlipClockView(configuration: .init(), timer: viewModel.timer)
-                                    .padding([.top, .horizontal])
+                                FTFlipClockView(
+                                    configuration: .init(),
+                                    timerPayload: viewModel.state.timerPayload
+                                )
+                                .padding([.top, .horizontal])
                                 Text(timerTitle)
                                     .foregroundStyle(.ftGray3Light)
                             }
@@ -66,8 +72,8 @@ struct TaskConcentrationView: View {
                             Button(buttonTitle) {
                                 viewModel.startBreakTimer()
                             }
-                            .opacity(viewModel.timer.isPaused ? 1 : 0)
-                            .animation(.easeInOut, value: viewModel.timer.isPaused)
+                            .opacity(viewModel.state.item.state == .running ? 1 : 0)
+                            .animation(.easeInOut, value: viewModel.state.item.state)
                         }, endSessionAction: {
                             viewModel.moveToEndSessionAlertScene()
                         }
@@ -79,17 +85,17 @@ struct TaskConcentrationView: View {
                         centerView: {
                             // Animation.
                             LottieView(animation: Constants.Animations.warningAnimation)
-                            .playbackMode(
-                                .playing(
-                                    .fromProgress(0,
-                                                  toProgress: 1,
-                                                  loopMode: .loop)
+                                .playbackMode(
+                                    .playing(
+                                        .fromProgress(0,
+                                                      toProgress: 1,
+                                                      loopMode: .loop)
+                                    )
                                 )
-                            )
-                            .resizable()
-                            .containerRelativeFrame(.horizontal) { size, _ in
-                                size / 2
-                            }
+                                .resizable()
+                                .containerRelativeFrame(.horizontal) { size, _ in
+                                    size / 2
+                                }
                             
                             VStack {
                                 Text(subtitle)
@@ -140,8 +146,7 @@ struct TaskConcentrationView: View {
 #Preview {
     @Previewable @State var timer = ConcurrencyTimer()
     let viewModel = TaskConcentrationViewModel(
-        state: .init(item: ProtectedBlockItem.mock, phase: .focus),
-        timer: timer,
+        state: .init(timer: timer, item: ProtectedBlockItem.mock, phase: .focus),
         deviceActivityRegistrar: PreviewData.mockActivityRegistrar,
         blockItemPersistenceManager: PreviewData.mockBlockItemPersistenceManager
     )

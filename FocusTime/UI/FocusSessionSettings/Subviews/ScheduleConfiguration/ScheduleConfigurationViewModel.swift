@@ -27,7 +27,7 @@ final class ScheduleConfigurationViewModel {
     }
     
     // MARK: - State
-    struct State: Equatable {
+    struct State {
         var blockItem: ProtectedBlockItem = .default
         
         var durationHours: Int = FocusSessionView.Constants.DefaultValues.durationHours
@@ -60,26 +60,6 @@ final class ScheduleConfigurationViewModel {
     /// - Parameter isOn: A boolean indicating whether scheduling for later is active.
     func setScheduleForLater(isOn: Bool) {
         state.isScheduledForLater = isOn
-    }
-    
-    func refreshBlockItem() {
-        if state.isScheduledForLater {
-            let startTime = try? TimeComponents(from: state.startTime)
-            let endTime = try? TimeComponents(from: state.endTime)
-            
-            state.blockItem.type = .scheduled(
-                startTime: startTime ?? .default,
-                endTime: endTime ?? .default
-            )
-        } else {
-            let hoursAsSeconds = state.durationHours * 60 * 60
-            let minutesAsSeconds = state.durationMinutes * 60
-            let totalSeconds = hoursAsSeconds + minutesAsSeconds
-            
-            state.blockItem.type = .duration(
-                duration: DurationComponents(seconds: totalSeconds)
-            )
-        }
     }
     
     func updateDelegateEmojiFocusStateStatus(with isFocused: Bool) {
@@ -164,4 +144,46 @@ final class ScheduleConfigurationViewModel {
     func dismissSheet(_ sheet: ScheduleSheetType?) {
         state.activeSheet = nil
     }
+    
+    // MARK: - Logic
+    
+    /// Clears the emoji associated with the current `BlockItem`.
+    /// - Note: A small asynchronous delay is introduced before clearing
+    ///   because the `TextField` binding updates its value immediately
+    ///   on tap gesture, which would otherwise override this change.
+    func clearEmoji() {
+        Task {
+            // Delay the removal of the emoji because TextField binding
+            // seems to be setting values on tap gesture immediately.
+            try? await Task.sleep(for: .milliseconds(1))
+            state.blockItem.emoji = String()
+        }
+    }
+
+    /// Updates the `blockItem` type based on the current scheduling state.
+    /// - If `isScheduledForLater` is `true`, the block item will be updated
+    ///   with `scheduled` type, using the provided `startTime` and `endTime`.
+    ///   If parsing fails, defaults are applied.
+    /// - Otherwise, the block item will be updated with `duration` type,
+    ///   calculated from the configured hours and minutes.
+    func refreshBlockItem() {
+        if state.isScheduledForLater {
+            let startTime = try? TimeComponents(from: state.startTime)
+            let endTime = try? TimeComponents(from: state.endTime)
+            
+            state.blockItem.type = .scheduled(
+                startTime: startTime ?? .default,
+                endTime: endTime ?? .default
+            )
+        } else {
+            let hoursAsSeconds = state.durationHours * 60 * 60
+            let minutesAsSeconds = state.durationMinutes * 60
+            let totalSeconds = hoursAsSeconds + minutesAsSeconds
+            
+            state.blockItem.type = .duration(
+                duration: DurationComponents(seconds: totalSeconds)
+            )
+        }
+    }
+
 }

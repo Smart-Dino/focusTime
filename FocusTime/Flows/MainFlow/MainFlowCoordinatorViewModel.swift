@@ -68,7 +68,7 @@ final class MainFlowCoordinatorViewModel {
     }
     
     private(set) var state: State
-    let timer: FTTimer
+    private let timer: FTTimer
     
     private let deviceActivityRegistrar: DeviceActivityRegistrar
     private let blockItemPersistenceManager: BlockItemPersistenceManager
@@ -96,7 +96,7 @@ final class MainFlowCoordinatorViewModel {
         state.tabViewModels = [
             State.MainTabScreens.home(
                 viewModel: HomeViewModel(
-                    timer: timer,
+                    state: .init(timer: timer),
                     deviceActivityRegistrar: deviceActivityRegistrar,
                     blockItemPersistenceManager: blockItemPersistenceManager,
                     delegate: self
@@ -104,7 +104,7 @@ final class MainFlowCoordinatorViewModel {
             ),
             State.MainTabScreens.drafts(
                 viewModel: DraftsBlockItemListViewModel(
-                    timer: timer,
+                    state: .init(timer: timer),
                     blockItemPersistenceManager: blockItemPersistenceManager
                 )
             )

@@ -53,6 +53,9 @@ struct ScheduleConfigurationView: View {
                             emoji: viewModel.state.blockItem.emoji.filterToFirstEmoji()
                         )
                     }
+                    .simultaneousGesture(TapGesture().onEnded {
+                        viewModel.clearEmoji()
+                    })
                     .onChange(of: isFocusedEmojiField) {
                         viewModel.updateDelegateEmojiFocusStateStatus(with: isFocusedEmojiField)
                     }
@@ -164,9 +167,9 @@ struct ScheduleConfigurationView: View {
             .rowStyle()
         }
         .padding(.horizontal)
-        .onChange(of: viewModel.state) {
-            viewModel.refreshBlockItem()
-        }
+//        .onChange(of: viewModel.state) {
+//            viewModel.refreshBlockItem()
+//        }
         
         // MARK: - Sheet Presentation
         .sheet(
