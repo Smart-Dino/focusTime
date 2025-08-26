@@ -55,22 +55,22 @@ extension ScheduleConfigurationView {
             // Schedule picker.
             static let startTimeTitle = String(
                 localized: "schedule_configuration_view_start_time_title",
-                table: "Localizable",
+                table: "SessionLocalizable",
                 comment: "Title for start time"
             )
             static let startTimeSubtitle = String(
                 localized: "schedule_configuration_view_start_time_subtitle",
-                table: "Localizable",
+                table: "SessionLocalizable",
                 comment: "Title for start session subtitle"
             )
             static let endTimeTitle = String(
                 localized: "schedule_configuration_view_end_time_title",
-                table: "Localizable",
+                table: "SessionLocalizable",
                 comment: "Title for end time"
             )
             static let endTimeSubtitle = String(
                 localized: "schedule_configuration_view_end_time_subtitle",
-                table: "Localizable",
+                table: "SessionLocalizable",
                 comment: "Title for end session subtitle"
             )
             

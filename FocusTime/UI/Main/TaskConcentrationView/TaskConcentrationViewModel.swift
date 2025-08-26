@@ -11,6 +11,7 @@ import FocusTimeUI
 @MainActor
 @Observable
 final class TaskConcentrationViewModel {
+    @MainActor
     struct State {
         enum Phase {
             case focus(
@@ -41,17 +42,20 @@ final class TaskConcentrationViewModel {
                 subtitle: String
             )
         }
+        
+        let timer: FTTimer
+        var timerPayload: FTTimerPayload {
+            timer.payload
+        }
+        
         var error: Error?
         
         var item: ProtectedBlockItem
         var phase: Phase
-        
-        var timerIsPaused: Bool = true
     }
     
     // MARK: - Properties
     private(set) var state: State
-    let timer: FTTimer
     
     private let deviceActivityRegistrar: DeviceActivityRegistrar
     private let blockItemPersistenceManager: BlockItemPersistenceManager
@@ -61,16 +65,13 @@ final class TaskConcentrationViewModel {
     // MARK: - Initialization
     init(
         state: State,
-        timer: FTTimer,
         deviceActivityRegistrar: DeviceActivityRegistrar,
         blockItemPersistenceManager: BlockItemPersistenceManager
     ) {
         self.state = state
-        self.timer = timer
         self.deviceActivityRegistrar = deviceActivityRegistrar
         self.blockItemPersistenceManager = blockItemPersistenceManager
         
-        setupTimer()
         subscribeToDB()
     }
     
@@ -100,7 +101,7 @@ final class TaskConcentrationViewModel {
     }
     
     func replaceTimerWithSuspensionTimer() {
-        timer.start(
+        state.timer.start(
             deadline: .now.addingTimeInterval(TimeInterval(SharedAppValues.breakTimeDuration)),
             isInitiallyPaused: true
         )
@@ -109,7 +110,7 @@ final class TaskConcentrationViewModel {
     func endBlock() async throws {
         do {
             try await deviceActivityRegistrar.cancelIfRunning(state.item)
-            timer.cancel()
+            state.timer.cancel()
         } catch {
             state.error = error
             throw error // Rethrow so the view does not dismiss.
@@ -117,9 +118,6 @@ final class TaskConcentrationViewModel {
     }
     
     // MARK: - Private Methods
-    private func setupTimer() {
-        state.timerIsPaused = timer.isPaused
-    }
     
     private func moveTo(_ phase: State.Phase) {
         guard state.phase != phase else { return }
@@ -147,8 +145,8 @@ final class TaskConcentrationViewModel {
     
     private func updateStateWithNewItem(_ newItem: ProtectedBlockItem) {
         state.item = newItem
-        timer.startTimer(for: newItem, withSuspensionCountdown: true)
-        timer.resume()
+        state.timer.startTimer(for: newItem, withSuspensionCountdown: true)
+        state.timer.resume()
         
         if state.item.state == .running {
             moveTo(.focus)
