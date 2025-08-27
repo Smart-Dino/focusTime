@@ -10,15 +10,16 @@ import FocusTimeUI
 import FamilyControls
 
 struct BlockListPickerSheetView: View {
+    @Environment(\.dismiss) var dismiss
     @State var viewModel: BlockListPickerSheetViewModel
     
     var body: some View {
         VStack {
-            Text("Block Distractions")
+            Text(Constants.Strings.title)
                 .font(.title3.bold())
                 .foregroundStyle(.ftMainBlue)
             
-            Text("Choose which apps to block during your\nfocus sessions")
+            Text(Constants.Strings.subtitle)
                 .font(.subheadline)
                 .foregroundStyle(.ftGray3Light)
                 .padding(.bottom)
@@ -26,8 +27,8 @@ struct BlockListPickerSheetView: View {
             
             Text(
                 viewModel.state.blockItems.isEmpty
-                ? "No Blocklists Yet"
-                : "Your Blocklists"
+                ? Constants.Strings.emptyStateTitle
+                : Constants.Strings.listTitle
             )
             .font(.title2.bold())
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -55,12 +56,24 @@ struct BlockListPickerSheetView: View {
             )
         )
         .safeAreaInset(edge: .bottom) {
-            Button("New Blocklist", systemImage: "plus.circle") {
-                viewModel.setIsFamilyActivitySheetPresented(true)
+            let showCreateButton = viewModel.state.finalSelection.isEmpty && viewModel.state.selectedBlockItems.isEmpty
+            
+            Group {
+                if showCreateButton {
+                    Button(Constants.Strings.newBlocklistButton, systemImage: "plus.circle") {
+                        viewModel.setIsFamilyActivitySheetPresented(true)
+                    }
+                    .transition(.scale)
+                } else {
+                    Button(Constants.Strings.saveSelectionButton, systemImage: "checkmark") {
+                        viewModel.saveSelection()
+                        dismiss()
+                    }
+                    .transition(.scale)
+                }
             }
+            .animation(.default, value: showCreateButton)
             .buttonStyle(.ftPrimary)
-            .opacity(viewModel.state.selectedBlockItems.isEmpty ? 1 : 0)
-            .animation(.default, value: viewModel.state.selectedBlockItems.isEmpty)
             .padding()
         }
     }
@@ -80,7 +93,7 @@ struct BlockListPickerSheetView: View {
                                 viewModel.toggleBlockItem(blockItem, isSelected: isSelected)
                             }
                         )) {
-                            // Move to the editing view.
+#warning("Move to the editing view")
                         }
                         .padding(.horizontal)
                         .onAppear { viewModel.hasReachEndOfList(blockItem: blockItem) }
@@ -91,7 +104,7 @@ struct BlockListPickerSheetView: View {
     
     @ViewBuilder
     var blockItemEmptyListView: some View {
-        Text("Create custom app blocklists to help you stay focused, reduce distractions, and build healthier screen habits.")
+        Text(Constants.Strings.emptyStateDescription)
             .foregroundStyle(.ftGray3Light)
         Spacer()
     }
@@ -102,19 +115,23 @@ struct BlockListPickerSheetView: View {
     let manager = PreviewData.mockBlockItemPersistenceManager
     let viewModel = BlockListPickerSheetViewModel(blockItemPersistenceManager: manager)
     
+    var randomBlockItem: ProtectedBlockItem {
+        ProtectedBlockItem(
+            emoji: SharedConstants.Strings.defaultEmojis.randomElement()!,
+            name: "Test item",
+            days: Weekday.weekdays,
+            type: .duration(duration: .init(seconds: Int.random(in: 0..<3600))),
+            blockedContent: FamilyActivitySelection()
+        )
+    }
+    
     NavigationStack {
         BlockListPickerSheetView(viewModel: viewModel)
             .preferredColorScheme(.dark)
             .onAppear {
                 Task {
                     for _ in 0..<100 {
-                        let blockItem = ProtectedBlockItem(
-                            emoji: SharedConstants.Strings.defaultEmojis.randomElement()!,
-                            name: "Test item",
-                            days: Weekday.weekdays,
-                            type: .duration(duration: .init(seconds: Int.random(in: 0..<3600))),
-                            blockedContent: FamilyActivitySelection()
-                        )
+                        let blockItem = randomBlockItem
                         try? await manager.insert(blockItem)
                     }
                     viewModel.fetchNextPage()

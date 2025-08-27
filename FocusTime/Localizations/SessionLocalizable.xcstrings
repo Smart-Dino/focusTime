@@ -1,6 +1,82 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "block_list_picker_sheet_empty_state_description" : {
+      "comment" : "Description shown when the user has no created blocklists.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create custom app blocklists to help you stay focused, reduce distractions, and build healthier screen habits."
+          }
+        }
+      }
+    },
+    "block_list_picker_sheet_empty_state_title" : {
+      "comment" : "Title shown when the user has no created blocklists.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Blocklists Yet"
+          }
+        }
+      }
+    },
+    "block_list_picker_sheet_list_title" : {
+      "comment" : "Title for the list of existing blocklists.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your Blocklists"
+          }
+        }
+      }
+    },
+    "block_list_picker_sheet_new_blocklist_button" : {
+      "comment" : "Button text to create a new blocklist.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New Blocklist"
+          }
+        }
+      }
+    },
+    "block_list_picker_sheet_save_selection_button" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save Selection"
+          }
+        }
+      }
+    },
+    "block_list_picker_sheet_subtitle" : {
+      "comment" : "Subtitle for the blocklist picker sheet.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose which apps to block during your\nfocus sessions"
+          }
+        }
+      }
+    },
+    "block_list_picker_sheet_title" : {
+      "comment" : "Main title for the blocklist picker sheet.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Block Distractions"
+          }
+        }
+      }
+    },
     "duration_picker_sheet_view_hours_picker_title" : {
       "comment" : "Label for hours picker in duration sheet",
       "localizations" : {
@@ -320,5 +396,5 @@
       }
     }
   },
-  "version" : "1.0"
+  "version" : "1.1"
 }

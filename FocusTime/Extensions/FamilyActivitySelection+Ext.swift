@@ -21,13 +21,22 @@ extension FamilyActivitySelection: @retroactive Hashable {
 }
 
 extension FamilyActivitySelection {
+    /// Returns true if the selection contains no tokens and
+    /// does not include entire categories.
+    var isEmpty: Bool {
+        applicationTokens.isEmpty &&
+        categoryTokens.isEmpty &&
+        webDomainTokens.isEmpty &&
+        !includeEntireCategory
+    }
+    
     /// Merges two `FamilyActivitySelection` values into one,
     /// combining their tokens and respecting the `includeEntireCategory` flag.
     ///
     /// - Parameter other: The other selection to merge with.
     /// - Returns: A new `FamilyActivitySelection` containing the union
     ///   of applications, categories, and web domains from both selections.
-    public func merged(with other: FamilyActivitySelection) -> FamilyActivitySelection {
+    func merged(with other: FamilyActivitySelection) -> FamilyActivitySelection {
         var merged = FamilyActivitySelection(
             includeEntireCategory: self.includeEntireCategory || other.includeEntireCategory
         )

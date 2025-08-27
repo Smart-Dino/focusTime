@@ -9,6 +9,11 @@ import Foundation
 import FamilyControls
 
 @MainActor
+protocol BlockListPickerSheetDelegate: AnyObject {
+    func didFinishSelectionWith(_ selection: FamilyActivitySelection)
+}
+
+@MainActor
 @Observable
 final class BlockListPickerSheetViewModel {
     struct State {
@@ -24,6 +29,7 @@ final class BlockListPickerSheetViewModel {
     }
     
     private(set) var state: State
+    weak var delegate: BlockListPickerSheetDelegate?
     private let blockItemPersistenceManager: BlockItemPersistenceManager
     
     private var fetchTask: Task<Void, Never>?
@@ -49,10 +55,10 @@ final class BlockListPickerSheetViewModel {
     }
     
     func toggleBlockItem(_ blockItem: ProtectedBlockItem, isSelected: Bool) {
-        if state.selectedBlockItems.contains(blockItem) {
-            state.selectedBlockItems.remove(blockItem)
-        } else {
+        if isSelected {
             state.selectedBlockItems.insert(blockItem)
+        } else {
+            state.selectedBlockItems.remove(blockItem)
         }
         recomputeFinalSelection()
     }
@@ -82,6 +88,10 @@ final class BlockListPickerSheetViewModel {
             }
             fetchTask = nil
         }
+    }
+    
+    func saveSelection() {
+        delegate?.didFinishSelectionWith(state.finalSelection)
     }
     
     func hasReachEndOfList(blockItem: ProtectedBlockItem) {
