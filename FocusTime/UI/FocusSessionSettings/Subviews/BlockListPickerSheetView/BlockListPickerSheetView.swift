@@ -83,6 +83,7 @@ struct BlockListPickerSheetView: View {
             .animation(.default, value: viewModel.state.showCreateButton)
             .buttonStyle(.ftPrimary)
             .padding()
+            .backgroundGradientFade()
         }
     }
     
