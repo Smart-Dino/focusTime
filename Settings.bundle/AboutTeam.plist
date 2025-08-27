@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>StringsTable</key>
+	<string>AboutTeam</string>
+	<key>PreferenceSpecifiers</key>
+	<array>
+		<dict>
+			<key>Type</key>
+			<string>PSTitleValueSpecifier</string>
+			<key>Title</key>
+			<string>LEAD_NAME</string> 
+			<key>Key</key>
+			<string>lead_role_key</string>
+			<key>DefaultValue</key>
+			<string>Project Lead</string> 
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSTitleValueSpecifier</string>
+			<key>Title</key>
+			<string>DESIGNER_NAME</string>
+			<key>Key</key>
+			<string>designer_role_key</string>
+			<key>DefaultValue</key>
+			<string>Designer</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSTitleValueSpecifier</string>
+			<key>Title</key>
+			<string>DEV_1_NAME</string>
+			<key>Key</key>
+			<string>dev1_role_key</string>
+			<key>DefaultValue</key>
+			<string>Developer</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSTitleValueSpecifier</string>
+			<key>Title</key>
+			<string>DEV_2_NAME</string>
+			<key>Key</key>
+			<string>dev2_role_key</string>
+			<key>DefaultValue</key>
+			<string>Developer</string>
+		</dict>
+	</array>
+</dict>
+</plist>
