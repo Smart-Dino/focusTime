@@ -6,12 +6,15 @@
 //
 
 import Foundation
+import FamilyControls
 
 @MainActor
 @Observable
 final class BlockListPickerSheetViewModel {
     struct State {
         var error: Error? = nil
+        var finalSelection: FamilyActivitySelection = FamilyActivitySelection()
+        var isFamilyActivitySheetPresented: Bool = false
         
         var page = 0
         let amountPerPage = SharedAppValues.amountOfItemsPerPage
@@ -33,6 +36,14 @@ final class BlockListPickerSheetViewModel {
         self.blockItemPersistenceManager = blockItemPersistenceManager
     }
     
+    func setIsFamilyActivitySheetPresented(_ isPresented: Bool) {
+        state.isFamilyActivitySheetPresented = isPresented
+    }
+    
+    func setFamilyActivitySelection(_ selection: FamilyActivitySelection) {
+        state.finalSelection = selection
+    }
+    
     func isSelected(_ blockItem: ProtectedBlockItem) -> Bool {
         state.selectedBlockItems.contains(blockItem)
     }
@@ -43,6 +54,17 @@ final class BlockListPickerSheetViewModel {
         } else {
             state.selectedBlockItems.insert(blockItem)
         }
+        recomputeFinalSelection()
+    }
+    
+    private func recomputeFinalSelection() {
+        var combined = FamilyActivitySelection()
+        
+        for item in state.selectedBlockItems {
+            combined = combined.merged(with: item.blockedContent)
+        }
+        
+        state.finalSelection = combined
     }
     
     func fetchNextPage() {
@@ -67,5 +89,4 @@ final class BlockListPickerSheetViewModel {
             fetchNextPage()
         }
     }
-    
 }

@@ -40,10 +40,29 @@ struct BlockListPickerSheetView: View {
                     blockItemListView
                 }
             }
-                .onAppear(perform: viewModel.fetchNextPage)
+            .onAppear(perform: viewModel.fetchNextPage)
         }
         .background(Color.ftblockListPickerSheetBackground)
         .presentationDragIndicator(.visible)
+        .familyActivityPicker(
+            isPresented: .binding(
+                get: viewModel.state.isFamilyActivitySheetPresented,
+                set: viewModel.setIsFamilyActivitySheetPresented(_:)
+            ),
+            selection: .binding(
+                get: viewModel.state.finalSelection,
+                set: viewModel.setFamilyActivitySelection(_:)
+            )
+        )
+        .safeAreaInset(edge: .bottom) {
+            Button("New Blocklist", systemImage: "plus.circle") {
+                viewModel.setIsFamilyActivitySheetPresented(true)
+            }
+            .buttonStyle(.ftPrimary)
+            .opacity(viewModel.state.selectedBlockItems.isEmpty ? 1 : 0)
+            .animation(.default, value: viewModel.state.selectedBlockItems.isEmpty)
+            .padding()
+        }
     }
     
     @ViewBuilder
@@ -83,21 +102,23 @@ struct BlockListPickerSheetView: View {
     let manager = PreviewData.mockBlockItemPersistenceManager
     let viewModel = BlockListPickerSheetViewModel(blockItemPersistenceManager: manager)
     
-    BlockListPickerSheetView(viewModel: viewModel)
-        .preferredColorScheme(.dark)
-        .onAppear {
-            Task {
-                for _ in 0..<100 {
-                    let blockItem = ProtectedBlockItem(
-                        emoji: SharedConstants.Strings.defaultEmojis.randomElement()!,
-                        name: "Test item",
-                        days: Weekday.weekdays,
-                        type: .duration(duration: .init(seconds: Int.random(in: 0..<3600))),
-                        blockedContent: ProtectedActivitySelection(FamilyActivitySelection())
-                    )
-                    try? await manager.insert(blockItem)
+    NavigationStack {
+        BlockListPickerSheetView(viewModel: viewModel)
+            .preferredColorScheme(.dark)
+            .onAppear {
+                Task {
+                    for _ in 0..<100 {
+                        let blockItem = ProtectedBlockItem(
+                            emoji: SharedConstants.Strings.defaultEmojis.randomElement()!,
+                            name: "Test item",
+                            days: Weekday.weekdays,
+                            type: .duration(duration: .init(seconds: Int.random(in: 0..<3600))),
+                            blockedContent: FamilyActivitySelection()
+                        )
+                        try? await manager.insert(blockItem)
+                    }
+                    viewModel.fetchNextPage()
                 }
-                viewModel.fetchNextPage()
             }
-        }
+    }
 }

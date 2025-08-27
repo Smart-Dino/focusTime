@@ -135,7 +135,7 @@ final class ShieldDebugViewModel {
     }
     
     func addScheduleToDB() {
-        let protectedSelection = ProtectedActivitySelection(state.selection)
+        let protectedSelection = state.selection
         let state = self.state
         Task {
             do {
@@ -203,7 +203,7 @@ final class ShieldDebugViewModel {
     
     func blockSelection() async {
         do {
-            try await shieldManager.block(specific: ProtectedActivitySelection(state.selection))
+            try await shieldManager.block(specific: state.selection)
         } catch {
             state.error = error
         }

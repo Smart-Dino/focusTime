@@ -23,7 +23,7 @@ struct ProtectedBlockItem: ProtectedModel, Hashable, Equatable {
     var isCancelled: Bool
     
     var isScheduled: Bool
-    var blockedContent: ProtectedActivitySelection
+    var blockedContent: FamilyActivitySelection
     
     var state: BlockState {
         switch type {
@@ -55,7 +55,7 @@ struct ProtectedBlockItem: ProtectedModel, Hashable, Equatable {
         isTemporary: Bool = false,
         isCancelled: Bool = false,
         isScheduled: Bool = false,
-        blockedContent: ProtectedActivitySelection
+        blockedContent: FamilyActivitySelection
     ) {
         self.id = id
         self.persistentModelID = persistentModelID

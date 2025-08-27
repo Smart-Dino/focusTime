@@ -32,9 +32,8 @@ actor LiveShieldManager: ShieldManager {
         store.shield.applicationCategories = .all()
     }
     
-    func block(specific selection: ProtectedActivitySelection) async throws {
+    func block(specific selection: FamilyActivitySelection) async throws {
         try await checkAuthorization()
-        let selection = selection.selection
         
         // Block selected applications.
         store.shield.applications = selection.applicationTokens
@@ -43,9 +42,8 @@ actor LiveShieldManager: ShieldManager {
         store.shield.applicationCategories = .specific(selection.categoryTokens)
     }
     
-    func block(specific selections: [ProtectedActivitySelection]) async throws {
+    func block(specific selections: [FamilyActivitySelection]) async throws {
         try await checkAuthorization()
-        let selections = selections.map(\.selection)
         
         // Add all the items to discourage.
         var applicationsToDiscourage = Set<ApplicationToken>()

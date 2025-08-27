@@ -14,7 +14,7 @@ extension ProtectedBlockItem {
         name: "Test",
         days: Weekday.weekdays,
         type: .duration(duration: .init(seconds: 120)),
-        blockedContent: ProtectedActivitySelection(FamilyActivitySelection())
+        blockedContent: FamilyActivitySelection()
     )
     
     static let `default` = Self.init(
@@ -25,6 +25,6 @@ extension ProtectedBlockItem {
         ),
         days: Set(Weekday.allCases),
         type: .duration(duration: .init(hour: 0, minute: 30)),
-        blockedContent: ProtectedActivitySelection(FamilyActivitySelection())
+        blockedContent: FamilyActivitySelection()
     )
 }
