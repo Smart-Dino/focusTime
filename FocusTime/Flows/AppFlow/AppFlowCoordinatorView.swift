@@ -60,4 +60,5 @@ struct AppFlowCoordinatorView: View {
     AppFlowCoordinatorView(
         viewModel: viewModel
     )
+    .preferredColorScheme(.dark)
 }
