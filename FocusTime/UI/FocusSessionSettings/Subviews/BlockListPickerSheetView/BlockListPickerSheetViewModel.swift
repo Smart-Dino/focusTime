@@ -26,6 +26,10 @@ final class BlockListPickerSheetViewModel {
         
         var selectedBlockItems: Set<ProtectedBlockItem> = []
         var blockItems: [ProtectedBlockItem] = []
+        
+        var showCreateButton: Bool {
+            finalSelection.isEmpty && selectedBlockItems.isEmpty
+        }
     }
     
     private(set) var state: State

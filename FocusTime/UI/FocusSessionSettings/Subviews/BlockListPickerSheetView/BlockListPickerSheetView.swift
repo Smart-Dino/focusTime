@@ -66,10 +66,8 @@ struct BlockListPickerSheetView: View {
             )
         )
         .safeAreaInset(edge: .bottom) {
-            let showCreateButton = viewModel.state.finalSelection.isEmpty && viewModel.state.selectedBlockItems.isEmpty
-            
             Group {
-                if showCreateButton {
+                if viewModel.state.showCreateButton {
                     Button(Constants.Strings.newBlocklistButton, systemImage: "plus.circle") {
                         viewModel.setIsFamilyActivitySheetPresented(true)
                     }
@@ -82,7 +80,7 @@ struct BlockListPickerSheetView: View {
                     .transition(.scale)
                 }
             }
-            .animation(.default, value: showCreateButton)
+            .animation(.default, value: viewModel.state.showCreateButton)
             .buttonStyle(.ftPrimary)
             .padding()
         }
