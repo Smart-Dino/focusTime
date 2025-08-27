@@ -15,6 +15,8 @@ public struct FTSessionSelectionRowView: View {
     @Binding private var isToggled: Bool
     private let onTapAction: () -> Void
     
+    private let buttonShape = FocusSessionBackgroundShape()
+    
     public var body: some View {
         HStack(spacing: 20) {
             Toggle(isOn: $isToggled) {
@@ -38,9 +40,10 @@ public struct FTSessionSelectionRowView: View {
                 }
                 .padding()
                 .background {
-                    FocusSessionBackgroundShape()
+                    buttonShape
                         .stroke(.primary.opacity(0.15), lineWidth: 1.2)
                 }
+                .contentShape(buttonShape)
             }
             .buttonStyle(.plain)
         }
