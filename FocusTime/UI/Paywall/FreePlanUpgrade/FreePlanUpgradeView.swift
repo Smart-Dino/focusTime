@@ -39,8 +39,7 @@ struct FreePlanUpgradeView: View {
                     
                     SubscriptionUtilityLinksView(
                         viewModel: .init(
-                            paymentManager: viewModel.getCurrentPaymentManager(),
-                            flowDelegate: viewModel.flowDelegate
+                            paymentManager: viewModel.getCurrentPaymentManager()
                         )
                     )
                 }

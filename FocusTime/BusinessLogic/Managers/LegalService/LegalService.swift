@@ -7,9 +7,11 @@
 
 import Foundation
 
-enum PolicyType {
+enum PolicyType: Identifiable {
     case termsOfService
     case privacyPolicy
+    
+    var id: Self { self }
     
     var url: URL? {
         switch self {

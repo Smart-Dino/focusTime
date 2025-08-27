@@ -12,25 +12,33 @@ import Foundation
 final class SubscriptionUtilityLinksViewModel {
     struct State {
         var error: Error?
+        
+        var legalResult: String? = nil
     }
     
     private(set) var state: State
-    private var paymentManager: PaymentManager
-    private var flowDelegate: PaywallNavigationDelegate?
+    private let legalService: LegalService
+    private let paymentManager: PaymentManager
     
     init(
         state: State = State(),
+        legalService: LegalService = LiveLegalService(),
         paymentManager: PaymentManager,
-        flowDelegate: PaywallNavigationDelegate?
     ) {
         self.state = state
+        self.legalService = legalService
         self.paymentManager = paymentManager
-        self.flowDelegate = flowDelegate
     }
     
     func setErrorVisibility(_ isVisible: Bool) {
         if !isVisible {
             state.error = nil
+        }
+    }
+    
+    func setLegalVisibility(_ isVisible: Bool) {
+        if !isVisible {
+            state.legalResult = nil
         }
     }
     
@@ -45,11 +53,23 @@ final class SubscriptionUtilityLinksViewModel {
     }
     
     func openTermsOfService() {
-        flowDelegate?.paywallDidRequestTermsOfService()
+        Task {
+            do {
+                state.legalResult = try await legalService.requestContents(for: .termsOfService)
+            } catch {
+                state.error = error
+            }
+        }
     }
     
     func openPrivacy() {
-        flowDelegate?.paywallDidRequestPrivacyPolicy()
+        Task {
+            do {
+                state.legalResult = try await legalService.requestContents(for: .privacyPolicy)
+            } catch {
+                state.error = error
+            }
+        }
     }
     
 }

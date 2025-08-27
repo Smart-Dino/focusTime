@@ -72,8 +72,7 @@ struct PlanSelectionPaywallView: View {
                 
                 SubscriptionUtilityLinksView(
                     viewModel: .init(
-                        paymentManager: viewModel.getCurrentPaymentManager(),
-                        flowDelegate: viewModel.getCurrentFlowDelegate()
+                        paymentManager: viewModel.getCurrentPaymentManager()
                     )
                 )
             }
