@@ -25,6 +25,18 @@ struct FocusSessionView: View {
                         set: viewModel.setSelectedPreset(selectedPreset:)
                     )
                 )
+                
+                if viewModel.state.isInEditingMode {
+                    Button(role: .destructive) {
+                        #warning("No implementation")
+                    } label: {
+                        Text("Delete Preset")
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .rowStyle(height: 50)
+                            .padding(.horizontal)
+                            .contentShape(.rect)
+                    }
+                }
             }
             .padding(.vertical)
         }
@@ -42,16 +54,36 @@ struct FocusSessionView: View {
                         emojis: Constants.Strings.emojis
                     )
                 } else {
-                    Button {
-                        viewModel.startTapped()
-                    } label: {
-                        Label(Constants.Strings.startButtonTitle, systemImage: Constants.Symbols.startButtonIcon)
+                    VStack {
+                        // Start Focusing button (only in editing + duration mode)
+                        if viewModel.state.isInEditingMode && viewModel.state.isDurationSchedule {
+                            Button("Start Focusing") {
+                                #warning("No implementation")
+                            }
+                            .buttonStyle(.ftAction)
+                        }
+                        
+                        // Save button (editing mode or scheduled)
+                        if viewModel.state.isInEditingMode || viewModel.state.isScheduled {
+                            Button("Save") {
+                                #warning("No implementation")
+                            }
+                            .buttonStyle(.ftPrimary)
+                        } else {
+                            // Default Start button
+                            Button {
+                                viewModel.startTapped()
+                            } label: {
+                                Label(Constants.Strings.startButtonTitle, systemImage: Constants.Symbols.startButtonIcon)
+                            }
+                            .buttonStyle(.ftPrimary)
+                            .disabled(!viewModel.state.isStartButtonEnabled)
+                        }
                     }
-                    .buttonStyle(FTPrimaryButtonStyle())
-                    .disabled(!viewModel.state.isStartButtonEnabled)
                 }
             }
             .padding(Constants.Layout.floatingButtonPadding)
+            .backgroundGradientFade()
         }
         .preferredColorScheme(.dark)
     }
@@ -64,8 +96,28 @@ struct FocusSessionView: View {
 }
 
 // MARK: - Preview
-#Preview {
+#Preview("Creation mode") {
     NavigationStack {
         FocusSessionView()
+    }
+}
+
+#Preview("Editing mode duration") {
+    NavigationStack {
+        FocusSessionView(
+            viewModel: FocusSessionViewModel(
+                state: .init(blockItem: ProtectedBlockItem.mockDuration)
+            )
+        )
+    }
+}
+
+#Preview("Editing mode scheduled") {
+    NavigationStack {
+        FocusSessionView(
+            viewModel: FocusSessionViewModel(
+                state: .init(blockItem: ProtectedBlockItem.mockScheduled)
+            )
+        )
     }
 }
