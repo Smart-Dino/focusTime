@@ -43,8 +43,18 @@ struct BlockListPickerSheetView: View {
             }
             .onAppear(perform: viewModel.fetchNextPage)
         }
-        .background(Color.ftblockListPickerSheetBackground)
+        .padding(.top, Constants.Layout.topViewPadding)
+        .background(Color.ftBlockListPickerSheetBackground)
         .presentationDragIndicator(.visible)
+        .alert(
+            SharedConstants.Strings.errorHeader,
+            isPresented: Binding(
+                get: { viewModel.state.error != nil },
+                set: { viewModel.setErrorVisibility($0) }
+            ),
+            actions: { /* OK dismissal button by default */ },
+            message: { Text(viewModel.state.error?.localizedDescription ?? String()) }
+        )
         .familyActivityPicker(
             isPresented: .binding(
                 get: viewModel.state.isFamilyActivitySheetPresented,
@@ -126,16 +136,21 @@ struct BlockListPickerSheetView: View {
     }
     
     NavigationStack {
-        BlockListPickerSheetView(viewModel: viewModel)
-            .preferredColorScheme(.dark)
-            .onAppear {
-                Task {
-                    for _ in 0..<100 {
-                        let blockItem = randomBlockItem
-                        try? await manager.insert(blockItem)
+        VStack {
+            Text("Some View")
+        }
+        .sheet(isPresented: .constant(true)) {
+            BlockListPickerSheetView(viewModel: viewModel)
+                .onAppear {
+                    Task {
+                        for _ in 0..<100 {
+                            let blockItem = randomBlockItem
+                            try? await manager.insert(blockItem)
+                        }
+                        viewModel.fetchNextPage()
                     }
-                    viewModel.fetchNextPage()
                 }
-            }
+        }
+        .preferredColorScheme(.dark)
     }
 }

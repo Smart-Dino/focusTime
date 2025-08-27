@@ -42,6 +42,12 @@ final class BlockListPickerSheetViewModel {
         self.blockItemPersistenceManager = blockItemPersistenceManager
     }
     
+    func setErrorVisibility(_ isVisible: Bool) {
+        if !isVisible {
+            state.error = nil
+        }
+    }
+    
     func setIsFamilyActivitySheetPresented(_ isPresented: Bool) {
         state.isFamilyActivitySheetPresented = isPresented
     }

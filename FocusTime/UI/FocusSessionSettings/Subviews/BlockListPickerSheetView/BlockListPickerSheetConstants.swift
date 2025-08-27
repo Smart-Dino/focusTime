@@ -46,5 +46,9 @@ extension BlockListPickerSheetView {
                 table: "SessionLocalizable"
             )
         }
+        
+        enum Layout {
+            static let topViewPadding: CGFloat = 50
+        }
     }
 }
