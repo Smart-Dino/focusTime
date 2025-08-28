@@ -31,14 +31,16 @@ extension ProtectedBlockItem {
         blockedContent: FamilyActivitySelection()
     )
     
-    static let `default` = Self.init(
-        emoji: FocusPreset.allCases.first?.emoji ?? "☀️",
-        name: String(
-            localized: "focus_session_default_name",
-            table: "SessionLocalizable"
-        ),
-        days: Set(Weekday.allCases),
-        type: .duration(duration: .init(hour: 0, minute: 30)),
-        blockedContent: FamilyActivitySelection()
-    )
+    static var `default`: ProtectedBlockItem {
+        ProtectedBlockItem(
+            emoji: FocusPreset.allCases.first?.emoji ?? "☀️",
+            name: String(
+                localized: "focus_session_default_name",
+                table: "SessionLocalizable"
+            ),
+            days: Set(Weekday.allCases),
+            type: .duration(duration: .init(hour: 0, minute: 30)),
+            blockedContent: FamilyActivitySelection()
+        )
+    }
 }

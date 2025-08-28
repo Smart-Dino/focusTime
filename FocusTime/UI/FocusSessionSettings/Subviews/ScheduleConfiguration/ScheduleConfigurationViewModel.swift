@@ -6,6 +6,8 @@
 //
 
 import SwiftUI
+import FamilyControls
+import ManagedSettings
 
 @MainActor
 protocol ScheduleConfigurationDelegate: AnyObject {
@@ -21,14 +23,44 @@ final class ScheduleConfigurationViewModel {
         case durationPicker
         case startTimePicker
         case endTimePicker
-        case appBlockerSheet
+        case appBlockerSheet(_ viewModel: BlockListPickerSheetViewModel)
         
         var id: Int { self.hashValue }
+        
+        func hash(into hasher: inout Hasher) {
+            switch self {
+            case .durationPicker:
+                hasher.combine(0)
+            case .startTimePicker:
+                hasher.combine(1)
+            case .endTimePicker:
+                hasher.combine(2)
+            case .appBlockerSheet:
+                hasher.combine(3)
+            }
+        }
+        
+        static func == (lhs: Self, rhs: Self) -> Bool {
+            switch (lhs, rhs) {
+            case (.durationPicker, .durationPicker): true
+            case (.startTimePicker, .startTimePicker): true
+            case (.endTimePicker, .endTimePicker): true
+            case (.appBlockerSheet, .appBlockerSheet): true
+            default: false
+            }
+        }
+
     }
     
     // MARK: - State
     struct State: Equatable {
         var blockItem: ProtectedBlockItem
+        var appsTokenSelectionCount: Int {
+            blockItem.blockedContent.applicationTokens.count
+        }
+        var categoriesSelectionCount: Int {
+            blockItem.blockedContent.categoryTokens.count
+        }
         
         var durationHours: Int
         var durationMinutes: Int
@@ -65,11 +97,16 @@ final class ScheduleConfigurationViewModel {
     
     // MARK: - Properties
     private(set) var state: State
+    private let blockItemPersistenceManager: BlockItemPersistenceManager
     weak var delegate: ScheduleConfigurationDelegate?
     
     // MARK: - Initializers
-    init(state: State = State()) {
+    init(
+        state: State = State(),
+        blockItemPersistenceManager: BlockItemPersistenceManager
+    ) {
         self.state = state
+        self.blockItemPersistenceManager = blockItemPersistenceManager
     }
 
     // MARK: - Methods
@@ -160,7 +197,12 @@ final class ScheduleConfigurationViewModel {
 
     /// Presents the app blocker sheet by setting the active sheet state accordingly.
     func presentAppBlockerSheet() {
-        state.activeSheet = .appBlockerSheet
+        let viewModel = BlockListPickerSheetViewModel(
+            blockItemPersistenceManager: blockItemPersistenceManager
+        )
+        viewModel.delegate = self
+        
+        state.activeSheet = .appBlockerSheet(viewModel)
     }
 
     /// Dismisses any currently presented sheet by setting the active sheet to nil.
@@ -214,4 +256,10 @@ final class ScheduleConfigurationViewModel {
         }
     }
 
+}
+
+extension ScheduleConfigurationViewModel: BlockListPickerSheetDelegate {
+    func didFinishSelectionWith(_ selection: FamilyActivitySelection) {
+        state.blockItem.blockedContent = selection
+    }
 }

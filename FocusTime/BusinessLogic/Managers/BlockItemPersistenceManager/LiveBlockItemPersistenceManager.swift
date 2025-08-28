@@ -47,6 +47,9 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
     // MARK: If any ViewModel needs specific values of methods add them here instead of that ViewModel.
     
     func insert(_ item: ProtectedBlockItem) async throws {
+        var item = item
+        item.name = item.name.collapsedLines()
+        
         try await store.insert(item)
     }
     
@@ -58,7 +61,7 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
             id: item.id,
             persistentModelID: persistenceID,
             emoji: item.emoji,
-            name: item.name,
+            name: item.name.collapsedLines(),
             days: item.days,
             type: item.type,
             blockedContent: item.blockedContent
@@ -71,7 +74,7 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
         guard let id = blockItem.persistentModelID else { return }
         try await store.updateFields(id: id) { model in
             model.emoji = blockItem.emoji
-            model.name = blockItem.name
+            model.name = blockItem.name.collapsedLines()
             model.days = blockItem.days
             model.type = blockItem.type
             model.blockedContent = blockItem.blockedContent

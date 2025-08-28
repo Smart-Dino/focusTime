@@ -46,6 +46,14 @@ extension ScheduleConfigurationView {
                 table: "SessionLocalizable",
                 comment: "Value indicating the app list is available"
             )
+            
+            static func appsBlockedListWithCounts(categoriesCount: Int, appsCount: Int) -> String {
+                let format = String(localized: "schedule_configuration_view_apps_blocked_list_with_counts",
+                                    table: "SessionLocalizable",
+                                    comment: "Shows the number of selected categories and apps")
+                return String(format: format, categoriesCount, appsCount)
+            }
+
             static let scheduledDays = String(
                 localized: "schedule_configuration_view_scheduled_days",
                 table: "SessionLocalizable",

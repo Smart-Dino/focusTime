@@ -18,6 +18,7 @@ protocol BlockListPickerSheetDelegate: AnyObject {
 final class BlockListPickerSheetViewModel {
     struct State {
         var error: Error? = nil
+        
         var finalSelection: FamilyActivitySelection = FamilyActivitySelection()
         var isFamilyActivitySheetPresented: Bool = false
         
@@ -26,13 +27,10 @@ final class BlockListPickerSheetViewModel {
         
         var selectedBlockItems: Set<ProtectedBlockItem> = []
         var blockItems: [ProtectedBlockItem] = []
-        
-        var showCreateButton: Bool {
-            finalSelection.isEmpty && selectedBlockItems.isEmpty
-        }
     }
     
     private(set) var state: State
+    
     weak var delegate: BlockListPickerSheetDelegate?
     private let blockItemPersistenceManager: BlockItemPersistenceManager
     
@@ -59,6 +57,7 @@ final class BlockListPickerSheetViewModel {
     func setFamilyActivitySelection(_ selection: FamilyActivitySelection) {
         state.finalSelection = selection
     }
+
     
     func openFamilyActivitySelectionIfNeeded() {
         if state.blockItems.isEmpty && state.page <= 1 {

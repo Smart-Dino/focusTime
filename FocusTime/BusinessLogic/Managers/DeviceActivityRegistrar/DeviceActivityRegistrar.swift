@@ -8,6 +8,8 @@
 import Foundation
 
 protocol DeviceActivityRegistrar: Actor {
+    func checkAuth() async throws
+    
     func registerActivity(during blockItem: ProtectedBlockItem) async throws
     func unregisterActivity(during blockItem: ProtectedBlockItem) async throws
     

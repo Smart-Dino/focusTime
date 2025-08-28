@@ -159,7 +159,15 @@ struct ScheduleConfigurationView: View {
                 HStack {
                     Text(Constants.Strings.appsBlocked)
                     Spacer()
-                    Text(Constants.Strings.appsBlockedList)
+                    if viewModel.state.blockItem.blockedContent.isEmpty {
+                        Text(Constants.Strings.appsBlockedList)
+                    } else {
+                        Text(Constants.Strings.appsBlockedListWithCounts(
+                            categoriesCount: viewModel.state.categoriesSelectionCount,
+                            appsCount: viewModel.state.appsTokenSelectionCount
+                        )
+                        )
+                    }
                     Image(systemName: Constants.Symbols.navigationChevron)
                         .foregroundStyle(Constants.Colors.chevronColor)
                 }
@@ -218,16 +226,18 @@ struct ScheduleConfigurationView: View {
                 )
                 .presentationDetents([.height(FocusSessionView.Constants.Layout.sheetHeight)])
                 
-            case .appBlockerSheet:
-#warning("Change ContentView with actual view")
-                Text("App Blocker List View Placeholder")
-                    .presentationDetents([.medium, .large])
+            case .appBlockerSheet(let viewModel):
+                BlockListPickerSheetView(viewModel: viewModel)
+                    .presentationDetents([.large])
             }
         }
     }
 }
 
 #Preview {
-    ScheduleConfigurationView(viewModel: ScheduleConfigurationViewModel())
-        .preferredColorScheme(.dark)
+    ScheduleConfigurationView(
+        viewModel: ScheduleConfigurationViewModel(
+            blockItemPersistenceManager: PreviewData.mockBlockItemPersistenceManager)
+    )
+    .preferredColorScheme(.dark)
 }

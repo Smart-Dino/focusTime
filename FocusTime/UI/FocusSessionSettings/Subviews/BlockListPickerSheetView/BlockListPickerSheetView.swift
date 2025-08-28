@@ -60,14 +60,20 @@ struct BlockListPickerSheetView: View {
                 get: viewModel.state.isFamilyActivitySheetPresented,
                 set: viewModel.setIsFamilyActivitySheetPresented(_:)
             ),
-            selection: .binding(
-                get: viewModel.state.finalSelection,
-                set: viewModel.setFamilyActivitySelection(_:)
+            selection: .init(
+                get: { viewModel.state.finalSelection },
+                set: { viewModel.setFamilyActivitySelection($0) }
             )
         )
+        .onChange(of: viewModel.state.isFamilyActivitySheetPresented) {
+            if !viewModel.state.isFamilyActivitySheetPresented && viewModel.state.blockItems.isEmpty {
+                viewModel.saveSelection()
+                dismiss.callAsFunction()
+            }
+        }
         .safeAreaInset(edge: .bottom) {
             Group {
-                if viewModel.state.showCreateButton {
+                if viewModel.state.finalSelection.isEmpty {
                     Button(Constants.Strings.newBlocklistButton, systemImage: "plus.circle") {
                         viewModel.setIsFamilyActivitySheetPresented(true)
                     }
@@ -80,7 +86,7 @@ struct BlockListPickerSheetView: View {
                     .transition(.scale)
                 }
             }
-            .animation(.default, value: viewModel.state.showCreateButton)
+            .animation(.default, value: viewModel.state.finalSelection.isEmpty)
             .buttonStyle(.ftPrimary)
             .padding()
             .backgroundGradientFade()

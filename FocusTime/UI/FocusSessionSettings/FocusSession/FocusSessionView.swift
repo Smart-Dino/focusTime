@@ -10,7 +10,7 @@ import FocusTimeUI
 
 struct FocusSessionView: View {
     //MARK: - Properties
-    @State private var viewModel: FocusSessionViewModel
+    @State var viewModel: FocusSessionViewModel
     
     //MARK: - Body
     var body: some View {
@@ -41,6 +41,15 @@ struct FocusSessionView: View {
             .padding(.vertical)
         }
         .gradientBackground()
+        .alert(
+            SharedConstants.Strings.errorHeader,
+            isPresented: Binding(
+                get: { viewModel.state.error != nil },
+                set: { viewModel.setErrorVisibility($0) }
+            ),
+            actions: { /* OK dismissal button by default */ },
+            message: { Text(viewModel.state.error?.localizedDescription ?? String()) }
+        )
         .navigationTitle(Constants.Strings.navigationTitle)
         .navigationBarTitleDisplayMode(.inline)
         .safeAreaInset(edge: .bottom) {
@@ -64,7 +73,7 @@ struct FocusSessionView: View {
                         }
                         
                         // Save button (editing mode or scheduled)
-                        if viewModel.state.isInEditingMode || viewModel.state.isScheduled {
+                        if !viewModel.state.isStartButtonDisplayed || viewModel.state.isScheduled {
                             Button("Save") {
                                 #warning("No implementation")
                             }
@@ -87,37 +96,73 @@ struct FocusSessionView: View {
         }
         .preferredColorScheme(.dark)
     }
-    
-    //MARK: - Initializer
-    init(viewModel: FocusSessionViewModel = FocusSessionViewModel()) {
-        self.viewModel = viewModel
-    }
-    
 }
 
 // MARK: - Preview
 #Preview("Creation mode") {
+    let manager = PreviewData.mockBlockItemPersistenceManager
+    let registrar = LiveDeviceActivityRegistrar(
+        blockItemPersistenceManager: manager,
+        shieldManager: LiveShieldManager()
+    )
+    let viewModel = FocusSessionViewModel(
+        mode: .addBlockList,
+        blockItemPersistenceManager: manager,
+        deviceActivityRegistrar: registrar
+    )
+    
     NavigationStack {
-        FocusSessionView()
+        FocusSessionView(viewModel: viewModel)
+    }
+}
+
+#Preview("Start focusing mode") {
+    let manager = PreviewData.mockBlockItemPersistenceManager
+    let registrar = LiveDeviceActivityRegistrar(
+        blockItemPersistenceManager: manager,
+        shieldManager: LiveShieldManager()
+    )
+    let viewModel = FocusSessionViewModel(
+        mode: .startFocusing,
+        blockItemPersistenceManager: manager,
+        deviceActivityRegistrar: registrar
+    )
+    
+    return NavigationStack {
+        FocusSessionView(viewModel: viewModel)
     }
 }
 
 #Preview("Editing mode duration") {
-    NavigationStack {
-        FocusSessionView(
-            viewModel: FocusSessionViewModel(
-                state: .init(blockItem: ProtectedBlockItem.mockDuration)
-            )
-        )
+    let manager = PreviewData.mockBlockItemPersistenceManager
+    let registrar = LiveDeviceActivityRegistrar(
+        blockItemPersistenceManager: manager,
+        shieldManager: LiveShieldManager()
+    )
+    let viewModel = FocusSessionViewModel(
+        mode: .editBlockList(ProtectedBlockItem.mockDuration),
+        blockItemPersistenceManager: manager,
+        deviceActivityRegistrar: registrar
+    )
+    
+    return NavigationStack {
+        FocusSessionView(viewModel: viewModel)
     }
 }
 
 #Preview("Editing mode scheduled") {
-    NavigationStack {
-        FocusSessionView(
-            viewModel: FocusSessionViewModel(
-                state: .init(blockItem: ProtectedBlockItem.mockScheduled)
-            )
-        )
+    let manager = PreviewData.mockBlockItemPersistenceManager
+    let registrar = LiveDeviceActivityRegistrar(
+        blockItemPersistenceManager: manager,
+        shieldManager: LiveShieldManager()
+    )
+    let viewModel = FocusSessionViewModel(
+        mode: .editBlockList(ProtectedBlockItem.mockScheduled),
+        blockItemPersistenceManager: manager,
+        deviceActivityRegistrar: registrar
+    )
+    
+    return NavigationStack {
+        FocusSessionView(viewModel: viewModel)
     }
 }

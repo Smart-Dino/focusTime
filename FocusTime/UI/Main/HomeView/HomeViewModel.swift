@@ -12,6 +12,7 @@ import FocusTimeUI
 enum HomeViewNavigationRoute: Equatable, Hashable {
     case scheduledFocusList(_ viewModel: ScheduledBlockItemsViewModel)
     case taskConcentration(_ viewModel: TaskConcentrationViewModel)
+    case focusSession(_ viewModel: FocusSessionViewModel)
     
     var id: Self { self }
     
@@ -19,6 +20,7 @@ enum HomeViewNavigationRoute: Equatable, Hashable {
         switch (lhs, rhs) {
         case (.scheduledFocusList, .scheduledFocusList): true
         case (.taskConcentration, .taskConcentration): true
+        case (.focusSession, .focusSession): true
         default: false
         }
     }
@@ -29,6 +31,8 @@ enum HomeViewNavigationRoute: Equatable, Hashable {
             hasher.combine(0)
         case .taskConcentration:
             hasher.combine(1)
+        case .focusSession:
+            hasher.combine(2)
         }
     }
 }
@@ -95,6 +99,16 @@ final class HomeViewModel {
         }
     }
     
+    func checkAuthorization() {
+        Task {
+            do {
+                try await deviceActivityRegistrar.checkAuth()
+            } catch {
+                state.error = error
+            }
+        }
+    }
+    
     func setUpcomingItem() {
         guard fetchTask == nil else { return }
         fetchTask = Task {
@@ -118,6 +132,12 @@ final class HomeViewModel {
         if !showing {
             state.nextNavigationScreen = nil
         }
+    }
+    
+    func showFocusSessionSetupView() {
+        state.nextNavigationScreen = .focusSession(
+            makeFocusSessionViewModel(mode: .startFocusing)
+        )
     }
     
     func showScheduledFocusView() {
@@ -145,6 +165,14 @@ final class HomeViewModel {
     
     private func makeScheduledFocusViewModel() -> ScheduledBlockItemsViewModel {
         ScheduledBlockItemsViewModel(blockItemPersistenceManager: blockItemPersistenceManager)
+    }
+    
+    private func makeFocusSessionViewModel(mode: FocusSessionMode) -> FocusSessionViewModel {
+        FocusSessionViewModel(
+            mode: mode,
+            blockItemPersistenceManager: blockItemPersistenceManager,
+            deviceActivityRegistrar: deviceActivityRegistrar
+        )
     }
     
     private func makeTaskConcentrationViewModel(with phase: TaskConcentrationViewModel.State.Phase) -> TaskConcentrationViewModel? {

@@ -35,9 +35,12 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
     }
 
     // MARK: - Public API (conforms to DeviceActivityRegistrar)
+    func checkAuth() async throws {
+        try await AuthorizationCenter.shared.requestAuthorization(for: .individual)
+    }
 
     func registerActivity(during blockItem: ProtectedBlockItem) async throws {
-        try await AuthorizationCenter.shared.requestAuthorization(for: .individual)
+        try await checkAuth()
 
         switch blockItem.type {
         case .scheduled(let startTime, let endTime, _, _, _):

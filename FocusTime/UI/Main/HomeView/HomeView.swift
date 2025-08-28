@@ -88,7 +88,7 @@ struct HomeView: View {
             
             if item == nil || !(item?.state.isActive ?? true) {
                 Button(Constants.Strings.bottomButtonTitle, systemImage: Constants.Icons.hourglass) {
-#warning("Action is empty")
+                    viewModel.showFocusSessionSetupView()
                 }
                 .buttonStyle(.ftPrimary)
                 .padding()
@@ -108,6 +108,8 @@ struct HomeView: View {
                 ScheduledBlockItemsView(viewModel: viewModel)
             case .taskConcentration(let viewModel):
                 TaskConcentrationView(viewModel: viewModel)
+            case .focusSession(let viewModel):
+                FocusSessionView(viewModel: viewModel)
             case .none: Text("No view")
             }
         }
@@ -121,6 +123,7 @@ struct HomeView: View {
             message: { Text(viewModel.state.error?.localizedDescription ?? String()) }
         )
         .onAppear {
+            viewModel.checkAuthorization()
             viewModel.setUpcomingItem()
             viewModel.subscribeToDB()
         }
