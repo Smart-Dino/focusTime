@@ -17,12 +17,13 @@ extension LiveDeviceActivityRegistrar {
     ) async throws {
         guard blockItem.persistentModelID != nil else { throw DeviceActivityRegistrarError.noPersistentItem }
         guard case let .duration(originalDuration, _, _, _) = blockItem.type else { return }
+        let startTime = await clock.now
 
         // Start blocking immediately.
         try await shieldManager.block(specific: blockItem.blockedContent)
 
         // Build schedule based on seconds. DeviceActivitySchedule requires >= 15 minutes interval.
-        let nowComponents = calendar.dateComponents([.hour, .minute, .second], from: await clock.now)
+        let nowComponents = calendar.dateComponents([.hour, .minute, .second], from: startTime)
         let durationSeconds = forcedDuration ?? originalDuration.rawValue
         let intervalStart = nowComponents.adding(seconds: durationSeconds)
         let intervalEnd = intervalStart.adding(seconds: Self.fallbackIntervalSeconds)
@@ -32,10 +33,8 @@ extension LiveDeviceActivityRegistrar {
         let activityName = try createActivityName(for: blockItem, actionType: .regular)
         try await centerManager.startMonitoring(activityName, during: schedule)
 
-        // Persist start time and absolute end date.
-        let startTime = await clock.now
-        let actualTimeBeforeEnd = await computeActualTimeBeforeEnd(intervalStart: intervalStart, forcedDuration: forcedDuration, originalDuration: originalDuration)
-        let endDate = startTime.addingTimeInterval(TimeInterval(max(0, actualTimeBeforeEnd)))
+        let timeBeforeEnd = forcedDuration ?? originalDuration.rawValue
+        let endDate = startTime.addingTimeInterval(TimeInterval(max(0, timeBeforeEnd)))
 
         var copy = blockItem
         copy.type = .duration(duration: originalDuration, suspendedAt: nil, suspendedUntil: nil, endDate: endDate)
@@ -167,17 +166,6 @@ extension LiveDeviceActivityRegistrar {
 
         try await blockItemPersistenceManager.insert(&temp)
         try await registerDurationActivity(for: temp, forcedDuration: timeLeft)
-    }
-
-    // Compute actual seconds until end using existing logic (keeps previous behaviour).
-    func computeActualTimeBeforeEnd(intervalStart: DateComponents, forcedDuration: Int?, originalDuration: DurationComponents) async -> Int {
-        if let forced = forcedDuration { return forced }
-        if let hour = intervalStart.hour, let minute = intervalStart.minute {
-            let endTime = (try? TimeComponents(hour: hour, minute: minute).localizedSecondsSinceMidnight) ?? originalDuration.rawValue
-            let currentSecond = await clock.now.secondsSinceMidnight()
-            return endTime - currentSecond
-        }
-        return originalDuration.rawValue
     }
 
     static func adjustedEndDate(endDate: Date, suspendedAt: Date?, resumedAt: Date) -> Date {

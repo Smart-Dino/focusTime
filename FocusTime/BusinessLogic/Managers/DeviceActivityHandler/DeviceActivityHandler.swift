@@ -74,8 +74,8 @@ struct DeviceActivityHandler: Sendable {
             guard blockItem.days.contains(Weekday.currentDay) else { return }
             await blockAndActivateSession(for: blockItem, in: store)
             
-        case .duration:
-            await handleDurationUnblocking(for: blockItem, in: store)
+        case .duration(_, _, _, let endDate):
+            await handleDurationUnblocking(for: blockItem, in: store, endDate: endDate)
             DeviceActivityCenter().stopMonitoring([activity])
         }
     }
@@ -94,12 +94,15 @@ struct DeviceActivityHandler: Sendable {
         DeviceActivityCenter().stopMonitoring([activity])
     }
     
-    // No changes needed in the rest of the file...
-    // ...
     private func resumeDurationBlocking(for blockItem: BlockItem, in store: BlockItemExtensionStore) async {
-        guard case let .duration(_, _, _, endDate) = blockItem.type, let endDate else {
+        guard case let .duration(_, _, suspendedUntil, endDate) = blockItem.type, let endDate else {
             logger?.warning("Attempted to resume a duration block that has no end date.")
             return
+        }
+        
+        if let suspendedUntil {
+            let offset = Int(suspendedUntil.timeIntervalSinceNow)
+            await self.offset(seconds: offset)
         }
 
         do {
@@ -121,7 +124,11 @@ struct DeviceActivityHandler: Sendable {
         }
     }
     
-    private func handleDurationUnblocking(for blockItem: BlockItem, in store: BlockItemExtensionStore) async {
+    private func handleDurationUnblocking(for blockItem: BlockItem, in store: BlockItemExtensionStore, endDate: Date?) async {
+        if let endDate {
+            let offset = Int(endDate.timeIntervalSinceNow)
+            await self.offset(seconds: offset)
+        }
         await unblockAndDeactivateSession(for: blockItem, in: store)
 
         if blockItem.isTemporary {
@@ -148,6 +155,17 @@ struct DeviceActivityHandler: Sendable {
             store.updateSessionState(for: blockItem, isActive: false)
         } catch {
             logger?.error("Failed to unblock content: \(error.localizedDescription)")
+        }
+    }
+    
+    private func offset(seconds: Int) async {
+        var counter = 0
+        while counter < seconds {
+            // I decided not to do Task.sleep(for: .seconds(seconds))) so that the system sees activity
+            // in the extension and does not kill it.
+            // Basically this solution is safer.
+            try? await Task.sleep(for: .seconds(1), tolerance: SharedAppValues.timerLeeway)
+            counter += 1
         }
     }
 }

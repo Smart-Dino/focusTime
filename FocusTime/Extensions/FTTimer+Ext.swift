@@ -57,15 +57,7 @@ extension FTTimer {
         // If counting down a suspension, the deadline is the date the suspension ends.
         var deadline: Date?
         if useSuspensionTime, let suspensionEndDate = blockItem.type.suspensionEndDate {
-            let timeComponents = try? TimeComponents(from: suspensionEndDate)
-            if let dateComponents = timeComponents?.dateComponents {
-                deadline = Calendar.current.date(
-                    bySettingHour: dateComponents.hour ?? 0,
-                    minute: dateComponents.minute ?? 0,
-                    second: dateComponents.second ?? 0,
-                    of: suspensionEndDate
-                )
-            }
+            deadline = suspensionEndDate
         }
 
         // Otherwise, the deadline is the current time plus the remaining interval duration.

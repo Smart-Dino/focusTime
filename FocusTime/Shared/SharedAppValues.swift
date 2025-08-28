@@ -18,6 +18,13 @@ enum SharedAppValues {
     static let breakTimeDuration: Int = 300 // 5 minutes.
     #endif
     static let debounceAfterDBRefreshed: Duration = .seconds(0.3)
+    
+    /// A small "leeway" tolerance (100ms) used when scheduling sleeps or timers.
+    /// This tells the system it can wake slightly later than the exact deadline,
+    /// which reduces CPU wakeups and improves power efficiency without noticeably
+    /// affecting accuracy for 1-second intervals.
+    static let timerLeeway: Duration = .milliseconds(100)
+    
     static let activityRegistrarFallbackInterval: Int = 15 * 60
     
     enum DefaultsKeys: String {
