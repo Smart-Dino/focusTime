@@ -22,14 +22,6 @@ protocol PaymentManager: Actor {
     /// Used to load/reload data into payment manager's public and private properties.
     /// - Important: Recommended to use on every paywall screen launch. Access the needed data after awaiting this method.
     func reloadData() async throws
-    
-    // MARK: - Convenience
-    /// Returns the `FTProduct` associated with the given product identifier.
-    ///
-    /// - Parameter id: The product identifier as a `String`.
-    /// - Returns: The `FTProduct` corresponding to the given identifier.
-    /// - Throws: `PaymentError` if the product cannot be found or retrieved.
-    func productForID(_ id: String) throws(PaymentError) -> FTProduct
 
     /// Checks if the specified product has been purchased.
     ///
@@ -114,10 +106,6 @@ actor MockPaymentManagerWithPurchaseError: PaymentManager {
     }
     
     func reloadData() async { return }
-    
-    func productForID(_ id: String) throws(PaymentError) -> FTProduct {
-        throw .productNotFound
-    }
 
     func purchase(_ product: FTProduct) async throws -> FTProduct.PurchaseResult? {
         print("[Mock] purchase invoked for product: \(product)")

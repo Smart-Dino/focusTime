@@ -60,7 +60,6 @@ final class ShieldDebugViewModel {
     // MARK: - Initializer
     init(
         state: State = State(),
-        center: DeviceActivityCenter = DeviceActivityCenter(),
         shieldManager: ShieldManager = LiveShieldManager(),
         blockItemPersistenceManager: BlockItemPersistenceManager,
     ) {

@@ -11,9 +11,9 @@ import FocusTimeUI
 struct PlanSelectionSecondPromoView: View {
     var body: some View {
         ZStack {
-            Color.ftBackground
+            Constants.Colors.background
                 .overlay {
-                    Image(.SharedImages.wave)
+                    Image(Constants.Images.background)
                         .resizable()
                         .scaledToFill()
                         .rotationEffect(Angle(degrees: -21))
@@ -21,7 +21,7 @@ struct PlanSelectionSecondPromoView: View {
                 }
             
             HStack {
-                Image(.PaywallImages.promoScreenSecondIcons)
+                Image(Constants.Images.icons)
                     .resizable()
                     .scaledToFit()
                     .containerRelativeFrame(.vertical) { size, _ in
@@ -29,7 +29,7 @@ struct PlanSelectionSecondPromoView: View {
                     }
                 
                 Rectangle()
-                    .foregroundStyle(.ftPaywallPromoGreen)
+                    .foregroundStyle(Constants.Colors.accent)
                     .containerRelativeFrame(.vertical) { size, _ in
                         size / 2.5
                     }
@@ -37,11 +37,11 @@ struct PlanSelectionSecondPromoView: View {
                     .padding(.leading, 50)
                 
                 Image(systemName: "chevron.right")
-                    .foregroundStyle(.ftPaywallPromoGreen)
+                    .foregroundStyle(Constants.Colors.accent)
                     .padding()
                 
-                Text("No more noise.\nJust \(SharedAppValues.appName ?? .init()).")
-                    .font(.title.bold())
+                Text(Constants.Strings.subtitle)
+                    .font(Constants.Fonts.headline)
                     
             }
         }

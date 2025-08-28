@@ -24,9 +24,9 @@ struct AppFlowCoordinatorView: View {
             }
         }
         .fullScreenCover(
-            item: Binding(
-                get: { viewModel.state.screenCover },
-                set: { viewModel.setScreenCover(to: $0) }
+            item: .binding(
+                get: viewModel.state.screenCover,
+                set: viewModel.setScreenCover(to:)
             )
         ) { cover in
             NavigationStack {

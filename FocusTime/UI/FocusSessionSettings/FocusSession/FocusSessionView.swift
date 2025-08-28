@@ -12,11 +12,6 @@ struct FocusSessionView: View {
     //MARK: - Properties
     @State private var viewModel: FocusSessionViewModel
     
-    //MARK: - Initializer
-    init(viewModel: FocusSessionViewModel = FocusSessionViewModel()) {
-        self.viewModel = viewModel
-    }
-    
     //MARK: - Body
     var body: some View {
         ScrollView {
@@ -26,7 +21,7 @@ struct FocusSessionView: View {
                 FocusPresetGridView(
                     presets: viewModel.state.presets,
                     selectedPreset: .binding(
-                        get: viewModel.state.scheduleConfigViewModel.state.scheduleConfiguration.selectedPreset,
+                        get: viewModel.state.selectedPreset,
                         set: viewModel.setSelectedPreset(selectedPreset:)
                     )
                 )
@@ -48,6 +43,12 @@ struct FocusSessionView: View {
         }
         .preferredColorScheme(.dark)
     }
+    
+    //MARK: - Initializer
+    init(viewModel: FocusSessionViewModel = FocusSessionViewModel()) {
+        self.viewModel = viewModel
+    }
+    
 }
 
 // MARK: - Preview

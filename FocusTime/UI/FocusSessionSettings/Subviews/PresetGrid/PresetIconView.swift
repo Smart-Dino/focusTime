@@ -14,7 +14,7 @@ struct PresetIconView: View {
     
     var body: some View {
         VStack(spacing: FocusSessionView.Constants.PresetIcon.Layout.mainSpacing) {
-            Text(preset.iconName)
+            Text(preset.emoji)
                 .font(.largeTitle)
                 .frame(width: FocusSessionView.Constants.PresetIcon.Layout.size, height: FocusSessionView.Constants.PresetIcon.Layout.size)
                 .background(isSelected ? Color.ftPresetSelectedBackgroundColor : Color.ftPresetBackgroundColor)

@@ -26,46 +26,6 @@ enum Weekday: Int, Codable, CaseIterable, Identifiable, Hashable, Equatable {
         }
     }
     
-    var fullName: String {
-        switch self {
-        case .monday: return String(
-            localized: "Monday",
-            table: "SessionLocalizable",
-            comment: "Full name for Monday"
-        )
-        case .tuesday: return String(
-            localized: "Tuesday",
-            table: "SessionLocalizable",
-            comment: "Full name for Tuesday"
-        )
-        case .wednesday: return String(
-            localized: "Wednesday",
-            table: "SessionLocalizable",
-            comment: "Full name for Wednesday"
-        )
-        case .thursday: return String(
-            localized: "Thursday",
-            table: "SessionLocalizable",
-            comment: "Full name for Thursday"
-        )
-        case .friday: return String(
-            localized: "Friday",
-            table: "SessionLocalizable",
-            comment: "Full name for Friday"
-        )
-        case .saturday: return String(
-            localized: "Saturday",
-            table: "SessionLocalizable",
-            comment: "Full name for Saturday"
-        )
-        case .sunday: return String(
-            localized: "Sunday",
-            table: "SessionLocalizable",
-            comment: "Full name for Sunday"
-        )
-        }
-    }
-    
     static func < (lhs: Weekday, rhs: Weekday) -> Bool {
         let order: [Weekday] = [.monday, .tuesday, .wednesday, .thursday, .friday, .saturday, .sunday]
         guard let lhsIndex = order.firstIndex(of: lhs),
@@ -93,14 +53,14 @@ enum Weekday: Int, Codable, CaseIterable, Identifiable, Hashable, Equatable {
     }
     
     /// Returns the days of the week reordered to start with the user's locale preference.
-    static var allCases: [Weekday] {
+    static let allCases: [Weekday] = {
         let start = Calendar.current.firstWeekday
         return [.sunday, .monday, .tuesday, .wednesday, .thursday, .friday, .saturday].sorted {
             let lhsOffset = ($0.rawValue - start + 7) % 7
             let rhsOffset = ($1.rawValue - start + 7) % 7
             return lhsOffset < rhsOffset
         }
-    }
+    }()
     
     /// Human-readable name of the weekday.
     var description: String {

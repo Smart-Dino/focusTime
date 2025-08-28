@@ -130,7 +130,7 @@ struct TaskConcentrationView: View {
             }
         }
         .containerRelativeFrame([.horizontal, .vertical])
-        .background(MainBackgroundGradientView())
+        .background(FTBackgroundGradientView())
         .alert(
             SharedConstants.Strings.errorHeader,
             isPresented: Binding(

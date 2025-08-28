@@ -18,14 +18,6 @@ extension StoreKitPaymentManager {
         purchasedProducts.contains(product)
     }
     
-    func productForID(_ id: String) throws(PaymentError) -> FTProduct {
-        if let product = products.first(where: { $0.id == id }) {
-            return product
-        } else {
-            throw .productNotFound
-        }
-    }
-    
     func reloadData() async throws {
         try await getProducts()
         await updateCustomerProductStatus()
