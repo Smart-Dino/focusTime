@@ -162,10 +162,11 @@ struct ScheduleConfigurationView: View {
                     if viewModel.state.blockItem.blockedContent.isEmpty {
                         Text(Constants.Strings.appsBlockedList)
                     } else {
-                        Text(Constants.Strings.appsBlockedListWithCounts(
-                            categoriesCount: viewModel.state.categoriesSelectionCount,
-                            appsCount: viewModel.state.appsTokenSelectionCount
-                        )
+                        Text(
+                            Constants.Strings.appsBlockedListWithCounts(
+                                categoriesCount: viewModel.state.categoriesSelectionCount,
+                                appsCount: viewModel.state.appsTokenSelectionCount
+                            )
                         )
                     }
                     Image(systemName: Constants.Symbols.navigationChevron)
@@ -235,9 +236,16 @@ struct ScheduleConfigurationView: View {
 }
 
 #Preview {
+    let manager = PreviewData.mockBlockItemPersistenceManager
+    let registrar = LiveDeviceActivityRegistrar(
+        blockItemPersistenceManager: manager,
+        shieldManager: LiveShieldManager()
+    )
     ScheduleConfigurationView(
         viewModel: ScheduleConfigurationViewModel(
-            blockItemPersistenceManager: PreviewData.mockBlockItemPersistenceManager)
+            deviceActivityRegistrar: registrar,
+            blockItemPersistenceManager: manager
+        )
     )
     .preferredColorScheme(.dark)
 }

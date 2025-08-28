@@ -68,8 +68,10 @@ final class DraftsBlockItemListViewModel {
                     amountPerPage: state.amountPerPage
                 )
                 state.items.append(contentsOf: newItems)
-                state.page += 1
                 setupTimerForActiveItem()
+                if !newItems.isEmpty || !(newItems.count < state.amountPerPage) {
+                    state.page += 1
+                }
             } catch {
                 state.error = error
             }

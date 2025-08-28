@@ -97,15 +97,18 @@ final class ScheduleConfigurationViewModel {
     
     // MARK: - Properties
     private(set) var state: State
+    private let deviceActivityRegistrar: DeviceActivityRegistrar
     private let blockItemPersistenceManager: BlockItemPersistenceManager
     weak var delegate: ScheduleConfigurationDelegate?
     
     // MARK: - Initializers
     init(
         state: State = State(),
+        deviceActivityRegistrar: DeviceActivityRegistrar,
         blockItemPersistenceManager: BlockItemPersistenceManager
     ) {
         self.state = state
+        self.deviceActivityRegistrar = deviceActivityRegistrar
         self.blockItemPersistenceManager = blockItemPersistenceManager
     }
 
@@ -197,12 +200,15 @@ final class ScheduleConfigurationViewModel {
 
     /// Presents the app blocker sheet by setting the active sheet state accordingly.
     func presentAppBlockerSheet() {
-        let viewModel = BlockListPickerSheetViewModel(
-            blockItemPersistenceManager: blockItemPersistenceManager
-        )
-        viewModel.delegate = self
-        
-        state.activeSheet = .appBlockerSheet(viewModel)
+        Task {
+            try await deviceActivityRegistrar.checkAuth()
+            let viewModel = BlockListPickerSheetViewModel(
+                blockItemPersistenceManager: blockItemPersistenceManager
+            )
+            viewModel.delegate = self
+            
+            state.activeSheet = .appBlockerSheet(viewModel)
+        }
     }
 
     /// Dismisses any currently presented sheet by setting the active sheet to nil.

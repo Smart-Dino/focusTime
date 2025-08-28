@@ -10,6 +10,7 @@ import FocusTimeUI
 
 struct FocusSessionView: View {
     //MARK: - Properties
+    @Environment(\.dismiss) var dismiss
     @State var viewModel: FocusSessionViewModel
     
     //MARK: - Body
@@ -82,6 +83,7 @@ struct FocusSessionView: View {
                             // Default Start button
                             Button {
                                 viewModel.startTapped()
+                                dismiss.callAsFunction()
                             } label: {
                                 Label(Constants.Strings.startButtonTitle, systemImage: Constants.Symbols.startButtonIcon)
                             }

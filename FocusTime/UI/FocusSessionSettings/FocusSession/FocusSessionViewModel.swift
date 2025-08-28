@@ -84,9 +84,16 @@ final class FocusSessionViewModel {
         let scheduleConfigViewModel: ScheduleConfigurationViewModel
         switch mode {
         case .startFocusing, .addBlockList:
-            scheduleConfigViewModel = ScheduleConfigurationViewModel(blockItemPersistenceManager: blockItemPersistenceManager)
+            scheduleConfigViewModel = ScheduleConfigurationViewModel(
+                deviceActivityRegistrar: deviceActivityRegistrar,
+                blockItemPersistenceManager: blockItemPersistenceManager
+            )
         case .editBlockList(let block):
-            scheduleConfigViewModel = ScheduleConfigurationViewModel(state: .init(blockItem: block), blockItemPersistenceManager: blockItemPersistenceManager)
+            scheduleConfigViewModel = ScheduleConfigurationViewModel(
+                state: .init(blockItem: block),
+                deviceActivityRegistrar: deviceActivityRegistrar,
+                blockItemPersistenceManager: blockItemPersistenceManager
+            )
         }
         
         self.state = State(
