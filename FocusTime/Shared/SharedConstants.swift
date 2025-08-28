@@ -26,6 +26,8 @@ enum SharedConstants {
         static let purchasedTitle = String(localized: "shared_purchased_title", table: "SharedLocalizable")
         
         static let simulatorUnavailability = String(localized: "shared_simulator_unavailable", table: "SharedLocalizable")
+        
+        static let defaultEmojis = ["☕️", "⏳", "📖", "🌿", "💪", "💻", "🚀", "⚡️"]
     }
     
     // MARK: - Typography

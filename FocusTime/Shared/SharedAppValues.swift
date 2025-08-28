@@ -27,6 +27,8 @@ enum SharedAppValues {
     
     static let activityRegistrarFallbackInterval: Int = 15 * 60
     
+    static let amountOfItemsPerPage: Int = 100
+    
     enum DefaultsKeys: String {
         case isOnboardingFinished = "IS_ONBOARDING_FINISHED"
     }

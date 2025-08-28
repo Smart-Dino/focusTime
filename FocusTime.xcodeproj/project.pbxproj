@@ -121,7 +121,6 @@
 				BusinessLogic/Models/Blocking/BlockItem/BlockItem.swift,
 				BusinessLogic/Models/Blocking/BlockItem/Helpers/BlockState.swift,
 				BusinessLogic/Models/Blocking/BlockItem/Helpers/DurationComponents.swift,
-				BusinessLogic/Models/Blocking/BlockItem/Helpers/ProtectedActivitySelection.swift,
 				BusinessLogic/Models/Blocking/BlockItem/Helpers/ScheduleType.swift,
 				BusinessLogic/Models/Blocking/BlockItem/Helpers/TimeComponents.swift,
 				BusinessLogic/Models/Blocking/BlockItem/Helpers/Weekday.swift,
@@ -130,6 +129,7 @@
 				BusinessLogic/Stores/Protocols/ProtectedModel.swift,
 				"Extensions/Date+Ext.swift",
 				"Extensions/DateComponents+Ext.swift",
+				"Extensions/FamilyActivitySelection+Ext.swift",
 				Shared/SharedAppValues.swift,
 			);
 			target = E97895A42E0AFCBE00E0AF42 /* FocusTimeActivityMonitor */;

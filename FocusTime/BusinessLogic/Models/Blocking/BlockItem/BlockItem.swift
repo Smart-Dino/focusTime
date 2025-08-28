@@ -22,7 +22,7 @@ final class BlockItem {
     var isTemporary: Bool // Signals whether this item will have to be removed after use.
     var isCancelled: Bool
     // Blocked apps.
-    var blockedContent: ProtectedActivitySelection
+    var blockedContent: FamilyActivitySelection
     
     var state: BlockState {
         switch type {
@@ -52,7 +52,7 @@ final class BlockItem {
         type: ScheduleType,
         isTemporary: Bool = false,
         isCancelled: Bool = false,
-        blockedContent: ProtectedActivitySelection
+        blockedContent: FamilyActivitySelection
     ) {
         self.id = id
         self.name = name

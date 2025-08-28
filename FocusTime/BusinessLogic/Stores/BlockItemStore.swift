@@ -44,7 +44,7 @@ actor BlockItemStore: PersistenceStore {
             .map { ProtectedBlockItem(from: $0) }
     }
     
-    func fetch(page: Int = 0, amountPerPage: Int = 50) throws -> [ProtectedBlockItem] {
+    func fetch(page: Int = 0, amountPerPage: Int = SharedAppValues.amountOfItemsPerPage) throws -> [ProtectedBlockItem] {
         let alreadyFetched = page * amountPerPage
         
         var descriptor = FetchDescriptor<BlockItem>()

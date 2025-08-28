@@ -30,7 +30,7 @@ public struct FTPrimaryButtonStyle: ButtonStyle {
     public func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 13)
+            .padding(.vertical, 18)
             .background(.ftMainBlue)
             .clipShape(.capsule)
             .opacity(isEnabled ? (configuration.isPressed ? 0.8 : 1) : 0.3)

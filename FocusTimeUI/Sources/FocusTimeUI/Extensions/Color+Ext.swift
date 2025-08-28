@@ -26,6 +26,8 @@ public extension ShapeStyle where Self == Color {
     static var ftOnboardingImageOverlayColor: Color { Color("OnboardingImageOverlayColor", bundle: .module) }
     // MARK: - Green
     static var ftPaywallPromoGreen: Color { Color("PaywallPromoGreenColor", bundle: .module) }
+    // MARK: - Gray
+    static var ftBlockListPickerSheetBackground: Color { Color("BlockListPickerSheetBackgroundColor", bundle: .module) }
     // MARK: - UIKit Adapted
     // https://stackoverflow.com/questions/65493461/get-dark-style-of-uicolor
     static var ftGray3Light: Color {
