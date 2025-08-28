@@ -63,48 +63,53 @@ final class FocusSessionViewModel {
     
     // MARK: - Initializer
     init(
-        state: State = State(scheduleConfigurationViewModel: ScheduleConfigurationViewModel())
+        state: State = State()
     ) {
         self.state = state
+        self.state.scheduleConfigViewModel.delegate = self
+    }
+     
+    // MARK: - Intents
+    func startTapped() {
+        print("Start button tapped!")
         
-        state.scheduleConfigViewModel.delegate = self
+        // Ensure the blockItem's type is up-to-date before logging
+        state.scheduleConfigViewModel.refreshBlockItem()
+
+        let configState = state.scheduleConfigViewModel.state
+        
+        let parameters: [String: Any] = [
+            FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.presetName: state.selectedPreset?.name ?? "Custom",
+            FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.durationHours: configState.durationHours,
+            FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.durationMinutes: configState.durationMinutes,
+            FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.isScheduled: configState.isScheduledForLater
+        ]
+        
+        analyticsManager.logEvent(
+            name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.startButtonTapped.rawValue,
+            parameters: parameters
+        )
+        
+        if let selectedPreset = state.selectedPreset {
+            print("Selected Preset: \(selectedPreset.name)")
+        } else {
+            print("Custom session named: \(configState.blockItem.name)")
+        }
     }
      
-     // MARK: - Intents for global actions or actions not covered by ScheduleConfigurationViewModel
-     func startTapped() {
-         print("Start button tapped!")
-
-         let config = state.scheduleConfigViewModel.state.scheduleConfiguration
-         let parameters: [String: Any] = [
-            FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.presetName: config.selectedPreset?.name ?? "Custom",
-            FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.durationHours: config.selectedHours,
-            FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.durationMinutes: config.selectedMinutes,
-            FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.isScheduled: config.scheduleForLater
-         ]
-         analyticsManager.logEvent(name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.startButtonTapped.rawValue, parameters: parameters)
-
-         print("Current List Name: \(config.listName)")
-         print("Schedule for Later is: \(config.scheduleForLater)")
-         if let selectedPreset = config.selectedPreset {
-             print("Selected Preset: \(selectedPreset.name)")
-         } else {
-             print("No preset selected.")
-         }
-         print("Scheduled Days: \(config.scheduledDays)")
-         print("Start Time: \(config.startTime)")
-         print("End Time: \(config.endTime)")
-         print("Selected Hours: \(config.selectedHours)")
-         print("Selected Minutes: \(config.selectedMinutes)")
-         print("Custom Preset Emoji: \(config.customPresetEmoji)")
-     }
-     
-     func setSelectedPreset(selectedPreset: FocusPreset?) {
-         state.scheduleConfigViewModel.setSelectedPreset(selectedPreset: selectedPreset)
-     }
- }
-
- extension FocusSessionViewModel: ScheduleConfigurationDelegate {
-    func didChangeEmojiFieldFocusState(isFocused: Bool) {
-        state.emojiFieldIsFocused = isFocused
+    func setSelectedEmoji(_ emoji: String) {
+        state.scheduleConfigViewModel.setCustomPresetEmoji(emoji: emoji)
     }
+    
+    func setSelectedPreset(selectedPreset: FocusPreset?) {
+        state.scheduleConfigViewModel.setSelectedPreset(selectedPreset: selectedPreset)
+    }
+    
+}
+
+// MARK: - ScheduleConfigurationDelegate
+extension FocusSessionViewModel: ScheduleConfigurationDelegate {
+   func didChangeEmojiFieldFocusState(isFocused: Bool) {
+       state.emojiFieldIsFocused = isFocused
+   }
 }
