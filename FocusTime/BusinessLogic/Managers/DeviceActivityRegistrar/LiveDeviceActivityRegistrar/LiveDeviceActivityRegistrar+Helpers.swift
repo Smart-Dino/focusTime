@@ -145,7 +145,7 @@ extension LiveDeviceActivityRegistrar {
             }
         }
 
-        return overlapping
+        return overlapping.filter(\.isTemporary)
     }
 
     func startActivityIfRegisteredDuringIntervalWindow(item: ProtectedBlockItem) async throws {

@@ -31,7 +31,8 @@ enum ScheduleType: Codable, Hashable, Equatable {
             PeriodConverter.localizedConciseTimeString(
                 from: duration.rawValue,
                 allowedUnits: [.hour, .minute],
-                unitsStyle: .abbreviated
+                unitsStyle: .abbreviated,
+                maximumUnitsCount: 2 
             )
         }
     }
@@ -54,7 +55,8 @@ enum ScheduleType: Codable, Hashable, Equatable {
                 duration: PeriodConverter.localizedConciseTimeString(
                     from: duration.rawValue,
                     allowedUnits: [.hour, .minute],
-                    unitsStyle: .abbreviated
+                    unitsStyle: .abbreviated,
+                    maximumUnitsCount: 2
                 )
             )
         }

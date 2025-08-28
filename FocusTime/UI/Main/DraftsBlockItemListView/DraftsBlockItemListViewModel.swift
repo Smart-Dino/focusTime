@@ -67,8 +67,12 @@ final class DraftsBlockItemListViewModel {
                     page: state.page,
                     amountPerPage: state.amountPerPage
                 )
-                state.items.append(contentsOf: newItems)
+                let existingIDs = Set(state.items.map { $0.id })
+                let uniqueNewItems = newItems.filter { !existingIDs.contains($0.id) }
+                state.items.append(contentsOf: uniqueNewItems)
+                
                 setupTimerForActiveItem()
+                
                 if !newItems.isEmpty || !(newItems.count < state.amountPerPage) {
                     state.page += 1
                 }

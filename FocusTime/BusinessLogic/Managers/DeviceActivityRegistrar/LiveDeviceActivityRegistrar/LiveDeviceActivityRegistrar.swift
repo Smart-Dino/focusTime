@@ -129,6 +129,12 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         }
 
         try await shieldManager.unblock()
+        
+        if blockItem.isTemporary {
+            try await cancelScheduledResume(for: blockItem)
+            try await blockItemPersistenceManager.delete(blockItem: blockItem)
+            return
+        }
 
         var mutableBlockItem = blockItem
         switch mutableBlockItem.type {

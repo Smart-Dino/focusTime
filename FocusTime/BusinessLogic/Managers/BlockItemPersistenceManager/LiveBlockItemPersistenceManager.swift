@@ -52,18 +52,28 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
     }
     
     func insert(_ item: inout ProtectedBlockItem) async throws {
+        item.name = item.name.collapsedLines()
+        
         let persistenceID = try await store.insert(item)
         
         let itemCopy = ProtectedBlockItem(
             id: item.id,
             persistentModelID: persistenceID,
             emoji: item.emoji,
-            name: item.name.collapsedLines(),
+            name: item.name,
             days: item.days,
             type: item.type,
             blockedContent: item.blockedContent
         )
         item = itemCopy
+    }
+    
+    func delete(blockItem: ProtectedBlockItem) async throws {
+        guard let id = blockItem.persistentModelID else {
+            throw PersistenceStoreError.noIdentifier
+        }
+        
+        try await store.delete(id: id)
     }
     
     /// Applies passed ``ProtectedBlockItem`` to it's corresponding model.

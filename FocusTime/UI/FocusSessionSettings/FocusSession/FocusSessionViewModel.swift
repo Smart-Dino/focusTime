@@ -105,15 +105,26 @@ final class FocusSessionViewModel {
     }
     
     // MARK: - Intents
-    func startTapped() {
-        Task {
+    func saveTapped() async throws {
             do {
-                let savedItem = try await saveSelectedItemToStorage()
+                let item = try await saveSelectedItemToStorage(isTemporary: false)
+                if case .scheduled = item.type {
+                    try await deviceActivityRegistrar.registerActivity(during: item)
+                }
+            } catch {
+                state.error = error
+                throw error
+            }
+    }
+    
+    func startTapped() async throws {
+            do {
+                let savedItem = try await saveSelectedItemToStorage(isTemporary: true)
                 try await deviceActivityRegistrar.registerActivity(during: savedItem)
             } catch {
                 state.error = error
+                throw error
             }
-        }
     }
     
     func setErrorVisibility(_ isVisible: Bool) {
@@ -131,9 +142,15 @@ final class FocusSessionViewModel {
     }
     
     // MARK: - Private Helpers
-    private func saveSelectedItemToStorage() async throws -> ProtectedBlockItem {
+    private func saveSelectedItemToStorage(isTemporary: Bool) async throws -> ProtectedBlockItem {
         var item = state.scheduleConfigViewModel.state.blockItem
+        
+        if isTemporary {
+            item.isTemporary = true
+        }
+        
         try await blockItemPersistenceManager.insert(&item)
+        
         return item
     }
 }

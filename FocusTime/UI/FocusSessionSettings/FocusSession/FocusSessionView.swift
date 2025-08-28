@@ -76,14 +76,19 @@ struct FocusSessionView: View {
                         // Save button (editing mode or scheduled)
                         if !viewModel.state.isStartButtonDisplayed || viewModel.state.isScheduled {
                             Button("Save") {
-                                #warning("No implementation")
+                                Task {
+                                    try await viewModel.saveTapped()
+                                    dismiss.callAsFunction()
+                                }
                             }
                             .buttonStyle(.ftPrimary)
                         } else {
                             // Default Start button
                             Button {
-                                viewModel.startTapped()
-                                dismiss.callAsFunction()
+                                Task {
+                                    try await viewModel.startTapped()
+                                    dismiss.callAsFunction()
+                                }
                             } label: {
                                 Label(Constants.Strings.startButtonTitle, systemImage: Constants.Symbols.startButtonIcon)
                             }

@@ -43,7 +43,7 @@ struct MainFlowCoordinatorView: View {
                     switch viewModel.state.currentTabScreen {
                     case .home:
                         FTPlusToolbarButtonView {
-#warning("Action is empty")
+                            viewModel.showNewBlockListView()
                         }
                     case .drafts: EmptyView()
                     case .none: EmptyView()
@@ -57,6 +57,8 @@ struct MainFlowCoordinatorView: View {
                 switch viewModel.state.nextNavigationScreen {
                 case .shieldDebug(let viewModel):
                     ShieldDebugView(viewModel: viewModel)
+                case .focusSession(let viewModel):
+                    FocusSessionView(viewModel: viewModel)
                 case .none:
                     Text("No view")
                 }
@@ -71,6 +73,7 @@ struct MainFlowCoordinatorView: View {
         case .home(let homeViewModel):
             HomeView(viewModel: homeViewModel)
                 .tabItem {
+                    #warning("Unlocalized Strings")
                     LabeledContent("Home") {
                         Image(.wavelogo)
                             .renderingMode(.template)

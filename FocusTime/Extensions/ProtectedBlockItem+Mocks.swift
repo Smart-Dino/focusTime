@@ -11,6 +11,7 @@ import FamilyControls
 extension ProtectedBlockItem {
     static var mockDuration: ProtectedBlockItem {
         Self(
+            id: UUID(),
             emoji: "🧪",
             name: "Test",
             days: Weekday.weekdays,
@@ -21,6 +22,7 @@ extension ProtectedBlockItem {
     
     static var mockScheduled: ProtectedBlockItem {
         Self(
+            id: UUID(),
             emoji: "🧪",
             name: "Test",
             days: Weekday.weekdays,
@@ -37,6 +39,7 @@ extension ProtectedBlockItem {
     
     static var `default`: ProtectedBlockItem {
         Self(
+            id: UUID(),
             emoji: FocusPreset.allCases.first?.emoji ?? "☀️",
             name: String(
                 localized: "focus_session_default_name",

@@ -58,12 +58,13 @@ enum PeriodConverter: Sendable {
     static func localizedConciseTimeString(
         from seconds: Int,
         allowedUnits: NSCalendar.Unit = [.year, .month, .weekOfMonth, .day],
-        unitsStyle: DateComponentsFormatter.UnitsStyle = .full
+        unitsStyle: DateComponentsFormatter.UnitsStyle = .full,
+        maximumUnitsCount: Int = 1
     ) -> String {
         let formatter = DateComponentsFormatter()
         formatter.unitsStyle = unitsStyle
         formatter.allowedUnits = allowedUnits
-        formatter.maximumUnitCount = 1           // Only the largest non-zero unit
+        formatter.maximumUnitCount = maximumUnitsCount // Only the largest non-zero unit
         formatter.zeroFormattingBehavior = .dropAll
         formatter.includesApproximationPhrase = false
         formatter.includesTimeRemainingPhrase = false

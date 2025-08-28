@@ -12,6 +12,8 @@ protocol BlockItemPersistenceManager: Actor {
     func insert(_ item: ProtectedBlockItem) async throws
     func insert(_ item: inout ProtectedBlockItem) async throws
     
+    func delete(blockItem: ProtectedBlockItem) async throws
+    
     func editBlockItem(blockItem: ProtectedBlockItem) async throws
     
     func fetch(by uuid: UUID) async throws -> ProtectedBlockItem?

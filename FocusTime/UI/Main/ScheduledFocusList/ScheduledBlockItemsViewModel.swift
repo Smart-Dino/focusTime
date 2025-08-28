@@ -39,7 +39,7 @@ final class ScheduledBlockItemsViewModel {
                     totalPages: state.page,
                     packSize: state.amountPerPage
                 )
-                state.items = newItems
+                state.items = newItems.filter(\.isScheduled)
             } catch {
                 state.error = error
             }
@@ -55,7 +55,10 @@ final class ScheduledBlockItemsViewModel {
                     page: state.page,
                     amountPerPage: state.amountPerPage
                 )
-                state.items.append(contentsOf: newItems)
+                let existingIDs = Set(state.items.map { $0.id })
+                let uniqueNewItems = newItems.filter { !existingIDs.contains($0.id) && $0.isScheduled }
+                state.items.append(contentsOf: uniqueNewItems)
+                
                 if !newItems.isEmpty || !(newItems.count < state.amountPerPage) {
                     state.page += 1
                 }
