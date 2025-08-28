@@ -12,6 +12,7 @@ extension FocusSessionView {
     enum Constants {
         // MARK: - General Strings
         enum Strings {
+            static let emojis = ["☕️", "⏳", "📖", "🌿", "💪", "💻", "🚀", "⚡️"]
             static let navigationTitle = String(
                 localized: "focus_session_view_navigation_title",
                 table: "SessionLocalizable",
@@ -29,7 +30,7 @@ extension FocusSessionView {
             static let mainVStackSpacing: CGFloat = 40
             static let sheetHeight: CGFloat = 400
             static let sheetCornerRadius: CGFloat = 25
-            static let floatingButtonHorizontalPadding: CGFloat = 20
+            static let floatingButtonPadding: CGFloat = 20
         }
         
         // MARK: - Symbols
