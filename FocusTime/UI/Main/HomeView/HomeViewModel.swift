@@ -110,7 +110,7 @@ final class HomeViewModel {
     
     private func setupTimerForActiveItem() {
         if let activeItem = state.upcomingOrRunningItem, activeItem.state.isActive {
-            state.timer.startTimer(for: activeItem, withSuspensionCountdown: false)
+            state.timer.startTimer(for: activeItem, withSuspensionCountdown: true)
          }
      }
     

@@ -144,7 +144,7 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
         }
 
         // If no future found, wrap to earliest (next day).
-        return sortedByStartTime.first(where: { !$0.isCancelled })
+        return sortedByStartTime.first(where: { !$0.isCancelled && !$0.isTemporary })
     }
 
     

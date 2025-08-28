@@ -46,12 +46,9 @@ struct TaskConcentrationView: View {
                         title: title,
                         subtitle: subtitle,
                         onFinished: {
-                            viewModel.moveToBreakTime()
+                            viewModel.moveToBreakTimeAndSetupBreakTimer()
                         }
                     )
-                    .onAppear {
-                        viewModel.replaceTimerWithSuspensionTimer()
-                    }
                 case .breakTime(let title, let subtitle, let timerTitle, let buttonTitle):
                     StandardPhaseView(
                         title: title,

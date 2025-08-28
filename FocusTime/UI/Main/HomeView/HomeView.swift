@@ -84,15 +84,19 @@ struct HomeView: View {
         .dynamicTypeSize(...DynamicTypeSize.accessibility2)
         // MARK: - Bottom floating button
         .safeAreaInset(edge: .bottom) {
-            Button(Constants.Strings.bottomButtonTitle, systemImage: Constants.Icons.hourglass) {
-                #warning("Action is empty")
-            }
-            .buttonStyle(.ftPrimary)
-            .padding()
-            .background {
-                Rectangle()
-                    .fill(.ftBackground)
-                    .ignoresSafeArea(edges: .bottom)
+            let item = viewModel.state.upcomingOrRunningItem
+            
+            if item == nil || !(item?.state.isActive ?? true) {
+                Button(Constants.Strings.bottomButtonTitle, systemImage: Constants.Icons.hourglass) {
+#warning("Action is empty")
+                }
+                .buttonStyle(.ftPrimary)
+                .padding()
+                .background {
+                    Rectangle()
+                        .fill(.ftBackground)
+                        .ignoresSafeArea(edges: .bottom)
+                }
             }
         }
         .navigationDestination(isPresented: .init(
