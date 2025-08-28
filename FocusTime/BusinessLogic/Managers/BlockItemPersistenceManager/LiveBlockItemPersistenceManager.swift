@@ -28,10 +28,8 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
     }
     
     deinit {
-        // Continuation.
         continuation?.finish()
         continuation = nil
-        // Database-tracking task.
         databaseChanges?.cancel()
         databaseChanges = nil
     }
@@ -56,7 +54,6 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
     func insert(_ item: inout ProtectedBlockItem) async throws {
         let persistenceID = try await store.insert(item)
         
-        // I cannot set persistentID since it is a constant so I will create a new instance instead.
         let itemCopy = ProtectedBlockItem(
             id: item.id,
             persistentModelID: persistenceID,
@@ -121,14 +118,12 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
             return running
         }
 
-        // Mark scheduled & filter only scheduled ones.
         let scheduledBlocks = await markScheduled(blocks).filter(\.isScheduled)
 
         guard !scheduledBlocks.isEmpty else {
             return nil
         }
 
-        // Sort by start time.
         let sortedByStartTime = scheduledBlocks.sorted {
             guard case .scheduled(let firstStart, _, _, _, _) = $0.type,
                   case .scheduled(let secondStart, _, _, _, _) = $1.type else {
@@ -137,7 +132,6 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
             return firstStart < secondStart
         }
 
-        // Find the closest future schedule.
         let currentTimeComponent = try TimeComponents(from: now)
         if let upcoming = sortedByStartTime.first(where: {
             guard case .scheduled(let start, _, _, _, _) = $0.type else { return false }
@@ -146,7 +140,6 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
             return upcoming
         }
 
-        // If no future found, wrap to earliest (next day).
         return sortedByStartTime.first(where: { !$0.isCancelled || !$0.isTemporary })
     }
 
@@ -162,24 +155,24 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
     }
     
     func reloadPaginatedData(
-        totalCount: Int,
+        totalPages: Int,
         packSize: Int
     ) async throws -> [ProtectedBlockItem] {
         var allItems: [ProtectedBlockItem] = []
 
-        for offset in stride(from: 0, to: totalCount, by: packSize) {
+        for page in 0...totalPages {
             let predicate = #Predicate<BlockItem> { model in
                 !model.isTemporary
             }
 
             var descriptor = FetchDescriptor<BlockItem>(predicate: predicate)
-            descriptor.fetchLimit = min(packSize, totalCount - offset)
-            descriptor.fetchOffset = offset
+            descriptor.fetchOffset = page * packSize
+            descriptor.fetchLimit = packSize
 
             let fetchedBlockItems = try await store.fetch(descriptor: descriptor)
             allItems.append(contentsOf: fetchedBlockItems)
 
-            await Task.yield() // Allow thread to breathe between batches.
+            await Task.yield()
         }
 
         return await markScheduled(allItems)
@@ -204,15 +197,8 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
     }
     
     private func handleTermination(_ reason: AsyncStream<Bool>.Continuation.Termination) {
-        // Swift marked the stream as terminated,
-        // finishing the continuation.
         continuation?.finish()
         continuation = nil
-        
-        // switch reason {
-        //   case .cancelled:   …
-        //   case .finished:    …
-        // }
     }
 }
 

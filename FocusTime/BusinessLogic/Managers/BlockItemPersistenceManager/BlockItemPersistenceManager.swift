@@ -21,7 +21,7 @@ protocol BlockItemPersistenceManager: Actor {
     func fetchClosestOrRunningCurrentScheduled(now: Date) async throws -> ProtectedBlockItem?
     
     func fetchPaginated(page: Int, amountPerPage: Int) async throws -> [ProtectedBlockItem]
-    func reloadPaginatedData(totalCount: Int, packSize: Int) async throws -> [ProtectedBlockItem]
+    func reloadPaginatedData(totalPages: Int, packSize: Int) async throws -> [ProtectedBlockItem]
     
     func eraseAllData() async throws
     

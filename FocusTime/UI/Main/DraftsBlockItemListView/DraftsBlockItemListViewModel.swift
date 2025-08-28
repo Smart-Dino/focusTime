@@ -47,7 +47,7 @@ final class DraftsBlockItemListViewModel {
         fetchTask = Task {
             do {
                 let newItems = try await blockItemPersistenceManager.reloadPaginatedData(
-                    totalCount: state.items.count,
+                    totalPages: state.page,
                     packSize: state.amountPerPage
                 )
                 state.items = newItems

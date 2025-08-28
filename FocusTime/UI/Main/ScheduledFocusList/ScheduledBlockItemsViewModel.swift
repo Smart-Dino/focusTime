@@ -36,17 +36,17 @@ final class ScheduledBlockItemsViewModel {
         fetchTask = Task {
             do {
                 let newItems = try await blockItemPersistenceManager.reloadPaginatedData(
-                    totalCount: state.items.count,
+                    totalPages: state.page,
                     packSize: state.amountPerPage
                 )
-                state.items = newItems.filter(\.isScheduled)
+                state.items = newItems
             } catch {
                 state.error = error
             }
             fetchTask = nil
         }
     }
-
+    
     private func fetchNextPage() {
         guard fetchTask == nil else { return }
         fetchTask = Task {
@@ -55,8 +55,10 @@ final class ScheduledBlockItemsViewModel {
                     page: state.page,
                     amountPerPage: state.amountPerPage
                 )
-                state.items.append(contentsOf: newItems.filter(\.isScheduled))
-                state.page += 1
+                state.items.append(contentsOf: newItems)
+                if !newItems.isEmpty || !(newItems.count < state.amountPerPage) {
+                    state.page += 1
+                }
             } catch {
                 state.error = error
             }
