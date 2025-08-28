@@ -158,7 +158,7 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
         page: Int,
         amountPerPage: Int
     ) async throws -> [ProtectedBlockItem] {
-        let items = try await store.fetch(page: page, amountPerPage: page)
+        let items = try await store.fetch(page: page, amountPerPage: amountPerPage)
         let filteredFromTemp = items.filter { !$0.isTemporary }
         
         return await markScheduled(filteredFromTemp)

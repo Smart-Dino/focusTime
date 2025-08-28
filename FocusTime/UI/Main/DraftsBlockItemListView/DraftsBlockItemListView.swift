@@ -49,7 +49,7 @@ struct DraftsBlockItemListView: View {
                 Constants.Strings.newBlocklistButtonTitle,
                 systemImage: "plus.circle"
             ) {
-#warning("No implementation")
+                viewModel.navigateToFocusSessionNewItem()
             }
             .buttonStyle(.ftPrimary)
             .padding()
@@ -60,6 +60,16 @@ struct DraftsBlockItemListView: View {
             }
         }
         .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+        .navigationDestination(isPresented: .init(
+            get: { viewModel.state.nextNavigationScreen != nil },
+            set: { viewModel.setNextNavigationScreen($0) }
+        )) {
+            switch viewModel.state.nextNavigationScreen {
+            case .focusSession(let viewModel):
+                FocusSessionView(viewModel: viewModel)
+            case .none: Text("No view")
+            }
+        }
         .alert(
             SharedConstants.Strings.errorHeader,
             isPresented: Binding(
@@ -103,26 +113,31 @@ struct DraftsBlockItemListView: View {
     @ViewBuilder
     private func sessionCard(for block: ProtectedBlockItem) -> some View {
         if block.state.isActive {
-
+            
             FTActiveSessionDraftRowView(
                 emoji: block.emoji,
                 title: block.name,
                 timerPayload: viewModel.state.timerPayload
             )
         } else {
-            if block.isScheduled {
-                FTSessionScheduledRowView(
-                    emoji: block.emoji,
-                    title: block.name,
-                    description: block.type.description
-                )
-            } else {
-                FTSessionDraftRowView(
-                    emoji: block.emoji,
-                    title: block.name,
-                    description: block.type.description
-                )
+            Button {
+                viewModel.navigateToFocusSessionEditing(list: block)
+            } label: {
+                if block.isScheduled {
+                    FTSessionScheduledRowView(
+                        emoji: block.emoji,
+                        title: block.name,
+                        description: block.type.description
+                    )
+                } else {
+                    FTSessionDraftRowView(
+                        emoji: block.emoji,
+                        title: block.name,
+                        description: block.type.description
+                    )
+                }
             }
+            .buttonStyle(.plain)
         }
     }
     
@@ -131,10 +146,12 @@ struct DraftsBlockItemListView: View {
 #Preview {
     let factory = MockPersistenceStoreFactory()
     let manager = PreviewData.mockBlockItemPersistenceManager
+    let registrar = LiveDeviceActivityRegistrar(blockItemPersistenceManager: manager, shieldManager: LiveShieldManager())
     
     DraftsBlockItemListView(
         viewModel: .init(
             state: .init(timer: ConcurrencyTimer()),
+            deviceActivityRegistrar: registrar,
             blockItemPersistenceManager: manager
         )
     )

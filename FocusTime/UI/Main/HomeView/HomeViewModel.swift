@@ -18,21 +18,28 @@ enum HomeViewNavigationRoute: Equatable, Hashable {
     
     static func == (lhs: HomeViewNavigationRoute, rhs: HomeViewNavigationRoute) -> Bool {
         switch (lhs, rhs) {
-        case (.scheduledFocusList, .scheduledFocusList): true
-        case (.taskConcentration, .taskConcentration): true
-        case (.focusSession, .focusSession): true
-        default: false
+        case let (.scheduledFocusList(lVM), .scheduledFocusList(rVM)):
+            lVM === rVM
+        case let (.taskConcentration(lVM), .taskConcentration(rVM)):
+            lVM === rVM
+        case let (.focusSession(lVM), .focusSession(rVM)):
+            lVM === rVM
+        default:
+            false
         }
     }
     
     func hash(into hasher: inout Hasher) {
         switch self {
-        case .scheduledFocusList:
+        case let .scheduledFocusList(vm):
             hasher.combine(0)
-        case .taskConcentration:
+            hasher.combine(ObjectIdentifier(vm))
+        case let .taskConcentration(vm):
             hasher.combine(1)
-        case .focusSession:
+            hasher.combine(ObjectIdentifier(vm))
+        case let .focusSession(vm):
             hasher.combine(2)
+            hasher.combine(ObjectIdentifier(vm))
         }
     }
 }

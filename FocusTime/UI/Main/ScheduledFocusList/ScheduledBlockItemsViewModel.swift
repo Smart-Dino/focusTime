@@ -49,26 +49,29 @@ final class ScheduledBlockItemsViewModel {
     
     private func fetchNextPage() {
         guard fetchTask == nil else { return }
+
         fetchTask = Task {
             do {
                 let newItems = try await blockItemPersistenceManager.fetchPaginated(
                     page: state.page,
                     amountPerPage: state.amountPerPage
                 )
-                let existingIDs = Set(state.items.map { $0.id })
-                let uniqueNewItems = newItems.filter { !existingIDs.contains($0.id) && $0.isScheduled }
-                state.items.append(contentsOf: uniqueNewItems)
+
+                let existingIDs = Set(state.items.map(\.id))
+                state.items.append(contentsOf: newItems.filter { !existingIDs.contains($0.id) })
                 
-                if !newItems.isEmpty || !(newItems.count < state.amountPerPage) {
+                if !(newItems.count < state.amountPerPage) {
                     state.page += 1
                 }
+                
             } catch {
                 state.error = error
             }
+            
             fetchTask = nil
         }
     }
-
+    
     func setErrorVisibility(_ isVisible: Bool) {
         if !isVisible {
             state.error = nil

@@ -121,6 +121,7 @@ final class MainFlowCoordinatorViewModel {
             State.MainTabScreens.drafts(
                 viewModel: DraftsBlockItemListViewModel(
                     state: .init(timer: timer),
+                    deviceActivityRegistrar: deviceActivityRegistrar,
                     blockItemPersistenceManager: blockItemPersistenceManager
                 )
             )

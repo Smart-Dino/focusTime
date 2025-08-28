@@ -90,20 +90,26 @@ final class BlockListPickerSheetViewModel {
     
     func fetchNextPage() {
         guard fetchTask == nil else { return }
+
         fetchTask = Task {
             do {
                 let newItems = try await blockItemPersistenceManager.fetchPaginated(
                     page: state.page,
                     amountPerPage: state.amountPerPage
                 )
-                state.blockItems.append(contentsOf: newItems)
-                state.page += 1
+
+                let existingIDs = Set(state.blockItems.map(\.id))
+                state.blockItems.append(contentsOf: newItems.filter { !existingIDs.contains($0.id) })
+                
+                if !(newItems.count < state.amountPerPage) {
+                    state.page += 1
+                }
+                
             } catch {
                 state.error = error
             }
-            fetchTask = nil
             
-            openFamilyActivitySelectionIfNeeded()
+            fetchTask = nil
         }
     }
     
