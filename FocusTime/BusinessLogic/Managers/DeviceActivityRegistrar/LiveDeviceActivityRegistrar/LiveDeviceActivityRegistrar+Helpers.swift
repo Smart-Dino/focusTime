@@ -129,7 +129,7 @@ extension LiveDeviceActivityRegistrar {
     ) async throws -> [ProtectedBlockItem] {
         var overlapping: [ProtectedBlockItem] = []
         let activities = await centerManager.activities
-
+        
         for activity in activities {
             guard
                 let existingSchedule = await centerManager.schedule(for: activity),
@@ -140,8 +140,8 @@ extension LiveDeviceActivityRegistrar {
             else {
                 throw DeviceActivityRegistrarError.couldNotCheckOverlap
             }
-
-            if start1 < end2 && start2 < end1 {
+            
+            if start1 <= end2 && start2 <= end1 {
                 guard let decoded = CodableActivityIdentifier(from: activity) else {
                     throw DeviceActivityRegistrarError.couldNotCheckOverlap
                 }
@@ -151,8 +151,8 @@ extension LiveDeviceActivityRegistrar {
                 }
             }
         }
-
-        return overlapping.filter(\.isTemporary)
+        
+        return overlapping.filter { !$0.isTemporary }
     }
 
     func startActivityIfRegisteredDuringIntervalWindow(item: ProtectedBlockItem) async throws {

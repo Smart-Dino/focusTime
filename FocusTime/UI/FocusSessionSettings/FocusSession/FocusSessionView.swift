@@ -27,7 +27,7 @@ struct FocusSessionView: View {
                     )
                 )
                 
-                if viewModel.state.isInEditingMode {
+                if case .editBlockList = viewModel.state.mode {
                     Button(role: .destructive) {
                         #warning("No implementation")
                     } label: {
@@ -66,7 +66,7 @@ struct FocusSessionView: View {
                 } else {
                     VStack {
                         // Start Focusing button (only in editing + duration mode)
-                        if viewModel.state.isInEditingMode && viewModel.state.isDurationSchedule {
+                        if case .editBlockList = viewModel.state.mode, viewModel.state.isDurationSchedule {
                             Button("Start Focusing") {
                                 #warning("No implementation")
                             }
