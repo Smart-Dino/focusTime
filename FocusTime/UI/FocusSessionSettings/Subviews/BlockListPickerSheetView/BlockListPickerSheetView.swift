@@ -119,7 +119,7 @@ struct BlockListPickerSheetView: View {
     }
 }
 
-#Preview {
+#Preview("Populated list") {
     let factory = MockPersistenceStoreFactory()
     let manager = PreviewData.mockBlockItemPersistenceManager
     let viewModel = BlockListPickerSheetViewModel(blockItemPersistenceManager: manager)

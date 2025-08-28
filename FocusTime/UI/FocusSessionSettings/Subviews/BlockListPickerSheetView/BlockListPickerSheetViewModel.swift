@@ -60,6 +60,12 @@ final class BlockListPickerSheetViewModel {
         state.finalSelection = selection
     }
     
+    func openFamilyActivitySelectionIfNeeded() {
+        if state.blockItems.isEmpty && state.page <= 1 {
+            setIsFamilyActivitySheetPresented(true)
+        }
+    }
+    
     func isSelected(_ blockItem: ProtectedBlockItem) -> Bool {
         state.selectedBlockItems.contains(blockItem)
     }
@@ -97,6 +103,8 @@ final class BlockListPickerSheetViewModel {
                 state.error = error
             }
             fetchTask = nil
+            
+            openFamilyActivitySelectionIfNeeded()
         }
     }
     
