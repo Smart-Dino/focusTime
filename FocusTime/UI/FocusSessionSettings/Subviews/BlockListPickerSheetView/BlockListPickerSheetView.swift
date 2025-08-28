@@ -60,6 +60,7 @@ struct BlockListPickerSheetView: View {
                 get: viewModel.state.isFamilyActivitySheetPresented,
                 set: viewModel.setIsFamilyActivitySheetPresented(_:)
             ),
+            // This does not work with a custom binding initializer.
             selection: .init(
                 get: { viewModel.state.finalSelection },
                 set: { viewModel.setFamilyActivitySelection($0) }
