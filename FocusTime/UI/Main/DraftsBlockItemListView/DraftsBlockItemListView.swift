@@ -69,7 +69,7 @@ struct DraftsBlockItemListView: View {
             }), actions: {
                 // OK dismissal button by default
             }, message: {
-                Text(viewModel.state.error?.localizedDescription ?? "")
+                Text(viewModel.state.error?.localizedDescription ?? String())
             }
         )
         .onAppear {
@@ -105,11 +105,12 @@ struct DraftsBlockItemListView: View {
     
     @ViewBuilder
     private func sessionCard(for block: ProtectedBlockItem) -> some View {
-        if block.isActive {
+        if block.state.isActive {
+
             FTActiveSessionDraftRowView(
                 emoji: block.emoji,
                 title: block.name,
-                timer: viewModel.getTimer(for: block)
+                timerPayload: viewModel.state.timerPayload
             )
         } else {
             if block.isScheduled {
@@ -136,7 +137,7 @@ struct DraftsBlockItemListView: View {
     
     DraftsBlockItemListView(
         viewModel: .init(
-            timer: ConcurrencyTimer(),
+            state: .init(timer: ConcurrencyTimer()),
             blockItemPersistenceManager: manager
         )
     )

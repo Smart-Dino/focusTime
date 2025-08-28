@@ -10,7 +10,7 @@ import SwiftUI
 public struct FTActiveSessionDraftRowView: View {
     private let emoji: String
     private let title: String
-    @State private var timer: FTTimer
+    private let timerPayload: FTTimerPayload
     
     public var body: some View {
         HStack(spacing: 15) {
@@ -18,7 +18,7 @@ public struct FTActiveSessionDraftRowView: View {
                 .font(.title2)
             VStack(alignment: .leading) {
                 Text(title)
-                Text(timer.payload.formatted)
+                Text(timerPayload.formatted)
                     .foregroundStyle(.ftGray3Light)
             }
             Spacer()
@@ -34,7 +34,7 @@ public struct FTActiveSessionDraftRowView: View {
             }
         }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(emoji), \(title), \(timer.payload.formatted)")
+        .accessibilityLabel("\(emoji), \(title), \(timerPayload.formatted)")
     }
     
     var gradient: LinearGradient {
@@ -48,11 +48,11 @@ public struct FTActiveSessionDraftRowView: View {
     public init(
         emoji: String,
         title: String,
-        timer: FTTimer
+        timerPayload: FTTimerPayload
     ) {
         self.emoji = emoji
         self.title = title
-        self.timer = timer
+        self.timerPayload = timerPayload
     }
     
 }

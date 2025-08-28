@@ -11,7 +11,10 @@ import DeviceActivity
 extension LiveDeviceActivityRegistrar {
     // MARK: - Register helpers (duration / regular / fallback)
 
-    func registerDurationActivity(for blockItem: ProtectedBlockItem, forcedDuration: Int? = nil) async throws {
+    func registerDurationActivity(
+        for blockItem: ProtectedBlockItem,
+        forcedDuration: Int? = nil
+    ) async throws {
         guard blockItem.persistentModelID != nil else { throw DeviceActivityRegistrarError.noPersistentItem }
         guard case let .duration(originalDuration, _, _, _) = blockItem.type else { return }
 
@@ -19,14 +22,14 @@ extension LiveDeviceActivityRegistrar {
         try await shieldManager.block(specific: blockItem.blockedContent)
 
         // Build schedule based on seconds. DeviceActivitySchedule requires >= 15 minutes interval.
-        let nowComponents = Calendar.current.dateComponents([.hour, .minute, .second], from: await clock.now)
+        let nowComponents = calendar.dateComponents([.hour, .minute, .second], from: await clock.now)
         let durationSeconds = forcedDuration ?? originalDuration.rawValue
         let intervalStart = nowComponents.adding(seconds: durationSeconds)
         let intervalEnd = intervalStart.adding(seconds: Self.fallbackIntervalSeconds)
 
         let schedule = DeviceActivitySchedule(intervalStart: intervalStart, intervalEnd: intervalEnd, repeats: false)
 
-        let activityName = try getActivityName(for: blockItem, isFallback: false)
+        let activityName = try createActivityName(for: blockItem, actionType: .regular)
         try await centerManager.startMonitoring(activityName, during: schedule)
 
         // Persist start time and absolute end date.
@@ -35,7 +38,7 @@ extension LiveDeviceActivityRegistrar {
         let endDate = startTime.addingTimeInterval(TimeInterval(max(0, actualTimeBeforeEnd)))
 
         var copy = blockItem
-        copy.type = .duration(originalDuration, startedAt: startTime, suspendedAt: nil, endDate: endDate)
+        copy.type = .duration(duration: originalDuration, suspendedAt: nil, suspendedUntil: nil, endDate: endDate)
         try await blockItemPersistenceManager.editBlockItem(blockItem: copy)
     }
 
@@ -47,29 +50,23 @@ extension LiveDeviceActivityRegistrar {
         let overlaps = try await overlapsWithAlreadyRegisteredSchedules(schedule, days: blockItem.days)
         guard overlaps.isEmpty else { throw DeviceActivityRegistrarError.scheduleOverlap(with: overlaps) }
 
-        let activityName = try getActivityName(for: blockItem, isFallback: false)
-        try await centerManager.startMonitoring(activityName, during: schedule)
-    }
-
-    func registerFallbackActivity(for blockItem: ProtectedBlockItem, startTime: TimeComponents, endTime: TimeComponents) async throws {
-        guard blockItem.persistentModelID != nil else { throw DeviceActivityRegistrarError.noPersistentItem }
-
-        // Shift end to satisfy DeviceActivityCenter (workaround)
-        let intervalEnd = endTime.dateComponents.adding(seconds: Self.fallbackIntervalSeconds)
-        let schedule = DeviceActivitySchedule(intervalStart: startTime.dateComponents, intervalEnd: intervalEnd, repeats: true)
-
-        let overlaps = try await overlapsWithAlreadyRegisteredSchedules(schedule, days: blockItem.days)
-        guard overlaps.isEmpty else { throw DeviceActivityRegistrarError.scheduleOverlap(with: overlaps) }
-
-        let activityName = try getActivityName(for: blockItem, isFallback: true)
+        let activityName = try createActivityName(for: blockItem, actionType: .regular)
         try await centerManager.startMonitoring(activityName, during: schedule)
     }
 
     // MARK: - Utilities & Small helpers
 
-    func getActivityName(for blockItem: ProtectedBlockItem, isFallback: Bool) throws -> DeviceActivityName {
-        guard let identifier = CodableActivityIdentifier(blockItemID: blockItem.id, isFallback: isFallback).jsonString
-        else { throw DeviceActivityRegistrarError.couldNotGenerateIdentifier }
+    func createActivityName(
+        for blockItem: ProtectedBlockItem,
+        actionType: CodableActivityIdentifier.BlockType
+    ) throws -> DeviceActivityName {
+        guard let identifier = CodableActivityIdentifier(
+            blockItemID: blockItem.id,
+            blockType: actionType
+        ).jsonString else {
+            throw DeviceActivityRegistrarError.couldNotGenerateIdentifier
+        }
+        
         return DeviceActivityName(identifier)
     }
 
@@ -83,11 +80,46 @@ extension LiveDeviceActivityRegistrar {
         }
         throw DeviceActivityRegistrarError.activityNotFound
     }
+    
+    func validateNoOverlapForDurationBlocking(proposedDuration: Int) async throws {
+        let now = await clock.now
+
+        // Fetch the next block. If none exists, there is no possibility of an overlap.
+        guard let nextBlock = try await blockItemPersistenceManager.fetchClosestOrRunningCurrentScheduled(now: now) else {
+            return
+        }
+
+        // Ignore the cancelled block.
+        guard !nextBlock.isCancelled else {
+            return
+        }
+
+        // Determine if an overlap condition is met.
+        let isOverlapping: Bool
+
+        if nextBlock.type.secondsToIntervalEndIfShouldBeRunning(now: now) != nil {
+            // If the block is already running - it will definitely overlap.
+            isOverlapping = true
+        } else if case .scheduled(let startTime, _, _, _, _) = nextBlock.type {
+            // Check if the proposed duration extends beyond the start time of the next scheduled block.
+            let startOfToday = calendar.startOfDay(for: now)
+            let scheduledBlockStartTime = startOfToday.addingTimeInterval(TimeInterval(startTime.localizedSecondsSinceMidnight))
+            let proposedEndTime = now.addingTimeInterval(TimeInterval(proposedDuration))
+            
+            isOverlapping = proposedEndTime > scheduledBlockStartTime
+        } else {
+            isOverlapping = false
+        }
+
+        // If any overlap condition was met - throw error.
+        if isOverlapping {
+            throw DeviceActivityRegistrarError.scheduleOverlap(with: [nextBlock])
+        }
+    }
 
     func overlapsWithAlreadyRegisteredSchedules(
         _ newSchedule: DeviceActivitySchedule,
-        days: Set<Weekday>,
-        on calendar: Calendar = .current
+        days: Set<Weekday>
     ) async throws -> [ProtectedBlockItem] {
         var overlapping: [ProtectedBlockItem] = []
         let activities = await centerManager.activities
@@ -121,14 +153,14 @@ extension LiveDeviceActivityRegistrar {
         guard case .scheduled = item.type else { return }
 
         let timeLeftInSeconds = item.type.secondsToIntervalEndIfShouldBeRunning(now: await clock.now)
-        guard let timeLeft = timeLeftInSeconds else { return }
+        guard let timeLeft = timeLeftInSeconds, !item.isCancelled else { return }
 
         // Create temporary duration block and schedule it immediately.
         var temp = ProtectedBlockItem(
             emoji: "⏳",
             name: "temp-" + UUID().uuidString,
             days: item.days,
-            type: .duration(.init(duration: timeLeft)),
+            type: .duration(duration: .init(seconds: timeLeft)),
             isTemporary: true,
             blockedContent: item.blockedContent
         )

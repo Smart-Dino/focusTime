@@ -11,12 +11,15 @@ import FocusTimeUI
 
 enum HomeViewNavigationRoute: Equatable, Hashable {
     case scheduledFocusList(_ viewModel: ScheduledBlockItemsViewModel)
+    case taskConcentration(_ viewModel: TaskConcentrationViewModel)
     
     var id: Self { self }
     
     static func == (lhs: HomeViewNavigationRoute, rhs: HomeViewNavigationRoute) -> Bool {
         switch (lhs, rhs) {
         case (.scheduledFocusList, .scheduledFocusList): true
+        case (.taskConcentration, .taskConcentration): true
+        default: false
         }
     }
     
@@ -24,6 +27,8 @@ enum HomeViewNavigationRoute: Equatable, Hashable {
         switch self {
         case .scheduledFocusList:
             hasher.combine(0)
+        case .taskConcentration:
+            hasher.combine(1)
         }
     }
 }
@@ -31,14 +36,20 @@ enum HomeViewNavigationRoute: Equatable, Hashable {
 @MainActor
 @Observable
 final class HomeViewModel {
+    @MainActor
     struct State {
+        let timer: FTTimer
+        var timerPayload: FTTimerPayload {
+            timer.payload
+        }
+        
         var error: Error? = nil
         
         var upcomingOrRunningItem: ProtectedBlockItem?
         var isPaused: Bool {
             guard let upcomingOrRunningItem else { return true }
             
-            if !upcomingOrRunningItem.isPaused {
+            if upcomingOrRunningItem.state == .running {
                 return false
             } else {
                 return true
@@ -48,7 +59,6 @@ final class HomeViewModel {
         var nextNavigationScreen: HomeViewNavigationRoute?
     }
     
-    private let timer: FTTimer
     private(set) var state: State
     
     private let deviceActivityRegistrar: DeviceActivityRegistrar
@@ -56,18 +66,15 @@ final class HomeViewModel {
     weak var delegate: HomeViewDelegate?
     
     private var fetchTask: Task<Void, Never>?
-    private var pauseResumeTask: Task<Void, Never>?
     private var dbChangesNotificationTask: Task<Void, Never>?
     
     init(
-        state: State = State(),
-        timer: FTTimer,
+        state: State,
         deviceActivityRegistrar: DeviceActivityRegistrar,
         blockItemPersistenceManager: BlockItemPersistenceManager,
         delegate: HomeViewDelegate?
     ) {
         self.state = state
-        self.timer = timer
         self.deviceActivityRegistrar = deviceActivityRegistrar
         self.blockItemPersistenceManager = blockItemPersistenceManager
         self.delegate = delegate
@@ -88,63 +95,24 @@ final class HomeViewModel {
         }
     }
     
-    func togglePause() {
-        let pause = !state.isPaused
-        
-        setTimerIsPaused(pause)
-    }
-    
-    private func setTimerIsPaused(_ pause: Bool) {
-        // Cancel any previously running pause/resume task
-        pauseResumeTask?.cancel()
-        
-        pauseResumeTask = Task { [weak self] in
-            guard let item = self?.state.upcomingOrRunningItem else { return }
-            
-            do {
-                if pause {
-                    try await self?.pause(item)
-                } else {
-                    try await self?.resume(item)
-                }
-            } catch is CancellationError {
-                // Task was cancelled, safe to ignore.
-            } catch {
-                self?.state.error = error
-            }
-        }
-    }
-
-    private func pause(_ item: ProtectedBlockItem) async throws {
-        timer.pause()
-        try Task.checkCancellation()
-        try await deviceActivityRegistrar.suspendActivity(for: item)
-    }
-
-    private func resume(_ item: ProtectedBlockItem) async throws {
-        try await deviceActivityRegistrar.resumeActivity(for: item)
-        try Task.checkCancellation()
-        timer.startTimer(for: item)
-        timer.resume()
-    }
-
-    
-    func getTimer(for blockItem: ProtectedBlockItem) -> FTTimer {
-        timer.startTimer(for: blockItem)
-        return timer
-    }
-    
     func setUpcomingItem() {
         guard fetchTask == nil else { return }
         fetchTask = Task {
             do {
                 state.upcomingOrRunningItem = try await blockItemPersistenceManager.fetchClosestOrRunningCurrentScheduled(now: .now)
+                setupTimerForActiveItem()
             } catch {
                 state.error = error
             }
             fetchTask = nil
         }
     }
+    
+    private func setupTimerForActiveItem() {
+        if let activeItem = state.upcomingOrRunningItem, activeItem.state.isActive {
+            state.timer.startTimer(for: activeItem, withSuspensionCountdown: false)
+         }
+     }
     
     func setNextNavigationScreen(_ showing: Bool) {
         if !showing {
@@ -156,7 +124,36 @@ final class HomeViewModel {
         state.nextNavigationScreen = .scheduledFocusList(makeScheduledFocusViewModel())
     }
     
+    func showTaskConcentrationView(isPauseAction: Bool) {
+        if state.isPaused {
+            if let viewModel = makeTaskConcentrationViewModel(with: .breakTime) {
+                state.nextNavigationScreen = .taskConcentration(viewModel)
+                return
+            }
+        }
+        
+        if isPauseAction {
+            if let viewModel = makeTaskConcentrationViewModel(with: .breakTransition) {
+                state.nextNavigationScreen = .taskConcentration(viewModel)
+            }
+        } else {
+            if let viewModel = makeTaskConcentrationViewModel(with: .focus) {
+                state.nextNavigationScreen = .taskConcentration(viewModel)
+            }
+        }
+    }
+    
     private func makeScheduledFocusViewModel() -> ScheduledBlockItemsViewModel {
         ScheduledBlockItemsViewModel(blockItemPersistenceManager: blockItemPersistenceManager)
+    }
+    
+    private func makeTaskConcentrationViewModel(with phase: TaskConcentrationViewModel.State.Phase) -> TaskConcentrationViewModel? {
+        guard let upcomingOrRunningItem = state.upcomingOrRunningItem else { return nil }
+        
+        return TaskConcentrationViewModel(
+            state: .init(timer: state.timer, item: upcomingOrRunningItem, phase: phase),
+            deviceActivityRegistrar: deviceActivityRegistrar,
+            blockItemPersistenceManager: blockItemPersistenceManager
+        )
     }
 }

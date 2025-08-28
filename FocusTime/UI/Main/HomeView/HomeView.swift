@@ -85,7 +85,7 @@ struct HomeView: View {
         // MARK: - Bottom floating button
         .safeAreaInset(edge: .bottom) {
             Button(Constants.Strings.bottomButtonTitle, systemImage: Constants.Icons.hourglass) {
-#warning("Action is empty")
+                #warning("Action is empty")
             }
             .buttonStyle(.ftPrimary)
             .padding()
@@ -102,6 +102,8 @@ struct HomeView: View {
             switch viewModel.state.nextNavigationScreen {
             case .scheduledFocusList(let viewModel):
                 ScheduledBlockItemsView(viewModel: viewModel)
+            case .taskConcentration(let viewModel):
+                TaskConcentrationView(viewModel: viewModel)
             case .none: Text("No view")
             }
         }
@@ -114,7 +116,7 @@ struct HomeView: View {
             }), actions: {
                 // OK dismissal button by default
             }, message: {
-                Text(viewModel.state.error?.localizedDescription ?? "")
+                Text(viewModel.state.error?.localizedDescription ?? String())
             }
         )
         .onAppear {
@@ -124,16 +126,16 @@ struct HomeView: View {
     }
     
     func makeSessionViewForItem(_ item: ProtectedBlockItem) -> some View {
-        let isActive = item.isActive
+        let isActive = item.state.isActive
         
         return Group {
             if isActive {
                 FTActiveHomeSessionCardView(
                     title: item.name,
-                    timer: viewModel.getTimer(for: item),
+                    timerPayload: viewModel.state.timerPayload,
                     isPaused: viewModel.state.isPaused,
-                    action: {}, // This will show timer detail view but it is not ready in this branch.
-                    pauseAction: viewModel.togglePause
+                    action: { viewModel.showTaskConcentrationView(isPauseAction: false) },
+                    pauseAction: { viewModel.showTaskConcentrationView(isPauseAction: true) }
                 )
             } else {
                 FTHomeSessionCardView(
@@ -154,11 +156,12 @@ struct HomeView: View {
         let registrar = PreviewData.mockActivityRegistrar
         HomeView(
             viewModel: .init(
-                timer: ConcurrencyTimer(),
+                state: .init(timer: ConcurrencyTimer()),
                 deviceActivityRegistrar: registrar,
                 blockItemPersistenceManager: manager,
                 delegate: nil
             )
         )
     }
+    .preferredColorScheme(.dark)
 }

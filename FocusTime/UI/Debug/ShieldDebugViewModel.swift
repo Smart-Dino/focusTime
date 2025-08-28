@@ -23,9 +23,9 @@ final class ShieldDebugViewModel {
             var buttonTitle: String {
                 switch self {
                 case .scheduled:
-                    "Activate scheduled block"
+                    ShieldDebugView.Constants.Strings.activateScheduledBlock
                 case .duration:
-                    "Start duration block"
+                    ShieldDebugView.Constants.Strings.startDurationBlock
                 }
             }
         }
@@ -55,6 +55,7 @@ final class ShieldDebugViewModel {
     
     // Prepare for future async fetching tasks.
     private var fetchTask: Task<Void, Never>? = nil
+    private var dbChangesNotificationTask: Task<Void, Never>?
     
     // MARK: - Initializer
     init(
@@ -70,11 +71,22 @@ final class ShieldDebugViewModel {
             blockItemPersistenceManager: blockItemPersistenceManager,
             shieldManager: shieldManager
         )
+        
+        subscribeToDB()
+    }
+    
+    func subscribeToDB() {
+        dbChangesNotificationTask = Task {
+            for await _ in await blockItemPersistenceManager.contextChangesStream() {
+                try? await Task.sleep(for: SharedAppValues.debounceAfterDBRefreshed)
+                reloadItems()
+            }
+        }
     }
     
     // MARK: - Setters
-    func removeError(_ removeError: Bool) {
-        if removeError {
+    func setErrorVisibility(_ isVisible: Bool) {
+        if !isVisible {
             state.error = nil
         }
     }
@@ -116,7 +128,6 @@ final class ShieldDebugViewModel {
         Task {
             do {
                 try await blockItemPersistenceManager.eraseAllData()
-                self.fetchAllItems()
                 await self.activityRegistrar.unregisterAll()
             } catch {
                 self.state.error = error
@@ -140,7 +151,7 @@ final class ShieldDebugViewModel {
                 
                 switch state.scheduleType {
                 case .duration:
-                    type = .duration(DurationComponents(duration: state.duration * 60)) // Minutes to seconds.
+                    type = .duration(duration: DurationComponents(seconds: state.duration * 60)) // Minutes to seconds.
                 case .scheduled:
                     let startComponent = try TimeComponents(from: state.startTime)
                     let endComponent = try TimeComponents(from: state.endTime)
@@ -149,15 +160,13 @@ final class ShieldDebugViewModel {
                 }
                 
                 let blockItem = ProtectedBlockItem(emoji: "❌",
-                                                   name: "Block",
-                                                    days: state.daySelection,
+                                                   name: ShieldDebugView.Constants.Strings.defaultBlockItemName,
+                                                   days: state.daySelection,
                                                    type: type,
                                                    blockedContent: protectedSelection)
                 
                 
                 try await self.blockItemPersistenceManager.insert(blockItem)
-                
-                self.fetchAllItems()
             } catch {
                 await MainActor.run {
                     self.state.error = error
@@ -166,14 +175,16 @@ final class ShieldDebugViewModel {
         }
     }
     
-    func fetchAllItems() {
-        Task {
+    func reloadItems() {
+        fetchTask?.cancel()
+        fetchTask = Task {
             do {
-                let fetchedBlockItems = try await self.blockItemPersistenceManager.fetch(includeTemporary: true)
-                self.state.blockItems = fetchedBlockItems
+                let newItems = try await blockItemPersistenceManager.fetch(includeTemporary: true)
+                state.blockItems = newItems
             } catch {
-                self.state.error = error
+                state.error = error
             }
+            fetchTask = nil
         }
     }
     
@@ -242,5 +253,16 @@ final class ShieldDebugViewModel {
         }
     }
     
+    func suspendFor(_ seconds: Int = 60) {
+        Task {
+            do {
+                let blockItems = try await self.blockItemPersistenceManager.fetch(includeTemporary: true)
+                guard let blockItem = blockItems.first else { return }
+                try await activityRegistrar.suspendActivity(for: blockItem, forSeconds: seconds)
+            } catch {
+                self.state.error = error
+            }
+        }
+    }
+    
 }
-

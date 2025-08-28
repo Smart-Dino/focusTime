@@ -105,7 +105,7 @@ struct PlanSelectionPaywallView: View {
             }), actions: {
                 // OK dismissal button by default
             }, message: {
-                Text(viewModel.state.superState.error?.localizedDescription ?? "")
+                Text(viewModel.state.superState.error?.localizedDescription ?? String())
             }
         )
     }

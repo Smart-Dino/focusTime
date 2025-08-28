@@ -12,21 +12,24 @@ import FamilyControls
 
 actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
     // MARK: - Constants & Dependencies
-    static let fallbackIntervalSeconds = 15 * 60
+    static let fallbackIntervalSeconds = SharedAppValues.activityRegistrarFallbackInterval
 
     let clock: Clock
+    let calendar: Calendar
     let centerManager: DeviceActivityCenterManager
     let shieldManager: ShieldManager
     let blockItemPersistenceManager: BlockItemPersistenceManager
 
     init(
-        centerManager: DeviceActivityCenterManager = LiveDeviceActivityCenterManager(),
         clock: Clock = SystemClock(),
+        calendar: Calendar = .current,
+        centerManager: DeviceActivityCenterManager = LiveDeviceActivityCenterManager(),
         blockItemPersistenceManager: BlockItemPersistenceManager,
         shieldManager: ShieldManager
     ) {
-        self.centerManager = centerManager
         self.clock = clock
+        self.calendar = calendar
+        self.centerManager = centerManager
         self.blockItemPersistenceManager = blockItemPersistenceManager
         self.shieldManager = shieldManager
     }
@@ -37,21 +40,11 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         try await AuthorizationCenter.shared.requestAuthorization(for: .individual)
 
         switch blockItem.type {
-        case .scheduled(let startTime, let endTime, _, _):
-            do {
-                try await registerRegularActivity(for: blockItem, startTime: startTime, endTime: endTime)
-            } catch {
-                switch error {
-                case DeviceActivityCenter.MonitoringError.intervalTooShort:
-                    try await registerFallbackActivity(for: blockItem, startTime: startTime, endTime: endTime)
-                default:
-                    throw error
-                }
-            }
-
+        case .scheduled(let startTime, let endTime, _, _, _):
+            try await registerRegularActivity(for: blockItem, startTime: startTime, endTime: endTime)
             try await startActivityIfRegisteredDuringIntervalWindow(item: blockItem)
-
-        case .duration:
+        case .duration(let duration, _, _, _):
+            try await validateNoOverlapForDurationBlocking(proposedDuration: duration.rawValue)
             try await registerDurationActivity(for: blockItem)
         }
     }
@@ -71,18 +64,18 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         var stored = try await blockItemPersistenceManager.fetch(by: persistentModelID)
 
         switch stored.type {
-        case .scheduled(let startTime, let endTime, let isActive, _):
+        case .scheduled(let startTime, let endTime, let isActive, _, _):
             stored.type = .scheduled(startTime: startTime, endTime: endTime, isActive: isActive, isPaused: true)
             try await blockItemPersistenceManager.editBlockItem(blockItem: stored)
             
             try await shieldManager.unblock()
-        case .duration(let duration, let startedAt, _, let endDate):
-            guard let startedAt else {
+        case .duration(let duration, _, _, let endDate):
+            guard let endDate else {
                 throw DeviceActivityRegistrarError.couldNotExtractDatePoints
             }
 
             // Store suspension moment and keep endDate unchanged.
-            stored.type = .duration(duration, startedAt: startedAt, suspendedAt: suspensionDate, endDate: endDate)
+            stored.type = .duration(duration: duration, suspendedAt: suspensionDate, suspendedUntil: nil, endDate: endDate)
             try await blockItemPersistenceManager.editBlockItem(blockItem: stored)
 
             try await shieldManager.unblock()
@@ -100,28 +93,65 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         var stored = try await blockItemPersistenceManager.fetch(by: persistentModelID)
 
         switch stored.type {
-        case .scheduled(let startTime, let endTime, let isActive, _):
+        case .scheduled(let startTime, let endTime, let isActive, _, _):
             stored.type = .scheduled(startTime: startTime, endTime: endTime, isActive: isActive, isPaused: false)
             try await blockItemPersistenceManager.editBlockItem(blockItem: stored)
             
             try await shieldManager.block(specific: stored.blockedContent)
 
-        case .duration(let duration, _, let suspendedAt, let endDate):
+        case .duration(let duration, let suspendedAt, _, let endDate):
+            guard let endDate else { throw DeviceActivityRegistrarError.activityNotFound }
             // If suspended, slide the end date forward by pause duration so remaining time stays consistent.
             let adjustedEndDate = Self.adjustedEndDate(endDate: endDate, suspendedAt: suspendedAt, resumedAt: resumptionDate)
             let remainingSeconds = max(0, Int(adjustedEndDate.timeIntervalSince(resumptionDate)))
 
-            stored.type = .duration(duration, startedAt: resumptionDate, suspendedAt: nil, endDate: adjustedEndDate)
+            stored.type = .duration(duration: duration, suspendedAt: nil, suspendedUntil: nil, endDate: adjustedEndDate)
             try await blockItemPersistenceManager.editBlockItem(blockItem: stored)
 
             // Re-register device activity for the remaining duration.
             try await registerDurationActivity(for: stored, forcedDuration: remainingSeconds)
         }
     }
-
+    
     func isActivityRegistered(for blockItem: ProtectedBlockItem) async throws -> Bool {
         guard blockItem.persistentModelID != nil else { throw DeviceActivityRegistrarError.activityNotFound }
         return (try? await getActivityForSchedule(blockItem)) != nil
+    }
+    
+    func cancelIfRunning(_ blockItem: ProtectedBlockItem) async throws {
+        let now = await clock.now
+        
+        guard blockItem.type.secondsToIntervalEndIfShouldBeRunning(now: now) != nil else {
+            return
+        }
+
+        try await shieldManager.unblock()
+
+        var mutableBlockItem = blockItem
+        switch mutableBlockItem.type {
+        case .scheduled(let startTime, let endTime, _, let isPaused, let suspendedUntil):
+            // Only update isActive, keep pause state intact.
+            mutableBlockItem.isCancelled = true
+            mutableBlockItem.type = .scheduled(
+                startTime: startTime,
+                endTime: endTime,
+                isActive: false,
+                isPaused: isPaused,
+                suspendedUntil: suspendedUntil
+            )
+        case .duration(let duration, let suspendedAt, let suspendedUntil, _):
+            mutableBlockItem.type = .duration(
+                duration: duration,
+                suspendedAt: suspendedAt,
+                suspendedUntil: suspendedUntil,
+                endDate: nil // Set or clear endDate based on activity.
+            )
+            
+            try await unregisterActivity(during: mutableBlockItem)
+        }
+        
+        try await blockItemPersistenceManager.editBlockItem(blockItem: mutableBlockItem)
+        try await cancelScheduledResume(for: mutableBlockItem)
     }
 
     func unregisterAll() async {

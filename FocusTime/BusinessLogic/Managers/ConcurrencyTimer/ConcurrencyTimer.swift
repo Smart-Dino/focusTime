@@ -24,26 +24,20 @@ final class ConcurrencyTimer: FTTimer {
 
         let remaining = max(Int(deadline.timeIntervalSinceNow), 0)
 
-        payload.hours = remaining / 3600
-        payload.minutes = (remaining % 3600) / 60
-        payload.seconds = remaining % 60
-        payload.formatted = String(format: "%02d:%02d:%02d", payload.hours, payload.minutes, payload.seconds)
+        payload.setHours(remaining / 3600)
+        payload.setMinutes((remaining % 3600) / 60)
+        payload.setSeconds(remaining % 60)
+        let formatted = String(
+            format: "%02d:%02d:%02d",
+            payload.hours,
+            payload.minutes,
+            payload.seconds
+        )
+        payload.setFormatted(formatted)
 
         if remaining <= 0 {
             cancel()
         }
-    }
-    
-    func setHours(_ hours: Int) {
-        payload.hours = hours
-    }
-    
-    func setMinutes(_ minutes: Int) {
-        payload.minutes = minutes
-    }
-    
-    func setSeconds(_ seconds: Int) {
-        payload.seconds = seconds
     }
 
     func start(deadline: Date, isInitiallyPaused: Bool) {
@@ -51,6 +45,7 @@ final class ConcurrencyTimer: FTTimer {
         self.isPaused = isInitiallyPaused
 
         timer?.cancel()
+        ping()
         timer = Task(priority: .utility) { [weak self] in
             guard let self else { return }
             while !Task.isCancelled {

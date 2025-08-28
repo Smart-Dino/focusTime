@@ -8,7 +8,7 @@
 import Foundation
 
 /// Days of the week, starting with Sunday = 1 to match Calendar.
-enum Weekday: Int, Codable, CaseIterable, Identifiable {
+enum Weekday: Int, Codable, CaseIterable, Identifiable, Hashable, Equatable {
     case sunday = 1, monday, tuesday, wednesday, thursday, friday, saturday
     
     private static let formatter: DateFormatter = {

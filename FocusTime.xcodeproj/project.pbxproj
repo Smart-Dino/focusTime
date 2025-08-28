@@ -14,6 +14,7 @@
 		C68617AA2E2976BD00E49BF7 /* ManagedSettings.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C68617A92E2976BD00E49BF7 /* ManagedSettings.framework */; };
 		C68617AC2E2976BD00E49BF7 /* ManagedSettingsUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C68617AB2E2976BD00E49BF7 /* ManagedSettingsUI.framework */; };
 		C68617B42E2976BD00E49BF7 /* FocusTimeShieldConfiguration.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = C68617A82E2976BD00E49BF7 /* FocusTimeShieldConfiguration.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		C689F2352E533B780090BB82 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = C689F2342E533B780090BB82 /* Lottie */; };
 		C6A8A0C12E327781004B0D75 /* FocusTimeActivityReport.appex in Embed ExtensionKit Extensions */ = {isa = PBXBuildFile; fileRef = C6A8A0B52E327781004B0D75 /* FocusTimeActivityReport.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		E97895A82E0AFCBF00E0AF42 /* DeviceActivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E97895A72E0AFCBE00E0AF42 /* DeviceActivity.framework */; };
 /* End PBXBuildFile section */
@@ -118,6 +119,7 @@
 				BusinessLogic/Managers/ShieldManager/LiveShieldManager.swift,
 				BusinessLogic/Managers/ShieldManager/ShieldManager.swift,
 				BusinessLogic/Models/Blocking/BlockItem/BlockItem.swift,
+				BusinessLogic/Models/Blocking/BlockItem/Helpers/BlockState.swift,
 				BusinessLogic/Models/Blocking/BlockItem/Helpers/DurationComponents.swift,
 				BusinessLogic/Models/Blocking/BlockItem/Helpers/ProtectedActivitySelection.swift,
 				BusinessLogic/Models/Blocking/BlockItem/Helpers/ScheduleType.swift,
@@ -127,7 +129,8 @@
 				BusinessLogic/Models/Blocking/BlockItem/ProtectedBlockItem.swift,
 				BusinessLogic/Models/Blocking/CodableActivityIdentifier/CodableActivityIdentifier.swift,
 				BusinessLogic/Stores/Protocols/ProtectedModel.swift,
-				"Extentions/Date+Ext.swift",
+				"Extensions/Date+Ext.swift",
+				"Extensions/DateComponents+Ext.swift",
 				Shared/SharedAppValues.swift,
 			);
 			target = E97895A42E0AFCBE00E0AF42 /* FocusTimeActivityMonitor */;
@@ -190,6 +193,7 @@
 				0C439A272E3249F80031E7EB /* OnboardingKit in Frameworks */,
 				674241732E27EFBA00500101 /* FocusTimeUI in Frameworks */,
 				C66D93522E29108800452D56 /* FocusTimeUI in Frameworks */,
+				C689F2352E533B780090BB82 /* Lottie in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -227,13 +231,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		6742416F2E27EED600500101 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		674FA6972DB05ACE0002FDC1 = {
 			isa = PBXGroup;
 			children = (
@@ -244,7 +241,6 @@
 				C68617AD2E2976BD00E49BF7 /* FocusTimeShieldConfiguration */,
 				C6A8A0B62E327781004B0D75 /* FocusTimeActivityReport */,
 				E97895A62E0AFCBE00E0AF42 /* Frameworks */,
-				6742416F2E27EED600500101 /* Frameworks */,
 				674FA6A12DB05ACE0002FDC1 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -297,6 +293,7 @@
 			name = FocusTime;
 			packageProductDependencies = (
 				674241722E27EFBA00500101 /* FocusTimeUI */,
+				C689F2342E533B780090BB82 /* Lottie */,
 				0C439A262E3249F80031E7EB /* OnboardingKit */,
 			);
 			productName = FocusTime;
@@ -430,6 +427,7 @@
 			mainGroup = 674FA6972DB05ACE0002FDC1;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+				C689F2332E533B780090BB82 /* XCRemoteSwiftPackageReference "lottie-spm" */,
 				0C439A252E3249F80031E7EB /* XCRemoteSwiftPackageReference "OnboardingKit" */,
 			);
 			preferredProjectObjectVersion = 77;
@@ -1044,6 +1042,14 @@
 				minimumVersion = 1.2.0;
 			};
 		};
+		C689F2332E533B780090BB82 /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/airbnb/lottie-spm";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.5.2;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1055,6 +1061,11 @@
 		674241722E27EFBA00500101 /* FocusTimeUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = FocusTimeUI;
+		};
+		C689F2342E533B780090BB82 /* Lottie */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C689F2332E533B780090BB82 /* XCRemoteSwiftPackageReference "lottie-spm" */;
+			productName = Lottie;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

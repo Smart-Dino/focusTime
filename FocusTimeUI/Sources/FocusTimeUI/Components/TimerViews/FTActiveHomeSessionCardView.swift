@@ -11,7 +11,7 @@ public struct FTActiveHomeSessionCardView: View {
     private let title: String
     private let isPaused: Bool
     
-    @State private var timer: FTTimer
+    private let timerPayload: FTTimerPayload
     
     let action: (() -> Void)?
     let pauseAction: (() -> Void)?
@@ -20,7 +20,7 @@ public struct FTActiveHomeSessionCardView: View {
         HStack(spacing: 15) {
             VStack(alignment: .leading) {
                 Text(title)
-                Text(timer.payload.formatted)
+                Text(timerPayload.formatted)
                     .foregroundStyle(.ftGray3Light)
             }
             Spacer()
@@ -64,13 +64,13 @@ public struct FTActiveHomeSessionCardView: View {
     
     public init(
         title: String,
-        timer: FTTimer,
+        timerPayload: FTTimerPayload,
         isPaused: Bool,
         action: (() -> Void)?,
         pauseAction: (() -> Void)?
     ) {
         self.title = title
-        self.timer = timer
+        self.timerPayload = timerPayload
         self.isPaused = isPaused
         self.action = action
         self.pauseAction = pauseAction

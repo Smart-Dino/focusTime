@@ -18,28 +18,32 @@ final class BlockItem {
     // Schedule.
     var days: Set<Weekday>
     var type: ScheduleType
+    
     var isTemporary: Bool // Signals whether this item will have to be removed after use.
+    var isCancelled: Bool
     // Blocked apps.
     var blockedContent: ProtectedActivitySelection
     
-    var isActive: Bool {
+    var state: BlockState {
         switch type {
-        case .scheduled(_, _, let isActive, _):
-            isActive
-        case .duration(_, let startedAt, _, _):
-            startedAt != nil
+        case let .scheduled(_, _, isActive, isPaused, suspendedUntil):
+            switch (isPaused, suspendedUntil, isActive) {
+            case (true, .some, _):    return .suspended
+            case (true, .none, _):    return .suspendedIndefinitely
+            case (_, _, true):        return .running
+            default:                  return .inactive
+            }
+
+        case let .duration(_, suspendedAt, suspendedUntil, endDate):
+            switch (suspendedAt, suspendedUntil, endDate) {
+            case (.some, .some, _):   return .suspended
+            case (.some, .none, _):   return .suspendedIndefinitely
+            case (_, _, .some):       return .running
+            default:                  return .inactive
+            }
         }
     }
-    
-    var isPaused: Bool {
-        switch type {
-        case .scheduled(_, _, _, let isPaused):
-            isPaused
-        case .duration(_, _, let suspendedAt, _):
-            suspendedAt != nil
-        }
-    }
-    
+
     init(
         id: UUID = UUID(),
         name: String,
@@ -47,6 +51,7 @@ final class BlockItem {
         days: Set<Weekday>,
         type: ScheduleType,
         isTemporary: Bool = false,
+        isCancelled: Bool = false,
         blockedContent: ProtectedActivitySelection
     ) {
         self.id = id
@@ -55,6 +60,7 @@ final class BlockItem {
         self.days = days
         self.type = type
         self.isTemporary = isTemporary
+        self.isCancelled = isCancelled
         self.blockedContent = blockedContent
     }
     
@@ -66,6 +72,7 @@ final class BlockItem {
             days: item.days,
             type: item.type,
             isTemporary: item.isTemporary,
+            isCancelled: item.isCancelled,
             blockedContent: item.blockedContent
         )
     }

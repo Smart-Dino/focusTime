@@ -8,6 +8,7 @@
 import Foundation
 
 enum DeviceActivityRegistrarError: LocalizedError {
+    case cannotSuspend
     case noPersistentItem
     case couldNotGenerateIdentifier
     case activityNotFound
@@ -20,6 +21,8 @@ enum DeviceActivityRegistrarError: LocalizedError {
     
     var errorDescription: String? {
         switch self {
+        case .cannotSuspend:
+            String(localized: "device_activity_registrar_cannot_suspend_description", table: "ErrorLocalizable")
         case .noPersistentItem:
             String(localized: "device_activity_registrar_no_persistent_item_description", table: "ErrorLocalizable")
         case .couldNotGenerateIdentifier:
@@ -44,6 +47,8 @@ enum DeviceActivityRegistrarError: LocalizedError {
     
     var failureReason: String? {
         switch self {
+        case .cannotSuspend:
+            String(localized: "device_activity_registrar_cannot_suspend_reason", table: "ErrorLocalizable")
         case .noPersistentItem:
             String(localized: "device_activity_registrar_no_persistent_item_reason", table: "ErrorLocalizable")
         case .couldNotGenerateIdentifier:
