@@ -102,9 +102,16 @@ extension LiveDeviceActivityRegistrar {
         } else if case .scheduled(let startTime, _, _, _, _) = nextBlock.type {
             // Check if the proposed duration extends beyond the start time of the next scheduled block.
             let startOfToday = calendar.startOfDay(for: now)
-            let scheduledBlockStartTime = startOfToday.addingTimeInterval(TimeInterval(startTime.localizedSecondsSinceMidnight))
+            var scheduledBlockStartTime = startOfToday.addingTimeInterval(
+                TimeInterval(startTime.localizedSecondsSinceMidnight)
+            )
+
+            // If that scheduled start is already in the past today, roll it over to tomorrow.
+            if scheduledBlockStartTime <= now {
+                scheduledBlockStartTime = calendar.date(byAdding: .day, value: 1, to: scheduledBlockStartTime)!
+            }
+
             let proposedEndTime = now.addingTimeInterval(TimeInterval(proposedDuration))
-            
             isOverlapping = proposedEndTime > scheduledBlockStartTime
         } else {
             isOverlapping = false
