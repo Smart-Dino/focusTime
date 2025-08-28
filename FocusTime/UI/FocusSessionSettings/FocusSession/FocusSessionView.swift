@@ -82,6 +82,7 @@ struct FocusSessionView: View {
                                 }
                             }
                             .buttonStyle(.ftPrimary)
+                            .disabled(!viewModel.state.isSavingButtonsEnabled)
                         } else {
                             // Default Start button
                             Button {
@@ -93,7 +94,7 @@ struct FocusSessionView: View {
                                 Label(Constants.Strings.startButtonTitle, systemImage: Constants.Symbols.startButtonIcon)
                             }
                             .buttonStyle(.ftPrimary)
-                            .disabled(!viewModel.state.isStartButtonEnabled)
+                            .disabled(!viewModel.state.isSavingButtonsEnabled)
                         }
                     }
                 }

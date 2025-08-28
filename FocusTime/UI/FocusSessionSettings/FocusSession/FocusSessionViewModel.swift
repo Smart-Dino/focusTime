@@ -40,12 +40,18 @@ final class FocusSessionViewModel {
             mode == .startFocusing
         }
         
-        var isStartButtonEnabled: Bool {
-            !scheduleConfigViewModel.state.blockItem.name
+        var isSavingButtonsEnabled: Bool {
+            let nameFilled = !scheduleConfigViewModel.state.blockItem.name
                 .trimmingCharacters(in: .whitespaces).isEmpty
-            && !scheduleConfigViewModel.state.blockItem.emoji
+            
+            let emojiFilled = !scheduleConfigViewModel.state.blockItem.emoji
                 .trimmingCharacters(in: .whitespaces).isEmpty
+            
+            let blockedContentFilled = !scheduleConfigViewModel.state.blockItem.blockedContent.isEmpty
+            
+            return nameFilled && emojiFilled && blockedContentFilled
         }
+
         
         var selectedEmoji: String {
             scheduleConfigViewModel.state.blockItem.emoji
