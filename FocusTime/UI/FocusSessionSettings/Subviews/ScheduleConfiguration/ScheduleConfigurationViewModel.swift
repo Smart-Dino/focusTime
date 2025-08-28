@@ -28,16 +28,39 @@ final class ScheduleConfigurationViewModel {
     
     // MARK: - State
     struct State: Equatable {
-        var blockItem: ProtectedBlockItem = .default
+        var blockItem: ProtectedBlockItem
         
-        var durationHours: Int = FocusSessionView.Constants.DefaultValues.durationHours
-        var durationMinutes: Int = FocusSessionView.Constants.DefaultValues.durationMinutes
-        var startTime: Date = FocusSessionView.Constants.DefaultValues.startTime
-        var endTime: Date = FocusSessionView.Constants.DefaultValues.endTime
+        var durationHours: Int
+        var durationMinutes: Int
+        var startTime: Date
+        var endTime: Date
         
-        var isScheduledForLater: Bool = false
+        var isScheduledForLater: Bool
         
-        var activeSheet: ScheduleSheetType? = nil
+        var activeSheet: ScheduleSheetType?
+        
+        init(
+            blockItem: ProtectedBlockItem = .default,
+            durationHours: Int = FocusSessionView.Constants.DefaultValues.durationHours,
+            durationMinutes: Int = FocusSessionView.Constants.DefaultValues.durationMinutes,
+            startTime: Date = FocusSessionView.Constants.DefaultValues.startTime,
+            endTime: Date = FocusSessionView.Constants.DefaultValues.endTime,
+            activeSheet: ScheduleSheetType? = nil
+        ) {
+            self.blockItem = blockItem
+            self.durationHours = durationHours
+            self.durationMinutes = durationMinutes
+            self.startTime = startTime
+            self.endTime = endTime
+            self.activeSheet = activeSheet
+            
+            switch blockItem.type {
+            case .scheduled:
+                self.isScheduledForLater = true
+            case .duration:
+                self.isScheduledForLater = false
+            }
+        }
     }
     
     // MARK: - Properties

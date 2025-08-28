@@ -43,6 +43,7 @@ struct ScheduledBlockItemsView: View {
             }
             .buttonStyle(.ftPrimary)
             .padding()
+            .backgroundGradientFade()
         }
         .navigationTitle(Constants.Strings.navTitle)
         .navigationBarTitleDisplayMode(.inline)
@@ -98,5 +99,6 @@ struct ScheduledBlockItemsView: View {
         ScheduledBlockItemsView(
             viewModel: .init(blockItemPersistenceManager: manager)
         )
+        .preferredColorScheme(.dark)
     }
 }

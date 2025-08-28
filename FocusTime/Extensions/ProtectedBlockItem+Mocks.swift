@@ -9,11 +9,25 @@ import Foundation
 import FamilyControls
 
 extension ProtectedBlockItem {
-    static let mock = Self.init(
+    static let mockDuration = Self.init(
         emoji: "🧪",
         name: "Test",
         days: Weekday.weekdays,
         type: .duration(duration: .init(seconds: 120)),
+        blockedContent: FamilyActivitySelection()
+    )
+    
+    static let mockScheduled = Self.init(
+        emoji: "🧪",
+        name: "Test",
+        days: Weekday.weekdays,
+        type: .scheduled(
+            startTime: try! .init(hour: 1, minute: 0),
+            endTime: try! .init(hour: 2, minute: 0),
+            isActive: false,
+            isPaused: false,
+            suspendedUntil: nil
+        ),
         blockedContent: FamilyActivitySelection()
     )
     

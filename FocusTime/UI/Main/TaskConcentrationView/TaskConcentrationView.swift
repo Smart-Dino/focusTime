@@ -146,7 +146,7 @@ struct TaskConcentrationView: View {
 #Preview {
     @Previewable @State var timer = ConcurrencyTimer()
     let viewModel = TaskConcentrationViewModel(
-        state: .init(timer: timer, item: ProtectedBlockItem.mock, phase: .focus),
+        state: .init(timer: timer, item: ProtectedBlockItem.mockDuration, phase: .focus),
         deviceActivityRegistrar: PreviewData.mockActivityRegistrar,
         blockItemPersistenceManager: PreviewData.mockBlockItemPersistenceManager
     )

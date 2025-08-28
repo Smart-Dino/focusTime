@@ -15,6 +15,7 @@ final class FocusSessionViewModel {
     struct State {
         let presets: [FocusPreset] = FocusPreset.allCases
         
+        var isInEditingMode: Bool
         var emojiFieldIsFocused = false
         
         var selectedPreset: FocusPreset? {
@@ -33,11 +34,26 @@ final class FocusSessionViewModel {
         var selectedEmoji: String {
             scheduleConfigViewModel.state.blockItem.emoji
         }
+        var isDurationSchedule: Bool {
+            if case .duration = scheduleConfigViewModel.state.blockItem.type { return true }
+            return false
+        }
+        
+        var isScheduled: Bool {
+            if case .scheduled = scheduleConfigViewModel.state.blockItem.type { return true }
+            return false
+        }
         
         init(
-            scheduleConfigurationViewModel: ScheduleConfigurationViewModel,
+            blockItem: ProtectedBlockItem? = nil
         ) {
-            self.scheduleConfigViewModel = scheduleConfigurationViewModel
+            if let blockItem {
+                self.isInEditingMode = true
+                self.scheduleConfigViewModel = ScheduleConfigurationViewModel(state: .init(blockItem: blockItem))
+            } else {
+                self.isInEditingMode = false
+                self.scheduleConfigViewModel = ScheduleConfigurationViewModel()
+            }
         }
     }
     
@@ -45,7 +61,7 @@ final class FocusSessionViewModel {
     private(set) var state: State
     
     // MARK: - Initializer
-    init(state: State = State(scheduleConfigurationViewModel: ScheduleConfigurationViewModel())) {
+    init(state: State = State()) {
         self.state = state
         
         state.scheduleConfigViewModel.delegate = self
