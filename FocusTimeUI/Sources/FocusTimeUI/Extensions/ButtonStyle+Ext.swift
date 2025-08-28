@@ -40,3 +40,24 @@ public extension ButtonStyle where Self == FTSecondaryButtonStyle {
     ///   ```
     static var ftSecondary: Self { Self() }
 }
+
+public extension ButtonStyle where Self == FTActionButtonStyle {
+    /// A bold, full-width capsule button style used in the FocusTime app.
+    ///
+    /// - Appearance:
+    ///   - Background: semi-transparent black fill (`opacity(0.8)`).
+    ///   - Shape: capsule with rounded ends.
+    ///   - Border: 2pt stroke in `ftMainBlue`.
+    ///   - Expands to the maximum available width of its container.
+    ///   - Pressed: reduces opacity to `0.8`.
+    ///   - Disabled: reduces opacity to `0.3`.
+    ///
+    /// - Usage:
+    ///   Apply this style to any SwiftUI `Button` where you need a primary call-to-action. For example:
+    ///   ```swift
+    ///   Button("Start Focus Session") { ... }
+    ///       .buttonStyle(.ftAction)
+    ///   ```
+    static var ftAction: Self { Self() }
+}
+

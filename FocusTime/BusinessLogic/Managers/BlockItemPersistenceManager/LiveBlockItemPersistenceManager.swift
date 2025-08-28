@@ -110,41 +110,41 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
         // 1. Fetch all monitored blocks.
         let blocks = try await store.fetch()
         let runningOrScheduledBlocks = blocks.filter(
-            { $0.isActive || identifiers.contains($0.id) }
+            { $0.state.isActive || identifiers.contains($0.id) }
         )
 
         // 2. Return running if found.
-        if let running = runningOrScheduledBlocks.first(where: { $0.isActive }) {
+        if let running = runningOrScheduledBlocks.first(where: { $0.state.isActive }) {
             return running
         }
 
-        // 3. Mark scheduled & filter only scheduled ones.
+        // Mark scheduled & filter only scheduled ones.
         let scheduledBlocks = await markScheduled(blocks).filter(\.isScheduled)
 
         guard !scheduledBlocks.isEmpty else {
             return nil
         }
 
-        // 4. Sort by start time.
+        // Sort by start time.
         let sortedByStartTime = scheduledBlocks.sorted {
-            guard case .scheduled(let firstStart, _, _, _) = $0.type,
-                  case .scheduled(let secondStart, _, _, _) = $1.type else {
+            guard case .scheduled(let firstStart, _, _, _, _) = $0.type,
+                  case .scheduled(let secondStart, _, _, _, _) = $1.type else {
                 return false
             }
             return firstStart < secondStart
         }
 
-        // 5. Find the closest future schedule.
+        // Find the closest future schedule.
         let currentTimeComponent = try TimeComponents(from: now)
         if let upcoming = sortedByStartTime.first(where: {
-            guard case .scheduled(let start, _, _, _) = $0.type else { return false }
+            guard case .scheduled(let start, _, _, _, _) = $0.type else { return false }
             return start > currentTimeComponent
         }) {
             return upcoming
         }
 
-        // 6. If no future found, wrap to earliest (next day)
-        return sortedByStartTime.first!
+        // If no future found, wrap to earliest (next day).
+        return sortedByStartTime.first(where: { !$0.isCancelled })
     }
 
     

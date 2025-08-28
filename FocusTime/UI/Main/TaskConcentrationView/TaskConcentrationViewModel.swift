@@ -5,68 +5,167 @@
 //  Created by Maksym Horobets on 28.07.2025.
 //
 
-import Foundation
+import SwiftUI
 import FocusTimeUI
 
 @MainActor
 @Observable
 final class TaskConcentrationViewModel {
+    @MainActor
     struct State {
-        var timerIsPaused: Bool = true
+        enum Phase {
+            case focus(
+                title: String,
+                subtitle: String,
+                timerTitle: String,
+                runningTitle: String,
+                runningIcon: String
+            )
+            case breakTransition(
+                title: String,
+                subtitle: String
+            )
+            case breakTime(
+                title: String,
+                subtitle: String,
+                timerTitle: String,
+                buttonTitle: String
+            )
+            case almostDone(
+                title: String,
+                subtitle: String,
+                message: String,
+                buttonTitle: String
+            )
+            case finished(
+                title: String,
+                subtitle: String
+            )
+        }
         
-        var timerControlButtonIcon = TaskConcentrationView.Constants.Icons.pause
-        var timerControlButtonTitle = TaskConcentrationView.Constants.Strings.resumeButtonTitle
+        let timer: FTTimer
+        var timerPayload: FTTimerPayload {
+            timer.payload
+        }
+        
+        var error: Error?
+        
+        var item: ProtectedBlockItem
+        var phase: Phase
     }
     
+    // MARK: - Properties
     private(set) var state: State
-    private let timer: FTTimer
     
+    private let deviceActivityRegistrar: DeviceActivityRegistrar
+    private let blockItemPersistenceManager: BlockItemPersistenceManager
+    
+    private var dbChangesNotificationTask: Task<Void, Never>?
+    
+    // MARK: - Initialization
     init(
-        state: State = State(),
-        timer: FTTimer
+        state: State,
+        deviceActivityRegistrar: DeviceActivityRegistrar,
+        blockItemPersistenceManager: BlockItemPersistenceManager
     ) {
         self.state = state
-        self.timer = timer
-    }
-    
-    func getTimer() -> FTTimer {
-        timer
-    }
-    
-    func updateUIBasedOnTimerState() {
-        if state.timerIsPaused {
-            state.timerControlButtonIcon = TaskConcentrationView.Constants.Icons.pause
-            state.timerControlButtonTitle = TaskConcentrationView.Constants.Strings.resumeButtonTitle
-        } else {
-            state.timerControlButtonIcon = TaskConcentrationView.Constants.Icons.play
-            state.timerControlButtonTitle = TaskConcentrationView.Constants.Strings.pauseButtonTitle
-        }
-    }
-    
-    func toggleSession() {
-        if state.timerIsPaused {
-            resumeSession()
-        } else {
-            pauseSession()
-        }
+        self.deviceActivityRegistrar = deviceActivityRegistrar
+        self.blockItemPersistenceManager = blockItemPersistenceManager
         
-        updateUIBasedOnTimerState()
+        subscribeToDB()
     }
     
-    func pauseSession() {
-        #warning("Notify DeviceActivityRegistrar of pausing")
-        timer.pause()
-        // Delegation will set the state.
+    // MARK: - Public Methods
+    func setErrorVisibility(_ isVisible: Bool) {
+        if !isVisible {
+            state.error = nil
+        }
     }
     
-    func resumeSession() {
-        #warning("Notify DeviceActivityRegistrar of resumption")
-        timer.resume()
-        // Delegation will set the state.
+    func startBreakTimer() {
+        Task {
+            await startABreak()
+        }
     }
     
-    func endSession() {
-        #warning("Notify DeviceActivityRegistrar of stopping and unregistering the session")
+    func moveToPauseSessionScene() {
+        moveTo(.breakTransition)
     }
     
+    func moveToBreakTime() {
+        moveTo(.breakTime)
+    }
+    
+    func moveToEndSessionAlertScene() {
+        moveTo(.almostDone)
+    }
+    
+    func replaceTimerWithSuspensionTimer() {
+        state.timer.start(
+            deadline: .now.addingTimeInterval(TimeInterval(SharedAppValues.breakTimeDuration)),
+            isInitiallyPaused: true
+        )
+    }
+    
+    func endBlock() async throws {
+        do {
+            try await deviceActivityRegistrar.cancelIfRunning(state.item)
+            state.timer.cancel()
+        } catch {
+            state.error = error
+            throw error // Rethrow so the view does not dismiss.
+        }
+    }
+    
+    // MARK: - Private Methods
+    
+    private func moveTo(_ phase: State.Phase) {
+        guard state.phase != phase else { return }
+        
+        withAnimation {
+            state.phase = phase
+        }
+    }
+    
+    private func subscribeToDB() {
+        dbChangesNotificationTask = Task {
+            for await _ in await blockItemPersistenceManager.contextChangesStream() {
+                try? await Task.sleep(for: SharedAppValues.debounceAfterDBRefreshed)
+                
+                guard let newItem = try? await blockItemPersistenceManager.fetchClosestOrRunningCurrentScheduled(now: .now),
+                      newItem.state.isActive else {
+                    moveTo(.finished)
+                    return
+                }
+                
+                updateStateWithNewItem(newItem)
+            }
+        }
+    }
+    
+    private func updateStateWithNewItem(_ newItem: ProtectedBlockItem) {
+        state.item = newItem
+        state.timer.startTimer(for: newItem, withSuspensionCountdown: true)
+        state.timer.resume()
+        
+        if state.item.state == .running {
+            moveTo(.focus)
+        }
+    }
+    
+    private func startABreak(for seconds: Int = SharedAppValues.breakTimeDuration) async {
+        do {
+            try await deviceActivityRegistrar.suspendActivity(for: state.item, forSeconds: seconds)
+        } catch {
+            state.error = error
+        }
+    }
+    
+    private func resumeFromBreak() async {
+        do {
+            try await deviceActivityRegistrar.resumeActivity(for: state.item)
+        } catch {
+            state.error = error
+        }
+    }
 }

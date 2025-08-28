@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 import FamilyControls
 
-struct ProtectedBlockItem: ProtectedModel {
+struct ProtectedBlockItem: ProtectedModel, Hashable, Equatable {
     
     var id: UUID
     let persistentModelID: PersistentIdentifier?
@@ -18,25 +18,30 @@ struct ProtectedBlockItem: ProtectedModel {
     var name: String
     var days: Set<Weekday>
     var type: ScheduleType
+    
     var isTemporary: Bool
+    var isCancelled: Bool
+    
     var isScheduled: Bool
-    var blockedContent: ProtectedActivitySelection
+    var blockedContent: FamilyActivitySelection
     
-    var isActive: Bool {
+    var state: BlockState {
         switch type {
-        case .scheduled(_, _, let isActive, _):
-            isActive
-        case .duration(_, let startedAt, let suspendedAt, _):
-            (startedAt != nil) || (suspendedAt != nil)
-        }
-    }
-    
-    var isPaused: Bool {
-        switch type {
-        case .scheduled(_, _, _, let isPaused):
-            isPaused
-        case .duration(_, _, let suspendedAt, _):
-            suspendedAt != nil
+        case let .scheduled(_, _, isActive, isPaused, suspendedUntil):
+            switch (isPaused, suspendedUntil, isActive) {
+            case (true, .some, _):    return .suspended
+            case (true, .none, _):    return .suspendedIndefinitely
+            case (_, _, true):        return .running
+            default:                  return .inactive
+            }
+
+        case let .duration(_, suspendedAt, suspendedUntil, endDate):
+            switch (suspendedAt, suspendedUntil, endDate) {
+            case (.some, .some, _):   return .suspended
+            case (.some, .none, _):   return .suspendedIndefinitely
+            case (_, _, .some):       return .running
+            default:                  return .inactive
+            }
         }
     }
     
@@ -48,8 +53,9 @@ struct ProtectedBlockItem: ProtectedModel {
         days: Set<Weekday>,
         type: ScheduleType,
         isTemporary: Bool = false,
+        isCancelled: Bool = false,
         isScheduled: Bool = false,
-        blockedContent: ProtectedActivitySelection
+        blockedContent: FamilyActivitySelection
     ) {
         self.id = id
         self.persistentModelID = persistentModelID
@@ -58,6 +64,7 @@ struct ProtectedBlockItem: ProtectedModel {
         self.days = days
         self.type = type
         self.isTemporary = isTemporary
+        self.isCancelled = isCancelled
         self.isScheduled = isScheduled
         self.blockedContent = blockedContent
     }
@@ -71,6 +78,7 @@ struct ProtectedBlockItem: ProtectedModel {
             days: item.days,
             type: item.type,
             isTemporary: item.isTemporary,
+            isCancelled: item.isCancelled,
             blockedContent: item.blockedContent
         )
     }

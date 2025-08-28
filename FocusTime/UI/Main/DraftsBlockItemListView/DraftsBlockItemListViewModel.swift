@@ -13,16 +13,21 @@ import FamilyControls
 @MainActor
 @Observable
 final class DraftsBlockItemListViewModel {
+    @MainActor
     struct State {
+        let timer: FTTimer // There can only be one schedule running at a time.
+        var timerPayload: FTTimerPayload {
+            timer.payload
+        }
+        
         var error: Error? = nil
         
         var page = 0
-        let amountPerPage = 100
+        let amountPerPage = SharedAppValues.amountOfItemsPerPage
         var items = [ProtectedBlockItem]()
     }
     
     private(set) var state: State
-    private let timer: FTTimer // There can only be one schedule running at a time.
     
     private let blockItemPersistenceManager: BlockItemPersistenceManager
     
@@ -30,18 +35,11 @@ final class DraftsBlockItemListViewModel {
     private var dbChangesNotificationTask: Task<Void, Never>?
     
     init(
-        state: State = State(),
-        timer: FTTimer,
+        state: State,
         blockItemPersistenceManager: BlockItemPersistenceManager
     ) {
         self.state = state
-        self.timer = timer
         self.blockItemPersistenceManager = blockItemPersistenceManager
-    }
-    
-    func getTimer(for blockItem: ProtectedBlockItem) -> FTTimer {
-        timer.startTimer(for: blockItem)
-        return timer
     }
     
     private func reloadItems() {
@@ -53,6 +51,7 @@ final class DraftsBlockItemListViewModel {
                     packSize: state.amountPerPage
                 )
                 state.items = newItems
+                setupTimerForActiveItem()
             } catch {
                 state.error = error
             }
@@ -70,6 +69,7 @@ final class DraftsBlockItemListViewModel {
                 )
                 state.items.append(contentsOf: newItems)
                 state.page += 1
+                setupTimerForActiveItem()
             } catch {
                 state.error = error
             }
@@ -101,7 +101,13 @@ final class DraftsBlockItemListViewModel {
         }
     }
     
-    func hasReachEndOfList(blockItem: ProtectedBlockItem){
+    private func setupTimerForActiveItem() {
+         if let activeItem = state.items.first(where: { $0.state.isActive }) {
+             state.timer.startTimer(for: activeItem, withSuspensionCountdown: false)
+         }
+     }
+    
+    func hasReachEndOfList(blockItem: ProtectedBlockItem) {
         if blockItem.id == state.items.last?.id {
             fetchNextPage()
         }

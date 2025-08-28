@@ -15,7 +15,7 @@ final class ScheduledBlockItemsViewModel {
     struct State {
         var error: Error? = nil
         var page = 0
-        let amountPerPage = 100
+        let amountPerPage = SharedAppValues.amountOfItemsPerPage
         var items = [ProtectedBlockItem]()
     }
 

@@ -1,126 +1,400 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "0m" : {
-      "comment" : "Fallback zero minutes duration\nZero minutes duration"
+    "block_list_picker_sheet_empty_state_description" : {
+      "comment" : "Description shown when the user has no created blocklists.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create custom app blocklists to help you stay focused, reduce distractions, and build healthier screen habits."
+          }
+        }
+      }
     },
-    "App List Picker Screen" : {
-      "comment" : "Accessibility label or destination title for app list picker"
+    "block_list_picker_sheet_empty_state_title" : {
+      "comment" : "Title shown when the user has no created blocklists.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Blocklists Yet"
+          }
+        }
+      }
     },
-    "Apps Blocked" : {
-      "comment" : "Label for the 'Apps Blocked' setting"
+    "block_list_picker_sheet_list_title" : {
+      "comment" : "Title for the list of existing blocklists.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your Blocklists"
+          }
+        }
+      }
     },
-    "Choose how long you want to stay focused" : {
-      "comment" : "Subtitle for the duration picker sheet"
+    "block_list_picker_sheet_new_blocklist_button" : {
+      "comment" : "Button text to create a new blocklist.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New Blocklist"
+          }
+        }
+      }
     },
-    "Choose Your Focus Preset" : {
-      "comment" : "Title for the focus preset selection grid"
+    "block_list_picker_sheet_save_selection_button" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save Selection"
+          }
+        }
+      }
     },
-    "Creative" : {
-      "comment" : "Focus preset: Creative"
+    "block_list_picker_sheet_subtitle" : {
+      "comment" : "Subtitle for the blocklist picker sheet.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose which apps to block during your\nfocus sessions"
+          }
+        }
+      }
     },
-    "Duration" : {
-      "comment" : "Label for the duration setting"
+    "block_list_picker_sheet_title" : {
+      "comment" : "Main title for the blocklist picker sheet.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Block Distractions"
+          }
+        }
+      }
     },
-    "End time" : {
-      "comment" : "Label for the end time setting"
+    "duration_picker_sheet_view_hours_picker_title" : {
+      "comment" : "Label for hours picker in duration sheet",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hours"
+          }
+        }
+      }
     },
-    "Error: DurationPickerSheetViewModel not initialized." : {
-      "comment" : "Error message for duration picker"
+    "duration_picker_sheet_view_minutes_picker_title" : {
+      "comment" : "Label for minutes picker in duration sheet",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minutes"
+          }
+        }
+      }
     },
-    "Every Day" : {
-      "comment" : "Scheduled for every day"
+    "focus_preset_creative" : {
+      "comment" : "Focus preset: Creative",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Creative"
+          }
+        }
+      }
     },
-    "Focus Session" : {
-      "comment" : "Default name for a new focus session"
+    "focus_preset_mindfulness" : {
+      "comment" : "Focus preset: Mindfulness",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mindfulness"
+          }
+        }
+      }
     },
-    "Focus Setup" : {
-      "comment" : "Navigation title for the focus session setup screen"
+    "focus_preset_morning_routine" : {
+      "comment" : "Focus preset: Morning Routine",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Morning\nRoutine"
+          }
+        }
+      }
     },
-    "Friday" : {
-      "comment" : "Full name for Friday"
+    "focus_preset_reading" : {
+      "comment" : "Focus preset: Reading",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reading"
+          }
+        }
+      }
     },
-    "Hours" : {
-      "comment" : "Label for hours picker in duration sheet"
+    "focus_preset_social_detox" : {
+      "comment" : "Focus preset: Social Detox",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Social\nDetox"
+          }
+        }
+      }
     },
-    "List" : {
-      "comment" : "Value indicating the app list is available"
+    "focus_preset_study" : {
+      "comment" : "Focus preset: Study",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Study"
+          }
+        }
+      }
     },
-    "List name" : {
-      "comment" : "Label for the list name input field"
+    "focus_preset_work_sprint" : {
+      "comment" : "Focus preset: Work Sprint",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Work\nSprint"
+          }
+        }
+      }
     },
-    "Mindfulness" : {
-      "comment" : "Focus preset: Mindfulness"
+    "focus_preset_zero_distraction" : {
+      "comment" : "Focus preset: Zero Distraction",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zero\nDistraction"
+          }
+        }
+      }
     },
-    "Minutes" : {
-      "comment" : "Label for minutes picker in duration sheet"
+    "focus_session_default_name" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Focus Session"
+          }
+        }
+      }
     },
-    "Monday" : {
-      "comment" : "Full name for Monday"
+    "focus_session_view_navigation_title" : {
+      "comment" : "Navigation title for the focus session setup screen",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Focus Setup"
+          }
+        }
+      }
     },
-    "Morning\nRoutine" : {
-      "comment" : "Focus preset: Morning Routine"
+    "focus_session_view_preset_grid_subtitle" : {
+      "comment" : "Subtitle explaining preset blocklists",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ready-made blocklists to help you stay focused. Choose a preset to quickly block distracting apps."
+          }
+        }
+      }
     },
-    "Name" : {
-      "comment" : "Placeholder text for the list name input field"
+    "focus_session_view_preset_grid_title" : {
+      "comment" : "Title for the focus preset selection grid",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose Your Focus Preset"
+          }
+        }
+      }
     },
-    "Reading" : {
-      "comment" : "Focus preset: Reading"
+    "focus_session_view_start_button_title" : {
+      "comment" : "Title for the start button",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start"
+          }
+        }
+      }
     },
-    "Ready-made blocklists to help you stay focused. Choose a preset to quickly block distracting apps." : {
-      "comment" : "Subtitle explaining preset blocklists"
+    "schedule_configuration_view_apps_blocked" : {
+      "comment" : "Label for the 'Apps Blocked' setting",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apps Blocked"
+          }
+        }
+      }
     },
-    "Saturday" : {
-      "comment" : "Full name for Saturday"
+    "schedule_configuration_view_apps_blocked_list" : {
+      "comment" : "Value indicating the app list is available",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "List"
+          }
+        }
+      }
     },
-    "Schedule for later" : {
-      "comment" : "Label for the 'Schedule for later' toggle"
+    "schedule_configuration_view_duration" : {
+      "comment" : "Label for the duration setting",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duration"
+          }
+        }
+      }
     },
-    "Scheduled Days" : {
-      "comment" : "Label for the 'Scheduled Days' setting"
+    "schedule_configuration_view_duration_picker_subtitle" : {
+      "comment" : "Subtitle for the duration picker sheet",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose how long you want to stay focused"
+          }
+        }
+      }
     },
-    "Session Length" : {
-      "comment" : "Title for the duration picker sheet"
+    "schedule_configuration_view_duration_picker_title" : {
+      "comment" : "Title for the duration picker sheet",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Session Length"
+          }
+        }
+      }
     },
-    "Social\nDetox" : {
-      "comment" : "Focus preset: Social Detox"
+    "schedule_configuration_view_end_time_subtitle" : {
+      "comment" : "Title for end session subtitle",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Defines when your focus session will end"
+          }
+        }
+      }
     },
-    "Start" : {
-      "comment" : "Title for the start button"
+    "schedule_configuration_view_end_time_title" : {
+      "comment" : "Title for end time",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "End Time"
+          }
+        }
+      }
     },
-    "Start time" : {
-      "comment" : "Label for the start time setting"
+    "schedule_configuration_view_list_name" : {
+      "comment" : "Label for the list name input field",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "List name"
+          }
+        }
+      }
     },
-    "Study" : {
-      "comment" : "Focus preset: Study"
+    "schedule_configuration_view_list_name_placeholder" : {
+      "comment" : "Placeholder text for the list name input field",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
+        }
+      }
     },
-    "Sunday" : {
-      "comment" : "Full name for Sunday"
+    "schedule_configuration_view_schedule_for_later" : {
+      "comment" : "Label for the 'Schedule for later' toggle",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schedule for later"
+          }
+        }
+      }
     },
-    "Thursday" : {
-      "comment" : "Full name for Thursday"
+    "schedule_configuration_view_schedule_info" : {
+      "comment" : "Informational text about scheduling a blocklist",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turn on to have this blocklist activate automatically based on your scheduled days and times."
+          }
+        }
+      }
     },
-    "Tuesday" : {
-      "comment" : "Full name for Tuesday"
+    "schedule_configuration_view_scheduled_days" : {
+      "comment" : "Label for the 'Scheduled Days' setting",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scheduled Days"
+          }
+        }
+      }
     },
-    "Turn on to have this blocklist activate automatically based on your scheduled days and times." : {
-      "comment" : "Informational text about scheduling a blocklist"
+    "schedule_configuration_view_start_time_subtitle" : {
+      "comment" : "Title for start session subtitle",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Defines when your focus session will start"
+          }
+        }
+      }
     },
-    "Wednesday" : {
-      "comment" : "Full name for Wednesday"
-    },
-    "Weekdays" : {
-      "comment" : "Scheduled for weekdays"
-    },
-    "Weekends" : {
-      "comment" : "Scheduled for weekends"
-    },
-    "Work\nSprint" : {
-      "comment" : "Focus preset: Work Sprint"
-    },
-    "Zero\nDistraction" : {
-      "comment" : "Focus preset: Zero Distraction"
+    "schedule_configuration_view_start_time_title" : {
+      "comment" : "Title for start time",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start Time"
+          }
+        }
+      }
     }
   },
-  "version" : "1.0"
+  "version" : "1.1"
 }

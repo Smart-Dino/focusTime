@@ -13,11 +13,10 @@ struct MainFlowCoordinatorView: View {
     
     var body: some View {
         NavigationStack {
-            TabView(selection: Binding(get: {
-                viewModel.state.currentTabScreen
-            }, set: { screen in
-                viewModel.setTabScreen(screen)
-            })) {
+            TabView(selection: .binding(
+                get: viewModel.state.currentTabScreen,
+                set: viewModel.setTabScreen(_:))
+            ) {
                 Group {
                     ForEach(viewModel.state.tabViewModels) { screen in
                         makeViewForTab(screen)

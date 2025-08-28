@@ -39,8 +39,7 @@ struct FreePlanUpgradeView: View {
                     
                     SubscriptionUtilityLinksView(
                         viewModel: .init(
-                            paymentManager: viewModel.getCurrentPaymentManager(),
-                            flowDelegate: viewModel.flowDelegate
+                            paymentManager: viewModel.getCurrentPaymentManager()
                         )
                     )
                 }
@@ -55,16 +54,13 @@ struct FreePlanUpgradeView: View {
             toolbarItems
         }
         .alert(
-            Constants.Strings.errorHeader,
-            isPresented: Binding(get: {
-                viewModel.state.superState.error != nil
-            }, set: { isVisible in
-                viewModel.setErrorVisibility(isVisible)
-            }), actions: {
-                // OK dismissal button by default
-            }, message: {
-                Text(viewModel.state.superState.error?.localizedDescription ?? "")
-            }
+            SharedConstants.Strings.errorHeader,
+            isPresented: Binding(
+                get: { viewModel.state.superState.error != nil },
+                set: { viewModel.setErrorVisibility($0) }
+            ),
+            actions: { /* OK dismissal button by default */ },
+            message: { Text(viewModel.state.superState.error?.localizedDescription ?? String()) }
         )
     }
     

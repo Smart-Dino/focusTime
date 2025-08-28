@@ -1,0 +1,34 @@
+//
+//  PresetIconView.swift
+//  FocusTime
+//
+//  Created by Keto Nioradze on 18.06.25.
+//
+
+import SwiftUI
+import FocusTimeUI 
+
+struct PresetIconView: View {
+    let preset: FocusPreset
+    @Binding var isSelected: Bool
+    
+    var body: some View {
+        VStack(spacing: FocusSessionView.Constants.PresetIcon.Layout.mainSpacing) {
+            Text(preset.emoji)
+                .font(.largeTitle)
+                .frame(width: FocusSessionView.Constants.PresetIcon.Layout.size, height: FocusSessionView.Constants.PresetIcon.Layout.size)
+                .background(isSelected ? Color.ftPresetSelectedBackgroundColor : Color.ftPresetBackgroundColor)
+                .cornerRadius(FocusSessionView.Constants.PresetIcon.Layout.cornerRadius)
+            
+            Text(preset.name)
+                .font(.caption)
+                .multilineTextAlignment(.center)
+                .foregroundStyle(.white)
+        }
+    }
+}
+
+
+#Preview {
+    PresetIconView(preset: .morningRoutine, isSelected: .constant(true))
+}

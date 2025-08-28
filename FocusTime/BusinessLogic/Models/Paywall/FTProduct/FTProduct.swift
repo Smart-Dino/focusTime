@@ -34,7 +34,6 @@ struct FTProduct: Identifiable, Equatable, Sendable {
     let priceAndPeriodString: String?
     let periodString: String?
     let trialPeriodString: String?
-    let trialOfferSubtitle: String?
     let subscriptionPeriodDescription: String?
     let trialPeriodDescription: String?
     
@@ -66,12 +65,10 @@ struct FTProduct: Identifiable, Equatable, Sendable {
             self.periodString = periodStr
             self.priceAndPeriodString = "\(priceString) / \(periodStr)"
             self.subscriptionPeriodDescription = Self.subscriptionDescription(price: price, format: priceFormatStyle, period: periodStr)
-            self.trialOfferSubtitle = "\(priceString)/\(periodStr)"
         } else {
             self.periodString = nil
             self.priceAndPeriodString = nil
             self.subscriptionPeriodDescription = nil
-            self.trialOfferSubtitle = nil
         }
 
         if let trialPeriod {

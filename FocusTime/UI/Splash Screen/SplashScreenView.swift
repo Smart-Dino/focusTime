@@ -10,7 +10,6 @@ import SwiftUI
 
 struct SplashScreenView: View {
     @State var viewModel: SplashScreenViewModel
-    @State private var opacity: Double = .zero
     
     var body: some View {
         ZStack {

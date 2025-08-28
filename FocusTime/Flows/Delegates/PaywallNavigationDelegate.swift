@@ -13,8 +13,4 @@ protocol PaywallNavigationDelegate: AnyObject {
     func paywallDidRequestPlanSelection()
     /// View's request to dismiss itself.
     func paywallDidRequestDismissal()
-    /// Request **Terms of Service**.
-    func paywallDidRequestTermsOfService()
-    /// Request **Privacy**.
-    func paywallDidRequestPrivacyPolicy()
 }

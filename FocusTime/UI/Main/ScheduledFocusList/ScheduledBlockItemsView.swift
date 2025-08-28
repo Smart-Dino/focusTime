@@ -32,7 +32,7 @@ struct ScheduledBlockItemsView: View {
             }
             .padding(.horizontal)
         }
-        .background { MainBackgroundGradientView() }
+        .background { FTBackgroundGradientView() }
         // MARK: - Bottom floating button
         .safeAreaInset(edge: .bottom) {
             Button(
@@ -43,21 +43,19 @@ struct ScheduledBlockItemsView: View {
             }
             .buttonStyle(.ftPrimary)
             .padding()
+            .backgroundGradientFade()
         }
         .navigationTitle(Constants.Strings.navTitle)
         .navigationBarTitleDisplayMode(.inline)
         .dynamicTypeSize(...DynamicTypeSize.accessibility2)
         .alert(
             SharedConstants.Strings.errorHeader,
-            isPresented: Binding(get: {
-                viewModel.state.error != nil
-            }, set: { isVisible in
-                viewModel.setErrorVisibility(isVisible)
-            }), actions: {
-                // OK dismissal button by default
-            }, message: {
-                Text(viewModel.state.error?.localizedDescription ?? "")
-            }
+            isPresented: Binding(
+                get: { viewModel.state.error != nil },
+                set: { viewModel.setErrorVisibility($0) }
+            ),
+            actions: { /* OK dismissal button by default */ },
+            message: { Text(viewModel.state.error?.localizedDescription ?? String()) }
         )
         .onAppear {
             viewModel.loadData()
@@ -101,5 +99,6 @@ struct ScheduledBlockItemsView: View {
         ScheduledBlockItemsView(
             viewModel: .init(blockItemPersistenceManager: manager)
         )
+        .preferredColorScheme(.dark)
     }
 }
