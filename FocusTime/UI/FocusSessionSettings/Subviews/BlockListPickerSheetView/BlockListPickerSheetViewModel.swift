@@ -13,6 +13,28 @@ protocol BlockListPickerSheetDelegate: AnyObject {
     func didFinishSelectionWith(_ selection: FamilyActivitySelection)
 }
 
+enum BlockListPickerSheetViewModelNavigationRoute: Equatable, Hashable {
+    case focusSession(_ viewModel: FocusSessionViewModel)
+    
+    var id: Self { self }
+    
+    static func == (lhs: BlockListPickerSheetViewModelNavigationRoute, rhs: BlockListPickerSheetViewModelNavigationRoute) -> Bool {
+        switch (lhs, rhs) {
+        case let (.focusSession(lVM), .focusSession(rVM)):
+            lVM === rVM
+        }
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        switch self {
+        case let .focusSession(vm):
+            hasher.combine(1)
+            hasher.combine(ObjectIdentifier(vm))
+        }
+    }
+}
+
+
 @MainActor
 @Observable
 final class BlockListPickerSheetViewModel {
@@ -27,26 +49,38 @@ final class BlockListPickerSheetViewModel {
         
         var selectedBlockItems: Set<ProtectedBlockItem> = []
         var blockItems: [ProtectedBlockItem] = []
+        
+        var nextNavigationScreen: DraftsBlockItemListViewNavigationRoute?
     }
     
     private(set) var state: State
     
     weak var delegate: BlockListPickerSheetDelegate?
+    private let deviceActivityRegistrar: DeviceActivityRegistrar
     private let blockItemPersistenceManager: BlockItemPersistenceManager
     
     private var fetchTask: Task<Void, Never>?
     
     init(
         state: State = State(),
+        deviceActivityRegistrar: DeviceActivityRegistrar,
         blockItemPersistenceManager: BlockItemPersistenceManager
     ) {
         self.state = state
+        self.deviceActivityRegistrar = deviceActivityRegistrar
         self.blockItemPersistenceManager = blockItemPersistenceManager
     }
     
     func setErrorVisibility(_ isVisible: Bool) {
         if !isVisible {
             state.error = nil
+        }
+    }
+    
+    func setNextNavigationScreen(_ showing: Bool) {
+        if !showing {
+            state.nextNavigationScreen = nil
+            reloadItems()
         }
     }
     
@@ -79,6 +113,22 @@ final class BlockListPickerSheetViewModel {
         }
         
         state.finalSelection = combined
+    }
+    
+    private func reloadItems() {
+        fetchTask?.cancel()
+        fetchTask = Task {
+            do {
+                let newItems = try await blockItemPersistenceManager.reloadPaginatedData(
+                    totalPages: state.page,
+                    packSize: state.amountPerPage
+                )
+                state.blockItems = newItems
+            } catch {
+                state.error = error
+            }
+            fetchTask = nil
+        }
     }
     
     func fetchNextPage() {
@@ -115,6 +165,18 @@ final class BlockListPickerSheetViewModel {
         if blockItem.id == state.blockItems.last?.id {
             fetchNextPage()
         }
+    }
+    
+    func navigateToFocusSessionEditing(list: ProtectedBlockItem) {
+        state.nextNavigationScreen = .focusSession(makeFocusSessionViewModel(mode: .editBlockList(list)))
+    }
+    
+    private func makeFocusSessionViewModel(mode: FocusSessionMode) -> FocusSessionViewModel {
+        FocusSessionViewModel(
+            mode: mode,
+            blockItemPersistenceManager: blockItemPersistenceManager,
+            deviceActivityRegistrar: deviceActivityRegistrar
+        )
     }
     
     private func openFamilyActivitySelectionIfNeeded() {

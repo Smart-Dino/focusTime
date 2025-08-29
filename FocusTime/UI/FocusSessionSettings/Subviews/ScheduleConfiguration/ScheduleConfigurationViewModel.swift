@@ -203,6 +203,7 @@ final class ScheduleConfigurationViewModel {
         Task {
             try await deviceActivityRegistrar.checkAuth()
             let viewModel = BlockListPickerSheetViewModel(
+                deviceActivityRegistrar: deviceActivityRegistrar,
                 blockItemPersistenceManager: blockItemPersistenceManager
             )
             viewModel.delegate = self

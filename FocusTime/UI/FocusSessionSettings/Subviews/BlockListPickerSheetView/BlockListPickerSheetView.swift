@@ -66,6 +66,16 @@ struct BlockListPickerSheetView: View {
                 set: { viewModel.setFamilyActivitySelection($0) }
             )
         )
+        .navigationDestination(isPresented: .init(
+            get: { viewModel.state.nextNavigationScreen != nil },
+            set: { viewModel.setNextNavigationScreen($0) }
+        )) {
+            switch viewModel.state.nextNavigationScreen {
+            case .focusSession(let viewModel):
+                FocusSessionView(viewModel: viewModel)
+            case .none: Text("No view")
+            }
+        }
         .onChange(of: viewModel.state.isFamilyActivitySheetPresented) {
             if !viewModel.state.isFamilyActivitySheetPresented && viewModel.state.blockItems.isEmpty {
                 viewModel.saveSelection()
@@ -109,7 +119,7 @@ struct BlockListPickerSheetView: View {
                                 viewModel.toggleBlockItem(blockItem, isSelected: isSelected)
                             }
                         )) {
-#warning("Move to the editing view")
+                            viewModel.navigateToFocusSessionEditing(list: blockItem)
                         }
                         .padding(.horizontal)
                         .onAppear { viewModel.hasReachEndOfList(blockItem: blockItem) }
@@ -129,7 +139,14 @@ struct BlockListPickerSheetView: View {
 #Preview("Populated list") {
     let factory = MockPersistenceStoreFactory()
     let manager = PreviewData.mockBlockItemPersistenceManager
-    let viewModel = BlockListPickerSheetViewModel(blockItemPersistenceManager: manager)
+    let registrar = LiveDeviceActivityRegistrar(
+        blockItemPersistenceManager: manager,
+        shieldManager: LiveShieldManager()
+    )
+    let viewModel = BlockListPickerSheetViewModel(
+        deviceActivityRegistrar: registrar,
+        blockItemPersistenceManager: manager
+    )
     
     var randomBlockItem: ProtectedBlockItem {
         ProtectedBlockItem(

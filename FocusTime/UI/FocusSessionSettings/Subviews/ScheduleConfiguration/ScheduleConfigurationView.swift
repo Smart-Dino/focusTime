@@ -185,49 +185,51 @@ struct ScheduleConfigurationView: View {
                 set: viewModel.dismissSheet
             )
         ) { sheetType in
-            switch sheetType {
-            case .durationPicker:
-                DurationPickerSheetView(
-                    hours: .binding(
-                        get: viewModel.state.durationHours,
-                        set: viewModel.setHours(hours:)
-                    ),
-                    minutes: .binding(
-                        get: viewModel.state.durationMinutes,
-                        set: viewModel.setMinutes(minutes:)
-                    ),
-                    title: Constants.Strings.durationPickerTitle,
-                    subtitle: Constants.Strings.durationPickerSubtitle
-                )
-                .presentationDetents([.height(FocusSessionView.Constants.Layout.sheetHeight)])
-                
-            case .startTimePicker:
-                TimePickerSheetView(
-                    selectedDate: .binding(
-                        get: viewModel.state.startTime,
-                        set: viewModel.setStartTime(startTime:)
-                    ),
-                    title: Constants.Strings.startTimeTitle,
-                    subtitle: Constants.Strings.startTimeSubtitle,
-                    minuteInterval: Constants.DefaultValues.minuteInterval
-                )
-                .presentationDetents([.height(FocusSessionView.Constants.Layout.sheetHeight)])
-                
-            case .endTimePicker:
-                TimePickerSheetView(
-                    selectedDate: .binding(
-                        get: viewModel.state.endTime,
-                        set: viewModel.setEndTime(endTime:)
-                    ),
-                    title: Constants.Strings.endTimeTitle,
-                    subtitle: Constants.Strings.endTimeSubtitle,
-                    minuteInterval: Constants.DefaultValues.minuteInterval
-                )
-                .presentationDetents([.height(FocusSessionView.Constants.Layout.sheetHeight)])
-                
-            case .appBlockerSheet(let viewModel):
-                BlockListPickerSheetView(viewModel: viewModel)
-                    .presentationDetents([.large])
+            NavigationStack {
+                switch sheetType {
+                case .durationPicker:
+                    DurationPickerSheetView(
+                        hours: .binding(
+                            get: viewModel.state.durationHours,
+                            set: viewModel.setHours(hours:)
+                        ),
+                        minutes: .binding(
+                            get: viewModel.state.durationMinutes,
+                            set: viewModel.setMinutes(minutes:)
+                        ),
+                        title: Constants.Strings.durationPickerTitle,
+                        subtitle: Constants.Strings.durationPickerSubtitle
+                    )
+                    .presentationDetents([.height(FocusSessionView.Constants.Layout.sheetHeight)])
+                    
+                case .startTimePicker:
+                    TimePickerSheetView(
+                        selectedDate: .binding(
+                            get: viewModel.state.startTime,
+                            set: viewModel.setStartTime(startTime:)
+                        ),
+                        title: Constants.Strings.startTimeTitle,
+                        subtitle: Constants.Strings.startTimeSubtitle,
+                        minuteInterval: Constants.DefaultValues.minuteInterval
+                    )
+                    .presentationDetents([.height(FocusSessionView.Constants.Layout.sheetHeight)])
+                    
+                case .endTimePicker:
+                    TimePickerSheetView(
+                        selectedDate: .binding(
+                            get: viewModel.state.endTime,
+                            set: viewModel.setEndTime(endTime:)
+                        ),
+                        title: Constants.Strings.endTimeTitle,
+                        subtitle: Constants.Strings.endTimeSubtitle,
+                        minuteInterval: Constants.DefaultValues.minuteInterval
+                    )
+                    .presentationDetents([.height(FocusSessionView.Constants.Layout.sheetHeight)])
+                    
+                case .appBlockerSheet(let viewModel):
+                    BlockListPickerSheetView(viewModel: viewModel)
+                        .presentationDetents([.large])
+                }
             }
         }
     }
