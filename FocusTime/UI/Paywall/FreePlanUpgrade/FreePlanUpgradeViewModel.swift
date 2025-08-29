@@ -15,6 +15,8 @@ final class FreePlanUpgradeViewModel {
     // MARK: - Nested declarations
     struct State {
         let requestedProductID: String
+        
+        var proState: ProState
         var superState: SuperPaywallViewModel.State
         
         // Dynamic strings
@@ -24,9 +26,11 @@ final class FreePlanUpgradeViewModel {
         
         init(
             requestedProductID: String,
+            proState: ProState,
             superState: SuperPaywallViewModel.State = .init()
         ) {
             self.requestedProductID = requestedProductID
+            self.proState = proState
             self.superState = superState
         }
     }
@@ -47,7 +51,6 @@ final class FreePlanUpgradeViewModel {
         self.state = state
         self.superPaywallVM = superPaywallVM
         self.flowDelegate = flowDelegate
-        superPaywallVM.delegate = self
         
         setupView()
     }
@@ -128,17 +131,15 @@ final class FreePlanUpgradeViewModel {
     func viewAllPlans() {
         flowDelegate?.paywallDidRequestPlanSelection()
     }
-}
-
-extension FreePlanUpgradeViewModel: SuperPaywallViewModelDelegate {
-    func didChangeUserEntitlementStatus(isPro: Bool) {
+    
+    func onChangeOfIsPro() {
         Task {
             await self.superPaywallVM.updatePurchaseResultForSelectedProduct(
                 state: self.state.superState
             )
             updateUIBasedOnPurchaseResult()
             
-            if isPro { flowDelegate?.paywallDidRequestDismissal() }
+            if state.proState.status.isPro { flowDelegate?.paywallDidRequestDismissal() }
         }
     }
 }

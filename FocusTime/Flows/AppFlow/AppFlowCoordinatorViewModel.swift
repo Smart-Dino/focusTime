@@ -122,7 +122,7 @@ final class AppFlowCoordinatorViewModel {
     func showFreePlanCoverIfNeeded() async {
         guard let paymentManager else { return }
         
-        guard await !paymentManager.isPro && state.screenCover == nil else { return }
+        guard !paymentManager.state.status.isPro && state.screenCover == nil else { return }
         
         if let viewModel = makeFreePlanUpgradeViewModel(
             requestedProductID: StoreKitProductIdentifiers.trialableWeekly.id
@@ -196,29 +196,30 @@ final class AppFlowCoordinatorViewModel {
     
     // Paywalls
     private func makeFreePlanUpgradeViewModel(requestedProductID: String) -> FreePlanUpgradeViewModel? {
-        guard let superPaywallVM else { return nil }
+        guard let superPaywallVM, let paymentManager else { return nil }
         
         return FreePlanUpgradeViewModel(
-            state: .init(requestedProductID: requestedProductID),
+            state: .init(requestedProductID: requestedProductID, proState: paymentManager.state),
             superPaywallVM: superPaywallVM,
             flowDelegate: self
         )
     }
     
     private func makeOnboardingPaywallViewModel(requestedProductID: String) -> OnboardingPaywallViewModel? {
-        guard let superPaywallVM else { return nil }
+        guard let superPaywallVM, let paymentManager else { return nil }
         
         return OnboardingPaywallViewModel(
-            state: .init(requestedProductID: requestedProductID),
+            state: .init(requestedProductID: requestedProductID, proState: paymentManager.state),
             superPaywallVM: superPaywallVM,
             flowDelegate: self
         )
     }
     
     private func makePlanSelectionPaywallViewModel() -> PlanSelectionPaywallViewModel? {
-        guard let superPaywallVM else { return nil }
+        guard let superPaywallVM, let paymentManager else { return nil }
         
         return PlanSelectionPaywallViewModel(
+            state: .init(proState: paymentManager.state),
             superPaywallVM: superPaywallVM,
             flowDelegate: self
         )

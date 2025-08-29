@@ -104,6 +104,9 @@ struct PlanSelectionPaywallView: View {
             actions: { /* OK dismissal button by default */ },
             message: { Text(viewModel.state.superState.error?.localizedDescription ?? String()) }
         )
+        .onChange(of: viewModel.state.proState.status) {
+            viewModel.onChangeOfIsPro()
+        }
     }
     
     // MARK: - Computed properties
@@ -167,7 +170,7 @@ struct PlanSelectionPaywallView: View {
     NavigationStack {
         PlanSelectionPaywallView(
             viewModel: .init(
-                superPaywallVM: .init(paymentManager: paymentManager),
+                state: .init(proState: paymentManager.state), superPaywallVM: .init(paymentManager: paymentManager),
                 flowDelegate: nil
             )
         )
@@ -180,7 +183,7 @@ struct PlanSelectionPaywallView: View {
     NavigationStack {
         PlanSelectionPaywallView(
             viewModel: .init(
-                superPaywallVM: .init(paymentManager: paymentManager),
+                state: .init(proState: paymentManager.state), superPaywallVM: .init(paymentManager: paymentManager),
                 flowDelegate: nil
             )
         )

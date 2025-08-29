@@ -60,6 +60,9 @@ struct FreePlanUpgradeView: View {
             actions: { /* OK dismissal button by default */ },
             message: { Text(viewModel.state.superState.error?.localizedDescription ?? String()) }
         )
+        .onChange(of: viewModel.state.proState.status) {
+            viewModel.onChangeOfIsPro()
+        }
     }
     
     /// Text to upsell the user.
@@ -112,7 +115,7 @@ struct FreePlanUpgradeView: View {
         NavigationStack {
             FreePlanUpgradeView(
                 viewModel: .init(
-                    state: .init(requestedProductID: productID),
+                    state: .init(requestedProductID: productID, proState: paymentManager.state),
                     superPaywallVM: .init(paymentManager: paymentManager),
                     flowDelegate: nil
                 )
@@ -130,7 +133,7 @@ struct FreePlanUpgradeView: View {
         NavigationStack {
             FreePlanUpgradeView(
                 viewModel: .init(
-                    state: .init(requestedProductID: productID),
+                    state: .init(requestedProductID: productID, proState: paymentManager.state),
                     superPaywallVM: .init(paymentManager: paymentManager),
                     flowDelegate: nil
                 )
