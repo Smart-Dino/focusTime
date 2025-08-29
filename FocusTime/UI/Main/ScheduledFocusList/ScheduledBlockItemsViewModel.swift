@@ -55,7 +55,7 @@ final class ScheduledBlockItemsViewModel {
                 let newItems = try await blockItemPersistenceManager.fetchPaginated(
                     page: state.page,
                     amountPerPage: state.amountPerPage
-                )
+                ).filter(\.isScheduled)
 
                 let existingIDs = Set(state.items.map(\.id))
                 state.items.append(contentsOf: newItems.filter { !existingIDs.contains($0.id) })

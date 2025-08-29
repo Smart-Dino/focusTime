@@ -23,6 +23,7 @@ final class FocusSessionViewModel {
     @MainActor
     struct State {
         var error: Error?
+        var isDeletionAlertPresented: Bool = false
         
         let presets: [FocusPreset] = FocusPreset.allCases
         let mode: FocusSessionMode
@@ -67,6 +68,10 @@ final class FocusSessionViewModel {
         var isScheduled: Bool {
             if case .scheduled = scheduleConfigViewModel.state.blockItem.type { return true }
             return false
+        }
+        
+        var isItemScheduled: Bool {
+            scheduleConfigViewModel.state.blockItem.isScheduled
         }
     }
     
@@ -140,11 +145,32 @@ final class FocusSessionViewModel {
     
     func startFocusingTapped() async throws {
         do {
-            try await deviceActivityRegistrar.registerActivity(during: state.scheduleConfigViewModel.state.blockItem)
+            let scheduleItem = state.scheduleConfigViewModel.state.blockItem
+            if state.isItemScheduled {
+                try await deviceActivityRegistrar.unregisterActivity(during: scheduleItem)
+            } else {
+                try await deviceActivityRegistrar.registerActivity(during: scheduleItem)
+            }
         } catch {
             state.error = error
             throw error
         }
+    }
+    
+    func deleteButtonTapped() async throws {
+        do {
+            let item = state.scheduleConfigViewModel.state.blockItem
+            try await blockItemPersistenceManager.delete(blockItem: item)
+            
+            setDeletionAlertPresentation(false)
+        } catch {
+            state.error = error
+            throw error
+        }
+    }
+    
+    func setDeletionAlertPresentation(_ isPresented: Bool) {
+        state.isDeletionAlertPresented = isPresented
     }
     
     func setErrorVisibility(_ isVisible: Bool) {

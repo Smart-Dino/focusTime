@@ -29,7 +29,7 @@ struct FocusSessionView: View {
                 
                 if case .editBlockList = viewModel.state.mode {
                     Button(role: .destructive) {
-                        #warning("No implementation")
+                        viewModel.setDeletionAlertPresentation(true)
                     } label: {
                         Text("Delete Preset")
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -51,6 +51,25 @@ struct FocusSessionView: View {
             actions: { /* OK dismissal button by default */ },
             message: { Text(viewModel.state.error?.localizedDescription ?? String()) }
         )
+        .alert(
+            "Are you sure you want to delete this item?",
+            isPresented: Binding(
+                get: { viewModel.state.isDeletionAlertPresented },
+                set: { viewModel.setDeletionAlertPresentation($0) }
+            ),
+            actions: {
+                Button("Delete", role: .destructive) {
+                    Task {
+                        try await viewModel.deleteButtonTapped()
+                        dismiss.callAsFunction()
+                    }
+                }
+                Button("Cancel", role: .cancel) {
+                    viewModel.setDeletionAlertPresentation(false)
+                }
+            },
+            message: { Text(viewModel.state.error?.localizedDescription ?? String()) }
+        )
         .navigationTitle(Constants.Strings.navigationTitle)
         .navigationBarTitleDisplayMode(.inline)
         .safeAreaInset(edge: .bottom) {
@@ -68,6 +87,14 @@ struct FocusSessionView: View {
                         // Start Focusing button (only in editing + duration mode)
                         if case .editBlockList = viewModel.state.mode, viewModel.state.isDurationSchedule {
                             Button("Start Focusing") {
+                                Task {
+                                    try await viewModel.startFocusingTapped()
+                                    dismiss.callAsFunction()
+                                }
+                            }
+                            .buttonStyle(.ftAction)
+                        } else if case .editBlockList = viewModel.state.mode, viewModel.state.isScheduled {
+                            Button(viewModel.state.isItemScheduled ? "Deactivate Schedule" : "Activate Schedule") {
                                 Task {
                                     try await viewModel.startFocusingTapped()
                                     dismiss.callAsFunction()
