@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import ManagedSettings
 
 enum SharedAppValues {
     static let appGroupIdentifier = "group.org.dino.smart.FocusTime"
@@ -28,6 +29,12 @@ enum SharedAppValues {
     static let activityRegistrarFallbackInterval: Int = 15 * 60
     
     static let amountOfItemsPerPage: Int = 100
+    
+    @MainActor
+    enum FreeUserLimits {
+        static let maximumAmountOfBlocks = 1
+        static let defaultFamilyActivitySelection: ShieldSettings.ActivityCategoryPolicy<Application> = .all()
+    }
     
     enum DefaultsKeys: String {
         case isOnboardingFinished = "IS_ONBOARDING_FINISHED"
