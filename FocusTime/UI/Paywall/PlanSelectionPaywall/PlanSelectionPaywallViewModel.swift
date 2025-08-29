@@ -52,7 +52,6 @@ final class PlanSelectionPaywallViewModel {
         Task {
             await fetchProducts()
             selectFirstProductIfNeeded()
-            await checkIfUserIsEligibleForFreeTrial()
             configureBottomSectionForSelectedProduct()
         }
     }
@@ -81,10 +80,6 @@ final class PlanSelectionPaywallViewModel {
         await superPaywallVM.fetchProducts(state: state.superState)
     }
     
-    func checkIfUserIsEligibleForFreeTrial() async {
-        await superPaywallVM.isUserEligibleForTrial(state: state.superState)
-    }
-    
     func selectFirstProductIfNeeded() {
         superPaywallVM.selectFirstProductIfNeeded(state: state.superState)
     }
@@ -100,7 +95,7 @@ final class PlanSelectionPaywallViewModel {
         if product.trialPeriod != nil && state.superState.isEligibleForIntro {
             // Product is trialable and the user is eligible for trial
             state.primaryButtonTitle = State.stringConstants.startFreeTrial
-            state.subscribeButtonTerms = State.stringConstants.noPaymentMessage
+            state.subscribeButtonTerms = product.trialPeriodDescription ?? product.priceString
         } else if product.trialPeriod == nil || !state.superState.isEligibleForIntro {
             // No trial on product or it is already used
             let periodDesc = product.subscriptionPeriodDescription ?? State.stringConstants.paidOnce

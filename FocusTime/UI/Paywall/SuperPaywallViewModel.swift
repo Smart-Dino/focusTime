@@ -124,6 +124,14 @@ final class SuperPaywallViewModel {
             try await paymentManager.reloadData()
             let products = await paymentManager.products
             state.allProducts = products
+            
+            
+            // So far we only have one subscriptions group in our app,
+            // so checking one product would automatically check if the user
+            // is eligible for any type of introductory offer
+            if let first = products.first {
+                state.isEligibleForIntro = try await paymentManager.eligibleForIntro(product: first)
+            }
         } catch {
             state.error = error
         }
@@ -137,22 +145,6 @@ final class SuperPaywallViewModel {
         let result: FTProduct.PurchaseResult? = isPurchased ? .success : nil
         state.purchaseResult = result
     }
-    
-    // So far we only have one subscriptions group in our app,
-    // so checking one product would automatically check if the user
-    // is eligible for any type of introductory offer
-    func isUserEligibleForTrial(state: State) async {
-        guard let product = state.selectedProduct else {
-            state.error = PaymentError.productNotFound
-            return
-        }
-        do {
-            state.isEligibleForIntro = try await paymentManager.eligibleForIntro(product: product)
-        } catch {
-            state.error = PaymentError.eligibilityCheckFail
-        }
-    }
-    
     
     func subscribeToCurrentRequestedProduct(state: State) async {
         guard let product = state.selectedProduct else {

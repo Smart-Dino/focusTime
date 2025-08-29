@@ -78,10 +78,20 @@ extension OnboardingPaywallView {
         }
         
         // MARK: - Strings
-        enum Strings {
+        enum Strings {            
             // Purchase button states
-            static let tryButtonTitle = String(localized: "onboarding_paywall_try_free_and_subscribe_button", table: "PaywallLocalizable")
-            static let subscribeButtonTitle = SharedConstants.Strings.subscribeTitle
+            static func tryButtonTitle(product: FTProduct) -> String{
+                let price = Decimal(0).formatted(product.priceFormatStyle)
+                let formatString = String(localized: "free_plan_upgrade_try_for_price", table: "PaywallLocalizable")
+                return String(format: formatString, price)
+            }
+            
+            static func subscribeButtonTitle(product: FTProduct) -> String {
+                let price = product.priceString
+                let formatString = String(localized: "free_plan_upgrade_subscribe_for_price", table: "PaywallLocalizable")
+                return String(format: formatString, price)
+            }
+            
             static let pendingTitle = SharedConstants.Strings.pendingTitle
             static let subscribedTitle = SharedConstants.Strings.subscribedTitle
             

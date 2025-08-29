@@ -28,26 +28,24 @@ struct FreePlanUpgradeView: View {
             .overlay {
                 Color.ftMainBlue.opacity(0.1)
             }
+            .ignoresSafeArea()
             // VStack to push the elements down with a spacer.
-            VStack {
+            VStack(spacing: Constants.Spacings.offerView) {
                 Spacer()
-                VStack(spacing: Constants.Spacings.offerView) {
-                    upgradePromptSection
-                    
-                    actionButtons
-                        .padding(.vertical)
-                    
-                    SubscriptionUtilityLinksView(
-                        viewModel: .init(
-                            paymentManager: viewModel.getCurrentPaymentManager()
-                        )
+                upgradePromptSection
+                
+                actionButtons
+                    .padding(.vertical)
+                
+                SubscriptionUtilityLinksView(
+                    viewModel: .init(
+                        paymentManager: viewModel.getCurrentPaymentManager()
                     )
-                }
-                .padding()
-                .padding(.bottom) // Padding, so we don't hit the safe area
+                )
             }
+            .padding()
+            .containerRelativeFrame([.vertical])
         }
-        .ignoresSafeArea()
         // Anything beyond xxLarge makes the UI look really bad.
         .dynamicTypeSize(...DynamicTypeSize.xxLarge)
         .toolbar {
