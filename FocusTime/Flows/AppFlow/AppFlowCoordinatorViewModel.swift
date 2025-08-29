@@ -185,9 +185,14 @@ final class AppFlowCoordinatorViewModel {
     }
     
     private func makeMainFlowCoordinatorViewModel() -> MainFlowCoordinatorViewModel? {
-        guard let blockItemPersistenceManager, let deviceActivityRegistrar else { return nil }
+        guard let blockItemPersistenceManager,
+              let deviceActivityRegistrar,
+              let paymentManager else {
+            return nil
+        }
         
         return MainFlowCoordinatorViewModel(
+            state: .init(currentTabScreen: .none, proState: paymentManager.state),
             deviceActivityRegistrar: deviceActivityRegistrar,
             blockItemPersistenceManager: blockItemPersistenceManager,
             appFlowDelegate: self

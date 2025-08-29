@@ -31,7 +31,7 @@ struct MainFlowCoordinatorView: View {
             }
             .toolbar(.visible)
             .toolbar {
-                if case .home = viewModel.state.currentTabScreen {
+                if case .home = viewModel.state.currentTabScreen, !viewModel.state.proState.status.isPro {
                     ToolbarItem {
                         FTProUpgradeButtonView {
                             viewModel.requestPaywall()
@@ -97,9 +97,11 @@ struct MainFlowCoordinatorView: View {
     let factory = MockPersistenceStoreFactory()
     let manager = PreviewData.mockBlockItemPersistenceManager
     let registrar = PreviewData.mockActivityRegistrar
+    let payment = MockPaymentManagerWithPurchaseError()
     
     MainFlowCoordinatorView(
         viewModel: .init(
+            state: .init(currentTabScreen: .none, proState: payment.state),
             deviceActivityRegistrar: registrar,
             blockItemPersistenceManager: manager,
             appFlowDelegate: nil

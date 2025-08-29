@@ -78,6 +78,8 @@ final class MainFlowCoordinatorViewModel {
         var currentTabScreen: MainTabScreens
         var tabViewModels: [MainTabScreens] = .init()
         
+        var proState: ProState
+        
         let debugViewCountGoal: Int = 5
         var debugViewCount: Int = 0
         var nextNavigationScreen: MainFlowNavigationRoute?
@@ -90,10 +92,8 @@ final class MainFlowCoordinatorViewModel {
     private let blockItemPersistenceManager: BlockItemPersistenceManager
     weak var appFlowDelegate: MainFlowDelegate?
     
-    #warning("Find out how we would wire up the isPro property to here")
-    
     init(
-        state: State = State(currentTabScreen: .none),
+        state: State,
         timer: FTTimer = ConcurrencyTimer(),
         deviceActivityRegistrar: DeviceActivityRegistrar,
         blockItemPersistenceManager: BlockItemPersistenceManager,
