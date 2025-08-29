@@ -31,9 +31,9 @@ struct FocusSessionView: View {
                     Button(role: .destructive) {
                         viewModel.setDeletionAlertPresentation(true)
                     } label: {
-                        Text("Delete Preset")
+                        Text(Constants.Strings.deletePresetButtonTitle)
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .rowStyle(height: 50)
+                            .rowStyle(height: Constants.Layout.deleteButtonHeight)
                             .padding(.horizontal)
                             .contentShape(.rect)
                     }
@@ -52,19 +52,19 @@ struct FocusSessionView: View {
             message: { Text(viewModel.state.error?.localizedDescription ?? String()) }
         )
         .alert(
-            "Are you sure you want to delete this item?",
+            Constants.Strings.deleteConfirmationAlertTitle,
             isPresented: Binding(
                 get: { viewModel.state.isDeletionAlertPresented },
                 set: { viewModel.setDeletionAlertPresentation($0) }
             ),
             actions: {
-                Button("Delete", role: .destructive) {
+                Button(Constants.Strings.deleteConfirmationAlertDeleteButton, role: .destructive) {
                     Task {
                         try await viewModel.deleteButtonTapped()
                         dismiss.callAsFunction()
                     }
                 }
-                Button("Cancel", role: .cancel) {
+                Button(Constants.Strings.deleteConfirmationAlertCancelButton, role: .cancel) {
                     viewModel.setDeletionAlertPresentation(false)
                 }
             },
@@ -86,7 +86,7 @@ struct FocusSessionView: View {
                     VStack {
                         // Start Focusing button (only in editing + duration mode)
                         if case .editBlockList = viewModel.state.mode, viewModel.state.isDurationSchedule {
-                            Button("Start Focusing") {
+                            Button(Constants.Strings.startFocusingButtonTitle) {
                                 Task {
                                     try await viewModel.startFocusingTapped()
                                     dismiss.callAsFunction()
@@ -94,7 +94,7 @@ struct FocusSessionView: View {
                             }
                             .buttonStyle(.ftAction)
                         } else if case .editBlockList = viewModel.state.mode, viewModel.state.isScheduled {
-                            Button(viewModel.state.isItemScheduled ? "Deactivate Schedule" : "Activate Schedule") {
+                            Button(viewModel.state.isItemScheduled ? Constants.Strings.deactivateScheduleButtonTitle : Constants.Strings.activateScheduleButtonTitle) {
                                 Task {
                                     try await viewModel.startFocusingTapped()
                                     dismiss.callAsFunction()
@@ -105,7 +105,7 @@ struct FocusSessionView: View {
                         
                         // Save button (editing mode or scheduled)
                         if !viewModel.state.isStartButtonDisplayed || viewModel.state.isScheduled {
-                            Button("Save") {
+                            Button(Constants.Strings.saveButtonTitle) {
                                 Task {
                                     try await viewModel.saveTapped()
                                     dismiss.callAsFunction()
