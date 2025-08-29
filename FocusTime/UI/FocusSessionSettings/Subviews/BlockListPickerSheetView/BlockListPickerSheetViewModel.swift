@@ -8,32 +8,21 @@
 import Foundation
 import FamilyControls
 
+enum BlockListPickerSheetError: LocalizedError {
+    case emptySelection
+    
+    var errorDescription: String {
+        switch self {
+        case .emptySelection:
+            String(localized: "block_list_picker_error_empty_selection", table: "ErrorLocalizable")
+        }
+    }
+}
+
 @MainActor
 protocol BlockListPickerSheetDelegate: AnyObject {
     func didFinishSelectionWith(_ selection: FamilyActivitySelection)
 }
-
-enum BlockListPickerSheetViewModelNavigationRoute: Equatable, Hashable {
-    case focusSession(_ viewModel: FocusSessionViewModel)
-    
-    var id: Self { self }
-    
-    static func == (lhs: BlockListPickerSheetViewModelNavigationRoute, rhs: BlockListPickerSheetViewModelNavigationRoute) -> Bool {
-        switch (lhs, rhs) {
-        case let (.focusSession(lVM), .focusSession(rVM)):
-            lVM === rVM
-        }
-    }
-    
-    func hash(into hasher: inout Hasher) {
-        switch self {
-        case let .focusSession(vm):
-            hasher.combine(1)
-            hasher.combine(ObjectIdentifier(vm))
-        }
-    }
-}
-
 
 @MainActor
 @Observable
@@ -44,13 +33,13 @@ final class BlockListPickerSheetViewModel {
         var finalSelection: FamilyActivitySelection = FamilyActivitySelection()
         var isFamilyActivitySheetPresented: Bool = false
         
+        var editedItem: ProtectedBlockItem? = nil
+        
         var page = 0
         let amountPerPage = SharedAppValues.amountOfItemsPerPage
         
         var selectedBlockItems: Set<ProtectedBlockItem> = []
         var blockItems: [ProtectedBlockItem] = []
-        
-        var nextNavigationScreen: DraftsBlockItemListViewNavigationRoute?
     }
     
     private(set) var state: State
@@ -77,11 +66,26 @@ final class BlockListPickerSheetViewModel {
         }
     }
     
-    func setNextNavigationScreen(_ showing: Bool) {
-        if !showing {
-            state.nextNavigationScreen = nil
-            reloadItems()
+    func setEditingItemSelectionVisibility(_ isVisible: Bool) {
+        if !isVisible {
+            Task {
+                do {
+                    guard let editedItem = state.editedItem else { return }
+                    state.editedItem = nil
+                    
+                    guard !editedItem.blockedContent.isEmpty else { throw BlockListPickerSheetError.emptySelection }
+                    
+                    try await blockItemPersistenceManager.editBlockItem(blockItem: editedItem)
+                    reloadItems()
+                } catch {
+                    state.error = error
+                }
+            }
         }
+    }
+    
+    func setEditedItem(_ item: ProtectedBlockItem) {
+        state.editedItem = item
     }
     
     func setIsFamilyActivitySheetPresented(_ isPresented: Bool) {
@@ -90,6 +94,10 @@ final class BlockListPickerSheetViewModel {
     
     func setFamilyActivitySelection(_ selection: FamilyActivitySelection) {
         state.finalSelection = selection
+    }
+    
+    func setFamilyActivityItemSelection(_ selection: FamilyActivitySelection) {
+        state.editedItem?.blockedContent = selection
     }
     
     func isSelected(_ blockItem: ProtectedBlockItem) -> Bool {
@@ -165,18 +173,6 @@ final class BlockListPickerSheetViewModel {
         if blockItem.id == state.blockItems.last?.id {
             fetchNextPage()
         }
-    }
-    
-    func navigateToFocusSessionEditing(list: ProtectedBlockItem) {
-        state.nextNavigationScreen = .focusSession(makeFocusSessionViewModel(mode: .editBlockList(list)))
-    }
-    
-    private func makeFocusSessionViewModel(mode: FocusSessionMode) -> FocusSessionViewModel {
-        FocusSessionViewModel(
-            mode: mode,
-            blockItemPersistenceManager: blockItemPersistenceManager,
-            deviceActivityRegistrar: deviceActivityRegistrar
-        )
     }
     
     private func openFamilyActivitySelectionIfNeeded() {

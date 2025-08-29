@@ -66,16 +66,6 @@ struct BlockListPickerSheetView: View {
                 set: { viewModel.setFamilyActivitySelection($0) }
             )
         )
-        .navigationDestination(isPresented: .init(
-            get: { viewModel.state.nextNavigationScreen != nil },
-            set: { viewModel.setNextNavigationScreen($0) }
-        )) {
-            switch viewModel.state.nextNavigationScreen {
-            case .focusSession(let viewModel):
-                FocusSessionView(viewModel: viewModel)
-            case .none: Text("No view")
-            }
-        }
         .onChange(of: viewModel.state.isFamilyActivitySheetPresented) {
             if !viewModel.state.isFamilyActivitySheetPresented && viewModel.state.blockItems.isEmpty {
                 viewModel.saveSelection()
@@ -119,13 +109,24 @@ struct BlockListPickerSheetView: View {
                                 viewModel.toggleBlockItem(blockItem, isSelected: isSelected)
                             }
                         )) {
-                            viewModel.navigateToFocusSessionEditing(list: blockItem)
+                            viewModel.setEditedItem(blockItem)
                         }
                         .padding(.horizontal)
                         .onAppear { viewModel.hasReachEndOfList(blockItem: blockItem) }
                 }
             }
         }
+        .familyActivityPicker(
+            isPresented: .binding(
+                get: viewModel.state.editedItem != nil,
+                set: viewModel.setEditingItemSelectionVisibility(_:)
+            ),
+            // This does not work with a custom binding initializer.
+            selection: .init(
+                get: { viewModel.state.editedItem?.blockedContent ?? FamilyActivitySelection() },
+                set: { viewModel.setFamilyActivityItemSelection($0) }
+            )
+        )
     }
     
     @ViewBuilder
