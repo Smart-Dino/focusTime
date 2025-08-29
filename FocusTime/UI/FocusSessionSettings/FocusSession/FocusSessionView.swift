@@ -139,10 +139,7 @@ struct FocusSessionView: View {
 // MARK: - Preview
 #Preview("Creation mode") {
     let manager = PreviewData.mockBlockItemPersistenceManager
-    let registrar = LiveDeviceActivityRegistrar(
-        blockItemPersistenceManager: manager,
-        shieldManager: LiveShieldManager()
-    )
+    let registrar = PreviewData.mockActivityRegistrar
     let viewModel = FocusSessionViewModel(
         mode: .addBlockList,
         blockItemPersistenceManager: manager,
@@ -156,10 +153,7 @@ struct FocusSessionView: View {
 
 #Preview("Start focusing mode") {
     let manager = PreviewData.mockBlockItemPersistenceManager
-    let registrar = LiveDeviceActivityRegistrar(
-        blockItemPersistenceManager: manager,
-        shieldManager: LiveShieldManager()
-    )
+    let registrar = PreviewData.mockActivityRegistrar
     let viewModel = FocusSessionViewModel(
         mode: .startFocusing,
         blockItemPersistenceManager: manager,
@@ -173,10 +167,7 @@ struct FocusSessionView: View {
 
 #Preview("Editing mode duration") {
     let manager = PreviewData.mockBlockItemPersistenceManager
-    let registrar = LiveDeviceActivityRegistrar(
-        blockItemPersistenceManager: manager,
-        shieldManager: LiveShieldManager()
-    )
+    let registrar = PreviewData.mockActivityRegistrar
     let viewModel = FocusSessionViewModel(
         mode: .editBlockList(ProtectedBlockItem.mockDuration),
         blockItemPersistenceManager: manager,
@@ -190,10 +181,7 @@ struct FocusSessionView: View {
 
 #Preview("Editing mode scheduled") {
     let manager = PreviewData.mockBlockItemPersistenceManager
-    let registrar = LiveDeviceActivityRegistrar(
-        blockItemPersistenceManager: manager,
-        shieldManager: LiveShieldManager()
-    )
+    let registrar = PreviewData.mockActivityRegistrar
     let viewModel = FocusSessionViewModel(
         mode: .editBlockList(ProtectedBlockItem.mockScheduled),
         blockItemPersistenceManager: manager,

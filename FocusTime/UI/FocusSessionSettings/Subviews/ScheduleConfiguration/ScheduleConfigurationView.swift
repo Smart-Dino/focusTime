@@ -237,10 +237,7 @@ struct ScheduleConfigurationView: View {
 
 #Preview {
     let manager = PreviewData.mockBlockItemPersistenceManager
-    let registrar = LiveDeviceActivityRegistrar(
-        blockItemPersistenceManager: manager,
-        shieldManager: LiveShieldManager()
-    )
+    let registrar = PreviewData.mockActivityRegistrar
     ScheduleConfigurationView(
         viewModel: ScheduleConfigurationViewModel(
             deviceActivityRegistrar: registrar,

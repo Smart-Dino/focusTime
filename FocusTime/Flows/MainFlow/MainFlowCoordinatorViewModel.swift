@@ -10,15 +10,12 @@ import Foundation
 import FocusTimeUI
 
 enum MainFlowNavigationRoute: Equatable, Hashable {
-    case shieldDebug(_ viewModel: ShieldDebugViewModel)
     case focusSession(_ viewModel: FocusSessionViewModel)
     
     var id: Self { self }
     
     static func == (lhs: MainFlowNavigationRoute, rhs: MainFlowNavigationRoute) -> Bool {
         switch (lhs, rhs) {
-        case let (.shieldDebug(lVM), .shieldDebug(rVM)):
-            lVM === rVM // compare by reference if class
         case let (.focusSession(lVM), .focusSession(rVM)):
             lVM === rVM // compare by reference if class
         default:
@@ -28,9 +25,6 @@ enum MainFlowNavigationRoute: Equatable, Hashable {
     
     func hash(into hasher: inout Hasher) {
         switch self {
-        case let .shieldDebug(vm):
-            hasher.combine(0)
-            hasher.combine(ObjectIdentifier(vm)) // hash the instance reference
         case let .focusSession(vm):
             hasher.combine(1)
             hasher.combine(ObjectIdentifier(vm))
@@ -80,8 +74,6 @@ final class MainFlowCoordinatorViewModel {
         
         var proState: ProState
         
-        let debugViewCountGoal: Int = 5
-        var debugViewCount: Int = 0
         var nextNavigationScreen: MainFlowNavigationRoute?
     }
     
@@ -135,29 +127,12 @@ final class MainFlowCoordinatorViewModel {
         }
     }
     
-    func showDebugView() {
-        state.nextNavigationScreen = .shieldDebug(makeShieldDebugViewModel())
-    }
-    
     func showNewBlockListView() {
         state.nextNavigationScreen = .focusSession(makeFocusSessionViewModel())
     }
     
     func setTabScreen(_ screen: State.MainTabScreens) {
-        if state.currentTabScreen == screen {
-            state.debugViewCount += 1
-        }
-        
-        if state.debugViewCount >= state.debugViewCountGoal {
-            showDebugView()
-            state.debugViewCount = .zero
-        }
-        
         state.currentTabScreen = screen
-    }
-    
-    func makeShieldDebugViewModel() -> ShieldDebugViewModel {
-        ShieldDebugViewModel(blockItemPersistenceManager: blockItemPersistenceManager)
     }
     
     func makeFocusSessionViewModel() -> FocusSessionViewModel {

@@ -55,8 +55,6 @@ struct MainFlowCoordinatorView: View {
                 set: { viewModel.setNextNavigationScreen($0) }
             )) {
                 switch viewModel.state.nextNavigationScreen {
-                case .shieldDebug(let viewModel):
-                    ShieldDebugView(viewModel: viewModel)
                 case .focusSession(let viewModel):
                     FocusSessionView(viewModel: viewModel)
                 case .none:

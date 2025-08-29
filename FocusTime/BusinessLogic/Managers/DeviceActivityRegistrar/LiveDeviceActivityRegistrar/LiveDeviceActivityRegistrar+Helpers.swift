@@ -9,6 +9,20 @@ import Foundation
 import DeviceActivity
 
 extension LiveDeviceActivityRegistrar {
+    func ensureUserCanSchedule() async throws {
+        let trackedActivitiesCount = await centerManager.activities
+            .compactMap { CodableActivityIdentifier(from: $0) }
+            .filter { $0.blockType == .regular }
+            .count
+        
+        let isPro = await proState.status.isPro
+        let allowedAmountOfBlocks = await SharedAppValues.FreeUserLimits.maximumAmountOfBlocks
+        
+        guard isPro || trackedActivitiesCount < allowedAmountOfBlocks else {
+            throw DeviceActivityRegistrarError.noProAccount
+        }
+    }
+    
     // MARK: - Register helpers (duration / regular / fallback)
 
     func registerDurationActivity(
@@ -30,7 +44,7 @@ extension LiveDeviceActivityRegistrar {
 
         let schedule = DeviceActivitySchedule(intervalStart: intervalStart, intervalEnd: intervalEnd, repeats: false)
 
-        let activityName = try createActivityName(for: blockItem, actionType: .regular)
+        let activityName = try createActivityName(for: blockItem, actionType: blockItem.isTemporary == nil ? .regular : .regularTemp)
         try await centerManager.startMonitoring(activityName, during: schedule)
 
         let timeBeforeEnd = forcedDuration ?? originalDuration.rawValue
@@ -49,7 +63,7 @@ extension LiveDeviceActivityRegistrar {
         let overlaps = try await overlapsWithAlreadyRegisteredSchedules(schedule, days: blockItem.days)
         guard overlaps.isEmpty else { throw DeviceActivityRegistrarError.scheduleOverlap(with: overlaps) }
 
-        let activityName = try createActivityName(for: blockItem, actionType: .regular)
+        let activityName = try createActivityName(for: blockItem, actionType: blockItem.isTemporary == nil ? .regular : .regularTemp)
         try await centerManager.startMonitoring(activityName, during: schedule)
     }
 

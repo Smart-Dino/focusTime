@@ -146,7 +146,7 @@ struct DraftsBlockItemListView: View {
 #Preview {
     let factory = MockPersistenceStoreFactory()
     let manager = PreviewData.mockBlockItemPersistenceManager
-    let registrar = LiveDeviceActivityRegistrar(blockItemPersistenceManager: manager, shieldManager: LiveShieldManager())
+    let registrar = PreviewData.mockActivityRegistrar
     
     DraftsBlockItemListView(
         viewModel: .init(

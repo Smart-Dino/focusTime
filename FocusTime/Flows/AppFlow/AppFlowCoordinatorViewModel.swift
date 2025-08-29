@@ -157,11 +157,14 @@ final class AppFlowCoordinatorViewModel {
         let resolvedPaymentManager = await paymentManager
         let resolvedPersistenceManager = await persistenceManager
         
+        let proState = await paymentManager.state
+        
         // Assign to properties.
         self.paymentManager = resolvedPaymentManager
         self.superPaywallVM = SuperPaywallViewModel(paymentManager: resolvedPaymentManager)
         self.blockItemPersistenceManager = resolvedPersistenceManager
         self.deviceActivityRegistrar = LiveDeviceActivityRegistrar(
+            proState: proState,
             blockItemPersistenceManager: resolvedPersistenceManager,
             shieldManager: shieldManager
         )
