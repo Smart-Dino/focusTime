@@ -115,44 +115,37 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
     }
     
     func fetchClosestOrRunningCurrentScheduled(now: Date) async throws -> ProtectedBlockItem? {
-        let identifiers = await centerManager.monitoredIdentifiers
+        // 1. Fetch all blocks.
+        let blocks = try await store.fetch().filter { !$0.isTemporary }
 
-        // 1. Fetch all monitored blocks.
-        let blocks = try await store.fetch()
-        let runningOrScheduledBlocks = blocks.filter(
-            { $0.state.isActive || identifiers.contains($0.id) }
-        )
-
-        // 2. Return running if found.
-        if let running = runningOrScheduledBlocks.first(where: { $0.state.isActive }) {
+        // 2. Prioritize and return a running block if one exists.
+        if let running = blocks.first(where: { $0.state.isActive }) {
             return running
         }
 
-        let scheduledBlocks = await markScheduled(blocks).filter(\.isScheduled)
-
-        guard !scheduledBlocks.isEmpty else {
-            return nil
+        // 3. Filter for only valid, schedulable blocks.
+        // This removes temporary, cancelled, or non-scheduled items immediately.
+        let scheduledBlocks = await markScheduled(blocks).filter {
+            $0.isScheduled && !$0.isCancelled
         }
 
-        let sortedByStartTime = scheduledBlocks.sorted {
-            guard case .scheduled(let firstStart, _, _, _, _) = $0.type,
-                  case .scheduled(let secondStart, _, _, _, _) = $1.type else {
-                return false
+        // 4. For each block, calculate its next concrete occurrence date after `now`.
+        let upcomingOccurrences = scheduledBlocks.compactMap { block -> (item: ProtectedBlockItem, nextFireDate: Date)? in
+            guard let nextDate = findNextOccurrence(for: block, after: now) else {
+                return nil
             }
-            return firstStart < secondStart
+            return (item: block, nextFireDate: nextDate)
         }
 
-        let currentTimeComponent = try TimeComponents(from: now)
-        if let upcoming = sortedByStartTime.first(where: {
-            guard case .scheduled(let start, _, _, _, _) = $0.type else { return false }
-            return start > currentTimeComponent
-        }) {
-            return upcoming
+        // 5. Find the occurrence that happens soonest.
+        let closestUpcoming = upcomingOccurrences.min {
+            $0.nextFireDate < $1.nextFireDate
         }
 
-        return sortedByStartTime.first(where: { !$0.isCancelled || !$0.isTemporary })
+        // 6. Return the block associated with that closest occurrence.
+        // If no upcoming blocks are found, this will correctly return nil.
+        return closestUpcoming?.item
     }
-
     
     func fetchPaginated(
         page: Int,
@@ -226,5 +219,47 @@ extension LiveBlockItemPersistenceManager {
         }
         
         return items
+    }
+    
+    /// A helper function to find the next valid occurrence of a block after a given date.
+    /// - Parameters:
+    ///   - block: The block item with its schedule days (`.days`) and start time (`.type`).
+    ///   - date: The date to search after (typically `Date()`).
+    /// - Returns: A concrete `Date` for the next scheduled run, or `nil` if none can be found.
+    /// - Note: Uses the user’s current calendar and time zone. If the user changes time zones,
+    ///         the computed next occurrence will shift accordingly.
+    private func findNextOccurrence(for block: ProtectedBlockItem, after date: Date) -> Date? {
+        // Ensure the block is a scheduled type and has days assigned.
+        guard case .scheduled(let startTime, _, _, _, _) = block.type, !block.days.isEmpty else {
+            return nil
+        }
+
+        // Explicitly tie to current time zone to avoid surprises.
+        var calendar = Calendar.current
+        calendar.timeZone = .current
+
+        // Look at today + the next 6 days (1 full week).
+        for dayOffset in 0..<7 {
+            guard let searchDate = calendar.date(byAdding: .day, value: dayOffset, to: date) else {
+                continue
+            }
+
+            let weekdayComponent = calendar.component(.weekday, from: searchDate)
+            guard let weekday = Weekday(rawValue: weekdayComponent), block.days.contains(weekday) else {
+                continue // Not a valid scheduled weekday for this block.
+            }
+
+            // Construct full candidate date with correct year/month/day + time-of-day.
+            var dateComponents = calendar.dateComponents([.year, .month, .day], from: searchDate)
+            let time = startTime.dateComponents
+            dateComponents.hour = time.hour
+            dateComponents.minute = time.minute
+
+            if let candidate = calendar.date(from: dateComponents), candidate > date {
+                return candidate // Short-circuit: return first valid match.
+            }
+        }
+
+        return nil
     }
 }

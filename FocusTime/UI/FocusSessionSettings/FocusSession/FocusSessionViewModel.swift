@@ -49,7 +49,9 @@ final class FocusSessionViewModel {
             
             let blockedContentFilled = !scheduleConfigViewModel.state.blockItem.blockedContent.isEmpty
             
-            return nameFilled && emojiFilled && blockedContentFilled
+            let daysHasAtLeastOneDay = !scheduleConfigViewModel.state.blockItem.days.isEmpty
+            
+            return nameFilled && emojiFilled && blockedContentFilled && daysHasAtLeastOneDay
         }
 
         
@@ -130,6 +132,15 @@ final class FocusSessionViewModel {
         do {
             let savedItem = try await saveSelectedItemToStorage(isTemporary: true)
             try await deviceActivityRegistrar.registerActivity(during: savedItem)
+        } catch {
+            state.error = error
+            throw error
+        }
+    }
+    
+    func startFocusingTapped() async throws {
+        do {
+            try await deviceActivityRegistrar.registerActivity(during: state.scheduleConfigViewModel.state.blockItem)
         } catch {
             state.error = error
             throw error

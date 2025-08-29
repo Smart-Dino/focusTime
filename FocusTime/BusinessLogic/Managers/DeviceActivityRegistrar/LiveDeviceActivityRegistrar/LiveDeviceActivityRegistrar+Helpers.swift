@@ -156,6 +156,7 @@ extension LiveDeviceActivityRegistrar {
     }
 
     func startActivityIfRegisteredDuringIntervalWindow(item: ProtectedBlockItem) async throws {
+        guard item.days.contains(Weekday.currentDay) else { return }
         guard case .scheduled = item.type else { return }
 
         let timeLeftInSeconds = item.type.secondsToIntervalEndIfShouldBeRunning(now: await clock.now)

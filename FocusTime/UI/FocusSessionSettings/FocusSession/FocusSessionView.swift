@@ -68,7 +68,10 @@ struct FocusSessionView: View {
                         // Start Focusing button (only in editing + duration mode)
                         if case .editBlockList = viewModel.state.mode, viewModel.state.isDurationSchedule {
                             Button("Start Focusing") {
-                                #warning("No implementation")
+                                Task {
+                                    try await viewModel.startFocusingTapped()
+                                    dismiss.callAsFunction()
+                                }
                             }
                             .buttonStyle(.ftAction)
                         }
