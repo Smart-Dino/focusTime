@@ -73,8 +73,7 @@ struct MainFlowCoordinatorView: View {
         case .home(let homeViewModel):
             HomeView(viewModel: homeViewModel)
                 .tabItem {
-                    #warning("Unlocalized Strings")
-                    LabeledContent("Home") {
+                    LabeledContent(Constants.Strings.homeTabTitle) {
                         Image(.wavelogo)
                             .renderingMode(.template)
                     }
@@ -83,13 +82,13 @@ struct MainFlowCoordinatorView: View {
         case .drafts(let draftsViewModel):
             DraftsBlockItemListView(viewModel: draftsViewModel)
                 .tabItem {
-                    Label("Blocks", systemImage: "hand.raised")
+                    Label(Constants.Strings.blocksTabTitle, systemImage: "hand.raised")
                     // Prevent system from filling system icons.
                         .environment(\.symbolVariants, .none)
                 }
                 .tag(screen)
         case .none:
-            Text("This view does not seem to have been setup.")
+            Text(Constants.Strings.noView)
         }
     }
 }
