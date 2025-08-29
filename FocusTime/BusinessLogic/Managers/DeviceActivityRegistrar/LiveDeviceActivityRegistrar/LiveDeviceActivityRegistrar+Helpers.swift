@@ -152,7 +152,7 @@ extension LiveDeviceActivityRegistrar {
             }
         }
         
-        return overlapping.filter { !$0.isTemporary }
+        return overlapping.filter { $0.isTemporary == nil }
     }
 
     func startActivityIfRegisteredDuringIntervalWindow(item: ProtectedBlockItem) async throws {
@@ -165,17 +165,33 @@ extension LiveDeviceActivityRegistrar {
         // Create temporary duration block and schedule it immediately.
         var temp = ProtectedBlockItem(
             emoji: "⏳",
-            name: "temp-" + UUID().uuidString,
+            name: UUID().uuidString,
             days: item.days,
             type: .duration(duration: .init(seconds: timeLeft)),
-            isTemporary: true,
+            isTemporary: .relatedTo(blockID: item.id),
             blockedContent: item.blockedContent
         )
 
         try await blockItemPersistenceManager.insert(&temp)
         try await registerDurationActivity(for: temp, forcedDuration: timeLeft)
     }
+    
+    /// Finds and deletes a temporary block associated with a primary block's ID.
+    func cleanupTemporaryBlock(relatedTo originalBlockID: UUID) async throws {
+        let allBlocks = try await blockItemPersistenceManager.fetchTemporary()
 
+        guard let tempBlock = allBlocks.first(where: { block in
+            if case .relatedTo(let relatedID) = block.isTemporary {
+                return relatedID == originalBlockID
+            }
+            return false
+        }) else { return }
+
+        // Use `try?` as cleanup failure shouldn't halt the main cancellation flow.
+        try? await cancelScheduledResume(for: tempBlock)
+        try? await blockItemPersistenceManager.delete(blockItem: tempBlock)
+    }
+    
     static func adjustedEndDate(endDate: Date, suspendedAt: Date?, resumedAt: Date) -> Date {
         guard let suspendedAt else { return endDate }
         let suspendedDuration = resumedAt.timeIntervalSince(suspendedAt)

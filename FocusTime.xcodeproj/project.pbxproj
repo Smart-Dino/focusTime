@@ -124,6 +124,7 @@
 				BusinessLogic/Models/Blocking/BlockItem/Helpers/BlockState.swift,
 				BusinessLogic/Models/Blocking/BlockItem/Helpers/DurationComponents.swift,
 				BusinessLogic/Models/Blocking/BlockItem/Helpers/ScheduleType.swift,
+				BusinessLogic/Models/Blocking/BlockItem/Helpers/TempMode.swift,
 				BusinessLogic/Models/Blocking/BlockItem/Helpers/TimeComponents.swift,
 				BusinessLogic/Models/Blocking/BlockItem/Helpers/Weekday.swift,
 				BusinessLogic/Models/Blocking/BlockItem/ProtectedBlockItem.swift,

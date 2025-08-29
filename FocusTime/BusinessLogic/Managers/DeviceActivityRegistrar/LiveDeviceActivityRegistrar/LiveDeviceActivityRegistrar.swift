@@ -53,8 +53,12 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
     }
 
     func unregisterActivity(during blockItem: ProtectedBlockItem) async throws {
+        // Stop the system-level monitoring.
         let activity = try await getActivityForSchedule(blockItem)
         await centerManager.stopMonitoring([activity])
+
+        // If the block had any related temp blocks to it - remove them.
+        try await cleanupTemporaryBlock(relatedTo: blockItem.id)
     }
 
     func suspendActivity(for blockItem: ProtectedBlockItem) async throws {
@@ -122,24 +126,29 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
     }
     
     func cancelIfRunning(_ blockItem: ProtectedBlockItem) async throws {
-        let now = await clock.now
-        
-        guard blockItem.type.secondsToIntervalEndIfShouldBeRunning(now: now) != nil else {
+        // Only act on blocks that are currently running.
+        guard blockItem.state == .running else {
+            // Attempt to clean up any orphaned temp blocks just in case.
+            try? await cleanupTemporaryBlock(relatedTo: blockItem.id)
             return
         }
 
         try await shieldManager.unblock()
         
-        if blockItem.isTemporary {
+        // If the block itself is temporary, just delete it and we're done.
+        if blockItem.isTemporary != nil {
             try await cancelScheduledResume(for: blockItem)
             try await blockItemPersistenceManager.delete(blockItem: blockItem)
             return
         }
 
+        // This is a permanent block - clean up its associated temporary block first.
+        try await cleanupTemporaryBlock(relatedTo: blockItem.id)
+
         var mutableBlockItem = blockItem
         switch mutableBlockItem.type {
         case .scheduled(let startTime, let endTime, _, let isPaused, let suspendedUntil):
-            // Only update isActive, keep pause state intact.
+            // Set isActive to false to stop the current session without affecting future runs.
             mutableBlockItem.isCancelled = true
             mutableBlockItem.type = .scheduled(
                 startTime: startTime,
@@ -148,14 +157,14 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
                 isPaused: isPaused,
                 suspendedUntil: suspendedUntil
             )
+            
         case .duration(let duration, let suspendedAt, let suspendedUntil, _):
             mutableBlockItem.type = .duration(
                 duration: duration,
                 suspendedAt: suspendedAt,
                 suspendedUntil: suspendedUntil,
-                endDate: nil // Set or clear endDate based on activity.
+                endDate: nil
             )
-            
             try await unregisterActivity(during: mutableBlockItem)
         }
         

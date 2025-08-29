@@ -157,14 +157,10 @@ final class TaskConcentrationViewModel {
             try await deviceActivityRegistrar.suspendActivity(for: state.item, forSeconds: seconds)
         } catch {
             state.error = error
-        }
-    }
-    
-    private func resumeFromBreak() async {
-        do {
-            try await deviceActivityRegistrar.resumeActivity(for: state.item)
-        } catch {
-            state.error = error
+            if state.item.state == .running {
+                moveTo(.focus)
+            }
+            state.timer.startTimer(for: state.item, withSuspensionCountdown: true)
         }
     }
 }

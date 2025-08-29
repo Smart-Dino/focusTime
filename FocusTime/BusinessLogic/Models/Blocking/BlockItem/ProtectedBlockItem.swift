@@ -19,7 +19,7 @@ struct ProtectedBlockItem: ProtectedModel, Hashable, Equatable {
     var days: Set<Weekday>
     var type: ScheduleType
     
-    var isTemporary: Bool
+    var isTemporary: TempMode?
     var isCancelled: Bool
     
     var isScheduled: Bool
@@ -52,7 +52,7 @@ struct ProtectedBlockItem: ProtectedModel, Hashable, Equatable {
         name: String,
         days: Set<Weekday>,
         type: ScheduleType,
-        isTemporary: Bool = false,
+        isTemporary: TempMode? = nil,
         isCancelled: Bool = false,
         isScheduled: Bool = false,
         blockedContent: FamilyActivitySelection

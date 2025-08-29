@@ -54,8 +54,6 @@ struct ScheduleConfigurationView: View {
                         )
                     }
                     .onChange(of: isFocusedEmojiField) {
-                        let isFocusedEmojiField = isFocusedEmojiField
-                        
                         viewModel.clearEmoji(isTextFieldFocused: isFocusedEmojiField)
                         viewModel.updateDelegateEmojiFocusStateStatus(with: isFocusedEmojiField)
                     }

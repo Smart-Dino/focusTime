@@ -141,7 +141,7 @@ struct DeviceActivityHandler: Sendable {
         }
         await unblockAndDeactivateSession(for: blockItem, in: store)
 
-        if blockItem.isTemporary {
+        if blockItem.isTemporary != nil {
             store.delete(model: blockItem)
         }
     }

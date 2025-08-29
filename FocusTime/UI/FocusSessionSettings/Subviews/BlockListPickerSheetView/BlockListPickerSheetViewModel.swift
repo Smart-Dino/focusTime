@@ -57,13 +57,6 @@ final class BlockListPickerSheetViewModel {
     func setFamilyActivitySelection(_ selection: FamilyActivitySelection) {
         state.finalSelection = selection
     }
-
-    
-    func openFamilyActivitySelectionIfNeeded() {
-        if state.blockItems.isEmpty && state.page <= 1 {
-            setIsFamilyActivitySheetPresented(true)
-        }
-    }
     
     func isSelected(_ blockItem: ProtectedBlockItem) -> Bool {
         state.selectedBlockItems.contains(blockItem)
@@ -110,6 +103,7 @@ final class BlockListPickerSheetViewModel {
             }
             
             fetchTask = nil
+            openFamilyActivitySelectionIfNeeded()
         }
     }
     
@@ -120,6 +114,12 @@ final class BlockListPickerSheetViewModel {
     func hasReachEndOfList(blockItem: ProtectedBlockItem) {
         if blockItem.id == state.blockItems.last?.id {
             fetchNextPage()
+        }
+    }
+    
+    private func openFamilyActivitySelectionIfNeeded() {
+        if state.blockItems.isEmpty && state.page <= 1 {
+            setIsFamilyActivitySheetPresented(true)
         }
     }
 }

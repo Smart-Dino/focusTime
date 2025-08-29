@@ -20,6 +20,8 @@ protocol BlockItemPersistenceManager: Actor {
     func fetch(by persistenceIdentifier: PersistentIdentifier) async throws -> ProtectedBlockItem
     func fetch(includeTemporary: Bool) async throws -> [ProtectedBlockItem]
     
+    func fetchTemporary() async throws -> [ProtectedBlockItem]
+    
     func fetchClosestOrRunningCurrentScheduled(now: Date) async throws -> ProtectedBlockItem?
     
     func fetchPaginated(page: Int, amountPerPage: Int) async throws -> [ProtectedBlockItem]

@@ -63,6 +63,9 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
             name: item.name,
             days: item.days,
             type: item.type,
+            isTemporary: item.isTemporary,
+            isCancelled: item.isCancelled,
+            isScheduled: item.isScheduled,
             blockedContent: item.blockedContent
         )
         item = itemCopy
@@ -76,7 +79,7 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
         try await store.delete(id: id)
     }
     
-    /// Applies passed ``ProtectedBlockItem`` to it's corresponding model.
+    /// Applies passed ``ProtectedBlockItem`` to its corresponding model.
     func editBlockItem(blockItem: ProtectedBlockItem) async throws {
         guard let id = blockItem.persistentModelID else { return }
         try await store.updateFields(id: id) { model in
@@ -85,6 +88,8 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
             model.days = blockItem.days
             model.type = blockItem.type
             model.blockedContent = blockItem.blockedContent
+            model.isTemporary = blockItem.isTemporary
+            model.isCancelled = blockItem.isCancelled
         }
     }
     
@@ -110,13 +115,23 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
         if includeTemporary {
             return items
         } else {
-            return items.filter { !$0.isTemporary }
+            return items.filter { $0.isTemporary == nil }
         }
+    }
+    
+    func fetchTemporary() async throws -> [ProtectedBlockItem] {
+        // SwiftData / CoreData do not support Predicate on complex types.
+        // I traded performance for code readability.
+        return try await store
+            .fetch()
+            .filter { $0.isTemporary != nil }
     }
     
     func fetchClosestOrRunningCurrentScheduled(now: Date) async throws -> ProtectedBlockItem? {
         // 1. Fetch all blocks.
-        let blocks = try await store.fetch().filter { !$0.isTemporary }
+        let blocks = try await store.fetch().filter {
+            if case .relatedTo = $0.isTemporary { false } else { true }
+        }
 
         // 2. Prioritize and return a running block if one exists.
         if let running = blocks.first(where: { $0.state.isActive }) {
@@ -152,7 +167,7 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
         amountPerPage: Int
     ) async throws -> [ProtectedBlockItem] {
         let items = try await store.fetch(page: page, amountPerPage: amountPerPage)
-        let filteredFromTemp = items.filter { !$0.isTemporary }
+        let filteredFromTemp = items.filter { $0.isTemporary == nil }
         
         return await markScheduled(filteredFromTemp)
     }
@@ -164,15 +179,14 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
         var allItems: [ProtectedBlockItem] = []
 
         for page in 0...totalPages {
-            let predicate = #Predicate<BlockItem> { model in
-                !model.isTemporary
-            }
-
-            var descriptor = FetchDescriptor<BlockItem>(predicate: predicate)
+            var descriptor = FetchDescriptor<BlockItem>()
             descriptor.fetchOffset = page * packSize
             descriptor.fetchLimit = packSize
 
-            let fetchedBlockItems = try await store.fetch(descriptor: descriptor)
+            let fetchedBlockItems = try await store
+                .fetch(descriptor: descriptor)
+                .filter { $0.isTemporary == nil }
+            
             allItems.append(contentsOf: fetchedBlockItems)
 
             await Task.yield()

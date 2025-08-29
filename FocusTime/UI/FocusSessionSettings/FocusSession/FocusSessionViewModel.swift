@@ -166,7 +166,7 @@ final class FocusSessionViewModel {
         var item = state.scheduleConfigViewModel.state.blockItem
         
         if isTemporary {
-            item.isTemporary = true
+            item.isTemporary = .oneTimeBlock
         }
         
         try await blockItemPersistenceManager.insert(&item)

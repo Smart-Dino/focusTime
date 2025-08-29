@@ -19,7 +19,7 @@ final class BlockItem {
     var days: Set<Weekday>
     var type: ScheduleType
     
-    var isTemporary: Bool // Signals whether this item will have to be removed after use.
+    var isTemporary: TempMode? // Signals whether this item will have to be removed after use.
     var isCancelled: Bool
     // Blocked apps.
     var blockedContent: FamilyActivitySelection
@@ -50,7 +50,7 @@ final class BlockItem {
         emoji: String,
         days: Set<Weekday>,
         type: ScheduleType,
-        isTemporary: Bool = false,
+        isTemporary: TempMode? = nil,
         isCancelled: Bool = false,
         blockedContent: FamilyActivitySelection
     ) {
