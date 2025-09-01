@@ -207,7 +207,9 @@ final class FocusSessionViewModel {
         Task {
             do {
                 let item = state.scheduleConfigViewModel.state.blockItem
-                try await deviceActivityRegistrar.unregisterActivity(during: item)
+                
+                // An item can be unregistered so silently try to unschedule it.
+                try? await deviceActivityRegistrar.unregisterActivity(during: item)
                 try await blockItemPersistenceManager.delete(blockItem: item)
                 
                 setDeletionAlertPresentation(false)
