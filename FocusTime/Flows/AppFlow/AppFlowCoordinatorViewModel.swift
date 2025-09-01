@@ -164,7 +164,6 @@ final class AppFlowCoordinatorViewModel {
         self.superPaywallVM = SuperPaywallViewModel(paymentManager: resolvedPaymentManager)
         self.blockItemPersistenceManager = resolvedPersistenceManager
         self.deviceActivityRegistrar = LiveDeviceActivityRegistrar(
-            proState: proState,
             blockItemPersistenceManager: resolvedPersistenceManager,
             shieldManager: shieldManager
         )

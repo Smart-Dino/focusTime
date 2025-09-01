@@ -16,7 +16,6 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
 
     let clock: Clock
     let calendar: Calendar
-    let proState: ProState
     let centerManager: DeviceActivityCenterManager
     let shieldManager: ShieldManager
     let blockItemPersistenceManager: BlockItemPersistenceManager
@@ -24,14 +23,12 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
     init(
         clock: Clock = SystemClock(),
         calendar: Calendar = .current,
-        proState: ProState,
         centerManager: DeviceActivityCenterManager = LiveDeviceActivityCenterManager(),
         blockItemPersistenceManager: BlockItemPersistenceManager,
         shieldManager: ShieldManager
     ) {
         self.clock = clock
         self.calendar = calendar
-        self.proState = proState
         self.centerManager = centerManager
         self.blockItemPersistenceManager = blockItemPersistenceManager
         self.shieldManager = shieldManager
@@ -44,7 +41,6 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
 
     func registerActivity(during blockItem: ProtectedBlockItem) async throws {
         try await checkAuth()
-        try await ensureUserCanSchedule()
 
         switch blockItem.type {
         case .scheduled(let startTime, let endTime, _, _, _):

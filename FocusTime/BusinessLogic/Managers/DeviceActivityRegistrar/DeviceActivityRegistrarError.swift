@@ -19,8 +19,6 @@ enum DeviceActivityRegistrarError: LocalizedError {
     case activityAlreadyRunning
     case couldNotExtractDatePoints
     
-    case noProAccount
-    
     var errorDescription: String? {
         switch self {
         case .cannotSuspend:
@@ -44,8 +42,6 @@ enum DeviceActivityRegistrarError: LocalizedError {
             String(localized: "device_activity_registrar_activity_already_suspended_description", table: "ErrorLocalizable")
         case .couldNotExtractDatePoints:
             String(localized: "device_activity_registrar_could_not_extract_date_points_description", table: "ErrorLocalizable")
-        case .noProAccount:
-            String(localized: "device_activity_registrar_no_pro_account_description", table: "ErrorLocalizable")
         }
     }
     
@@ -69,8 +65,6 @@ enum DeviceActivityRegistrarError: LocalizedError {
             String(localized: "device_activity_registrar_activity_already_suspended_reason", table: "ErrorLocalizable")
         case .couldNotExtractDatePoints:
             String(localized: "device_activity_registrar_could_not_extract_date_points_reason", table: "ErrorLocalizable")
-        case .noProAccount:
-            String(localized: "device_activity_registrar_no_pro_account_reason", table: "ErrorLocalizable")
         }
     }
 }

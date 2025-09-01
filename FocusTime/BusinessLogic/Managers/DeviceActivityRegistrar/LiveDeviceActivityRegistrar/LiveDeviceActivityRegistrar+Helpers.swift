@@ -9,20 +9,6 @@ import Foundation
 import DeviceActivity
 
 extension LiveDeviceActivityRegistrar {
-    func ensureUserCanSchedule() async throws {
-        let trackedActivitiesCount = await centerManager.activities
-            .compactMap { CodableActivityIdentifier(from: $0) }
-            .filter { $0.blockType == .regular }
-            .count
-        
-        let isPro = await proState.status.isPro
-        let allowedAmountOfBlocks = await SharedAppValues.FreeUserLimits.maximumAmountOfBlocks
-        
-        guard isPro || trackedActivitiesCount < allowedAmountOfBlocks else {
-            throw DeviceActivityRegistrarError.noProAccount
-        }
-    }
-    
     // MARK: - Register helpers (duration / regular / fallback)
 
     func registerDurationActivity(
