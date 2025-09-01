@@ -79,6 +79,7 @@ final class FocusSessionViewModel {
     
     // MARK: - Properties
     private(set) var state: State
+    private var analyticsManager: AnalyticsManagerProtocol = LiveAnalyticsManager()
     
     private let paywallPresenter: PaywallPresenter
     private let blockItemPersistenceManager: BlockItemPersistenceManager
@@ -160,8 +161,25 @@ final class FocusSessionViewModel {
         }
     }
     
-    func startTapped() {
-        Task {
+    func startTapped() async throws {
+        // MARK: - Analytics
+        state.scheduleConfigViewModel.refreshBlockItem()
+
+        let configState = state.scheduleConfigViewModel.state
+        
+        let parameters: [String: Any] = [
+            FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.presetName: state.selectedPreset?.name ?? "Custom",
+            FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.durationHours: configState.durationHours,
+            FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.durationMinutes: configState.durationMinutes,
+            FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.isScheduled: configState.isScheduledForLater
+        ]
+        
+        analyticsManager.logEvent(
+            name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.startButtonTapped.rawValue,
+            parameters: parameters
+        )
+        
+        // MARK: - Functionality
             do {
                 let savedItem = try await saveSelectedItemToStorage(isTemporary: true)
                 try await deviceActivityRegistrar.registerActivity(during: savedItem)
@@ -219,7 +237,7 @@ final class FocusSessionViewModel {
             state.error = nil
         }
     }
-    
+     
     func setSelectedEmoji(_ emoji: String) {
         state.scheduleConfigViewModel.setCustomPresetEmoji(emoji: emoji)
     }
@@ -257,7 +275,7 @@ final class FocusSessionViewModel {
 
 // MARK: - ScheduleConfigurationDelegate
 extension FocusSessionViewModel: ScheduleConfigurationDelegate {
-    func didChangeEmojiFieldFocusState(isFocused: Bool) {
-        state.emojiFieldIsFocused = isFocused
-    }
+   func didChangeEmojiFieldFocusState(isFocused: Bool) {
+       state.emojiFieldIsFocused = isFocused
+   }
 }
