@@ -32,10 +32,16 @@ struct DeviceActivityHandler: Sendable {
     // MARK: - Public API
     
     func handleBlockingStart(for activity: DeviceActivityName) async {
-        guard let activityIdentifier = CodableActivityIdentifier(from: activity) else { return }
+        guard let activityIdentifier = CodableActivityIdentifier(from: activity) else {
+            await fallbackExit(for: activity, unblockApps: false) // If related identifier cannot be recreated - remove activity.
+            return
+        }
         let store = BlockItemExtensionStore(logger: logger, context: ModelContext(container))
         
-        guard let blockItem = store.fetchBlockItem(id: activityIdentifier.blockItemID) else { return }
+        guard let blockItem = store.fetchBlockItem(id: activityIdentifier.blockItemID) else {
+            await fallbackExit(for: activity, unblockApps: false) // If related block item does not exist - remove activity.
+            return
+        }
         
         if blockItem.isCancelled {
             store.setItemIsCancelled(false, for: blockItem)
@@ -52,11 +58,17 @@ struct DeviceActivityHandler: Sendable {
     }
     
     func handleBlockingEnd(for activity: DeviceActivityName) async {
-        guard let activityIdentifier = CodableActivityIdentifier(from: activity) else { return }
+        guard let activityIdentifier = CodableActivityIdentifier(from: activity) else {
+            await fallbackExit(for: activity) // If related identifier cannot be recreated - remove activity.
+            return
+        }
         guard activityIdentifier.blockType == .regular || activityIdentifier.blockType == .regularTemp else { return }
         
         let store = BlockItemExtensionStore(logger: logger, context: ModelContext(container))
-        guard let blockItem = store.fetchBlockItem(id: activityIdentifier.blockItemID) else { return }
+        guard let blockItem = store.fetchBlockItem(id: activityIdentifier.blockItemID) else {
+            await fallbackExit(for: activity) // If the item cannot be found anymore - remove activity.
+            return
+        }
         
         if blockItem.isCancelled {
             store.setItemIsCancelled(false, for: blockItem)
@@ -176,6 +188,24 @@ struct DeviceActivityHandler: Sendable {
             // Basically this solution is safer.
             try? await Task.sleep(for: .seconds(1), tolerance: SharedAppValues.timerLeeway)
             counter += 1
+        }
+    }
+    
+    private func fallbackExit(for activity: DeviceActivityName, unblockApps: Bool = false) async {
+        logger?.warning("Executing fallback for activity '\(activity.rawValue)'. unblockApps: \(unblockApps)")
+        
+        logger?.info("Stopping monitoring for activity: \(activity.rawValue)")
+        DeviceActivityCenter().stopMonitoring([activity])
+        
+        if unblockApps {
+            logger?.info("Attempting to unblock all shielded content as part of fallback.")
+            
+            do {
+                try await shieldManager.unblock()
+                logger?.info("Successfully unblocked content for activity: \(activity.rawValue)")
+            } catch {
+                logger?.error("Failed to unblock content during fallback for activity '\(activity.rawValue)': \(error.localizedDescription)")
+            }
         }
     }
 }
