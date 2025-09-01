@@ -29,6 +29,7 @@ protocol BlockListPickerSheetDelegate: AnyObject {
 final class BlockListPickerSheetViewModel {
     struct State {
         var error: Error? = nil
+        var shouldDismiss = false
         
         var finalSelection: FamilyActivitySelection = FamilyActivitySelection()
         var isFamilyActivitySheetPresented: Bool = false
@@ -113,6 +114,10 @@ final class BlockListPickerSheetViewModel {
         recomputeFinalSelection()
     }
     
+    func dismiss() {
+        state.shouldDismiss = true
+    }
+    
     private func recomputeFinalSelection() {
         var combined = FamilyActivitySelection()
         
@@ -167,6 +172,7 @@ final class BlockListPickerSheetViewModel {
     
     func saveSelection() {
         delegate?.didFinishSelectionWith(state.finalSelection)
+        dismiss()
     }
     
     func hasReachEndOfList(blockItem: ProtectedBlockItem) {

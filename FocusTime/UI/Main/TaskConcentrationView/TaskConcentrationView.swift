@@ -108,10 +108,7 @@ struct TaskConcentrationView: View {
                                 viewModel.moveToPauseSessionScene()
                             }
                         }, endSessionAction: {
-                            Task {
-                                try await viewModel.endBlock()
-                                dismiss.callAsFunction()
-                            }
+                            viewModel.endBlock()
                         }
                     )
                     
@@ -120,7 +117,7 @@ struct TaskConcentrationView: View {
                         title: title,
                         subtitle: subtitle,
                         onFinished: {
-                            dismiss.callAsFunction()
+                            viewModel.dismiss()
                         }
                     )
                 }
@@ -137,6 +134,11 @@ struct TaskConcentrationView: View {
             actions: { /* OK dismissal button by default */ },
             message: { Text(viewModel.state.error?.localizedDescription ?? String()) }
         )
+        .onChange(of: viewModel.state.shouldDismiss) {
+            if viewModel.state.shouldDismiss {
+                dismiss.callAsFunction()
+            }
+        }
     }
 }
 
