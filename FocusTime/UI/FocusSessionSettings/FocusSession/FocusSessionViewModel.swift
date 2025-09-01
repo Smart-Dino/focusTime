@@ -152,12 +152,6 @@ final class FocusSessionViewModel {
             parameters: parameters
         )
         
-        if let selectedPreset = state.selectedPreset {
-            print("Selected Preset: \(selectedPreset.name)")
-        } else {
-            print("Custom session named: \(configState.blockItem.name)")
-        }
-
         // MARK: - Functionality
         do {
             let savedItem = try await saveSelectedItemToStorage(isTemporary: true)
