@@ -185,15 +185,15 @@ final class FocusSessionViewModel {
     func startFocusingTapped() {
         Task {
             do {
-                guard await canAddMoreItems() else {
-                    paywallPresenter.requestOnboarding()
-                    return
-                }
-                
                 let scheduleItem = state.scheduleConfigViewModel.state.blockItem
                 if state.isItemScheduled {
                     try await deviceActivityRegistrar.unregisterActivity(during: scheduleItem)
                 } else {
+                    guard await canAddMoreItems() else {
+                        paywallPresenter.requestOnboarding()
+                        return
+                    }
+                    
                     try await deviceActivityRegistrar.registerActivity(during: scheduleItem)
                 }
                 dismiss()
