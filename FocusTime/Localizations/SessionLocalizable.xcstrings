@@ -341,12 +341,12 @@
       }
     },
     "schedule_configuration_view_apps_blocked_list" : {
-      "comment" : "Value indicating the app list is available",
+      "comment" : "Value indicating an empty list",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "List"
+            "value" : "All"
           }
         }
       }

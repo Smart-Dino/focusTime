@@ -33,7 +33,7 @@ enum SharedAppValues {
     @MainActor
     enum FreeUserLimits {
         static let maximumAmountOfBlocks = 1
-        static let defaultFamilyActivitySelection: ShieldSettings.ActivityCategoryPolicy<Application> = .all()
+        static let defaultCategorieSelection: ShieldSettings.ActivityCategoryPolicy<Application> = .all()
     }
     
     enum DefaultsKeys: String {

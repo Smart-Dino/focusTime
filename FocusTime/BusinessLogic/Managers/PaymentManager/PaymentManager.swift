@@ -9,7 +9,11 @@ import Foundation
 
 @MainActor
 @Observable
-final class ProState {
+final class ProState: Equatable {
+    nonisolated static func == (lhs: ProState, rhs: ProState) -> Bool {
+        lhs === rhs
+    }
+    
     struct Status: Equatable {
         var isPro: Bool
         var lastUpdated: Date

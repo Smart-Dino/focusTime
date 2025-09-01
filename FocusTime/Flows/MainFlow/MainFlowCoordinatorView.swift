@@ -100,9 +100,10 @@ struct MainFlowCoordinatorView: View {
     MainFlowCoordinatorView(
         viewModel: .init(
             state: .init(currentTabScreen: .none, proState: payment.state),
+            proState: payment.state,
             deviceActivityRegistrar: registrar,
             blockItemPersistenceManager: manager,
-            appFlowDelegate: nil
+            paywallPresenter: LivePaywallPresenter()
         )
     )
 }

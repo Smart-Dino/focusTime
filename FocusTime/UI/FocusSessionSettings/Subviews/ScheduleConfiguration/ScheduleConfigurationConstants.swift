@@ -44,7 +44,7 @@ extension ScheduleConfigurationView {
             static let appsBlockedList = String(
                 localized: "schedule_configuration_view_apps_blocked_list",
                 table: "SessionLocalizable",
-                comment: "Value indicating the app list is available"
+                comment: "Value indicating an empty list"
             )
             
             static func appsBlockedListWithCounts(categoriesCount: Int, appsCount: Int) -> String {

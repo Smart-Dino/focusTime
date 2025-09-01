@@ -22,8 +22,12 @@ final class FocusSessionViewModel {
     // MARK: - State
     @MainActor
     struct State {
+        let proState: ProState
+        
         var error: Error?
         var isDeletionAlertPresented: Bool = false
+        
+        var shouldDismiss = false
         
         let presets: [FocusPreset] = FocusPreset.allCases
         let mode: FocusSessionMode
@@ -48,11 +52,9 @@ final class FocusSessionViewModel {
             let emojiFilled = !scheduleConfigViewModel.state.blockItem.emoji
                 .trimmingCharacters(in: .whitespaces).isEmpty
             
-            let blockedContentFilled = !scheduleConfigViewModel.state.blockItem.blockedContent.isEmpty
-            
             let daysHasAtLeastOneDay = !scheduleConfigViewModel.state.blockItem.days.isEmpty
             
-            return nameFilled && emojiFilled && blockedContentFilled && daysHasAtLeastOneDay
+            return nameFilled && emojiFilled && daysHasAtLeastOneDay
         }
 
         
@@ -78,15 +80,19 @@ final class FocusSessionViewModel {
     // MARK: - Properties
     private(set) var state: State
     
+    private let paywallPresenter: PaywallPresenter
     private let blockItemPersistenceManager: BlockItemPersistenceManager
     private let deviceActivityRegistrar: DeviceActivityRegistrar
     
     // MARK: - Initializer
     init(
         mode: FocusSessionMode,
+        proState: ProState,
+        paywallPresenter: PaywallPresenter,
         blockItemPersistenceManager: BlockItemPersistenceManager,
         deviceActivityRegistrar: DeviceActivityRegistrar
     ) {
+        self.paywallPresenter = paywallPresenter
         self.blockItemPersistenceManager = blockItemPersistenceManager
         self.deviceActivityRegistrar = deviceActivityRegistrar
         
@@ -94,18 +100,22 @@ final class FocusSessionViewModel {
         switch mode {
         case .startFocusing, .addBlockList:
             scheduleConfigViewModel = ScheduleConfigurationViewModel(
+                state: .init(proState: proState),
+                paywallPresenter: paywallPresenter,
                 deviceActivityRegistrar: deviceActivityRegistrar,
                 blockItemPersistenceManager: blockItemPersistenceManager
             )
         case .editBlockList(let block):
             scheduleConfigViewModel = ScheduleConfigurationViewModel(
-                state: .init(blockItem: block),
+                state: .init(proState: proState, blockItem: block),
+                paywallPresenter: paywallPresenter,
                 deviceActivityRegistrar: deviceActivityRegistrar,
                 blockItemPersistenceManager: blockItemPersistenceManager
             )
         }
         
         self.state = State(
+            proState: proState,
             mode: mode,
             scheduleConfigViewModel: scheduleConfigViewModel
         )
@@ -114,58 +124,89 @@ final class FocusSessionViewModel {
     }
     
     // MARK: - Intents
-    func saveTapped() async throws {
-        do {
-            switch state.mode {
-            case .startFocusing:
-                let item = try await saveSelectedItemToStorage(isTemporary: false)
-                try await deviceActivityRegistrar.registerActivity(during: item)
-            case .addBlockList:
-                let _ = try await saveSelectedItemToStorage(isTemporary: false)
-            case .editBlockList:
-                try await blockItemPersistenceManager.editBlockItem(
-                    blockItem: state.scheduleConfigViewModel.state.blockItem
-                )
+    func dismiss() {
+        state.shouldDismiss = true
+    }
+    
+    func saveTapped() {
+        Task {
+            do {
+                switch state.mode {
+                case .startFocusing:
+                    guard await self.checkIfCanAddMoreItems() else {
+                        paywallPresenter.requestOnboarding()
+                        return
+                    }
+                    
+                    let item = try await saveSelectedItemToStorage(isTemporary: false)
+                    try await deviceActivityRegistrar.registerActivity(during: item)
+                    
+                case .addBlockList:
+                    
+                    let _ = try await saveSelectedItemToStorage(isTemporary: false)
+                    
+                case .editBlockList:
+                    
+                    try await blockItemPersistenceManager.editBlockItem(
+                        blockItem: state.scheduleConfigViewModel.state.blockItem
+                    )
+                    
+                }
+                
+                dismiss()
+            } catch {
+                state.error = error
             }
-        } catch {
-            state.error = error
-            throw error
         }
     }
     
-    func startTapped() async throws {
-        do {
-            let savedItem = try await saveSelectedItemToStorage(isTemporary: true)
-            try await deviceActivityRegistrar.registerActivity(during: savedItem)
-        } catch {
-            state.error = error
-            throw error
-        }
-    }
-    
-    func startFocusingTapped() async throws {
-        do {
-            let scheduleItem = state.scheduleConfigViewModel.state.blockItem
-            if state.isItemScheduled {
-                try await deviceActivityRegistrar.unregisterActivity(during: scheduleItem)
-            } else {
-                try await deviceActivityRegistrar.registerActivity(during: scheduleItem)
+    func startTapped() {
+        Task {
+            do {
+                let savedItem = try await saveSelectedItemToStorage(isTemporary: true)
+                try await deviceActivityRegistrar.registerActivity(during: savedItem)
+                
+                dismiss()
+            } catch {
+                state.error = error
             }
-        } catch {
-            state.error = error
-            throw error
         }
     }
     
-    func deleteButtonTapped() async throws {
-        do {
-            let item = state.scheduleConfigViewModel.state.blockItem
-            try await blockItemPersistenceManager.delete(blockItem: item)
-            
-            setDeletionAlertPresentation(false)
-        } catch {
-            state.error = error
-            throw error
+    func startFocusingTapped() {
+        Task {
+            do {
+                guard await self.checkIfCanAddMoreItems() else {
+                    paywallPresenter.requestOnboarding()
+                    return
+                }
+                
+                let scheduleItem = state.scheduleConfigViewModel.state.blockItem
+                if state.isItemScheduled {
+                    try await deviceActivityRegistrar.unregisterActivity(during: scheduleItem)
+                } else {
+                    try await deviceActivityRegistrar.registerActivity(during: scheduleItem)
+                }
+                
+                dismiss()
+            } catch {
+                state.error = error
+            }
+        }
+    }
+    
+    func deleteButtonTapped() {
+        Task {
+            do {
+                let item = state.scheduleConfigViewModel.state.blockItem
+                try await blockItemPersistenceManager.delete(blockItem: item)
+                
+                setDeletionAlertPresentation(false)
+                
+                dismiss()
+            } catch {
+                throw error
+            }
         }
     }
     
@@ -199,6 +240,19 @@ final class FocusSessionViewModel {
         
         return item
     }
+    
+    private func checkIfCanAddMoreItems() async -> Bool {
+        let isPro = state.proState.status.isPro
+        let allowedAmountOfBlocks = SharedAppValues.FreeUserLimits.maximumAmountOfBlocks
+        let trackedItemsCount = await deviceActivityRegistrar.trackedActivities.count
+        
+        if !isPro && trackedItemsCount >= allowedAmountOfBlocks {
+            return false
+        } else {
+            return true
+        }
+    }
+    
 }
 
 // MARK: - ScheduleConfigurationDelegate

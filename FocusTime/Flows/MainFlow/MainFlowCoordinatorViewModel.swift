@@ -78,24 +78,27 @@ final class MainFlowCoordinatorViewModel {
     }
     
     private(set) var state: State
+    private let proState: ProState
     private let timer: FTTimer
     
     private let deviceActivityRegistrar: DeviceActivityRegistrar
     private let blockItemPersistenceManager: BlockItemPersistenceManager
-    weak var appFlowDelegate: MainFlowDelegate?
+    private let paywallPresenter: PaywallPresenter
     
     init(
         state: State,
+        proState: ProState,
         timer: FTTimer = ConcurrencyTimer(),
         deviceActivityRegistrar: DeviceActivityRegistrar,
         blockItemPersistenceManager: BlockItemPersistenceManager,
-        appFlowDelegate: MainFlowDelegate?
+        paywallPresenter: PaywallPresenter
     ) {
         self.state = state
+        self.proState = proState
         self.timer = timer
         self.deviceActivityRegistrar = deviceActivityRegistrar
         self.blockItemPersistenceManager = blockItemPersistenceManager
-        self.appFlowDelegate = appFlowDelegate
+        self.paywallPresenter = paywallPresenter
         
         setupFlow()
     }
@@ -105,14 +108,17 @@ final class MainFlowCoordinatorViewModel {
             State.MainTabScreens.home(
                 viewModel: HomeViewModel(
                     state: .init(timer: timer),
+                    proState: proState,
+                    paywallPresenter: paywallPresenter,
                     deviceActivityRegistrar: deviceActivityRegistrar,
-                    blockItemPersistenceManager: blockItemPersistenceManager,
-                    delegate: self
+                    blockItemPersistenceManager: blockItemPersistenceManager
                 )
             ),
             State.MainTabScreens.drafts(
                 viewModel: DraftsBlockItemListViewModel(
                     state: .init(timer: timer),
+                    proState: proState,
+                    paywallPresenter: paywallPresenter,
                     deviceActivityRegistrar: deviceActivityRegistrar,
                     blockItemPersistenceManager: blockItemPersistenceManager
                 )
@@ -138,19 +144,15 @@ final class MainFlowCoordinatorViewModel {
     func makeFocusSessionViewModel() -> FocusSessionViewModel {
         FocusSessionViewModel(
             mode: .addBlockList,
+            proState: proState,
+            paywallPresenter: paywallPresenter,
             blockItemPersistenceManager: blockItemPersistenceManager,
             deviceActivityRegistrar: deviceActivityRegistrar
         )
     }
     
     func requestPaywall() {
-        appFlowDelegate?.didRequestPaywallPlanSelection()
+        paywallPresenter.requestPlanSelection()
     }
     
-}
-
-extension MainFlowCoordinatorViewModel: HomeViewDelegate {
-    func didRequestPaywall() {
-        appFlowDelegate?.didRequestPaywallPlanSelection()
-    }
 }
