@@ -174,7 +174,12 @@ final class HomeViewModel {
     }
     
     private func makeScheduledFocusViewModel() -> ScheduledBlockItemsViewModel {
-        ScheduledBlockItemsViewModel(blockItemPersistenceManager: blockItemPersistenceManager)
+        ScheduledBlockItemsViewModel(
+            state: .init(proState: proState),
+            paywallPresenter: paywallPresenter,
+            deviceActivityRegistrar: deviceActivityRegistrar,
+            blockItemPersistenceManager: blockItemPersistenceManager
+        )
     }
     
     private func makeFocusSessionViewModel(mode: FocusSessionMode) -> FocusSessionViewModel {

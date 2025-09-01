@@ -18,8 +18,6 @@ enum MainFlowNavigationRoute: Equatable, Hashable {
         switch (lhs, rhs) {
         case let (.focusSession(lVM), .focusSession(rVM)):
             lVM === rVM // compare by reference if class
-        default:
-            false
         }
     }
     

@@ -80,6 +80,7 @@ final class ScheduleConfigurationViewModel {
             durationMinutes: Int = FocusSessionView.Constants.DefaultValues.durationMinutes,
             startTime: Date = FocusSessionView.Constants.DefaultValues.startTime,
             endTime: Date = FocusSessionView.Constants.DefaultValues.endTime,
+            isScheduledForLater: Bool = false,
             activeSheet: ScheduleSheetType? = nil
         ) {
             self.proState = proState
@@ -88,14 +89,8 @@ final class ScheduleConfigurationViewModel {
             self.durationMinutes = durationMinutes
             self.startTime = startTime
             self.endTime = endTime
+            self.isScheduledForLater = isScheduledForLater
             self.activeSheet = activeSheet
-            
-            switch blockItem.type {
-            case .scheduled:
-                self.isScheduledForLater = true
-            case .duration:
-                self.isScheduledForLater = false
-            }
         }
     }
     
@@ -118,6 +113,8 @@ final class ScheduleConfigurationViewModel {
         self.paywallPresenter = paywallPresenter
         self.deviceActivityRegistrar = deviceActivityRegistrar
         self.blockItemPersistenceManager = blockItemPersistenceManager
+        
+        refreshBlockItem()
     }
 
     // MARK: - Methods

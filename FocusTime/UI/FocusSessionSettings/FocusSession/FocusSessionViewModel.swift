@@ -11,6 +11,7 @@ import SwiftUI
 enum FocusSessionMode: Equatable {
     case startFocusing
     case addBlockList
+    case addScheduledBlockList
     case editBlockList(_ block: ProtectedBlockItem)
 }
 
@@ -105,6 +106,13 @@ final class FocusSessionViewModel {
                 deviceActivityRegistrar: deviceActivityRegistrar,
                 blockItemPersistenceManager: blockItemPersistenceManager
             )
+        case .addScheduledBlockList:
+            scheduleConfigViewModel = ScheduleConfigurationViewModel(
+                state: .init(proState: proState, isScheduledForLater: true),
+                paywallPresenter: paywallPresenter,
+                deviceActivityRegistrar: deviceActivityRegistrar,
+                blockItemPersistenceManager: blockItemPersistenceManager
+            )
         case .editBlockList(let block):
             scheduleConfigViewModel = ScheduleConfigurationViewModel(
                 state: .init(proState: proState, blockItem: block),
@@ -141,7 +149,7 @@ final class FocusSessionViewModel {
                     let item = try await saveSelectedItemToStorage(isTemporary: false)
                     try await deviceActivityRegistrar.registerActivity(during: item)
                     
-                case .addBlockList:
+                case .addBlockList, .addScheduledBlockList:
                     
                     let _ = try await saveSelectedItemToStorage(isTemporary: false)
                     

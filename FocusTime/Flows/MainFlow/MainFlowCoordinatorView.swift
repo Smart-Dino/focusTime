@@ -92,7 +92,6 @@ struct MainFlowCoordinatorView: View {
 }
 
 #Preview {
-    let factory = MockPersistenceStoreFactory()
     let manager = PreviewData.mockBlockItemPersistenceManager
     let registrar = PreviewData.mockActivityRegistrar
     let payment = MockPaymentManagerWithPurchaseError()
