@@ -51,12 +51,12 @@ final class FocusSessionViewModel {
             
             return nameFilled && emojiFilled && daysHasAtLeastOneDay
         }
+        
         var selectedPreset: FocusPreset? {
             let name = scheduleConfigViewModel.state.blockItem.name
             let emoji = scheduleConfigViewModel.state.blockItem.emoji
             return FocusPreset.getPreset(for: name, emoji: emoji)
         }
-
         
         var selectedEmoji: String {
             scheduleConfigViewModel.state.blockItem.emoji
@@ -126,7 +126,7 @@ final class FocusSessionViewModel {
         Task {
             do {
                 switch state.mode {
-                case .startFocusing:
+                case .startFocusing, .addScheduledBlockList:
                     guard await canAddMoreItems() else {
                         paywallPresenter.requestOnboarding()
                         return
@@ -134,7 +134,7 @@ final class FocusSessionViewModel {
                     let item = try await saveSelectedItemToStorage(isTemporary: false)
                     try await deviceActivityRegistrar.registerActivity(during: item)
                     
-                case .addBlockList, .addScheduledBlockList:
+                case .addBlockList:
                     _ = try await saveSelectedItemToStorage(isTemporary: false)
                     
                 case .editBlockList:
@@ -284,8 +284,10 @@ final class FocusSessionViewModel {
                 blockItemPersistenceManager: blockItemPersistenceManager
             )
         case .editBlockList(let block):
+            let isScheduledForLater = if case .scheduled = block.type { true } else { false }
+            
             return ScheduleConfigurationViewModel(
-                state: .init(proState: proState, blockItem: block),
+                state: .init(proState: proState, blockItem: block, isScheduledForLater: isScheduledForLater),
                 paywallPresenter: paywallPresenter,
                 deviceActivityRegistrar: deviceActivityRegistrar,
                 blockItemPersistenceManager: blockItemPersistenceManager
