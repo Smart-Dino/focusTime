@@ -134,14 +134,8 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
     }
     
     func cancelIfRunning(_ blockItem: ProtectedBlockItem) async throws {
-        // Only act on blocks that are currently running.
-        guard blockItem.state == .running else {
-            // Attempt to clean up any orphaned temp blocks just in case.
-            try? await cleanupTemporaryBlock(relatedTo: blockItem.id)
-            return
-        }
-        
         try await shieldManager.unblock()
+        try? await cleanupTemporaryBlock(relatedTo: blockItem.id)
         
         // If the block itself is temporary, just delete it and we're done.
         if blockItem.isTemporary != nil {
