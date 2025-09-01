@@ -41,20 +41,22 @@ final class FocusSessionViewModel {
         }
         
         var isSavingButtonsEnabled: Bool {
-            let nameIsFilled = !scheduleConfigViewModel.state.blockItem.name
+            let nameFilled = !scheduleConfigViewModel.state.blockItem.name
                 .trimmingCharacters(in: .whitespaces).isEmpty
-            let emojiIsFilled = !scheduleConfigViewModel.state.blockItem.emoji
-                .trimmingCharacters(in: .whitespaces).isEmpty
-            let atLeastOneDaySelected = !scheduleConfigViewModel.state.blockItem.days.isEmpty
             
-            return nameIsFilled && emojiIsFilled && atLeastOneDaySelected
+            let emojiFilled = !scheduleConfigViewModel.state.blockItem.emoji
+                .trimmingCharacters(in: .whitespaces).isEmpty
+            
+            let daysHasAtLeastOneDay = !scheduleConfigViewModel.state.blockItem.days.isEmpty
+            
+            return nameFilled && emojiFilled && daysHasAtLeastOneDay
         }
-
         var selectedPreset: FocusPreset? {
             let name = scheduleConfigViewModel.state.blockItem.name
             let emoji = scheduleConfigViewModel.state.blockItem.emoji
             return FocusPreset.getPreset(for: name, emoji: emoji)
         }
+
         
         var selectedEmoji: String {
             scheduleConfigViewModel.state.blockItem.emoji
@@ -81,6 +83,7 @@ final class FocusSessionViewModel {
     
     // MARK: - Properties
     private(set) var state: State
+    private var analyticsManager: AnalyticsManagerProtocol = LiveAnalyticsManager()
     
     // MARK: Dependencies
     private let paywallPresenter: PaywallPresenter
@@ -147,6 +150,24 @@ final class FocusSessionViewModel {
     }
     
     func startTapped() {
+        // MARK: - Analytics
+        state.scheduleConfigViewModel.refreshBlockItem()
+        
+        let configState = state.scheduleConfigViewModel.state
+        
+        let parameters: [String: Any] = [
+            FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.presetName: state.selectedPreset?.name ?? "Custom",
+            FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.durationHours: configState.durationHours,
+            FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.durationMinutes: configState.durationMinutes,
+            FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.isScheduled: configState.isScheduledForLater
+        ]
+        
+        analyticsManager.logEvent(
+            name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.startButtonTapped.rawValue,
+            parameters: parameters
+        )
+        
+        // MARK: - Functionality
         Task {
             do {
                 let savedItem = try await saveSelectedItemToStorage(isTemporary: true)
