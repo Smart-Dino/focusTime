@@ -56,7 +56,7 @@ final class FocusSessionViewModel {
             
             return nameFilled && emojiFilled && daysHasAtLeastOneDay
         }
-
+        
         
         var selectedEmoji: String {
             scheduleConfigViewModel.state.blockItem.emoji
@@ -161,10 +161,10 @@ final class FocusSessionViewModel {
         }
     }
     
-    func startTapped() async throws {
+    func startTapped() {
         // MARK: - Analytics
         state.scheduleConfigViewModel.refreshBlockItem()
-
+        
         let configState = state.scheduleConfigViewModel.state
         
         let parameters: [String: Any] = [
@@ -180,6 +180,7 @@ final class FocusSessionViewModel {
         )
         
         // MARK: - Functionality
+        Task {
             do {
                 let savedItem = try await saveSelectedItemToStorage(isTemporary: true)
                 try await deviceActivityRegistrar.registerActivity(during: savedItem)
@@ -237,7 +238,7 @@ final class FocusSessionViewModel {
             state.error = nil
         }
     }
-     
+    
     func setSelectedEmoji(_ emoji: String) {
         state.scheduleConfigViewModel.setCustomPresetEmoji(emoji: emoji)
     }
@@ -275,7 +276,7 @@ final class FocusSessionViewModel {
 
 // MARK: - ScheduleConfigurationDelegate
 extension FocusSessionViewModel: ScheduleConfigurationDelegate {
-   func didChangeEmojiFieldFocusState(isFocused: Bool) {
-       state.emojiFieldIsFocused = isFocused
-   }
+    func didChangeEmojiFieldFocusState(isFocused: Bool) {
+        state.emojiFieldIsFocused = isFocused
+    }
 }
