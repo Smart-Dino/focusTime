@@ -115,6 +115,7 @@ final class ScheduleConfigurationViewModel {
         self.deviceActivityRegistrar = deviceActivityRegistrar
         self.blockItemPersistenceManager = blockItemPersistenceManager
         
+        inheritSettingsFromInjectedBlock(from: state.blockItem)
         refreshBlockItem()
     }
 
@@ -293,6 +294,20 @@ final class ScheduleConfigurationViewModel {
     
     private func checkIfCanSetCustomApps() -> Bool {
         return state.proState.status.isPro
+    }
+    
+    private func inheritSettingsFromInjectedBlock(from blockItem: ProtectedBlockItem) {
+        switch blockItem.type {
+        case .scheduled(let startTime, let endTime, _, _, _):
+            state.startTime = startTime.localizedDate
+            state.endTime = endTime.localizedDate
+        case .duration(let duration, _, _, _):
+            var components = DateComponents()
+            components = components.adding(seconds: duration.rawValue)
+            
+            state.durationHours = components.hour ?? 0
+            state.durationMinutes = components.minute ?? 0
+        }
     }
 
 }
