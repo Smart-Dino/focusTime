@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0C439A272E3249F80031E7EB /* OnboardingKit in Frameworks */ = {isa = PBXBuildFile; productRef = 0C439A262E3249F80031E7EB /* OnboardingKit */; };
+		0CE17D122E574F6D00A70B49 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 0CE17D112E574F6D00A70B49 /* FirebaseAnalytics */; };
 		674241732E27EFBA00500101 /* FocusTimeUI in Frameworks */ = {isa = PBXBuildFile; productRef = 674241722E27EFBA00500101 /* FocusTimeUI */; };
 		C66B28102E1825160018E7AC /* FocusTimeActivityMonitor.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E97895A52E0AFCBE00E0AF42 /* FocusTimeActivityMonitor.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C66D93522E29108800452D56 /* FocusTimeUI in Frameworks */ = {isa = PBXBuildFile; productRef = 674241722E27EFBA00500101 /* FocusTimeUI */; };
@@ -91,6 +92,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		0C61D7232E5B45AB000CD3F6 /* Exceptions for "FocusTime" folder in "FocusTime" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 674FA69F2DB05ACE0002FDC1 /* FocusTime */;
+		};
 		C64C07892E329BEF00350A45 /* Exceptions for "FocusTimeActivityReport" folder in "FocusTime" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -149,6 +157,7 @@
 		674FA6A22DB05ACE0002FDC1 /* FocusTime */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
+				0C61D7232E5B45AB000CD3F6 /* Exceptions for "FocusTime" folder in "FocusTime" target */,
 				E977C59E2E0B0AF40035A6AF /* Exceptions for "FocusTime" folder in "FocusTimeActivityMonitor" target */,
 			);
 			path = FocusTime;
@@ -193,6 +202,7 @@
 			files = (
 				0C439A272E3249F80031E7EB /* OnboardingKit in Frameworks */,
 				674241732E27EFBA00500101 /* FocusTimeUI in Frameworks */,
+				0CE17D122E574F6D00A70B49 /* FirebaseAnalytics in Frameworks */,
 				C66D93522E29108800452D56 /* FocusTimeUI in Frameworks */,
 				C689F2352E533B780090BB82 /* Lottie in Frameworks */,
 			);
@@ -297,6 +307,7 @@
 				674241722E27EFBA00500101 /* FocusTimeUI */,
 				C689F2342E533B780090BB82 /* Lottie */,
 				0C439A262E3249F80031E7EB /* OnboardingKit */,
+				0CE17D112E574F6D00A70B49 /* FirebaseAnalytics */,
 			);
 			productName = FocusTime;
 			productReference = 674FA6A02DB05ACE0002FDC1 /* FocusTime.app */;
@@ -431,6 +442,7 @@
 			packageReferences = (
 				C689F2332E533B780090BB82 /* XCRemoteSwiftPackageReference "lottie-spm" */,
 				0C439A252E3249F80031E7EB /* XCRemoteSwiftPackageReference "OnboardingKit" */,
+				0CE17D102E574F6D00A70B49 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 674FA6A12DB05ACE0002FDC1 /* Products */;
@@ -685,6 +697,7 @@
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 242HT6L8AJ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FocusTime/Info.plist;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -721,6 +734,7 @@
 				ENABLE_PREVIEWS = YES;
 				GCC_OPTIMIZATION_LEVEL = s;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FocusTime/Info.plist;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -1045,6 +1059,14 @@
 				minimumVersion = 1.2.0;
 			};
 		};
+		0CE17D102E574F6D00A70B49 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.1.0;
+			};
+		};
 		C689F2332E533B780090BB82 /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/airbnb/lottie-spm";
@@ -1060,6 +1082,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 0C439A252E3249F80031E7EB /* XCRemoteSwiftPackageReference "OnboardingKit" */;
 			productName = OnboardingKit;
+		};
+		0CE17D112E574F6D00A70B49 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0CE17D102E574F6D00A70B49 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
 		};
 		674241722E27EFBA00500101 /* FocusTimeUI */ = {
 			isa = XCSwiftPackageProductDependency;

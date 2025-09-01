@@ -59,23 +59,44 @@ final class FocusSessionViewModel {
     
     // MARK: - Properties
     private(set) var state: State
+    private var analyticsManager: AnalyticsManagerProtocol = LiveAnalyticsManager()
     
     // MARK: - Initializer
-    init(state: State = State()) {
+    init(
+        state: State = State()
+    ) {
         self.state = state
-        
-        state.scheduleConfigViewModel.delegate = self
+        self.state.scheduleConfigViewModel.delegate = self
     }
-    
-    // MARK: - Intents for global actions or actions not covered by ScheduleConfigurationViewModel
+     
+    // MARK: - Intents
     func startTapped() {
+        print("Start button tapped!")
+        
+        // Ensure the blockItem's type is up-to-date before logging
+        state.scheduleConfigViewModel.refreshBlockItem()
+
+        let configState = state.scheduleConfigViewModel.state
+        
+        let parameters: [String: Any] = [
+            FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.presetName: state.selectedPreset?.name ?? "Custom",
+            FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.durationHours: configState.durationHours,
+            FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.durationMinutes: configState.durationMinutes,
+            FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.isScheduled: configState.isScheduledForLater
+        ]
+        
+        analyticsManager.logEvent(
+            name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.startButtonTapped.rawValue,
+            parameters: parameters
+        )
+        
         if let selectedPreset = state.selectedPreset {
             print("Selected Preset: \(selectedPreset.name)")
         } else {
-            print("No preset selected.")
+            print("Custom session named: \(configState.blockItem.name)")
         }
     }
-    
+     
     func setSelectedEmoji(_ emoji: String) {
         state.scheduleConfigViewModel.setCustomPresetEmoji(emoji: emoji)
     }
@@ -83,10 +104,12 @@ final class FocusSessionViewModel {
     func setSelectedPreset(selectedPreset: FocusPreset?) {
         state.scheduleConfigViewModel.setSelectedPreset(selectedPreset: selectedPreset)
     }
+    
 }
 
+// MARK: - ScheduleConfigurationDelegate
 extension FocusSessionViewModel: ScheduleConfigurationDelegate {
-    func didChangeEmojiFieldFocusState(isFocused: Bool) {
-        state.emojiFieldIsFocused = isFocused
-    }
+   func didChangeEmojiFieldFocusState(isFocused: Bool) {
+       state.emojiFieldIsFocused = isFocused
+   }
 }

@@ -12,8 +12,8 @@ protocol ScheduleConfigurationDelegate: AnyObject {
     func didChangeEmojiFieldFocusState(isFocused: Bool)
 }
 
-@Observable
 @MainActor
+@Observable
 final class ScheduleConfigurationViewModel {
     
     // MARK: - Enum
@@ -41,10 +41,10 @@ final class ScheduleConfigurationViewModel {
         
         init(
             blockItem: ProtectedBlockItem = .default,
-            durationHours: Int = FocusSessionView.Constants.DefaultValues.durationHours,
-            durationMinutes: Int = FocusSessionView.Constants.DefaultValues.durationMinutes,
-            startTime: Date = FocusSessionView.Constants.DefaultValues.startTime,
-            endTime: Date = FocusSessionView.Constants.DefaultValues.endTime,
+            durationHours: Int = ScheduleConfigurationView.Constants.DefaultValues.durationHours,
+            durationMinutes: Int = ScheduleConfigurationView.Constants.DefaultValues.durationMinutes,
+            startTime: Date = ScheduleConfigurationView.Constants.DefaultValues.startTime,
+            endTime: Date = ScheduleConfigurationView.Constants.DefaultValues.endTime,
             activeSheet: ScheduleSheetType? = nil
         ) {
             self.blockItem = blockItem
@@ -66,7 +66,8 @@ final class ScheduleConfigurationViewModel {
     // MARK: - Properties
     private(set) var state: State
     weak var delegate: ScheduleConfigurationDelegate?
-    
+    private var analyticsManager: AnalyticsManagerProtocol = LiveAnalyticsManager()
+
     // MARK: - Initializers
     init(state: State = State()) {
         self.state = state
@@ -77,12 +78,14 @@ final class ScheduleConfigurationViewModel {
     /// - Parameter listName: The new list name.
     func setListName(listName: String) {
         state.blockItem.name = listName
+        analyticsManager.logEvent(name: ScheduleConfigurationView.Constants.ScheduleSessionAnalyticsKeys.setListName.rawValue, parameters: [ScheduleConfigurationView.Constants.ScheduleSessionAnalyticsParameterKey.listname : listName])
     }
 
     /// Toggles the 'schedule for later' setting.
     /// - Parameter isOn: A boolean indicating whether scheduling for later is active.
     func setScheduleForLater(isOn: Bool) {
         state.isScheduledForLater = isOn
+        analyticsManager.logEvent(name: ScheduleConfigurationView.Constants.ScheduleSessionAnalyticsKeys.scheduledForLaterToggled.rawValue, parameters: [ScheduleConfigurationView.Constants.ScheduleSessionAnalyticsParameterKey.scheduleForLater : isOn])
     }
     
     func updateDelegateEmojiFocusStateStatus(with isFocused: Bool) {
@@ -96,39 +99,46 @@ final class ScheduleConfigurationViewModel {
     func setScheduledDay(_ day: Weekday, isSelected: Bool) {
         if isSelected {
             state.blockItem.days.insert(day)
+            analyticsManager.logEvent(name: ScheduleConfigurationView.Constants.ScheduleSessionAnalyticsKeys.scheduledDayAdded.rawValue, parameters: [ScheduleConfigurationView.Constants.ScheduleSessionAnalyticsParameterKey.scheduledDay : day])
         } else {
             state.blockItem.days.remove(day)
+            analyticsManager.logEvent(name: ScheduleConfigurationView.Constants.ScheduleSessionAnalyticsKeys.scheduledDayRemoved.rawValue, parameters: [ScheduleConfigurationView.Constants.ScheduleSessionAnalyticsParameterKey.scheduledDay : day])
         }
     }
 
     /// Sets the custom preset emoji.
     /// - Parameter emoji: The custom emoji string. Only the first character is kept.
     func setCustomPresetEmoji(emoji: String) {
-        state.blockItem.emoji = emoji
+        state.blockItem.emoji = String(emoji.prefix(1))
+        analyticsManager.logEvent(name: ScheduleConfigurationView.Constants.ScheduleSessionAnalyticsKeys.setCustomEmoji.rawValue, parameters: [ScheduleConfigurationView.Constants.ScheduleSessionAnalyticsParameterKey.customEmoji : emoji])
     }
     
     /// Updates the selected hours in the schedule configuration.
     /// - Parameter hours: The number of hours to set for the focus session duration.
     func setHours(hours: Int) {
         state.durationHours = hours
+        analyticsManager.logEvent(name: ScheduleConfigurationView.Constants.ScheduleSessionAnalyticsKeys.setHours.rawValue, parameters: [ScheduleConfigurationView.Constants.ScheduleSessionAnalyticsParameterKey.setHours : hours])
     }
 
     /// Updates the selected minutes value in the schedule configuration.
     /// - Parameter minutes: The number of minutes to set for the scheduled duration.
     func setMinutes(minutes: Int) {
         state.durationMinutes = minutes
+        analyticsManager.logEvent(name: ScheduleConfigurationView.Constants.ScheduleSessionAnalyticsKeys.setMinutes.rawValue, parameters: [ScheduleConfigurationView.Constants.ScheduleSessionAnalyticsParameterKey.setMinutes : minutes])
     }
 
     /// Updates the start time in the current schedule configuration.
     /// - Parameter startTime: The new start time to set.
     func setStartTime(startTime: Date) {
         state.startTime = startTime
+        analyticsManager.logEvent(name: ScheduleConfigurationView.Constants.ScheduleSessionAnalyticsKeys.startButtonTapped.rawValue, parameters: [ScheduleConfigurationView.Constants.ScheduleSessionAnalyticsParameterKey.startTime : startTime])
     }
 
     /// Updates the end time in the current schedule configuration.
     /// - Parameter endTime: The new end time to set.
     func setEndTime(endTime: Date) {
         state.endTime = endTime
+        analyticsManager.logEvent(name: ScheduleConfigurationView.Constants.ScheduleSessionAnalyticsKeys.endButtonTapped.rawValue, parameters: [ScheduleConfigurationView.Constants.ScheduleSessionAnalyticsParameterKey.endTime : endTime])
     }
 
     /// Updates the selected focus preset in the schedule configuration.
@@ -139,6 +149,10 @@ final class ScheduleConfigurationViewModel {
         guard let selectedPreset else { return }
         state.blockItem.name = selectedPreset.name
         state.blockItem.emoji = selectedPreset.emoji
+        
+        analyticsManager.logEvent(name: ScheduleConfigurationView.Constants.ScheduleSessionAnalyticsKeys.presetSelected.rawValue, parameters: [
+            ScheduleConfigurationView.Constants.ScheduleSessionAnalyticsParameterKey.presetName: selectedPreset.name
+        ])
     }
 
     // MARK: - Intents (Sheet Presentation)
@@ -146,26 +160,31 @@ final class ScheduleConfigurationViewModel {
     /// Presents the duration picker sheet by setting the active sheet state.
     func presentDurationPicker() {
         state.activeSheet = .durationPicker
+        analyticsManager.logEvent(name: ScheduleConfigurationView.Constants.ScheduleSessionAnalyticsKeys.durationPickerPresented.rawValue, parameters: nil)
     }
 
     /// Presents the start time picker sheet by setting the active sheet state.
     func presentStartTimePicker() {
         state.activeSheet = .startTimePicker
+        analyticsManager.logEvent(name: ScheduleConfigurationView.Constants.ScheduleSessionAnalyticsKeys.timePickerPresented.rawValue, parameters: [ScheduleConfigurationView.Constants.ScheduleSessionAnalyticsParameterKey.timePickerType : ScheduleConfigurationView.Constants.ScheduleSessionAnalyticsParameterKey.startTime])
     }
 
     /// Presents the end time picker sheet by setting the active sheet state.
     func presentEndTimePicker() {
         state.activeSheet = .endTimePicker
+        analyticsManager.logEvent(name: ScheduleConfigurationView.Constants.ScheduleSessionAnalyticsKeys.timePickerPresented.rawValue, parameters: [ScheduleConfigurationView.Constants.ScheduleSessionAnalyticsParameterKey.timePickerType : ScheduleConfigurationView.Constants.ScheduleSessionAnalyticsParameterKey.endTime])
     }
 
     /// Presents the app blocker sheet by setting the active sheet state accordingly.
     func presentAppBlockerSheet() {
         state.activeSheet = .appBlockerSheet
+        analyticsManager.logEvent(name: ScheduleConfigurationView.Constants.ScheduleSessionAnalyticsKeys.appBlockerSheetPresented.rawValue, parameters: nil)
     }
 
     /// Dismisses any currently presented sheet by setting the active sheet to nil.
     func dismissSheet(_ sheet: ScheduleSheetType?) {
         state.activeSheet = nil
+        analyticsManager.logEvent(name: ScheduleConfigurationView.Constants.ScheduleSessionAnalyticsKeys.dismissSheet.rawValue, parameters: nil)
     }
     
     // MARK: - Logic
@@ -213,5 +232,4 @@ final class ScheduleConfigurationViewModel {
             )
         }
     }
-
 }

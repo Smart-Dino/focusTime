@@ -21,6 +21,7 @@ final class QuizOnboardingViewModel {
     
     private(set) var state: State
     weak var delegate: QuizOnboardingDelegate?
+    var analyticsManager: AnalyticsManagerProtocol = LiveAnalyticsManager()
     
     init(
         state: State = State(),
@@ -31,6 +32,12 @@ final class QuizOnboardingViewModel {
     }
     
     func finishQuiz() {
+        analyticsManager.logEvent(
+            name: QuizOnboardingView.Constants.QuizOnboardingAnalyticsKeys.onboardingQuizFinished.rawValue,
+            parameters: [
+                QuizOnboardingView.Constants.QuizOnboardingAnalyticsParameterKeys.quizOptionsSelected: state.selection.map { $0.localizedString }.joined(separator: ",")
+            ]
+        )
         delegate?.didFinishQuiz(with: state.selection)
     }
     
@@ -40,5 +47,12 @@ final class QuizOnboardingViewModel {
         } else {
             state.selection.insert(option)
         }
+        
+        analyticsManager.logEvent(
+            name: QuizOnboardingView.Constants.QuizOnboardingAnalyticsKeys.onboardingQuizOptionToggled.rawValue,
+            parameters: [
+                QuizOnboardingView.Constants.QuizOnboardingAnalyticsParameterKeys.quizOption: option.localizedString
+            ]
+        )
     }
 }
