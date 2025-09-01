@@ -139,8 +139,12 @@ actor LiveDeviceActivityRegistrar: DeviceActivityRegistrar {
         
         // If the block itself is temporary, just delete it and we're done.
         if blockItem.isTemporary != nil {
+            let activity = try await getActivityForSchedule(blockItem)
+            await centerManager.stopMonitoring([activity])
+            
             try await cancelScheduledResume(for: blockItem)
             try await blockItemPersistenceManager.delete(blockItem: blockItem)
+            
             return
         }
         
