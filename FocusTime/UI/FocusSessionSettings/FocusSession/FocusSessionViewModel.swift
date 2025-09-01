@@ -138,9 +138,12 @@ final class FocusSessionViewModel {
                     _ = try await saveSelectedItemToStorage(isTemporary: false)
                     
                 case .editBlockList:
-                    try await blockItemPersistenceManager.editBlockItem(
-                        blockItem: state.scheduleConfigViewModel.state.blockItem
-                    )
+                    let item = state.scheduleConfigViewModel.state.blockItem
+                    
+                    try await blockItemPersistenceManager.editBlockItem(blockItem: item)
+                    if case .scheduled = item.type, item.isScheduled {
+                        try await deviceActivityRegistrar.registerActivity(during: item)
+                    }
                 }
                 dismiss()
             } catch {
@@ -240,6 +243,7 @@ final class FocusSessionViewModel {
     // MARK: - Private Helpers
     private func saveSelectedItemToStorage(isTemporary: Bool) async throws -> ProtectedBlockItem {
         var item = state.scheduleConfigViewModel.state.blockItem
+        item.id = UUID() // Make sure we always get a different UUID no matter what.
         
         if isTemporary {
             item.isTemporary = .oneTimeBlock
