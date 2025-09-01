@@ -166,11 +166,11 @@ struct PlanSelectionPaywallView: View {
 }
 
 #Preview("Trial unused") {
-    let paymentManager = MockPaymentManagerWithPurchaseError(trialUsed: false)
     NavigationStack {
         PlanSelectionPaywallView(
             viewModel: .init(
-                state: .init(proState: paymentManager.state), superPaywallVM: .init(paymentManager: paymentManager),
+                state: .init(proState: PreviewData.mockProStateTrialUnused),
+                superPaywallVM: .init(paymentManager: PreviewData.mockPaymentManagerTrialUnused),
                 flowDelegate: nil
             )
         )
@@ -179,11 +179,11 @@ struct PlanSelectionPaywallView: View {
 }
 
 #Preview("Trial used") {
-    let paymentManager = MockPaymentManagerWithPurchaseError(trialUsed: true)
     NavigationStack {
         PlanSelectionPaywallView(
             viewModel: .init(
-                state: .init(proState: paymentManager.state), superPaywallVM: .init(paymentManager: paymentManager),
+                state: .init(proState: PreviewData.mockProStateTrialUsed),
+                superPaywallVM: .init(paymentManager: PreviewData.mockPaymentManagerTrialUsed),
                 flowDelegate: nil
             )
         )

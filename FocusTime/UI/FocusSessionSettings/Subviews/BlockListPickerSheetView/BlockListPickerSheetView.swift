@@ -141,39 +141,16 @@ struct BlockListPickerSheetView: View {
 }
 
 #Preview("Populated list") {
-    let manager = PreviewData.mockBlockItemPersistenceManager
-    let registrar = PreviewData.mockActivityRegistrar
     let viewModel = BlockListPickerSheetViewModel(
-        deviceActivityRegistrar: registrar,
-        blockItemPersistenceManager: manager
+        deviceActivityRegistrar: PreviewData.mockPopulatedActivityRegistrar,
+        blockItemPersistenceManager: PreviewData.mockPopulatedPersistenceManager
     )
     
-    var randomBlockItem: ProtectedBlockItem {
-        ProtectedBlockItem(
-            emoji: SharedConstants.Strings.defaultEmojis.randomElement()!,
-            name: "Test item",
-            days: Weekday.weekdays,
-            type: .duration(duration: .init(seconds: Int.random(in: 0..<3600))),
-            blockedContent: FamilyActivitySelection()
-        )
-    }
-    
-    NavigationStack {
-        VStack {
-            Text("Some View")
-        }
-        .sheet(isPresented: .constant(true)) {
-            BlockListPickerSheetView(viewModel: viewModel)
-                .onAppear {
-                    Task {
-                        for _ in 0..<100 {
-                            let blockItem = randomBlockItem
-                            try? await manager.insert(blockItem)
-                        }
-                        viewModel.fetchNextPage()
-                    }
-                }
-        }
-        .preferredColorScheme(.dark)
+    return NavigationStack {
+        Text("Parent View")
+            .sheet(isPresented: .constant(true)) {
+                BlockListPickerSheetView(viewModel: viewModel)
+            }
+            .preferredColorScheme(.dark)
     }
 }

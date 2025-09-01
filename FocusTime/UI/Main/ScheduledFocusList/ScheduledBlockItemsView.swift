@@ -104,22 +104,13 @@ struct ScheduledBlockItemsView: View {
 
 #Preview {
     NavigationStack {
-        let manager = PreviewData.mockBlockItemPersistenceManager
-        let proState = MockPaymentManagerWithPurchaseError().state
-        let registrar = LiveDeviceActivityRegistrar(
-            blockItemPersistenceManager: manager,
-            shieldManager: LiveShieldManager()
-        )
-        
-        let viewModel = ScheduledBlockItemsViewModel(
-            state: .init(proState: proState),
-            paywallPresenter: LivePaywallPresenter(),
-            deviceActivityRegistrar: registrar,
-            blockItemPersistenceManager: manager
-        )
-        
         ScheduledBlockItemsView(
-            viewModel: viewModel
+            viewModel: .init(
+                state: .init(proState: PreviewData.mockProState),
+                paywallPresenter: PreviewData.mockPaywallPresenter,
+                deviceActivityRegistrar: PreviewData.mockPopulatedActivityRegistrar,
+                blockItemPersistenceManager: PreviewData.mockPopulatedPersistenceManager
+            )
         )
         .preferredColorScheme(.dark)
     }

@@ -155,18 +155,14 @@ struct HomeView: View {
 }
 
 #Preview {
-    let manager = PreviewData.mockBlockItemPersistenceManager
-    let registrar = PreviewData.mockActivityRegistrar
-    let proState = MockPaymentManagerWithPurchaseError().state
-    
     NavigationStack {
         HomeView(
             viewModel: .init(
-                state: .init(timer: ConcurrencyTimer()),
-                proState: proState,
-                paywallPresenter: LivePaywallPresenter(),
-                deviceActivityRegistrar: registrar,
-                blockItemPersistenceManager: manager
+                state: .init(timer: PreviewData.mockTimer),
+                proState: PreviewData.mockProState,
+                paywallPresenter: PreviewData.mockPaywallPresenter,
+                deviceActivityRegistrar: PreviewData.mockPopulatedActivityRegistrar,
+                blockItemPersistenceManager: PreviewData.mockPopulatedPersistenceManager
             )
         )
     }

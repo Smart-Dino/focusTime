@@ -240,19 +240,14 @@ struct ScheduleConfigurationView: View {
 }
 
 #Preview {
-    let manager = PreviewData.mockBlockItemPersistenceManager
-    let registrar = PreviewData.mockActivityRegistrar
-    let proState = MockPaymentManagerWithPurchaseError().state
-    
     let viewModel = ScheduleConfigurationViewModel(
-        state: .init(proState: proState),
-        paywallPresenter: LivePaywallPresenter(),
-        deviceActivityRegistrar: registrar,
-        blockItemPersistenceManager: manager
+        state: .init(proState: PreviewData.mockProState),
+        paywallPresenter: PreviewData.mockPaywallPresenter,
+        deviceActivityRegistrar: PreviewData.mockEmptyActivityRegistrar,
+        blockItemPersistenceManager: PreviewData.mockEmptyPersistenceManager
     )
     
-    ScheduleConfigurationView(
-        viewModel: viewModel
-    )
-    .preferredColorScheme(.dark)
+    return ScheduleConfigurationView(viewModel: viewModel)
+        .preferredColorScheme(.dark)
+        .gradientBackground()
 }

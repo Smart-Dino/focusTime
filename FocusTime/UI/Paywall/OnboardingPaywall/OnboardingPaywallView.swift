@@ -140,16 +140,17 @@ struct OnboardingPaywallView: View {
 
 #Preview {
     if let productID = try? FTProduct.Mocks.weekly.product.id {
-        let paymentManager = MockPaymentManagerWithPurchaseError()
         NavigationStack {
             OnboardingPaywallView(
                 viewModel: .init(
-                    state: .init(requestedProductID: productID, proState: paymentManager.state),
-                    superPaywallVM: .init(paymentManager: paymentManager),
+                    state: .init(requestedProductID: productID, proState: PreviewData.mockProState),
+                    superPaywallVM: .init(paymentManager: PreviewData.mockPaymentManager),
                     flowDelegate: nil
                 )
             )
             .preferredColorScheme(.dark)
         }
+    } else {
+        Text("Could not initialize the product.")
     }
 }
