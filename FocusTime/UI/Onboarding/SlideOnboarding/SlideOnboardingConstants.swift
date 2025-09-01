@@ -67,6 +67,17 @@ extension SlideOnboardingView {
         enum Images {
             static let onboardingBackgroundImageName = "OnboardingImages/OnboardingBackground"
         }
+        
+        enum SlideAnalyticsKeys: String {
+            case onboardingSlideNextTapped = "onboarding_slide_next_tapped"
+            case onboardingSlideSkipped = "onboarding_slide_skipped"
+            case onboardingFinished = "onboarding_finished"
+        }
+        
+        struct SlideAnalyticsParameterKeys {
+            static let slideIndex = "slide_index"
+            static let slideSkipped = "slide_skipped"
+        }
     }
 }
 

@@ -73,6 +73,7 @@ final class SlideOnboardingViewModel {
     private(set) var state: State
     private let startAction: () -> Void
     weak var delegate: SlideOnboardingDelegate?
+    private var analyticsManager: AnalyticsManagerProtocol = LiveAnalyticsManager()
     
     var nextButtonConfig: ButtonUIConfiguration {
         ButtonUIConfiguration(
@@ -81,7 +82,7 @@ final class SlideOnboardingViewModel {
                 verticalPadding: state.buttonVerticalPadding
             )
         ) {
-            // Log action.
+            self.analyticsManager.logEvent(name: SlideOnboardingView.SlideOnboardingConstants.SlideAnalyticsKeys.onboardingSlideNextTapped.rawValue, parameters: nil)
         }
     }
     
@@ -92,6 +93,7 @@ final class SlideOnboardingViewModel {
                 verticalPadding: 14
             )
         ) {
+            self.analyticsManager.logEvent(name: SlideOnboardingView.SlideOnboardingConstants.SlideAnalyticsKeys.onboardingFinished.rawValue, parameters: nil)
             self.delegate?.didFinishOnboardingSlides(skipped: nil)
         }
     }
@@ -114,11 +116,5 @@ final class SlideOnboardingViewModel {
         self.state = state
         self.delegate = delegate
         self.startAction = onStart
-    }
-    
-    
-    // MARK: - Actions
-    func didTapStartFocusing() {
-        startAction()
     }
 }
