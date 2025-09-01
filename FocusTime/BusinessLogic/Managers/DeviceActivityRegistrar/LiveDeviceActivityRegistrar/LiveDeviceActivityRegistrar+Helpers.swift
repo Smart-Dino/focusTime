@@ -193,6 +193,7 @@ extension LiveDeviceActivityRegistrar {
 
         // Use `try?` as cleanup failure shouldn't halt the main cancellation flow.
         try? await cancelScheduledResume(for: tempBlock)
+        try? await removeTempBlockRelated(to: tempBlock)
         try? await blockItemPersistenceManager.delete(blockItem: tempBlock)
     }
     
