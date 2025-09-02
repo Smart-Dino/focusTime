@@ -20,7 +20,7 @@ final class OnboardingPaywallViewModel {
         // Dynamic strings
         static let stringConstants = OnboardingPaywallView.Constants.Strings.self
         var trialPeriodDescription = stringConstants.loadingTitle
-        var purchaseButtonTitle    = stringConstants.subscribeButtonTitle
+        var purchaseButtonTitle    = stringConstants.loadingTitle
         
         init(
             requestedProductID: String,
@@ -89,10 +89,10 @@ final class OnboardingPaywallViewModel {
             return
         }
         
-        state.purchaseButtonTitle = if product.trialPeriod != nil {
-            State.stringConstants.tryButtonTitle
+        state.purchaseButtonTitle = if product.trialPeriod != nil && state.superState.isEligibleForIntro {
+            State.stringConstants.tryButtonTitle(product: product)
         } else {
-            State.stringConstants.subscribeButtonTitle
+            State.stringConstants.subscribeButtonTitle(product: product)
         }
         state.trialPeriodDescription = product.offerDescription
     }
@@ -112,7 +112,7 @@ final class OnboardingPaywallViewModel {
             state.superState.error = PaymentError.pending
             
         case .userCancelled:
-            state.purchaseButtonTitle = State.stringConstants.tryButtonTitle
+            setupProductInfo()
             state.superState.isButtonDisabled = false
         }
     }

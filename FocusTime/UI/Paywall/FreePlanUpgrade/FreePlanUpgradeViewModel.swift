@@ -19,7 +19,7 @@ final class FreePlanUpgradeViewModel {
         
         // Dynamic strings
         static let stringConstants = FreePlanUpgradeView.Constants.Strings.self
-        var purchaseButtonTitle    = stringConstants.tryButtonTitle
+        var purchaseButtonTitle    = stringConstants.loadingTitle
         var trialPeriodDescription = stringConstants.loadingTitle
         
         init(
@@ -88,10 +88,10 @@ final class FreePlanUpgradeViewModel {
             return
         }
         
-        state.purchaseButtonTitle = if product.trialPeriod != nil {
-            State.stringConstants.tryButtonTitle
+        state.purchaseButtonTitle = if product.trialPeriod != nil && state.superState.isEligibleForIntro {
+            State.stringConstants.tryButtonTitle(product: product)
         } else {
-            State.stringConstants.subscribeButtonTitle
+            State.stringConstants.subscribeButtonTitle(product: product)
         }
         state.trialPeriodDescription = product.offerDescription
     }
@@ -111,7 +111,7 @@ final class FreePlanUpgradeViewModel {
             state.superState.error = PaymentError.pending
             
         case .userCancelled:
-            state.purchaseButtonTitle = State.stringConstants.tryButtonTitle
+            setupProductInfo()
             state.superState.isButtonDisabled = false
         }
     }

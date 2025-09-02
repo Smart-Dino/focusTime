@@ -143,12 +143,10 @@ struct PlanSelectionPaywallView: View {
         && (viewModel.state.superState.isEligibleForIntro)
         
         let subtitle = isTrial
-        ? product.subscriptionPeriodDescription
+        ? viewModel.getTrialTerms(for: product)
         : nil
         
-        let descriptionText = isTrial
-        ? viewModel.getTrialTerms(for: product)
-        : product.priceString
+        let descriptionText = product.priceAndPeriodString ?? product.priceString
         
         return Button {
             viewModel.selectProduct(product)
