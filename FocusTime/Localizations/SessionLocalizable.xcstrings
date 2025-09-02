@@ -105,7 +105,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Creative"
+            "value" : "Creative\nFlow"
           }
         }
       }
@@ -116,7 +116,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mindfulness"
+            "value" : "Deep\nMode"
           }
         }
       }
@@ -138,7 +138,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reading"
+            "value" : "Reading\nFocus"
           }
         }
       }
@@ -160,7 +160,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Study"
+            "value" : "Study\nSession"
           }
         }
       }
@@ -193,6 +193,72 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Focus Session"
+          }
+        }
+      }
+    },
+    "focus_session_view_activate_schedule_button_title" : {
+      "comment" : "Title for activating a schedule",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activate Schedule"
+          }
+        }
+      }
+    },
+    "focus_session_view_deactivate_schedule_button_title" : {
+      "comment" : "Title for deactivating a schedule",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deactivate Schedule"
+          }
+        }
+      }
+    },
+    "focus_session_view_delete_alert_cancel_button" : {
+      "comment" : "Title for the cancel button in the alert",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        }
+      }
+    },
+    "focus_session_view_delete_alert_delete_button" : {
+      "comment" : "Title for the delete confirmation button in the alert",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete"
+          }
+        }
+      }
+    },
+    "focus_session_view_delete_alert_title" : {
+      "comment" : "Title for the delete confirmation alert",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to delete this item?"
+          }
+        }
+      }
+    },
+    "focus_session_view_delete_preset_button_title" : {
+      "comment" : "Title for the delete preset button",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Preset"
           }
         }
       }
@@ -230,6 +296,17 @@
         }
       }
     },
+    "focus_session_view_save_button_title" : {
+      "comment" : "Title for the save button",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        }
+      }
+    },
     "focus_session_view_start_button_title" : {
       "comment" : "Title for the start button",
       "localizations" : {
@@ -237,6 +314,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Start"
+          }
+        }
+      }
+    },
+    "focus_session_view_start_focusing_button_title" : {
+      "comment" : "Title for the 'Start Focusing' button when editing a preset",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start Focusing"
           }
         }
       }
@@ -259,6 +347,59 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "List"
+          }
+        }
+      }
+    },
+    "schedule_configuration_view_apps_blocked_list_with_counts" : {
+      "comment" : "Shows the number of selected categories and apps",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%#@arg1@, %#@arg2@"
+          },
+          "substitutions" : {
+            "arg1" : {
+              "argNum" : 1,
+              "formatSpecifier" : "d",
+              "variations" : {
+                "plural" : {
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg category"
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg categories"
+                    }
+                  }
+                }
+              }
+            },
+            "arg2" : {
+              "argNum" : 2,
+              "formatSpecifier" : "d",
+              "variations" : {
+                "plural" : {
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg app"
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg apps"
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }

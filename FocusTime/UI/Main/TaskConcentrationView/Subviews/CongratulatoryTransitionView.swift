@@ -9,6 +9,10 @@ import SwiftUI
 import Lottie
 
 struct CongratulatoryTransitionView: View {
+    @State private var playbackMode: LottiePlaybackMode = .playing(.fromProgress(0,
+                                                                                 toProgress: 1,
+                                                                                 loopMode: .playOnce))
+    
     let title: String
     let subtitle: String
     let onFinished: () -> Void
@@ -25,6 +29,11 @@ struct CongratulatoryTransitionView: View {
             )
             .animationDidFinish { _ in
                 onFinished()
+            }
+            .onAppear {
+                playbackMode = .playing(.fromProgress(0,
+                                                      toProgress: 1,
+                                                      loopMode: .playOnce))
             }
             .containerRelativeFrame([.vertical]) { size, _ in
                 size / 3

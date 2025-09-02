@@ -84,15 +84,19 @@ struct HomeView: View {
         .dynamicTypeSize(...DynamicTypeSize.accessibility2)
         // MARK: - Bottom floating button
         .safeAreaInset(edge: .bottom) {
-            Button(Constants.Strings.bottomButtonTitle, systemImage: Constants.Icons.hourglass) {
-                #warning("Action is empty")
-            }
-            .buttonStyle(.ftPrimary)
-            .padding()
-            .background {
-                Rectangle()
-                    .fill(.ftBackground)
-                    .ignoresSafeArea(edges: .bottom)
+            let item = viewModel.state.upcomingOrRunningItem
+            
+            if item == nil || !(item?.state.isActive ?? true) {
+                Button(Constants.Strings.bottomButtonTitle, systemImage: Constants.Icons.hourglass) {
+                    viewModel.showFocusSessionSetupView()
+                }
+                .buttonStyle(.ftPrimary)
+                .padding()
+                .background {
+                    Rectangle()
+                        .fill(.ftBackground)
+                        .ignoresSafeArea(edges: .bottom)
+                }
             }
         }
         .navigationDestination(isPresented: .init(
@@ -104,6 +108,8 @@ struct HomeView: View {
                 ScheduledBlockItemsView(viewModel: viewModel)
             case .taskConcentration(let viewModel):
                 TaskConcentrationView(viewModel: viewModel)
+            case .focusSession(let viewModel):
+                FocusSessionView(viewModel: viewModel)
             case .none: Text("No view")
             }
         }
@@ -117,6 +123,7 @@ struct HomeView: View {
             message: { Text(viewModel.state.error?.localizedDescription ?? String()) }
         )
         .onAppear {
+            viewModel.checkAuthorization()
             viewModel.setUpcomingItem()
             viewModel.subscribeToDB()
         }

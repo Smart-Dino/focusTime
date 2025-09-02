@@ -36,7 +36,7 @@ final class ScheduledBlockItemsViewModel {
         fetchTask = Task {
             do {
                 let newItems = try await blockItemPersistenceManager.reloadPaginatedData(
-                    totalCount: state.items.count,
+                    totalPages: state.page,
                     packSize: state.amountPerPage
                 )
                 state.items = newItems.filter(\.isScheduled)
@@ -46,24 +46,32 @@ final class ScheduledBlockItemsViewModel {
             fetchTask = nil
         }
     }
-
+    
     private func fetchNextPage() {
         guard fetchTask == nil else { return }
+
         fetchTask = Task {
             do {
                 let newItems = try await blockItemPersistenceManager.fetchPaginated(
                     page: state.page,
                     amountPerPage: state.amountPerPage
-                )
-                state.items.append(contentsOf: newItems.filter(\.isScheduled))
-                state.page += 1
+                ).filter(\.isScheduled)
+
+                let existingIDs = Set(state.items.map(\.id))
+                state.items.append(contentsOf: newItems.filter { !existingIDs.contains($0.id) })
+                
+                if !(newItems.count < state.amountPerPage) {
+                    state.page += 1
+                }
+                
             } catch {
                 state.error = error
             }
+            
             fetchTask = nil
         }
     }
-
+    
     func setErrorVisibility(_ isVisible: Bool) {
         if !isVisible {
             state.error = nil

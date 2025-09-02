@@ -23,6 +23,46 @@ extension FocusSessionView {
                 table: "SessionLocalizable",
                 comment: "Title for the start button"
             )
+            static let deletePresetButtonTitle = String(
+                localized: "focus_session_view_delete_preset_button_title",
+                table: "SessionLocalizable",
+                comment: "Title for the delete preset button"
+            )
+            static let deleteConfirmationAlertTitle = String(
+                localized: "focus_session_view_delete_alert_title",
+                table: "SessionLocalizable",
+                comment: "Title for the delete confirmation alert"
+            )
+            static let deleteConfirmationAlertDeleteButton = String(
+                localized: "focus_session_view_delete_alert_delete_button",
+                table: "SessionLocalizable",
+                comment: "Title for the delete confirmation button in the alert"
+            )
+            static let deleteConfirmationAlertCancelButton = String(
+                localized: "focus_session_view_delete_alert_cancel_button",
+                table: "SessionLocalizable",
+                comment: "Title for the cancel button in the alert"
+            )
+            static let startFocusingButtonTitle = String(
+                localized: "focus_session_view_start_focusing_button_title",
+                table: "SessionLocalizable",
+                comment: "Title for the 'Start Focusing' button when editing a preset"
+            )
+            static let activateScheduleButtonTitle = String(
+                localized: "focus_session_view_activate_schedule_button_title",
+                table: "SessionLocalizable",
+                comment: "Title for activating a schedule"
+            )
+            static let deactivateScheduleButtonTitle = String(
+                localized: "focus_session_view_deactivate_schedule_button_title",
+                table: "SessionLocalizable",
+                comment: "Title for deactivating a schedule"
+            )
+            static let saveButtonTitle = String(
+                localized: "focus_session_view_save_button_title",
+                table: "SessionLocalizable",
+                comment: "Title for the save button"
+            )
         }
         
         // MARK: - General Layout
@@ -31,6 +71,7 @@ extension FocusSessionView {
             static let sheetHeight: CGFloat = 400
             static let sheetCornerRadius: CGFloat = 25
             static let floatingButtonPadding: CGFloat = 20
+            static let deleteButtonHeight: CGFloat = 50
         }
         
         // MARK: - Symbols

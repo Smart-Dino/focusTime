@@ -60,14 +60,21 @@ struct BlockListPickerSheetView: View {
                 get: viewModel.state.isFamilyActivitySheetPresented,
                 set: viewModel.setIsFamilyActivitySheetPresented(_:)
             ),
-            selection: .binding(
-                get: viewModel.state.finalSelection,
-                set: viewModel.setFamilyActivitySelection(_:)
+            // This does not work with a custom binding initializer.
+            selection: .init(
+                get: { viewModel.state.finalSelection },
+                set: { viewModel.setFamilyActivitySelection($0) }
             )
         )
+        .onChange(of: viewModel.state.isFamilyActivitySheetPresented) {
+            if !viewModel.state.isFamilyActivitySheetPresented && viewModel.state.blockItems.isEmpty {
+                viewModel.saveSelection()
+                dismiss.callAsFunction()
+            }
+        }
         .safeAreaInset(edge: .bottom) {
             Group {
-                if viewModel.state.showCreateButton {
+                if viewModel.state.finalSelection.isEmpty {
                     Button(Constants.Strings.newBlocklistButton, systemImage: "plus.circle") {
                         viewModel.setIsFamilyActivitySheetPresented(true)
                     }
@@ -80,7 +87,7 @@ struct BlockListPickerSheetView: View {
                     .transition(.scale)
                 }
             }
-            .animation(.default, value: viewModel.state.showCreateButton)
+            .animation(.default, value: viewModel.state.finalSelection.isEmpty)
             .buttonStyle(.ftPrimary)
             .padding()
             .backgroundGradientFade()
@@ -102,13 +109,24 @@ struct BlockListPickerSheetView: View {
                                 viewModel.toggleBlockItem(blockItem, isSelected: isSelected)
                             }
                         )) {
-#warning("Move to the editing view")
+                            viewModel.setEditedItem(blockItem)
                         }
                         .padding(.horizontal)
                         .onAppear { viewModel.hasReachEndOfList(blockItem: blockItem) }
                 }
             }
         }
+        .familyActivityPicker(
+            isPresented: .binding(
+                get: viewModel.state.editedItem != nil,
+                set: viewModel.setEditingItemSelectionVisibility(_:)
+            ),
+            // This does not work with a custom binding initializer.
+            selection: .init(
+                get: { viewModel.state.editedItem?.blockedContent ?? FamilyActivitySelection() },
+                set: { viewModel.setFamilyActivityItemSelection($0) }
+            )
+        )
     }
     
     @ViewBuilder
@@ -119,10 +137,17 @@ struct BlockListPickerSheetView: View {
     }
 }
 
-#Preview {
+#Preview("Populated list") {
     let factory = MockPersistenceStoreFactory()
     let manager = PreviewData.mockBlockItemPersistenceManager
-    let viewModel = BlockListPickerSheetViewModel(blockItemPersistenceManager: manager)
+    let registrar = LiveDeviceActivityRegistrar(
+        blockItemPersistenceManager: manager,
+        shieldManager: LiveShieldManager()
+    )
+    let viewModel = BlockListPickerSheetViewModel(
+        deviceActivityRegistrar: registrar,
+        blockItemPersistenceManager: manager
+    )
     
     var randomBlockItem: ProtectedBlockItem {
         ProtectedBlockItem(

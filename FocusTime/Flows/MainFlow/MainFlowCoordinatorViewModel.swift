@@ -11,19 +11,29 @@ import FocusTimeUI
 
 enum MainFlowNavigationRoute: Equatable, Hashable {
     case shieldDebug(_ viewModel: ShieldDebugViewModel)
+    case focusSession(_ viewModel: FocusSessionViewModel)
     
     var id: Self { self }
     
     static func == (lhs: MainFlowNavigationRoute, rhs: MainFlowNavigationRoute) -> Bool {
         switch (lhs, rhs) {
-        case (.shieldDebug, .shieldDebug): true
+        case let (.shieldDebug(lVM), .shieldDebug(rVM)):
+            lVM === rVM // compare by reference if class
+        case let (.focusSession(lVM), .focusSession(rVM)):
+            lVM === rVM // compare by reference if class
+        default:
+            false
         }
     }
     
     func hash(into hasher: inout Hasher) {
         switch self {
-        case .shieldDebug:
+        case let .shieldDebug(vm):
             hasher.combine(0)
+            hasher.combine(ObjectIdentifier(vm)) // hash the instance reference
+        case let .focusSession(vm):
+            hasher.combine(1)
+            hasher.combine(ObjectIdentifier(vm))
         }
     }
 }
@@ -36,24 +46,30 @@ final class MainFlowCoordinatorViewModel {
             case home(viewModel: HomeViewModel)
             case drafts(viewModel: DraftsBlockItemListViewModel)
             case none
-            
+
             var id: Int { hashValue }
-            
+
             static func == (lhs: MainTabScreens, rhs: MainTabScreens) -> Bool {
                 switch (lhs, rhs) {
-                case (.home, .home): true
-                case (.drafts, .drafts): true
-                case (.none, .none): true
-                default: false
+                case let (.home(lVM), .home(rVM)):
+                    lVM === rVM // reference equality if class
+                case let (.drafts(lVM), .drafts(rVM)):
+                    lVM === rVM // reference equality if class
+                case (.none, .none):
+                    true
+                default:
+                    false
                 }
             }
-            
+
             func hash(into hasher: inout Hasher) {
                 switch self {
-                case .home:
+                case let .home(vm):
                     hasher.combine(0)
-                case .drafts:
+                    hasher.combine(ObjectIdentifier(vm))
+                case let .drafts(vm):
                     hasher.combine(1)
+                    hasher.combine(ObjectIdentifier(vm))
                 case .none:
                     hasher.combine(2)
                 }
@@ -105,6 +121,7 @@ final class MainFlowCoordinatorViewModel {
             State.MainTabScreens.drafts(
                 viewModel: DraftsBlockItemListViewModel(
                     state: .init(timer: timer),
+                    deviceActivityRegistrar: deviceActivityRegistrar,
                     blockItemPersistenceManager: blockItemPersistenceManager
                 )
             )
@@ -122,6 +139,10 @@ final class MainFlowCoordinatorViewModel {
         state.nextNavigationScreen = .shieldDebug(makeShieldDebugViewModel())
     }
     
+    func showNewBlockListView() {
+        state.nextNavigationScreen = .focusSession(makeFocusSessionViewModel())
+    }
+    
     func setTabScreen(_ screen: State.MainTabScreens) {
         if state.currentTabScreen == screen {
             state.debugViewCount += 1
@@ -137,6 +158,14 @@ final class MainFlowCoordinatorViewModel {
     
     func makeShieldDebugViewModel() -> ShieldDebugViewModel {
         ShieldDebugViewModel(blockItemPersistenceManager: blockItemPersistenceManager)
+    }
+    
+    func makeFocusSessionViewModel() -> FocusSessionViewModel {
+        FocusSessionViewModel(
+            mode: .addBlockList,
+            blockItemPersistenceManager: blockItemPersistenceManager,
+            deviceActivityRegistrar: deviceActivityRegistrar
+        )
     }
     
     func requestPaywall() {

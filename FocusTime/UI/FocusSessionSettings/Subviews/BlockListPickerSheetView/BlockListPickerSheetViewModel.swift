@@ -8,6 +8,17 @@
 import Foundation
 import FamilyControls
 
+enum BlockListPickerSheetError: LocalizedError {
+    case emptySelection
+    
+    var errorDescription: String {
+        switch self {
+        case .emptySelection:
+            String(localized: "block_list_picker_error_empty_selection", table: "ErrorLocalizable")
+        }
+    }
+}
+
 @MainActor
 protocol BlockListPickerSheetDelegate: AnyObject {
     func didFinishSelectionWith(_ selection: FamilyActivitySelection)
@@ -18,31 +29,34 @@ protocol BlockListPickerSheetDelegate: AnyObject {
 final class BlockListPickerSheetViewModel {
     struct State {
         var error: Error? = nil
+        
         var finalSelection: FamilyActivitySelection = FamilyActivitySelection()
         var isFamilyActivitySheetPresented: Bool = false
+        
+        var editedItem: ProtectedBlockItem? = nil
         
         var page = 0
         let amountPerPage = SharedAppValues.amountOfItemsPerPage
         
         var selectedBlockItems: Set<ProtectedBlockItem> = []
         var blockItems: [ProtectedBlockItem] = []
-        
-        var showCreateButton: Bool {
-            finalSelection.isEmpty && selectedBlockItems.isEmpty
-        }
     }
     
     private(set) var state: State
+    
     weak var delegate: BlockListPickerSheetDelegate?
+    private let deviceActivityRegistrar: DeviceActivityRegistrar
     private let blockItemPersistenceManager: BlockItemPersistenceManager
     
     private var fetchTask: Task<Void, Never>?
     
     init(
         state: State = State(),
+        deviceActivityRegistrar: DeviceActivityRegistrar,
         blockItemPersistenceManager: BlockItemPersistenceManager
     ) {
         self.state = state
+        self.deviceActivityRegistrar = deviceActivityRegistrar
         self.blockItemPersistenceManager = blockItemPersistenceManager
     }
     
@@ -52,12 +66,38 @@ final class BlockListPickerSheetViewModel {
         }
     }
     
+    func setEditingItemSelectionVisibility(_ isVisible: Bool) {
+        if !isVisible {
+            Task {
+                do {
+                    guard let editedItem = state.editedItem else { return }
+                    state.editedItem = nil
+                    
+                    guard !editedItem.blockedContent.isEmpty else { throw BlockListPickerSheetError.emptySelection }
+                    
+                    try await blockItemPersistenceManager.editBlockItem(blockItem: editedItem)
+                    reloadItems()
+                } catch {
+                    state.error = error
+                }
+            }
+        }
+    }
+    
+    func setEditedItem(_ item: ProtectedBlockItem) {
+        state.editedItem = item
+    }
+    
     func setIsFamilyActivitySheetPresented(_ isPresented: Bool) {
         state.isFamilyActivitySheetPresented = isPresented
     }
     
     func setFamilyActivitySelection(_ selection: FamilyActivitySelection) {
         state.finalSelection = selection
+    }
+    
+    func setFamilyActivityItemSelection(_ selection: FamilyActivitySelection) {
+        state.editedItem?.blockedContent = selection
     }
     
     func isSelected(_ blockItem: ProtectedBlockItem) -> Bool {
@@ -83,20 +123,45 @@ final class BlockListPickerSheetViewModel {
         state.finalSelection = combined
     }
     
+    private func reloadItems() {
+        fetchTask?.cancel()
+        fetchTask = Task {
+            do {
+                let newItems = try await blockItemPersistenceManager.reloadPaginatedData(
+                    totalPages: state.page,
+                    packSize: state.amountPerPage
+                )
+                state.blockItems = newItems
+            } catch {
+                state.error = error
+            }
+            fetchTask = nil
+        }
+    }
+    
     func fetchNextPage() {
         guard fetchTask == nil else { return }
+
         fetchTask = Task {
             do {
                 let newItems = try await blockItemPersistenceManager.fetchPaginated(
                     page: state.page,
                     amountPerPage: state.amountPerPage
                 )
-                state.blockItems.append(contentsOf: newItems)
-                state.page += 1
+
+                let existingIDs = Set(state.blockItems.map(\.id))
+                state.blockItems.append(contentsOf: newItems.filter { !existingIDs.contains($0.id) })
+                
+                if !(newItems.count < state.amountPerPage) {
+                    state.page += 1
+                }
+                
             } catch {
                 state.error = error
             }
+            
             fetchTask = nil
+            openFamilyActivitySelectionIfNeeded()
         }
     }
     
@@ -107,6 +172,12 @@ final class BlockListPickerSheetViewModel {
     func hasReachEndOfList(blockItem: ProtectedBlockItem) {
         if blockItem.id == state.blockItems.last?.id {
             fetchNextPage()
+        }
+    }
+    
+    private func openFamilyActivitySelectionIfNeeded() {
+        if state.blockItems.isEmpty && state.page <= 1 {
+            setIsFamilyActivitySheetPresented(true)
         }
     }
 }

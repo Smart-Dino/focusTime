@@ -28,10 +28,8 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
     }
     
     deinit {
-        // Continuation.
         continuation?.finish()
         continuation = nil
-        // Database-tracking task.
         databaseChanges?.cancel()
         databaseChanges = nil
     }
@@ -47,13 +45,17 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
     // MARK: If any ViewModel needs specific values of methods add them here instead of that ViewModel.
     
     func insert(_ item: ProtectedBlockItem) async throws {
+        var item = item
+        item.name = item.name.collapsedLines()
+        
         try await store.insert(item)
     }
     
     func insert(_ item: inout ProtectedBlockItem) async throws {
+        item.name = item.name.collapsedLines()
+        
         let persistenceID = try await store.insert(item)
         
-        // I cannot set persistentID since it is a constant so I will create a new instance instead.
         let itemCopy = ProtectedBlockItem(
             id: item.id,
             persistentModelID: persistenceID,
@@ -61,20 +63,33 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
             name: item.name,
             days: item.days,
             type: item.type,
+            isTemporary: item.isTemporary,
+            isCancelled: item.isCancelled,
+            isScheduled: item.isScheduled,
             blockedContent: item.blockedContent
         )
         item = itemCopy
     }
     
-    /// Applies passed ``ProtectedBlockItem`` to it's corresponding model.
+    func delete(blockItem: ProtectedBlockItem) async throws {
+        guard let id = blockItem.persistentModelID else {
+            throw PersistenceStoreError.noIdentifier
+        }
+        
+        try await store.delete(id: id)
+    }
+    
+    /// Applies passed ``ProtectedBlockItem`` to its corresponding model.
     func editBlockItem(blockItem: ProtectedBlockItem) async throws {
         guard let id = blockItem.persistentModelID else { return }
         try await store.updateFields(id: id) { model in
             model.emoji = blockItem.emoji
-            model.name = blockItem.name
+            model.name = blockItem.name.collapsedLines()
             model.days = blockItem.days
             model.type = blockItem.type
             model.blockedContent = blockItem.blockedContent
+            model.isTemporary = blockItem.isTemporary
+            model.isCancelled = blockItem.isCancelled
         }
     }
     
@@ -100,83 +115,81 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
         if includeTemporary {
             return items
         } else {
-            return items.filter { !$0.isTemporary }
+            return items.filter { $0.isTemporary == nil }
         }
     }
     
+    func fetchTemporary() async throws -> [ProtectedBlockItem] {
+        // SwiftData / CoreData do not support Predicate on complex types.
+        // I traded performance for code readability.
+        return try await store
+            .fetch()
+            .filter { $0.isTemporary != nil }
+    }
+    
     func fetchClosestOrRunningCurrentScheduled(now: Date) async throws -> ProtectedBlockItem? {
-        let identifiers = await centerManager.monitoredIdentifiers
+        // 1. Fetch all blocks.
+        let blocks = try await store.fetch().filter {
+            if case .relatedTo = $0.isTemporary { false } else { true }
+        }
 
-        // 1. Fetch all monitored blocks.
-        let blocks = try await store.fetch()
-        let runningOrScheduledBlocks = blocks.filter(
-            { $0.state.isActive || identifiers.contains($0.id) }
-        )
-
-        // 2. Return running if found.
-        if let running = runningOrScheduledBlocks.first(where: { $0.state.isActive }) {
+        // 2. Prioritize and return a running block if one exists.
+        if let running = blocks.first(where: { $0.state.isActive }) {
             return running
         }
 
-        // Mark scheduled & filter only scheduled ones.
-        let scheduledBlocks = await markScheduled(blocks).filter(\.isScheduled)
-
-        guard !scheduledBlocks.isEmpty else {
-            return nil
+        // 3. Filter for only valid, schedulable blocks.
+        // This removes temporary, cancelled, or non-scheduled items immediately.
+        let scheduledBlocks = await markScheduled(blocks).filter {
+            $0.isScheduled && !$0.isCancelled
         }
 
-        // Sort by start time.
-        let sortedByStartTime = scheduledBlocks.sorted {
-            guard case .scheduled(let firstStart, _, _, _, _) = $0.type,
-                  case .scheduled(let secondStart, _, _, _, _) = $1.type else {
-                return false
+        // 4. For each block, calculate its next concrete occurrence date after `now`.
+        let upcomingOccurrences = scheduledBlocks.compactMap { block -> (item: ProtectedBlockItem, nextFireDate: Date)? in
+            guard let nextDate = findNextOccurrence(for: block, after: now) else {
+                return nil
             }
-            return firstStart < secondStart
+            return (item: block, nextFireDate: nextDate)
         }
 
-        // Find the closest future schedule.
-        let currentTimeComponent = try TimeComponents(from: now)
-        if let upcoming = sortedByStartTime.first(where: {
-            guard case .scheduled(let start, _, _, _, _) = $0.type else { return false }
-            return start > currentTimeComponent
-        }) {
-            return upcoming
+        // 5. Find the occurrence that happens soonest.
+        let closestUpcoming = upcomingOccurrences.min {
+            $0.nextFireDate < $1.nextFireDate
         }
 
-        // If no future found, wrap to earliest (next day).
-        return sortedByStartTime.first(where: { !$0.isCancelled })
+        // 6. Return the block associated with that closest occurrence.
+        // If no upcoming blocks are found, this will correctly return nil.
+        return closestUpcoming?.item
     }
-
     
     func fetchPaginated(
         page: Int,
         amountPerPage: Int
     ) async throws -> [ProtectedBlockItem] {
-        let items = try await store.fetch(page: page, amountPerPage: page)
-        let filteredFromTemp = items.filter { !$0.isTemporary }
+        let items = try await store.fetch(page: page, amountPerPage: amountPerPage)
+        let filteredFromTemp = items.filter { $0.isTemporary == nil }
         
         return await markScheduled(filteredFromTemp)
     }
     
     func reloadPaginatedData(
-        totalCount: Int,
+        totalPages: Int,
         packSize: Int
     ) async throws -> [ProtectedBlockItem] {
         var allItems: [ProtectedBlockItem] = []
 
-        for offset in stride(from: 0, to: totalCount, by: packSize) {
-            let predicate = #Predicate<BlockItem> { model in
-                !model.isTemporary
-            }
+        for page in 0...totalPages {
+            var descriptor = FetchDescriptor<BlockItem>()
+            descriptor.fetchOffset = page * packSize
+            descriptor.fetchLimit = packSize
 
-            var descriptor = FetchDescriptor<BlockItem>(predicate: predicate)
-            descriptor.fetchLimit = min(packSize, totalCount - offset)
-            descriptor.fetchOffset = offset
-
-            let fetchedBlockItems = try await store.fetch(descriptor: descriptor)
+            let fetchedBlockItems = try await store
+                .fetch(descriptor: descriptor)
+                .filter { $0.isTemporary == nil }
+            
             allItems.append(contentsOf: fetchedBlockItems)
 
-            await Task.yield() // Allow thread to breathe between batches.
+            await Task.yield()
         }
 
         return await markScheduled(allItems)
@@ -201,15 +214,8 @@ actor LiveBlockItemPersistenceManager: BlockItemPersistenceManager, Sendable {
     }
     
     private func handleTermination(_ reason: AsyncStream<Bool>.Continuation.Termination) {
-        // Swift marked the stream as terminated,
-        // finishing the continuation.
         continuation?.finish()
         continuation = nil
-        
-        // switch reason {
-        //   case .cancelled:   …
-        //   case .finished:    …
-        // }
     }
 }
 
@@ -227,5 +233,47 @@ extension LiveBlockItemPersistenceManager {
         }
         
         return items
+    }
+    
+    /// A helper function to find the next valid occurrence of a block after a given date.
+    /// - Parameters:
+    ///   - block: The block item with its schedule days (`.days`) and start time (`.type`).
+    ///   - date: The date to search after (typically `Date()`).
+    /// - Returns: A concrete `Date` for the next scheduled run, or `nil` if none can be found.
+    /// - Note: Uses the user’s current calendar and time zone. If the user changes time zones,
+    ///         the computed next occurrence will shift accordingly.
+    private func findNextOccurrence(for block: ProtectedBlockItem, after date: Date) -> Date? {
+        // Ensure the block is a scheduled type and has days assigned.
+        guard case .scheduled(let startTime, _, _, _, _) = block.type, !block.days.isEmpty else {
+            return nil
+        }
+
+        // Explicitly tie to current time zone to avoid surprises.
+        var calendar = Calendar.current
+        calendar.timeZone = .current
+
+        // Look at today + the next 6 days (1 full week).
+        for dayOffset in 0..<7 {
+            guard let searchDate = calendar.date(byAdding: .day, value: dayOffset, to: date) else {
+                continue
+            }
+
+            let weekdayComponent = calendar.component(.weekday, from: searchDate)
+            guard let weekday = Weekday(rawValue: weekdayComponent), block.days.contains(weekday) else {
+                continue // Not a valid scheduled weekday for this block.
+            }
+
+            // Construct full candidate date with correct year/month/day + time-of-day.
+            var dateComponents = calendar.dateComponents([.year, .month, .day], from: searchDate)
+            let time = startTime.dateComponents
+            dateComponents.hour = time.hour
+            dateComponents.minute = time.minute
+
+            if let candidate = calendar.date(from: dateComponents), candidate > date {
+                return candidate // Short-circuit: return first valid match.
+            }
+        }
+
+        return nil
     }
 }

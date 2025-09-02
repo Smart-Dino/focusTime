@@ -83,10 +83,20 @@ struct DeviceActivityHandler: Sendable {
     // The signature now accepts the activity.
     private func handleResumption(for blockItem: BlockItem, with activity: DeviceActivityName, in store: BlockItemExtensionStore) async {
         switch blockItem.type {
-        case .scheduled:
+        case .scheduled(_, _, _, _, let suspendedUntil):
+            if let suspendedUntil {
+                let offset = Int(suspendedUntil.timeIntervalSinceNow)
+                await self.offset(seconds: offset)
+            }
+            
             await blockAndActivateSession(for: blockItem, in: store, isResuming: true)
             
-        case .duration:
+        case .duration(_, _, let suspendedUntil, _):
+            if let suspendedUntil {
+                let offset = Int(suspendedUntil.timeIntervalSinceNow)
+                await self.offset(seconds: offset)
+            }
+            
             await resumeDurationBlocking(for: blockItem, in: store)
         }
         // Once it has fired and we've handled it, stop monitoring it
@@ -131,7 +141,7 @@ struct DeviceActivityHandler: Sendable {
         }
         await unblockAndDeactivateSession(for: blockItem, in: store)
 
-        if blockItem.isTemporary {
+        if blockItem.isTemporary != nil {
             store.delete(model: blockItem)
         }
     }

@@ -31,7 +31,8 @@ enum ScheduleType: Codable, Hashable, Equatable {
             PeriodConverter.localizedConciseTimeString(
                 from: duration.rawValue,
                 allowedUnits: [.hour, .minute],
-                unitsStyle: .abbreviated
+                unitsStyle: .abbreviated,
+                maximumUnitsCount: 2 
             )
         }
     }
@@ -54,7 +55,8 @@ enum ScheduleType: Codable, Hashable, Equatable {
                 duration: PeriodConverter.localizedConciseTimeString(
                     from: duration.rawValue,
                     allowedUnits: [.hour, .minute],
-                    unitsStyle: .abbreviated
+                    unitsStyle: .abbreviated,
+                    maximumUnitsCount: 2
                 )
             )
         }
@@ -75,7 +77,7 @@ enum ScheduleType: Codable, Hashable, Equatable {
             let timeSinceStart = currentSecondsFromMidnight - startTime.localizedSecondsSinceMidnight
             let timeLeftInSeconds = endTime.localizedSecondsSinceMidnight - currentSecondsFromMidnight
             
-            if timeSinceStart >= 0 {
+            if timeSinceStart >= 0 && timeLeftInSeconds > 10 {
                 return timeLeftInSeconds
             } else {
                 return nil

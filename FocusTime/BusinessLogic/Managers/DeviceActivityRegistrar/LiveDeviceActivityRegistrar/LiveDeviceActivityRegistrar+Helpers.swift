@@ -102,9 +102,16 @@ extension LiveDeviceActivityRegistrar {
         } else if case .scheduled(let startTime, _, _, _, _) = nextBlock.type {
             // Check if the proposed duration extends beyond the start time of the next scheduled block.
             let startOfToday = calendar.startOfDay(for: now)
-            let scheduledBlockStartTime = startOfToday.addingTimeInterval(TimeInterval(startTime.localizedSecondsSinceMidnight))
+            var scheduledBlockStartTime = startOfToday.addingTimeInterval(
+                TimeInterval(startTime.localizedSecondsSinceMidnight)
+            )
+
+            // If that scheduled start is already in the past today, roll it over to tomorrow.
+            if scheduledBlockStartTime <= now {
+                scheduledBlockStartTime = calendar.date(byAdding: .day, value: 1, to: scheduledBlockStartTime)!
+            }
+
             let proposedEndTime = now.addingTimeInterval(TimeInterval(proposedDuration))
-            
             isOverlapping = proposedEndTime > scheduledBlockStartTime
         } else {
             isOverlapping = false
@@ -122,7 +129,7 @@ extension LiveDeviceActivityRegistrar {
     ) async throws -> [ProtectedBlockItem] {
         var overlapping: [ProtectedBlockItem] = []
         let activities = await centerManager.activities
-
+        
         for activity in activities {
             guard
                 let existingSchedule = await centerManager.schedule(for: activity),
@@ -133,8 +140,8 @@ extension LiveDeviceActivityRegistrar {
             else {
                 throw DeviceActivityRegistrarError.couldNotCheckOverlap
             }
-
-            if start1 < end2 && start2 < end1 {
+            
+            if start1 <= end2 && start2 <= end1 {
                 guard let decoded = CodableActivityIdentifier(from: activity) else {
                     throw DeviceActivityRegistrarError.couldNotCheckOverlap
                 }
@@ -144,11 +151,12 @@ extension LiveDeviceActivityRegistrar {
                 }
             }
         }
-
-        return overlapping
+        
+        return overlapping.filter { $0.isTemporary == nil }
     }
 
     func startActivityIfRegisteredDuringIntervalWindow(item: ProtectedBlockItem) async throws {
+        guard item.days.contains(Weekday.currentDay) else { return }
         guard case .scheduled = item.type else { return }
 
         let timeLeftInSeconds = item.type.secondsToIntervalEndIfShouldBeRunning(now: await clock.now)
@@ -157,17 +165,33 @@ extension LiveDeviceActivityRegistrar {
         // Create temporary duration block and schedule it immediately.
         var temp = ProtectedBlockItem(
             emoji: "⏳",
-            name: "temp-" + UUID().uuidString,
+            name: UUID().uuidString,
             days: item.days,
             type: .duration(duration: .init(seconds: timeLeft)),
-            isTemporary: true,
+            isTemporary: .relatedTo(blockID: item.id),
             blockedContent: item.blockedContent
         )
 
         try await blockItemPersistenceManager.insert(&temp)
         try await registerDurationActivity(for: temp, forcedDuration: timeLeft)
     }
+    
+    /// Finds and deletes a temporary block associated with a primary block's ID.
+    func cleanupTemporaryBlock(relatedTo originalBlockID: UUID) async throws {
+        let allBlocks = try await blockItemPersistenceManager.fetchTemporary()
 
+        guard let tempBlock = allBlocks.first(where: { block in
+            if case .relatedTo(let relatedID) = block.isTemporary {
+                return relatedID == originalBlockID
+            }
+            return false
+        }) else { return }
+
+        // Use `try?` as cleanup failure shouldn't halt the main cancellation flow.
+        try? await cancelScheduledResume(for: tempBlock)
+        try? await blockItemPersistenceManager.delete(blockItem: tempBlock)
+    }
+    
     static func adjustedEndDate(endDate: Date, suspendedAt: Date?, resumedAt: Date) -> Date {
         guard let suspendedAt else { return endDate }
         let suspendedDuration = resumedAt.timeIntervalSince(suspendedAt)

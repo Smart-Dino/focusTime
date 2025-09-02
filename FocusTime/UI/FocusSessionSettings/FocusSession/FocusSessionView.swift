@@ -10,7 +10,8 @@ import FocusTimeUI
 
 struct FocusSessionView: View {
     //MARK: - Properties
-    @State private var viewModel: FocusSessionViewModel
+    @Environment(\.dismiss) var dismiss
+    @State var viewModel: FocusSessionViewModel
     
     //MARK: - Body
     var body: some View {
@@ -26,13 +27,13 @@ struct FocusSessionView: View {
                     )
                 )
                 
-                if viewModel.state.isInEditingMode {
+                if case .editBlockList = viewModel.state.mode {
                     Button(role: .destructive) {
-                        #warning("No implementation")
+                        viewModel.setDeletionAlertPresentation(true)
                     } label: {
-                        Text("Delete Preset")
+                        Text(Constants.Strings.deletePresetButtonTitle)
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .rowStyle(height: 50)
+                            .rowStyle(height: Constants.Layout.deleteButtonHeight)
                             .padding(.horizontal)
                             .contentShape(.rect)
                     }
@@ -41,6 +42,34 @@ struct FocusSessionView: View {
             .padding(.vertical)
         }
         .gradientBackground()
+        .alert(
+            SharedConstants.Strings.errorHeader,
+            isPresented: Binding(
+                get: { viewModel.state.error != nil },
+                set: { viewModel.setErrorVisibility($0) }
+            ),
+            actions: { /* OK dismissal button by default */ },
+            message: { Text(viewModel.state.error?.localizedDescription ?? String()) }
+        )
+        .alert(
+            Constants.Strings.deleteConfirmationAlertTitle,
+            isPresented: Binding(
+                get: { viewModel.state.isDeletionAlertPresented },
+                set: { viewModel.setDeletionAlertPresentation($0) }
+            ),
+            actions: {
+                Button(Constants.Strings.deleteConfirmationAlertDeleteButton, role: .destructive) {
+                    Task {
+                        try await viewModel.deleteButtonTapped()
+                        dismiss.callAsFunction()
+                    }
+                }
+                Button(Constants.Strings.deleteConfirmationAlertCancelButton, role: .cancel) {
+                    viewModel.setDeletionAlertPresentation(false)
+                }
+            },
+            message: { Text(viewModel.state.error?.localizedDescription ?? String()) }
+        )
         .navigationTitle(Constants.Strings.navigationTitle)
         .navigationBarTitleDisplayMode(.inline)
         .safeAreaInset(edge: .bottom) {
@@ -56,28 +85,46 @@ struct FocusSessionView: View {
                 } else {
                     VStack {
                         // Start Focusing button (only in editing + duration mode)
-                        if viewModel.state.isInEditingMode && viewModel.state.isDurationSchedule {
-                            Button("Start Focusing") {
-                                #warning("No implementation")
+                        if case .editBlockList = viewModel.state.mode, viewModel.state.isDurationSchedule {
+                            Button(Constants.Strings.startFocusingButtonTitle) {
+                                Task {
+                                    try await viewModel.startFocusingTapped()
+                                    dismiss.callAsFunction()
+                                }
+                            }
+                            .buttonStyle(.ftAction)
+                        } else if case .editBlockList = viewModel.state.mode, viewModel.state.isScheduled {
+                            Button(viewModel.state.isItemScheduled ? Constants.Strings.deactivateScheduleButtonTitle : Constants.Strings.activateScheduleButtonTitle) {
+                                Task {
+                                    try await viewModel.startFocusingTapped()
+                                    dismiss.callAsFunction()
+                                }
                             }
                             .buttonStyle(.ftAction)
                         }
                         
                         // Save button (editing mode or scheduled)
-                        if viewModel.state.isInEditingMode || viewModel.state.isScheduled {
-                            Button("Save") {
-                                #warning("No implementation")
+                        if !viewModel.state.isStartButtonDisplayed || viewModel.state.isScheduled {
+                            Button(Constants.Strings.saveButtonTitle) {
+                                Task {
+                                    try await viewModel.saveTapped()
+                                    dismiss.callAsFunction()
+                                }
                             }
                             .buttonStyle(.ftPrimary)
+                            .disabled(!viewModel.state.isSavingButtonsEnabled)
                         } else {
                             // Default Start button
                             Button {
-                                viewModel.startTapped()
+                                Task {
+                                    try await viewModel.startTapped()
+                                    dismiss.callAsFunction()
+                                }
                             } label: {
                                 Label(Constants.Strings.startButtonTitle, systemImage: Constants.Symbols.startButtonIcon)
                             }
                             .buttonStyle(.ftPrimary)
-                            .disabled(!viewModel.state.isStartButtonEnabled)
+                            .disabled(!viewModel.state.isSavingButtonsEnabled)
                         }
                     }
                 }
@@ -87,37 +134,73 @@ struct FocusSessionView: View {
         }
         .preferredColorScheme(.dark)
     }
-    
-    //MARK: - Initializer
-    init(viewModel: FocusSessionViewModel = FocusSessionViewModel()) {
-        self.viewModel = viewModel
-    }
-    
 }
 
 // MARK: - Preview
 #Preview("Creation mode") {
+    let manager = PreviewData.mockBlockItemPersistenceManager
+    let registrar = LiveDeviceActivityRegistrar(
+        blockItemPersistenceManager: manager,
+        shieldManager: LiveShieldManager()
+    )
+    let viewModel = FocusSessionViewModel(
+        mode: .addBlockList,
+        blockItemPersistenceManager: manager,
+        deviceActivityRegistrar: registrar
+    )
+    
     NavigationStack {
-        FocusSessionView()
+        FocusSessionView(viewModel: viewModel)
+    }
+}
+
+#Preview("Start focusing mode") {
+    let manager = PreviewData.mockBlockItemPersistenceManager
+    let registrar = LiveDeviceActivityRegistrar(
+        blockItemPersistenceManager: manager,
+        shieldManager: LiveShieldManager()
+    )
+    let viewModel = FocusSessionViewModel(
+        mode: .startFocusing,
+        blockItemPersistenceManager: manager,
+        deviceActivityRegistrar: registrar
+    )
+    
+    return NavigationStack {
+        FocusSessionView(viewModel: viewModel)
     }
 }
 
 #Preview("Editing mode duration") {
-    NavigationStack {
-        FocusSessionView(
-            viewModel: FocusSessionViewModel(
-                state: .init(blockItem: ProtectedBlockItem.mockDuration)
-            )
-        )
+    let manager = PreviewData.mockBlockItemPersistenceManager
+    let registrar = LiveDeviceActivityRegistrar(
+        blockItemPersistenceManager: manager,
+        shieldManager: LiveShieldManager()
+    )
+    let viewModel = FocusSessionViewModel(
+        mode: .editBlockList(ProtectedBlockItem.mockDuration),
+        blockItemPersistenceManager: manager,
+        deviceActivityRegistrar: registrar
+    )
+    
+    return NavigationStack {
+        FocusSessionView(viewModel: viewModel)
     }
 }
 
 #Preview("Editing mode scheduled") {
-    NavigationStack {
-        FocusSessionView(
-            viewModel: FocusSessionViewModel(
-                state: .init(blockItem: ProtectedBlockItem.mockScheduled)
-            )
-        )
+    let manager = PreviewData.mockBlockItemPersistenceManager
+    let registrar = LiveDeviceActivityRegistrar(
+        blockItemPersistenceManager: manager,
+        shieldManager: LiveShieldManager()
+    )
+    let viewModel = FocusSessionViewModel(
+        mode: .editBlockList(ProtectedBlockItem.mockScheduled),
+        blockItemPersistenceManager: manager,
+        deviceActivityRegistrar: registrar
+    )
+    
+    return NavigationStack {
+        FocusSessionView(viewModel: viewModel)
     }
 }

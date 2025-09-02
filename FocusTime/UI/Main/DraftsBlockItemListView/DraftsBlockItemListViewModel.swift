@@ -10,6 +10,27 @@ import Foundation
 import FocusTimeUI
 import FamilyControls
 
+enum DraftsBlockItemListViewNavigationRoute: Equatable, Hashable {
+    case focusSession(_ viewModel: FocusSessionViewModel)
+    
+    var id: Self { self }
+    
+    static func == (lhs: DraftsBlockItemListViewNavigationRoute, rhs: DraftsBlockItemListViewNavigationRoute) -> Bool {
+        switch (lhs, rhs) {
+        case let (.focusSession(lVM), .focusSession(rVM)):
+            lVM === rVM
+        }
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        switch self {
+        case let .focusSession(vm):
+            hasher.combine(1)
+            hasher.combine(ObjectIdentifier(vm))
+        }
+    }
+}
+
 @MainActor
 @Observable
 final class DraftsBlockItemListViewModel {
@@ -25,10 +46,12 @@ final class DraftsBlockItemListViewModel {
         var page = 0
         let amountPerPage = SharedAppValues.amountOfItemsPerPage
         var items = [ProtectedBlockItem]()
+        
+        var nextNavigationScreen: DraftsBlockItemListViewNavigationRoute?
     }
     
     private(set) var state: State
-    
+    private let deviceActivityRegistrar: DeviceActivityRegistrar
     private let blockItemPersistenceManager: BlockItemPersistenceManager
     
     private var fetchTask: Task<Void, Never>?
@@ -36,10 +59,18 @@ final class DraftsBlockItemListViewModel {
     
     init(
         state: State,
+        deviceActivityRegistrar: DeviceActivityRegistrar,
         blockItemPersistenceManager: BlockItemPersistenceManager
     ) {
         self.state = state
+        self.deviceActivityRegistrar = deviceActivityRegistrar
         self.blockItemPersistenceManager = blockItemPersistenceManager
+    }
+    
+    func setNextNavigationScreen(_ showing: Bool) {
+        if !showing {
+            state.nextNavigationScreen = nil
+        }
     }
     
     private func reloadItems() {
@@ -47,7 +78,7 @@ final class DraftsBlockItemListViewModel {
         fetchTask = Task {
             do {
                 let newItems = try await blockItemPersistenceManager.reloadPaginatedData(
-                    totalCount: state.items.count,
+                    totalPages: state.page,
                     packSize: state.amountPerPage
                 )
                 state.items = newItems
@@ -61,18 +92,27 @@ final class DraftsBlockItemListViewModel {
     
     private func fetchNextPage() {
         guard fetchTask == nil else { return }
+
         fetchTask = Task {
             do {
                 let newItems = try await blockItemPersistenceManager.fetchPaginated(
                     page: state.page,
                     amountPerPage: state.amountPerPage
                 )
-                state.items.append(contentsOf: newItems)
-                state.page += 1
+
+                let existingIDs = Set(state.items.map(\.id))
+                state.items.append(contentsOf: newItems.filter { !existingIDs.contains($0.id) })
+                
                 setupTimerForActiveItem()
+                
+                if !(newItems.count < state.amountPerPage) {
+                    state.page += 1
+                }
+                
             } catch {
                 state.error = error
             }
+            
             fetchTask = nil
         }
     }
@@ -111,5 +151,21 @@ final class DraftsBlockItemListViewModel {
         if blockItem.id == state.items.last?.id {
             fetchNextPage()
         }
+    }
+    
+    func navigateToFocusSessionNewItem() {
+        state.nextNavigationScreen = .focusSession(makeFocusSessionViewModel(mode: .addBlockList))
+    }
+    
+    func navigateToFocusSessionEditing(list: ProtectedBlockItem) {
+        state.nextNavigationScreen = .focusSession(makeFocusSessionViewModel(mode: .editBlockList(list)))
+    }
+    
+    func makeFocusSessionViewModel(mode: FocusSessionMode) -> FocusSessionViewModel {
+        FocusSessionViewModel(
+            mode: mode,
+            blockItemPersistenceManager: blockItemPersistenceManager,
+            deviceActivityRegistrar: deviceActivityRegistrar
+        )
     }
 }

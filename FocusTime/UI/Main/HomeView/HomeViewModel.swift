@@ -12,23 +12,34 @@ import FocusTimeUI
 enum HomeViewNavigationRoute: Equatable, Hashable {
     case scheduledFocusList(_ viewModel: ScheduledBlockItemsViewModel)
     case taskConcentration(_ viewModel: TaskConcentrationViewModel)
+    case focusSession(_ viewModel: FocusSessionViewModel)
     
     var id: Self { self }
     
     static func == (lhs: HomeViewNavigationRoute, rhs: HomeViewNavigationRoute) -> Bool {
         switch (lhs, rhs) {
-        case (.scheduledFocusList, .scheduledFocusList): true
-        case (.taskConcentration, .taskConcentration): true
-        default: false
+        case let (.scheduledFocusList(lVM), .scheduledFocusList(rVM)):
+            lVM === rVM
+        case let (.taskConcentration(lVM), .taskConcentration(rVM)):
+            lVM === rVM
+        case let (.focusSession(lVM), .focusSession(rVM)):
+            lVM === rVM
+        default:
+            false
         }
     }
     
     func hash(into hasher: inout Hasher) {
         switch self {
-        case .scheduledFocusList:
+        case let .scheduledFocusList(vm):
             hasher.combine(0)
-        case .taskConcentration:
+            hasher.combine(ObjectIdentifier(vm))
+        case let .taskConcentration(vm):
             hasher.combine(1)
+            hasher.combine(ObjectIdentifier(vm))
+        case let .focusSession(vm):
+            hasher.combine(2)
+            hasher.combine(ObjectIdentifier(vm))
         }
     }
 }
@@ -95,6 +106,16 @@ final class HomeViewModel {
         }
     }
     
+    func checkAuthorization() {
+        Task {
+            do {
+                try await deviceActivityRegistrar.checkAuth()
+            } catch {
+                state.error = error
+            }
+        }
+    }
+    
     func setUpcomingItem() {
         guard fetchTask == nil else { return }
         fetchTask = Task {
@@ -110,7 +131,7 @@ final class HomeViewModel {
     
     private func setupTimerForActiveItem() {
         if let activeItem = state.upcomingOrRunningItem, activeItem.state.isActive {
-            state.timer.startTimer(for: activeItem, withSuspensionCountdown: false)
+            state.timer.startTimer(for: activeItem, withSuspensionCountdown: true)
          }
      }
     
@@ -118,6 +139,12 @@ final class HomeViewModel {
         if !showing {
             state.nextNavigationScreen = nil
         }
+    }
+    
+    func showFocusSessionSetupView() {
+        state.nextNavigationScreen = .focusSession(
+            makeFocusSessionViewModel(mode: .startFocusing)
+        )
     }
     
     func showScheduledFocusView() {
@@ -145,6 +172,14 @@ final class HomeViewModel {
     
     private func makeScheduledFocusViewModel() -> ScheduledBlockItemsViewModel {
         ScheduledBlockItemsViewModel(blockItemPersistenceManager: blockItemPersistenceManager)
+    }
+    
+    private func makeFocusSessionViewModel(mode: FocusSessionMode) -> FocusSessionViewModel {
+        FocusSessionViewModel(
+            mode: mode,
+            blockItemPersistenceManager: blockItemPersistenceManager,
+            deviceActivityRegistrar: deviceActivityRegistrar
+        )
     }
     
     private func makeTaskConcentrationViewModel(with phase: TaskConcentrationViewModel.State.Phase) -> TaskConcentrationViewModel? {
