@@ -128,73 +128,61 @@ struct FocusSessionView: View {
 
 // MARK: - Preview
 #Preview("Creation mode") {
-    let manager = PreviewData.mockBlockItemPersistenceManager
-    let registrar = PreviewData.mockActivityRegistrar
-    let proState = MockPaymentManagerWithPurchaseError().state
-    
     let viewModel = FocusSessionViewModel(
         mode: .addBlockList,
-        proState: proState,
-        paywallPresenter: LivePaywallPresenter(),
-        blockItemPersistenceManager: manager,
-        deviceActivityRegistrar: registrar
+        proState: PreviewData.mockProState,
+        paywallPresenter: PreviewData.mockPaywallPresenter,
+        blockItemPersistenceManager: PreviewData.mockEmptyPersistenceManager,
+        deviceActivityRegistrar: PreviewData.mockEmptyActivityRegistrar
     )
     
-    NavigationStack {
+    return NavigationStack {
         FocusSessionView(viewModel: viewModel)
+            .preferredColorScheme(.dark)
     }
 }
 
 #Preview("Start focusing mode") {
-    let manager = PreviewData.mockBlockItemPersistenceManager
-    let registrar = PreviewData.mockActivityRegistrar
-    let proState = MockPaymentManagerWithPurchaseError().state
-    
     let viewModel = FocusSessionViewModel(
         mode: .startFocusing,
-        proState: proState,
-        paywallPresenter: LivePaywallPresenter(),
-        blockItemPersistenceManager: manager,
-        deviceActivityRegistrar: registrar
+        proState: PreviewData.mockProState,
+        paywallPresenter: PreviewData.mockPaywallPresenter,
+        blockItemPersistenceManager: PreviewData.mockEmptyPersistenceManager,
+        deviceActivityRegistrar: PreviewData.mockEmptyActivityRegistrar
     )
     
-     NavigationStack {
+    return NavigationStack {
         FocusSessionView(viewModel: viewModel)
+            .preferredColorScheme(.dark)
     }
 }
 
 #Preview("Editing mode duration") {
-    let manager = PreviewData.mockBlockItemPersistenceManager
-    let registrar = PreviewData.mockActivityRegistrar
-    let proState = MockPaymentManagerWithPurchaseError().state
-    
     let viewModel = FocusSessionViewModel(
         mode: .editBlockList(ProtectedBlockItem.mockDuration),
-        proState: proState,
-        paywallPresenter: LivePaywallPresenter(),
-        blockItemPersistenceManager: manager,
-        deviceActivityRegistrar: registrar
+        proState: PreviewData.mockProState,
+        paywallPresenter: PreviewData.mockPaywallPresenter,
+        blockItemPersistenceManager: PreviewData.mockEmptyPersistenceManager,
+        deviceActivityRegistrar: PreviewData.mockEmptyActivityRegistrar
     )
     
-    NavigationStack {
+    return NavigationStack {
         FocusSessionView(viewModel: viewModel)
+            .preferredColorScheme(.dark)
     }
 }
 
 #Preview("Editing mode scheduled") {
-    let manager = PreviewData.mockBlockItemPersistenceManager
-    let registrar = PreviewData.mockActivityRegistrar
-    let proState = MockPaymentManagerWithPurchaseError().state
-    
     let viewModel = FocusSessionViewModel(
         mode: .editBlockList(ProtectedBlockItem.mockScheduled),
-        proState: proState,
-        paywallPresenter: LivePaywallPresenter(),
-        blockItemPersistenceManager: manager,
-        deviceActivityRegistrar: registrar
+        proState: PreviewData.mockProState,
+        paywallPresenter: PreviewData.mockPaywallPresenter,
+        blockItemPersistenceManager: PreviewData.mockEmptyPersistenceManager,
+        deviceActivityRegistrar: PreviewData.mockEmptyActivityRegistrar
     )
     
-    NavigationStack {
+    return NavigationStack {
         FocusSessionView(viewModel: viewModel)
+            .preferredColorScheme(.dark)
     }
 }

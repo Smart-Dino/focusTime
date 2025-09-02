@@ -39,7 +39,7 @@ struct ScheduledBlockItemsView: View {
                 Constants.Strings.newSessionButtonTitle,
                 systemImage: Constants.Icons.newSessionSymbol
             ) {
-                #warning("No implementation")
+                viewModel.navigateToFocusSessionNewItem()
             }
             .buttonStyle(.ftPrimary)
             .padding()
@@ -57,6 +57,16 @@ struct ScheduledBlockItemsView: View {
             actions: { /* OK dismissal button by default */ },
             message: { Text(viewModel.state.error?.localizedDescription ?? String()) }
         )
+        .navigationDestination(isPresented: .init(
+            get: { viewModel.state.nextNavigationScreen != nil },
+            set: { viewModel.setNextNavigationScreen($0) }
+        )) {
+            switch viewModel.state.nextNavigationScreen {
+            case .focusSession(let viewModel):
+                FocusSessionView(viewModel: viewModel)
+            case .none: Text("No view")
+            }
+        }
         .onAppear {
             viewModel.loadData()
         }
@@ -94,10 +104,13 @@ struct ScheduledBlockItemsView: View {
 
 #Preview {
     NavigationStack {
-        let manager = PreviewData.mockBlockItemPersistenceManager
-        
         ScheduledBlockItemsView(
-            viewModel: .init(blockItemPersistenceManager: manager)
+            viewModel: .init(
+                state: .init(proState: PreviewData.mockProState),
+                paywallPresenter: PreviewData.mockPaywallPresenter,
+                deviceActivityRegistrar: PreviewData.mockPopulatedActivityRegistrar,
+                blockItemPersistenceManager: PreviewData.mockPopulatedPersistenceManager
+            )
         )
         .preferredColorScheme(.dark)
     }

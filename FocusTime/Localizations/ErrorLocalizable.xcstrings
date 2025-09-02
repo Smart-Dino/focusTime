@@ -2,6 +2,7 @@
   "sourceLanguage" : "en",
   "strings" : {
     "block_list_picker_error_empty_selection" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {

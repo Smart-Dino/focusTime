@@ -76,10 +76,11 @@ final class ScheduleConfigurationViewModel {
         init(
             proState: ProState,
             blockItem: ProtectedBlockItem = .default,
-            durationHours: Int = ScheduleConfigurationView.Constants.DefaultValues.durationHours,
-            durationMinutes: Int = ScheduleConfigurationView.Constants.DefaultValues.durationMinutes,
-            startTime: Date = ScheduleConfigurationView.Constants.DefaultValues.startTime,
-            endTime: Date = ScheduleConfigurationView.Constants.DefaultValues.endTime,
+            durationHours: Int = FocusSessionView.Constants.DefaultValues.durationHours,
+            durationMinutes: Int = FocusSessionView.Constants.DefaultValues.durationMinutes,
+            startTime: Date = FocusSessionView.Constants.DefaultValues.startTime,
+            endTime: Date = FocusSessionView.Constants.DefaultValues.endTime,
+            isScheduledForLater: Bool = false,
             activeSheet: ScheduleSheetType? = nil
         ) {
             self.proState = proState
@@ -88,14 +89,8 @@ final class ScheduleConfigurationViewModel {
             self.durationMinutes = durationMinutes
             self.startTime = startTime
             self.endTime = endTime
+            self.isScheduledForLater = isScheduledForLater
             self.activeSheet = activeSheet
-            
-            switch blockItem.type {
-            case .scheduled:
-                self.isScheduledForLater = true
-            case .duration:
-                self.isScheduledForLater = false
-            }
         }
     }
     
@@ -119,6 +114,8 @@ final class ScheduleConfigurationViewModel {
         self.paywallPresenter = paywallPresenter
         self.deviceActivityRegistrar = deviceActivityRegistrar
         self.blockItemPersistenceManager = blockItemPersistenceManager
+        
+        refreshBlockItem()
     }
 
     // MARK: - Methods

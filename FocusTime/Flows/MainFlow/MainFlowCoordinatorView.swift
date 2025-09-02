@@ -92,18 +92,14 @@ struct MainFlowCoordinatorView: View {
 }
 
 #Preview {
-    let factory = MockPersistenceStoreFactory()
-    let manager = PreviewData.mockBlockItemPersistenceManager
-    let registrar = PreviewData.mockActivityRegistrar
-    let payment = MockPaymentManagerWithPurchaseError()
-    
     MainFlowCoordinatorView(
         viewModel: .init(
-            state: .init(currentTabScreen: .none, proState: payment.state),
-            proState: payment.state,
-            deviceActivityRegistrar: registrar,
-            blockItemPersistenceManager: manager,
-            paywallPresenter: LivePaywallPresenter()
+            state: .init(currentTabScreen: .none, proState: PreviewData.mockProState),
+            proState: PreviewData.mockProState,
+            deviceActivityRegistrar: PreviewData.mockPopulatedActivityRegistrar,
+            blockItemPersistenceManager: PreviewData.mockPopulatedPersistenceManager,
+            paywallPresenter: PreviewData.mockPaywallPresenter
         )
     )
+    .preferredColorScheme(.dark)
 }

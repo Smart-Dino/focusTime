@@ -111,12 +111,11 @@ struct FreePlanUpgradeView: View {
 // MARK: - Previews
 #Preview("MockPaymentManagerWithError") {
     if let productID = try? FTProduct.Mocks.weekly.product.id {
-        let paymentManager = MockPaymentManagerWithPurchaseError()
         NavigationStack {
             FreePlanUpgradeView(
                 viewModel: .init(
-                    state: .init(requestedProductID: productID, proState: paymentManager.state),
-                    superPaywallVM: .init(paymentManager: paymentManager),
+                    state: .init(requestedProductID: productID, proState: PreviewData.mockProState),
+                    superPaywallVM: .init(paymentManager: PreviewData.mockPaymentManager),
                     flowDelegate: nil
                 )
             )
@@ -129,12 +128,11 @@ struct FreePlanUpgradeView: View {
 
 #Preview("NonTrialableProduct") {
     if let productID = try? FTProduct.Mocks.monthly.product.id {
-        let paymentManager = MockPaymentManagerWithPurchaseError()
         NavigationStack {
             FreePlanUpgradeView(
                 viewModel: .init(
-                    state: .init(requestedProductID: productID, proState: paymentManager.state),
-                    superPaywallVM: .init(paymentManager: paymentManager),
+                    state: .init(requestedProductID: productID, proState: PreviewData.mockProState),
+                    superPaywallVM: .init(paymentManager: PreviewData.mockPaymentManager),
                     flowDelegate: nil
                 )
             )

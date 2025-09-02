@@ -11,6 +11,7 @@ import SwiftUI
 enum FocusSessionMode: Equatable {
     case startFocusing
     case addBlockList
+    case addScheduledBlockList
     case editBlockList(_ block: ProtectedBlockItem)
 }
 
@@ -18,29 +19,23 @@ enum FocusSessionMode: Equatable {
 @Observable
 @MainActor
 final class FocusSessionViewModel {
-    
+
     // MARK: - State
     @MainActor
     struct State {
-        let proState: ProState
-        
-        var error: Error?
-        var isDeletionAlertPresented: Bool = false
-        
-        var shouldDismiss = false
-        
-        let presets: [FocusPreset] = FocusPreset.allCases
+        // MARK: Properties
         let mode: FocusSessionMode
+        let proState: ProState
+        let presets: [FocusPreset] = FocusPreset.allCases
         var scheduleConfigViewModel: ScheduleConfigurationViewModel
         
+        // MARK: View State
+        var error: Error?
+        var isDeletionAlertPresented = false
         var emojiFieldIsFocused = false
+        var shouldDismiss = false
         
-        var selectedPreset: FocusPreset? {
-            let name = scheduleConfigViewModel.state.blockItem.name
-            let emoji = scheduleConfigViewModel.state.blockItem.emoji
-            return FocusPreset.getPreset(for: name, emoji: emoji)
-        }
-        
+        // MARK: Computed Properties
         var isStartButtonDisplayed: Bool {
             mode == .startFocusing
         }
@@ -56,19 +51,28 @@ final class FocusSessionViewModel {
             
             return nameFilled && emojiFilled && daysHasAtLeastOneDay
         }
-        
+        var selectedPreset: FocusPreset? {
+            let name = scheduleConfigViewModel.state.blockItem.name
+            let emoji = scheduleConfigViewModel.state.blockItem.emoji
+            return FocusPreset.getPreset(for: name, emoji: emoji)
+        }
+
         
         var selectedEmoji: String {
             scheduleConfigViewModel.state.blockItem.emoji
         }
         
         var isDurationSchedule: Bool {
-            if case .duration = scheduleConfigViewModel.state.blockItem.type { return true }
+            if case .duration = scheduleConfigViewModel.state.blockItem.type {
+                return true
+            }
             return false
         }
         
         var isScheduled: Bool {
-            if case .scheduled = scheduleConfigViewModel.state.blockItem.type { return true }
+            if case .scheduled = scheduleConfigViewModel.state.blockItem.type {
+                return true
+            }
             return false
         }
         
@@ -81,6 +85,7 @@ final class FocusSessionViewModel {
     private(set) var state: State
     private var analyticsManager: AnalyticsManagerProtocol = LiveAnalyticsManager()
     
+    // MARK: Dependencies
     private let paywallPresenter: PaywallPresenter
     private let blockItemPersistenceManager: BlockItemPersistenceManager
     private let deviceActivityRegistrar: DeviceActivityRegistrar
@@ -97,63 +102,46 @@ final class FocusSessionViewModel {
         self.blockItemPersistenceManager = blockItemPersistenceManager
         self.deviceActivityRegistrar = deviceActivityRegistrar
         
-        let scheduleConfigViewModel: ScheduleConfigurationViewModel
-        switch mode {
-        case .startFocusing, .addBlockList:
-            scheduleConfigViewModel = ScheduleConfigurationViewModel(
-                state: .init(proState: proState),
-                paywallPresenter: paywallPresenter,
-                deviceActivityRegistrar: deviceActivityRegistrar,
-                blockItemPersistenceManager: blockItemPersistenceManager
-            )
-        case .editBlockList(let block):
-            scheduleConfigViewModel = ScheduleConfigurationViewModel(
-                state: .init(proState: proState, blockItem: block),
-                paywallPresenter: paywallPresenter,
-                deviceActivityRegistrar: deviceActivityRegistrar,
-                blockItemPersistenceManager: blockItemPersistenceManager
-            )
-        }
+        let scheduleConfigViewModel = Self.makeScheduleConfigurationViewModel(
+            mode: mode,
+            proState: proState,
+            paywallPresenter: paywallPresenter,
+            deviceActivityRegistrar: deviceActivityRegistrar,
+            blockItemPersistenceManager: blockItemPersistenceManager
+        )
         
         self.state = State(
-            proState: proState,
             mode: mode,
+            proState: proState,
             scheduleConfigViewModel: scheduleConfigViewModel
         )
         
         self.state.scheduleConfigViewModel.delegate = self
     }
     
-    // MARK: - Intents
-    func dismiss() {
-        state.shouldDismiss = true
-    }
+    // MARK: - Public Intents
     
+    // MARK: Primary Actions
     func saveTapped() {
         Task {
             do {
                 switch state.mode {
                 case .startFocusing:
-                    guard await self.checkIfCanAddMoreItems() else {
+                    guard await canAddMoreItems() else {
                         paywallPresenter.requestOnboarding()
                         return
                     }
-                    
                     let item = try await saveSelectedItemToStorage(isTemporary: false)
                     try await deviceActivityRegistrar.registerActivity(during: item)
                     
-                case .addBlockList:
-                    
-                    let _ = try await saveSelectedItemToStorage(isTemporary: false)
+                case .addBlockList, .addScheduledBlockList:
+                    _ = try await saveSelectedItemToStorage(isTemporary: false)
                     
                 case .editBlockList:
-                    
                     try await blockItemPersistenceManager.editBlockItem(
                         blockItem: state.scheduleConfigViewModel.state.blockItem
                     )
-                    
                 }
-                
                 dismiss()
             } catch {
                 state.error = error
@@ -184,7 +172,6 @@ final class FocusSessionViewModel {
             do {
                 let savedItem = try await saveSelectedItemToStorage(isTemporary: true)
                 try await deviceActivityRegistrar.registerActivity(during: savedItem)
-                
                 dismiss()
             } catch {
                 state.error = error
@@ -195,7 +182,7 @@ final class FocusSessionViewModel {
     func startFocusingTapped() {
         Task {
             do {
-                guard await self.checkIfCanAddMoreItems() else {
+                guard await canAddMoreItems() else {
                     paywallPresenter.requestOnboarding()
                     return
                 }
@@ -206,7 +193,6 @@ final class FocusSessionViewModel {
                 } else {
                     try await deviceActivityRegistrar.registerActivity(during: scheduleItem)
                 }
-                
                 dismiss()
             } catch {
                 state.error = error
@@ -219,16 +205,15 @@ final class FocusSessionViewModel {
             do {
                 let item = state.scheduleConfigViewModel.state.blockItem
                 try await blockItemPersistenceManager.delete(blockItem: item)
-                
                 setDeletionAlertPresentation(false)
-                
                 dismiss()
             } catch {
-                throw error
+                state.error = error
             }
         }
     }
     
+    // MARK: State Modifiers
     func setDeletionAlertPresentation(_ isPresented: Bool) {
         state.isDeletionAlertPresented = isPresented
     }
@@ -247,6 +232,11 @@ final class FocusSessionViewModel {
         state.scheduleConfigViewModel.setSelectedPreset(selectedPreset: selectedPreset)
     }
     
+    // MARK: Navigation
+    func dismiss() {
+        state.shouldDismiss = true
+    }
+    
     // MARK: - Private Helpers
     private func saveSelectedItemToStorage(isTemporary: Bool) async throws -> ProtectedBlockItem {
         var item = state.scheduleConfigViewModel.state.blockItem
@@ -256,22 +246,52 @@ final class FocusSessionViewModel {
         }
         
         try await blockItemPersistenceManager.insert(&item)
-        
         return item
     }
     
-    private func checkIfCanAddMoreItems() async -> Bool {
+    private func canAddMoreItems() async -> Bool {
         let isPro = state.proState.status.isPro
-        let allowedAmountOfBlocks = SharedAppValues.FreeUserLimits.maximumAmountOfBlocks
         let trackedItemsCount = await deviceActivityRegistrar.trackedActivities.count
+        let limit = SharedAppValues.FreeUserLimits.maximumAmountOfBlocks
         
-        if !isPro && trackedItemsCount >= allowedAmountOfBlocks {
-            return false
-        } else {
+        if isPro {
             return true
+        } else {
+            return trackedItemsCount < limit
         }
     }
-    
+
+    private static func makeScheduleConfigurationViewModel(
+        mode: FocusSessionMode,
+        proState: ProState,
+        paywallPresenter: PaywallPresenter,
+        deviceActivityRegistrar: DeviceActivityRegistrar,
+        blockItemPersistenceManager: BlockItemPersistenceManager
+    ) -> ScheduleConfigurationViewModel {
+        switch mode {
+        case .startFocusing, .addBlockList:
+            return ScheduleConfigurationViewModel(
+                state: .init(proState: proState),
+                paywallPresenter: paywallPresenter,
+                deviceActivityRegistrar: deviceActivityRegistrar,
+                blockItemPersistenceManager: blockItemPersistenceManager
+            )
+        case .addScheduledBlockList:
+            return ScheduleConfigurationViewModel(
+                state: .init(proState: proState, isScheduledForLater: true),
+                paywallPresenter: paywallPresenter,
+                deviceActivityRegistrar: deviceActivityRegistrar,
+                blockItemPersistenceManager: blockItemPersistenceManager
+            )
+        case .editBlockList(let block):
+            return ScheduleConfigurationViewModel(
+                state: .init(proState: proState, blockItem: block),
+                paywallPresenter: paywallPresenter,
+                deviceActivityRegistrar: deviceActivityRegistrar,
+                blockItemPersistenceManager: blockItemPersistenceManager
+            )
+        }
+    }
 }
 
 // MARK: - ScheduleConfigurationDelegate

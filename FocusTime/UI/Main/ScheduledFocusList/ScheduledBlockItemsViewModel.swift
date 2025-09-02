@@ -9,26 +9,69 @@ import SwiftData
 import Foundation
 import FamilyControls
 
+enum ScheduledBlockItemsViewNavigationRoute: Equatable, Hashable {
+    case focusSession(_ viewModel: FocusSessionViewModel)
+    
+    var id: Self { self }
+    
+    static func == (lhs: ScheduledBlockItemsViewNavigationRoute, rhs: ScheduledBlockItemsViewNavigationRoute) -> Bool {
+        switch (lhs, rhs) {
+        case let (.focusSession(lVM), .focusSession(rVM)):
+            lVM === rVM
+        }
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        switch self {
+        case let .focusSession(vm):
+            hasher.combine(1)
+            hasher.combine(ObjectIdentifier(vm))
+        }
+    }
+}
+
 @MainActor
 @Observable
 final class ScheduledBlockItemsViewModel {
     struct State {
+        let proState: ProState
         var error: Error? = nil
+        
         var page = 0
         let amountPerPage = SharedAppValues.amountOfItemsPerPage
         var items = [ProtectedBlockItem]()
+        
+        var nextNavigationScreen: ScheduledBlockItemsViewNavigationRoute?
     }
 
     private(set) var state: State
+    
+    private let paywallPresenter: PaywallPresenter
+    private let deviceActivityRegistrar: DeviceActivityRegistrar
     private let blockItemPersistenceManager: BlockItemPersistenceManager
     private var fetchTask: Task<Void, Never>?
 
     init(
-        state: State = State(),
+        state: State,
+        paywallPresenter: PaywallPresenter,
+        deviceActivityRegistrar: DeviceActivityRegistrar,
         blockItemPersistenceManager: BlockItemPersistenceManager
     ) {
         self.state = state
+        
+        self.paywallPresenter = paywallPresenter
+        self.deviceActivityRegistrar = deviceActivityRegistrar
         self.blockItemPersistenceManager = blockItemPersistenceManager
+    }
+    
+    func setNextNavigationScreen(_ showing: Bool) {
+        if !showing {
+            state.nextNavigationScreen = nil
+        }
+    }
+    
+    func navigateToFocusSessionNewItem() {
+        state.nextNavigationScreen = .focusSession(makeFocusSessionViewModel(mode: .addScheduledBlockList))
     }
 
     private func reloadItems() {
@@ -91,5 +134,15 @@ final class ScheduledBlockItemsViewModel {
         if blockItem.id == state.items.last?.id {
             fetchNextPage()
         }
+    }
+    
+    private func makeFocusSessionViewModel(mode: FocusSessionMode) -> FocusSessionViewModel {
+        FocusSessionViewModel(
+            mode: mode,
+            proState: state.proState,
+            paywallPresenter: paywallPresenter,
+            blockItemPersistenceManager: blockItemPersistenceManager,
+            deviceActivityRegistrar: deviceActivityRegistrar
+        )
     }
 }
