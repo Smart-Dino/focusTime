@@ -43,6 +43,10 @@ extension LiveDeviceActivityRegistrar {
 
     func registerRegularActivity(for blockItem: ProtectedBlockItem, startTime: TimeComponents, endTime: TimeComponents) async throws {
         guard blockItem.persistentModelID != nil else { throw DeviceActivityRegistrarError.noPersistentItem }
+        
+        if let activity = try? await getActivityForSchedule(blockItem) {
+            await centerManager.stopMonitoring([activity]) // Re-register activity.
+        }
 
         let schedule = DeviceActivitySchedule(intervalStart: startTime.dateComponents, intervalEnd: endTime.dateComponents, repeats: true)
 
@@ -189,6 +193,7 @@ extension LiveDeviceActivityRegistrar {
 
         // Use `try?` as cleanup failure shouldn't halt the main cancellation flow.
         try? await cancelScheduledResume(for: tempBlock)
+        try? await removeTempBlockRelated(to: tempBlock)
         try? await blockItemPersistenceManager.delete(blockItem: tempBlock)
     }
     

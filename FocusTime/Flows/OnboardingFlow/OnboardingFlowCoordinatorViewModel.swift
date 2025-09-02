@@ -73,14 +73,12 @@ final class OnboardingFlowCoordinatorViewModel {
 
 extension OnboardingFlowCoordinatorViewModel: QuizOnboardingDelegate {
     func didFinishQuiz(with results: Set<QuizOnboardingView.Constants.QuizOption>) {
-        #warning("Log results?")
         setStateFlow(to: .slide(viewModel: makeSlideOnboardingViewModel()))
     }
 }
 
 extension OnboardingFlowCoordinatorViewModel: SlideOnboardingDelegate {
     func didFinishOnboardingSlides(skipped: Bool?) {
-        #warning("Log results?")
         appFlowDelegate?.didFinishOnboarding()
     }
 }

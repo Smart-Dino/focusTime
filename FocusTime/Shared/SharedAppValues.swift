@@ -11,6 +11,7 @@ import ManagedSettings
 enum SharedAppValues {
     static let appGroupIdentifier = "group.org.dino.smart.FocusTime"
     static let appName = Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String
+    static let appIdentifier = Bundle.main.bundleIdentifier ?? "No bundle name"
     
     static let splashScreenDuration: TimeInterval = 2
     #if DEBUG

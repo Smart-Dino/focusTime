@@ -51,12 +51,12 @@ final class FocusSessionViewModel {
             
             return nameFilled && emojiFilled && daysHasAtLeastOneDay
         }
+        
         var selectedPreset: FocusPreset? {
             let name = scheduleConfigViewModel.state.blockItem.name
             let emoji = scheduleConfigViewModel.state.blockItem.emoji
             return FocusPreset.getPreset(for: name, emoji: emoji)
         }
-
         
         var selectedEmoji: String {
             scheduleConfigViewModel.state.blockItem.emoji
@@ -126,7 +126,7 @@ final class FocusSessionViewModel {
         Task {
             do {
                 switch state.mode {
-                case .startFocusing:
+                case .startFocusing, .addScheduledBlockList:
                     guard await canAddMoreItems() else {
                         paywallPresenter.requestOnboarding()
                         return
@@ -134,13 +134,16 @@ final class FocusSessionViewModel {
                     let item = try await saveSelectedItemToStorage(isTemporary: false)
                     try await deviceActivityRegistrar.registerActivity(during: item)
                     
-                case .addBlockList, .addScheduledBlockList:
+                case .addBlockList:
                     _ = try await saveSelectedItemToStorage(isTemporary: false)
                     
                 case .editBlockList:
-                    try await blockItemPersistenceManager.editBlockItem(
-                        blockItem: state.scheduleConfigViewModel.state.blockItem
-                    )
+                    let item = state.scheduleConfigViewModel.state.blockItem
+                    
+                    try await blockItemPersistenceManager.editBlockItem(blockItem: item)
+                    if case .scheduled = item.type, item.isScheduled {
+                        try await deviceActivityRegistrar.registerActivity(during: item)
+                    }
                 }
                 dismiss()
             } catch {
@@ -182,15 +185,15 @@ final class FocusSessionViewModel {
     func startFocusingTapped() {
         Task {
             do {
-                guard await canAddMoreItems() else {
-                    paywallPresenter.requestOnboarding()
-                    return
-                }
-                
                 let scheduleItem = state.scheduleConfigViewModel.state.blockItem
                 if state.isItemScheduled {
                     try await deviceActivityRegistrar.unregisterActivity(during: scheduleItem)
                 } else {
+                    guard await canAddMoreItems() else {
+                        paywallPresenter.requestOnboarding()
+                        return
+                    }
+                    
                     try await deviceActivityRegistrar.registerActivity(during: scheduleItem)
                 }
                 dismiss()
@@ -204,7 +207,11 @@ final class FocusSessionViewModel {
         Task {
             do {
                 let item = state.scheduleConfigViewModel.state.blockItem
+                
+                // An item can be unregistered so silently try to unschedule it.
+                try? await deviceActivityRegistrar.unregisterActivity(during: item)
                 try await blockItemPersistenceManager.delete(blockItem: item)
+                
                 setDeletionAlertPresentation(false)
                 dismiss()
             } catch {
@@ -240,6 +247,7 @@ final class FocusSessionViewModel {
     // MARK: - Private Helpers
     private func saveSelectedItemToStorage(isTemporary: Bool) async throws -> ProtectedBlockItem {
         var item = state.scheduleConfigViewModel.state.blockItem
+        item.id = UUID() // Make sure we always get a different UUID no matter what.
         
         if isTemporary {
             item.isTemporary = .oneTimeBlock
@@ -284,8 +292,10 @@ final class FocusSessionViewModel {
                 blockItemPersistenceManager: blockItemPersistenceManager
             )
         case .editBlockList(let block):
+            let isScheduledForLater = if case .scheduled = block.type { true } else { false }
+            
             return ScheduleConfigurationViewModel(
-                state: .init(proState: proState, blockItem: block),
+                state: .init(proState: proState, blockItem: block, isScheduledForLater: isScheduledForLater),
                 paywallPresenter: paywallPresenter,
                 deviceActivityRegistrar: deviceActivityRegistrar,
                 blockItemPersistenceManager: blockItemPersistenceManager
