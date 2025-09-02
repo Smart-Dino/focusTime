@@ -8,11 +8,6 @@
 import Foundation
 
 @MainActor
-protocol SuperPaywallViewModelDelegate: AnyObject {
-    func didChangeUserEntitlementStatus(isPro: Bool)
-}
-
-@MainActor
 //@Observable
 final class SuperPaywallViewModel {
     // MARK: - Nested Declarations
@@ -53,16 +48,11 @@ final class SuperPaywallViewModel {
     private let paymentManager: PaymentManager
     private var subscriptionTask: Task<Void, Never>?
     
-    // Delegation
-    weak var delegate: SuperPaywallViewModelDelegate?
-    
     // MARK: - Init, Deinit
     init(
         paymentManager: PaymentManager
     ) {
         self.paymentManager = paymentManager
-        
-        startListeningToSubscriptionUpdates()
     }
     
     deinit {
@@ -70,24 +60,11 @@ final class SuperPaywallViewModel {
         self.subscriptionTask = nil
     }
     
-    // MARK: - Stream
-    private func startListeningToSubscriptionUpdates() {
-        #if DEBUG
-        // Very important debug info.
-        // Make sure this ViewModel does not get created multiple times,
-        // or else it will lead to some very messy results.
-        print("\(self) - \(ObjectIdentifier(self))")
-        #endif
-        subscriptionTask?.cancel()
-        
-        subscriptionTask = Task {
-            for await isPro in await self.paymentManager.isProUserChangesStream() {
-                self.delegate?.didChangeUserEntitlementStatus(isPro: isPro)
-            }
-        }
+    // MARK: - Return
+    func getProState() -> ProState {
+        paymentManager.state
     }
     
-    // MARK: - Return
     func getCurrentPaymentManager() -> PaymentManager {
         paymentManager
     }

@@ -71,24 +71,27 @@ final class HomeViewModel {
     }
     
     private(set) var state: State
+    private let proState: ProState
     
+    private let paywallPresenter: PaywallPresenter
     private let deviceActivityRegistrar: DeviceActivityRegistrar
     private let blockItemPersistenceManager: BlockItemPersistenceManager
-    weak var delegate: HomeViewDelegate?
     
     private var fetchTask: Task<Void, Never>?
     private var dbChangesNotificationTask: Task<Void, Never>?
     
     init(
         state: State,
+        proState: ProState,
+        paywallPresenter: PaywallPresenter,
         deviceActivityRegistrar: DeviceActivityRegistrar,
         blockItemPersistenceManager: BlockItemPersistenceManager,
-        delegate: HomeViewDelegate?
     ) {
         self.state = state
+        self.proState = proState
+        self.paywallPresenter = paywallPresenter
         self.deviceActivityRegistrar = deviceActivityRegistrar
         self.blockItemPersistenceManager = blockItemPersistenceManager
-        self.delegate = delegate
     }
     
     func setErrorVisibility(_ isVisible: Bool) {
@@ -177,6 +180,8 @@ final class HomeViewModel {
     private func makeFocusSessionViewModel(mode: FocusSessionMode) -> FocusSessionViewModel {
         FocusSessionViewModel(
             mode: mode,
+            proState: proState,
+            paywallPresenter: paywallPresenter,
             blockItemPersistenceManager: blockItemPersistenceManager,
             deviceActivityRegistrar: deviceActivityRegistrar
         )

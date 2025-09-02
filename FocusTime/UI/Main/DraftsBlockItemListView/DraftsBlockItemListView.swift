@@ -146,11 +146,14 @@ struct DraftsBlockItemListView: View {
 #Preview {
     let factory = MockPersistenceStoreFactory()
     let manager = PreviewData.mockBlockItemPersistenceManager
-    let registrar = LiveDeviceActivityRegistrar(blockItemPersistenceManager: manager, shieldManager: LiveShieldManager())
+    let registrar = PreviewData.mockActivityRegistrar
+    let proState = MockPaymentManagerWithPurchaseError().state
     
     DraftsBlockItemListView(
         viewModel: .init(
             state: .init(timer: ConcurrencyTimer()),
+            proState: proState,
+            paywallPresenter: LivePaywallPresenter(),
             deviceActivityRegistrar: registrar,
             blockItemPersistenceManager: manager
         )

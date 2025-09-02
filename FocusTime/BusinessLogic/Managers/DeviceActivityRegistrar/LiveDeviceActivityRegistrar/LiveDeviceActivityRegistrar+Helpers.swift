@@ -30,7 +30,7 @@ extension LiveDeviceActivityRegistrar {
 
         let schedule = DeviceActivitySchedule(intervalStart: intervalStart, intervalEnd: intervalEnd, repeats: false)
 
-        let activityName = try createActivityName(for: blockItem, actionType: .regular)
+        let activityName = try createActivityName(for: blockItem, actionType: blockItem.isTemporary == nil ? .regular : .regularTemp)
         try await centerManager.startMonitoring(activityName, during: schedule)
 
         let timeBeforeEnd = forcedDuration ?? originalDuration.rawValue
@@ -49,7 +49,7 @@ extension LiveDeviceActivityRegistrar {
         let overlaps = try await overlapsWithAlreadyRegisteredSchedules(schedule, days: blockItem.days)
         guard overlaps.isEmpty else { throw DeviceActivityRegistrarError.scheduleOverlap(with: overlaps) }
 
-        let activityName = try createActivityName(for: blockItem, actionType: .regular)
+        let activityName = try createActivityName(for: blockItem, actionType: blockItem.isTemporary == nil ? .regular : .regularTemp)
         try await centerManager.startMonitoring(activityName, during: schedule)
     }
 

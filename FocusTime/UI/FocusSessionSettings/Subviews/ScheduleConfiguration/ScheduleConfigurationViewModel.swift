@@ -54,6 +54,8 @@ final class ScheduleConfigurationViewModel {
     
     // MARK: - State
     struct State: Equatable {
+        let proState: ProState
+        
         var blockItem: ProtectedBlockItem
         var appsTokenSelectionCount: Int {
             blockItem.blockedContent.applicationTokens.count
@@ -72,6 +74,7 @@ final class ScheduleConfigurationViewModel {
         var activeSheet: ScheduleSheetType?
         
         init(
+            proState: ProState,
             blockItem: ProtectedBlockItem = .default,
             durationHours: Int = ScheduleConfigurationView.Constants.DefaultValues.durationHours,
             durationMinutes: Int = ScheduleConfigurationView.Constants.DefaultValues.durationMinutes,
@@ -79,6 +82,7 @@ final class ScheduleConfigurationViewModel {
             endTime: Date = ScheduleConfigurationView.Constants.DefaultValues.endTime,
             activeSheet: ScheduleSheetType? = nil
         ) {
+            self.proState = proState
             self.blockItem = blockItem
             self.durationHours = durationHours
             self.durationMinutes = durationMinutes
@@ -97,6 +101,8 @@ final class ScheduleConfigurationViewModel {
     
     // MARK: - Properties
     private(set) var state: State
+    
+    private let paywallPresenter: PaywallPresenter
     private let deviceActivityRegistrar: DeviceActivityRegistrar
     private let blockItemPersistenceManager: BlockItemPersistenceManager
     weak var delegate: ScheduleConfigurationDelegate?
@@ -104,11 +110,13 @@ final class ScheduleConfigurationViewModel {
 
     // MARK: - Initializers
     init(
-        state: State = State(),
+        state: State,
+        paywallPresenter: PaywallPresenter,
         deviceActivityRegistrar: DeviceActivityRegistrar,
         blockItemPersistenceManager: BlockItemPersistenceManager
     ) {
         self.state = state
+        self.paywallPresenter = paywallPresenter
         self.deviceActivityRegistrar = deviceActivityRegistrar
         self.blockItemPersistenceManager = blockItemPersistenceManager
     }
@@ -281,6 +289,15 @@ final class ScheduleConfigurationViewModel {
             )
         }
     }
+    
+    func showPaywallIfNeeded() {
+        if !checkIfCanSetCustomApps() { paywallPresenter.requestOnboarding() }
+    }
+    
+    private func checkIfCanSetCustomApps() -> Bool {
+        return state.proState.status.isPro
+    }
+
 }
 
 extension ScheduleConfigurationViewModel: BlockListPickerSheetDelegate {

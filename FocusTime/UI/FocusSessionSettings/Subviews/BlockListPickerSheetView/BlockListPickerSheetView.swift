@@ -69,7 +69,6 @@ struct BlockListPickerSheetView: View {
         .onChange(of: viewModel.state.isFamilyActivitySheetPresented) {
             if !viewModel.state.isFamilyActivitySheetPresented && viewModel.state.blockItems.isEmpty {
                 viewModel.saveSelection()
-                dismiss.callAsFunction()
             }
         }
         .safeAreaInset(edge: .bottom) {
@@ -82,7 +81,6 @@ struct BlockListPickerSheetView: View {
                 } else {
                     Button(Constants.Strings.saveSelectionButton, systemImage: "checkmark") {
                         viewModel.saveSelection()
-                        dismiss()
                     }
                     .transition(.scale)
                 }
@@ -91,6 +89,11 @@ struct BlockListPickerSheetView: View {
             .buttonStyle(.ftPrimary)
             .padding()
             .backgroundGradientFade()
+        }
+        .onChange(of: viewModel.state.shouldDismiss) {
+            if viewModel.state.shouldDismiss {
+                dismiss.callAsFunction()
+            }
         }
     }
     
@@ -140,10 +143,7 @@ struct BlockListPickerSheetView: View {
 #Preview("Populated list") {
     let factory = MockPersistenceStoreFactory()
     let manager = PreviewData.mockBlockItemPersistenceManager
-    let registrar = LiveDeviceActivityRegistrar(
-        blockItemPersistenceManager: manager,
-        shieldManager: LiveShieldManager()
-    )
+    let registrar = PreviewData.mockActivityRegistrar
     let viewModel = BlockListPickerSheetViewModel(
         deviceActivityRegistrar: registrar,
         blockItemPersistenceManager: manager

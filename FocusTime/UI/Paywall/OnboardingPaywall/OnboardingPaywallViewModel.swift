@@ -15,6 +15,8 @@ final class OnboardingPaywallViewModel {
     // MARK: - Nested declarations
     struct State {
         let requestedProductID: String
+        
+        var proState: ProState
         var superState: SuperPaywallViewModel.State
         
         // Dynamic strings
@@ -24,9 +26,11 @@ final class OnboardingPaywallViewModel {
         
         init(
             requestedProductID: String,
+            proState: ProState,
             superState: SuperPaywallViewModel.State = .init()
         ) {
             self.requestedProductID = requestedProductID
+            self.proState = proState
             self.superState = superState
         }
     }
@@ -45,7 +49,6 @@ final class OnboardingPaywallViewModel {
         self.state = state
         self.superPaywallVM = superPaywallVM
         self.flowDelegate = flowDelegate
-        superPaywallVM.delegate = self
         
         setupView()
     }
@@ -126,17 +129,15 @@ final class OnboardingPaywallViewModel {
     func dismissView() {
         flowDelegate?.paywallDidRequestDismissal()
     }
-}
-
-extension OnboardingPaywallViewModel: SuperPaywallViewModelDelegate {
-    func didChangeUserEntitlementStatus(isPro: Bool) {
+    
+    func onChangeOfIsPro() {
         Task {
             await self.superPaywallVM.updatePurchaseResultForSelectedProduct(
                 state: self.state.superState
             )
             updateUIBasedOnPurchaseResult()
             
-            if isPro { flowDelegate?.paywallDidRequestDismissal() }
+            if state.proState.status.isPro { flowDelegate?.paywallDidRequestDismissal() }
         }
     }
 }

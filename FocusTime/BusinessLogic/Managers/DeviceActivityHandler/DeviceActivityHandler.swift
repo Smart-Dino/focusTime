@@ -43,7 +43,7 @@ struct DeviceActivityHandler: Sendable {
         }
         
         switch activityIdentifier.blockType {
-        case .regular:
+        case .regular, .regularTemp:
             await handleInitialBlocking(for: blockItem, with: activity, in: store)
         case .resumption:
             // Pass the activity down so it can be stopped.
@@ -53,7 +53,7 @@ struct DeviceActivityHandler: Sendable {
     
     func handleBlockingEnd(for activity: DeviceActivityName) async {
         guard let activityIdentifier = CodableActivityIdentifier(from: activity) else { return }
-        guard activityIdentifier.blockType == .regular else { return }
+        guard activityIdentifier.blockType == .regular || activityIdentifier.blockType == .regularTemp else { return }
         
         let store = BlockItemExtensionStore(logger: logger, context: ModelContext(container))
         guard let blockItem = store.fetchBlockItem(id: activityIdentifier.blockItemID) else { return }

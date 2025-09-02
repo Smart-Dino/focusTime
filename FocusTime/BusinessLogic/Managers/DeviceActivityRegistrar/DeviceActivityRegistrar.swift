@@ -8,6 +8,8 @@
 import Foundation
 
 protocol DeviceActivityRegistrar: Actor {
+    var trackedActivities: [CodableActivityIdentifier] { get async }
+    
     func checkAuth() async throws
     
     func registerActivity(during blockItem: ProtectedBlockItem) async throws

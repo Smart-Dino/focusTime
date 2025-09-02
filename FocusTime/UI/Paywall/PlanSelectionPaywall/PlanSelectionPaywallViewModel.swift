@@ -14,6 +14,7 @@ import SwiftUI
 final class PlanSelectionPaywallViewModel {
     // MARK: - Nested declarations
     struct State {
+        var proState: ProState
         var superState: SuperPaywallViewModel.State
         
         var selectedViewIndex: Int? = .zero
@@ -23,7 +24,11 @@ final class PlanSelectionPaywallViewModel {
         var primaryButtonTitle: String = stringConstants.loadingTitle
         var subscribeButtonTerms: String = String()
         
-        init(superState: SuperPaywallViewModel.State = .init()) {
+        init(
+            proState: ProState,
+            superState: SuperPaywallViewModel.State = .init()
+        ) {
+            self.proState = proState
             self.superState = superState
         }
     }
@@ -36,14 +41,13 @@ final class PlanSelectionPaywallViewModel {
     
     // MARK: - Initializers
     init(
-        state: State = State(),
+        state: State,
         superPaywallVM: SuperPaywallViewModel,
         flowDelegate: PaywallNavigationDelegate?
     ) {
         self.state = state
         self.superPaywallVM = superPaywallVM
         self.flowDelegate = flowDelegate
-        superPaywallVM.delegate = self
         
         setupView()
     }
@@ -140,11 +144,8 @@ final class PlanSelectionPaywallViewModel {
     func dismissView() {
         flowDelegate?.paywallDidRequestDismissal()
     }
-}
-
-
-extension PlanSelectionPaywallViewModel: SuperPaywallViewModelDelegate {
-    func didChangeUserEntitlementStatus(isPro: Bool) {
+    
+    func onChangeOfIsPro() {
         Task {
             await self.superPaywallVM.updatePurchaseResultForSelectedProduct(
                 state: self.state.superState

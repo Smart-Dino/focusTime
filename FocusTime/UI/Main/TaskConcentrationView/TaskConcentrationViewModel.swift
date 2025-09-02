@@ -50,6 +50,8 @@ final class TaskConcentrationViewModel {
         
         var error: Error?
         
+        var shouldDismiss = false
+        
         var item: ProtectedBlockItem
         var phase: Phase
     }
@@ -104,13 +106,19 @@ final class TaskConcentrationViewModel {
         moveTo(.almostDone)
     }
     
-    func endBlock() async throws {
-        do {
-            try await deviceActivityRegistrar.cancelIfRunning(state.item)
-            state.timer.cancel()
-        } catch {
-            state.error = error
-            throw error // Rethrow so the view does not dismiss.
+    func dismiss() {
+        state.shouldDismiss = true
+    }
+    
+    func endBlock() {
+        Task {
+            do {
+                try await deviceActivityRegistrar.cancelIfRunning(state.item)
+                state.timer.cancel()
+                dismiss()
+            } catch {
+                state.error = error
+            }
         }
     }
     
