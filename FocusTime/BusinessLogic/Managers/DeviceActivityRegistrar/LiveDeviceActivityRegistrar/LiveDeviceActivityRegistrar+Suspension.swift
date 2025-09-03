@@ -79,6 +79,15 @@ extension LiveDeviceActivityRegistrar {
 
         try await blockItemPersistenceManager.editBlockItem(blockItem: updatedBlockItem)
     }
+    
+    func removeTempBlockRelated(to blockItem: ProtectedBlockItem) async throws {
+        guard blockItem.persistentModelID != nil else { throw DeviceActivityRegistrarError.noPersistentItem }
+        
+        let activityIdentifier = CodableActivityIdentifier(blockItemID: blockItem.id, blockType: .regularTemp)
+        guard let jsonIdentifier = activityIdentifier.jsonString else { return }
+        let activity = DeviceActivityName(jsonIdentifier)
+        await centerManager.stopMonitoring([activity])
+    }
 
     private func registerResumeMonitoring(blockItemID: UUID, resumeAt: Date) async throws {
         let identifier = CodableActivityIdentifier(blockItemID: blockItemID, blockType: .resumption)

@@ -30,7 +30,7 @@ extension LiveDeviceActivityRegistrar {
 
         let schedule = DeviceActivitySchedule(intervalStart: intervalStart, intervalEnd: intervalEnd, repeats: false)
 
-        let activityName = try createActivityName(for: blockItem, actionType: .regular)
+        let activityName = try createActivityName(for: blockItem, actionType: blockItem.isTemporary == nil ? .regular : .regularTemp)
         try await centerManager.startMonitoring(activityName, during: schedule)
 
         let timeBeforeEnd = forcedDuration ?? originalDuration.rawValue
@@ -43,13 +43,17 @@ extension LiveDeviceActivityRegistrar {
 
     func registerRegularActivity(for blockItem: ProtectedBlockItem, startTime: TimeComponents, endTime: TimeComponents) async throws {
         guard blockItem.persistentModelID != nil else { throw DeviceActivityRegistrarError.noPersistentItem }
+        
+        if let activity = try? await getActivityForSchedule(blockItem) {
+            await centerManager.stopMonitoring([activity]) // Re-register activity.
+        }
 
         let schedule = DeviceActivitySchedule(intervalStart: startTime.dateComponents, intervalEnd: endTime.dateComponents, repeats: true)
 
         let overlaps = try await overlapsWithAlreadyRegisteredSchedules(schedule, days: blockItem.days)
         guard overlaps.isEmpty else { throw DeviceActivityRegistrarError.scheduleOverlap(with: overlaps) }
 
-        let activityName = try createActivityName(for: blockItem, actionType: .regular)
+        let activityName = try createActivityName(for: blockItem, actionType: blockItem.isTemporary == nil ? .regular : .regularTemp)
         try await centerManager.startMonitoring(activityName, during: schedule)
     }
 
@@ -189,6 +193,7 @@ extension LiveDeviceActivityRegistrar {
 
         // Use `try?` as cleanup failure shouldn't halt the main cancellation flow.
         try? await cancelScheduledResume(for: tempBlock)
+        try? await removeTempBlockRelated(to: tempBlock)
         try? await blockItemPersistenceManager.delete(blockItem: tempBlock)
     }
     

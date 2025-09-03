@@ -101,6 +101,9 @@ struct OnboardingPaywallView: View {
             actions: { /* OK dismissal button by default */ },
             message: { Text(viewModel.state.superState.error?.localizedDescription ?? String()) }
         )
+        .onChange(of: viewModel.state.proState.status) {
+            viewModel.onChangeOfIsPro()
+        }
     }
     
     // MARK: - Computed properties
@@ -137,16 +140,17 @@ struct OnboardingPaywallView: View {
 
 #Preview {
     if let productID = try? FTProduct.Mocks.weekly.product.id {
-        let paymentManager = MockPaymentManagerWithPurchaseError()
         NavigationStack {
             OnboardingPaywallView(
                 viewModel: .init(
-                    state: .init(requestedProductID: productID),
-                    superPaywallVM: .init(paymentManager: paymentManager),
+                    state: .init(requestedProductID: productID, proState: PreviewData.mockProState),
+                    superPaywallVM: .init(paymentManager: PreviewData.mockPaymentManager),
                     flowDelegate: nil
                 )
             )
             .preferredColorScheme(.dark)
         }
+    } else {
+        Text("Could not initialize the product.")
     }
 }

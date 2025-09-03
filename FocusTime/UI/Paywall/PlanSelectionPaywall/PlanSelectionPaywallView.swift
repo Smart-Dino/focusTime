@@ -104,6 +104,9 @@ struct PlanSelectionPaywallView: View {
             actions: { /* OK dismissal button by default */ },
             message: { Text(viewModel.state.superState.error?.localizedDescription ?? String()) }
         )
+        .onChange(of: viewModel.state.proState.status) {
+            viewModel.onChangeOfIsPro()
+        }
     }
     
     // MARK: - Computed properties
@@ -143,12 +146,10 @@ struct PlanSelectionPaywallView: View {
         && (viewModel.state.superState.isEligibleForIntro)
         
         let subtitle = isTrial
-        ? product.subscriptionPeriodDescription
+        ? viewModel.getTrialTerms(for: product)
         : nil
         
-        let descriptionText = isTrial
-        ? viewModel.getTrialTerms(for: product)
-        : product.priceString
+        let descriptionText = product.priceAndPeriodString ?? product.priceString
         
         return Button {
             viewModel.selectProduct(product)
@@ -165,11 +166,11 @@ struct PlanSelectionPaywallView: View {
 }
 
 #Preview("Trial unused") {
-    let paymentManager = MockPaymentManagerWithPurchaseError(trialUsed: false)
     NavigationStack {
         PlanSelectionPaywallView(
             viewModel: .init(
-                superPaywallVM: .init(paymentManager: paymentManager),
+                state: .init(proState: PreviewData.mockProStateTrialUnused),
+                superPaywallVM: .init(paymentManager: PreviewData.mockPaymentManagerTrialUnused),
                 flowDelegate: nil
             )
         )
@@ -178,11 +179,11 @@ struct PlanSelectionPaywallView: View {
 }
 
 #Preview("Trial used") {
-    let paymentManager = MockPaymentManagerWithPurchaseError(trialUsed: true)
     NavigationStack {
         PlanSelectionPaywallView(
             viewModel: .init(
-                superPaywallVM: .init(paymentManager: paymentManager),
+                state: .init(proState: PreviewData.mockProStateTrialUsed),
+                superPaywallVM: .init(paymentManager: PreviewData.mockPaymentManagerTrialUsed),
                 flowDelegate: nil
             )
         )

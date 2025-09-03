@@ -7,12 +7,35 @@
 
 import Foundation
 
+@MainActor
+@Observable
+final class ProState: Equatable {
+    nonisolated static func == (lhs: ProState, rhs: ProState) -> Bool {
+        lhs === rhs
+    }
+    
+    struct Status: Equatable {
+        var isPro: Bool
+        var lastUpdated: Date
+    }
+    
+    var status: Status = Status(isPro: false, lastUpdated: .now)
+    
+    nonisolated init() { }
+    
+    nonisolated func updateProStatus(_ newValue: Bool) async {
+        await MainActor.run {
+            status = Status(isPro: newValue, lastUpdated: .now)
+        }
+    }
+}
+
 // MARK: - Payment Manager Protocol
 /// Defines the interface for managing in-app purchases.
 protocol PaymentManager: Actor {
     // MARK: - Product Listings
     /// Tells whether the user has access to the **pro** version of the app.
-    var isPro: Bool { get }
+    @MainActor var state: ProState { get }
     /// All products available for purchase.
     var products: [FTProduct] { get async }
     /// Products that the user has already purchased and is entitled to.
@@ -51,18 +74,12 @@ protocol PaymentManager: Actor {
     ///
     /// After successful restoration, entitlements should be re-validated using `isPurchased(_:)`.
     func restorePurchases() async throws
-
-    // MARK: - Stream
-    /// Streams updates to the purchased products list.
-    ///
-    /// - Returns: An `AsyncStream` emitting arrays of `FTProduct`.
-    func isProUserChangesStream() -> AsyncStream<Bool>
 }
 
 // MARK: - Mock Implementation
 actor MockPaymentManagerWithPurchaseError: PaymentManager {
     // MARK: - Stored Properties
-    private(set) var isPro: Bool
+    @MainActor private(set) var state: ProState
     private(set) var products: [FTProduct]
     private(set) var purchasedProducts: [FTProduct] = []
     
@@ -72,7 +89,7 @@ actor MockPaymentManagerWithPurchaseError: PaymentManager {
     init(isPro: Bool = false,
         trialUsed: Bool = false
     ) {
-        self.isPro = isPro
+        self.state = ProState()
         self.trialUsed = trialUsed
         do {
             self.products = [
@@ -81,13 +98,6 @@ actor MockPaymentManagerWithPurchaseError: PaymentManager {
             ]
         } catch {
             self.products = []
-        }
-    }
-
-    // MARK: - Methods
-    func isProUserChangesStream() -> AsyncStream<Bool> {
-        AsyncStream { continuation in
-            continuation.yield(isPro)
         }
     }
 

@@ -144,16 +144,16 @@ struct DraftsBlockItemListView: View {
 }
 
 #Preview {
-    let factory = MockPersistenceStoreFactory()
-    let manager = PreviewData.mockBlockItemPersistenceManager
-    let registrar = LiveDeviceActivityRegistrar(blockItemPersistenceManager: manager, shieldManager: LiveShieldManager())
-    
-    DraftsBlockItemListView(
-        viewModel: .init(
-            state: .init(timer: ConcurrencyTimer()),
-            deviceActivityRegistrar: registrar,
-            blockItemPersistenceManager: manager
-        )
+    let viewModel = DraftsBlockItemListViewModel(
+        state: .init(timer: PreviewData.mockTimer),
+        proState: PreviewData.mockProState,
+        paywallPresenter: PreviewData.mockPaywallPresenter,
+        deviceActivityRegistrar: PreviewData.mockPopulatedActivityRegistrar,
+        blockItemPersistenceManager: PreviewData.mockPopulatedPersistenceManager
     )
-    .preferredColorScheme(.dark)
+
+    return NavigationStack {
+        DraftsBlockItemListView(viewModel: viewModel)
+            .preferredColorScheme(.dark)
+    }
 }

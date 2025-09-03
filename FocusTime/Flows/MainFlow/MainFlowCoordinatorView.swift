@@ -31,7 +31,7 @@ struct MainFlowCoordinatorView: View {
             }
             .toolbar(.visible)
             .toolbar {
-                if case .home = viewModel.state.currentTabScreen {
+                if case .home = viewModel.state.currentTabScreen, !viewModel.state.proState.status.isPro {
                     ToolbarItem {
                         FTProUpgradeButtonView {
                             viewModel.requestPaywall()
@@ -55,8 +55,6 @@ struct MainFlowCoordinatorView: View {
                 set: { viewModel.setNextNavigationScreen($0) }
             )) {
                 switch viewModel.state.nextNavigationScreen {
-                case .shieldDebug(let viewModel):
-                    ShieldDebugView(viewModel: viewModel)
                 case .focusSession(let viewModel):
                     FocusSessionView(viewModel: viewModel)
                 case .none:
@@ -94,15 +92,14 @@ struct MainFlowCoordinatorView: View {
 }
 
 #Preview {
-    let factory = MockPersistenceStoreFactory()
-    let manager = PreviewData.mockBlockItemPersistenceManager
-    let registrar = PreviewData.mockActivityRegistrar
-    
     MainFlowCoordinatorView(
         viewModel: .init(
-            deviceActivityRegistrar: registrar,
-            blockItemPersistenceManager: manager,
-            appFlowDelegate: nil
+            state: .init(currentTabScreen: .none, proState: PreviewData.mockProState),
+            proState: PreviewData.mockProState,
+            deviceActivityRegistrar: PreviewData.mockPopulatedActivityRegistrar,
+            blockItemPersistenceManager: PreviewData.mockPopulatedPersistenceManager,
+            paywallPresenter: PreviewData.mockPaywallPresenter
         )
     )
+    .preferredColorScheme(.dark)
 }

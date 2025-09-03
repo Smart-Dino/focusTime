@@ -15,18 +15,22 @@ final class OnboardingPaywallViewModel {
     // MARK: - Nested declarations
     struct State {
         let requestedProductID: String
+        
+        var proState: ProState
         var superState: SuperPaywallViewModel.State
         
         // Dynamic strings
         static let stringConstants = OnboardingPaywallView.Constants.Strings.self
         var trialPeriodDescription = stringConstants.loadingTitle
-        var purchaseButtonTitle    = stringConstants.subscribeButtonTitle
+        var purchaseButtonTitle    = stringConstants.loadingTitle
         
         init(
             requestedProductID: String,
+            proState: ProState,
             superState: SuperPaywallViewModel.State = .init()
         ) {
             self.requestedProductID = requestedProductID
+            self.proState = proState
             self.superState = superState
         }
     }
@@ -45,7 +49,6 @@ final class OnboardingPaywallViewModel {
         self.state = state
         self.superPaywallVM = superPaywallVM
         self.flowDelegate = flowDelegate
-        superPaywallVM.delegate = self
         
         setupView()
     }
@@ -89,10 +92,10 @@ final class OnboardingPaywallViewModel {
             return
         }
         
-        state.purchaseButtonTitle = if product.trialPeriod != nil {
-            State.stringConstants.tryButtonTitle
+        state.purchaseButtonTitle = if product.trialPeriod != nil && state.superState.isEligibleForIntro {
+            State.stringConstants.tryButtonTitle(product: product)
         } else {
-            State.stringConstants.subscribeButtonTitle
+            State.stringConstants.subscribeButtonTitle(product: product)
         }
         state.trialPeriodDescription = product.offerDescription
     }
@@ -112,7 +115,7 @@ final class OnboardingPaywallViewModel {
             state.superState.error = PaymentError.pending
             
         case .userCancelled:
-            state.purchaseButtonTitle = State.stringConstants.tryButtonTitle
+            setupProductInfo()
             state.superState.isButtonDisabled = false
         }
     }
@@ -126,17 +129,15 @@ final class OnboardingPaywallViewModel {
     func dismissView() {
         flowDelegate?.paywallDidRequestDismissal()
     }
-}
-
-extension OnboardingPaywallViewModel: SuperPaywallViewModelDelegate {
-    func didChangeUserEntitlementStatus(isPro: Bool) {
+    
+    func onChangeOfIsPro() {
         Task {
             await self.superPaywallVM.updatePurchaseResultForSelectedProduct(
                 state: self.state.superState
             )
             updateUIBasedOnPurchaseResult()
             
-            if isPro { flowDelegate?.paywallDidRequestDismissal() }
+            if state.proState.status.isPro { flowDelegate?.paywallDidRequestDismissal() }
         }
     }
 }

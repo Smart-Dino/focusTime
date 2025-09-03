@@ -9,10 +9,7 @@ import Foundation
 import DeviceActivity
 
 /// An actor protocol for managing device activity monitoring.
-protocol DeviceActivityCenterManager: Actor {
-    /// The underlying `DeviceActivityCenter` instance.
-    var center: DeviceActivityCenter { get }
-    
+protocol DeviceActivityCenterManager: Actor {    
     /// The activities currently being monitored.
     var activities: [DeviceActivityName] { get }
     

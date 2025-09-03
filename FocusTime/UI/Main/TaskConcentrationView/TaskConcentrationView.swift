@@ -108,10 +108,7 @@ struct TaskConcentrationView: View {
                                 viewModel.moveToPauseSessionScene()
                             }
                         }, endSessionAction: {
-                            Task {
-                                try await viewModel.endBlock()
-                                dismiss.callAsFunction()
-                            }
+                            viewModel.endBlock()
                         }
                     )
                     
@@ -120,7 +117,7 @@ struct TaskConcentrationView: View {
                         title: title,
                         subtitle: subtitle,
                         onFinished: {
-                            dismiss.callAsFunction()
+                            viewModel.dismiss()
                         }
                     )
                 }
@@ -137,25 +134,31 @@ struct TaskConcentrationView: View {
             actions: { /* OK dismissal button by default */ },
             message: { Text(viewModel.state.error?.localizedDescription ?? String()) }
         )
+        .onChange(of: viewModel.state.shouldDismiss) {
+            if viewModel.state.shouldDismiss {
+                dismiss.callAsFunction()
+            }
+        }
     }
 }
 
 #Preview {
-    @Previewable @State var timer = ConcurrencyTimer()
+    @Previewable @State var timer = PreviewData.mockTimer
+    
     let viewModel = TaskConcentrationViewModel(
         state: .init(timer: timer, item: ProtectedBlockItem.mockDuration, phase: .focus),
-        deviceActivityRegistrar: PreviewData.mockActivityRegistrar,
-        blockItemPersistenceManager: PreviewData.mockBlockItemPersistenceManager
+        deviceActivityRegistrar: PreviewData.mockEmptyActivityRegistrar,
+        blockItemPersistenceManager: PreviewData.mockEmptyPersistenceManager
     )
-    NavigationStack {
+    
+    return NavigationStack {
         TaskConcentrationView(viewModel: viewModel)
             .preferredColorScheme(.dark)
             .onAppear {
                 timer.start(
-                    deadline: .now.addingTimeInterval(5),
+                    deadline: .now.addingTimeInterval(300),
                     isInitiallyPaused: false
                 )
             }
     }
 }
-

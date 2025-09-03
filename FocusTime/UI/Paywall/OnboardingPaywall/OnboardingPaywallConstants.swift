@@ -15,9 +15,8 @@ extension OnboardingPaywallView {
         /// Main selling points of the app.
         enum FeatureItems: CaseIterable, Identifiable {
             case unlimitedSessions
-            case unlimitedApps
+            case appSelection
             case deepFocus
-            case whiteNoise
             case priorityFeatures
             
             var id: Self { self }
@@ -26,12 +25,10 @@ extension OnboardingPaywallView {
                 switch self {
                 case .unlimitedSessions:
                     String(localized: "onboarding_paywall_feature_unlimited_sessions", table: "PaywallLocalizable")
-                case .unlimitedApps:
-                    String(localized: "onboarding_paywall_feature_unlimited_apps", table: "PaywallLocalizable")
+                case .appSelection:
+                    String(localized: "onboarding_paywall_feature_app_selection", table: "PaywallLocalizable")
                 case .deepFocus:
                     String(localized: "onboarding_paywall_feature_deep_focus", table: "PaywallLocalizable")
-                case .whiteNoise:
-                    String(localized: "onboarding_paywall_feature_white_noise", table: "PaywallLocalizable")
                 case .priorityFeatures:
                     String(localized: "onboarding_paywall_feature_priority_features", table: "PaywallLocalizable")
                 }
@@ -41,12 +38,10 @@ extension OnboardingPaywallView {
                 switch self {
                 case .unlimitedSessions:
                     "arrow.trianglehead.2.clockwise.rotate.90"
-                case .unlimitedApps:
-                    "lock.circle"
+                case .appSelection:
+                    "checkmark.circle"
                 case .deepFocus:
                     "clock"
-                case .whiteNoise:
-                    "speaker.wave.2"
                 case .priorityFeatures:
                     "icloud.and.arrow.up"
                 }
@@ -78,10 +73,20 @@ extension OnboardingPaywallView {
         }
         
         // MARK: - Strings
-        enum Strings {
+        enum Strings {            
             // Purchase button states
-            static let tryButtonTitle = String(localized: "onboarding_paywall_try_free_and_subscribe_button", table: "PaywallLocalizable")
-            static let subscribeButtonTitle = SharedConstants.Strings.subscribeTitle
+            static func tryButtonTitle(product: FTProduct) -> String{
+                let price = Decimal(0).formatted(product.priceFormatStyle)
+                let formatString = String(localized: "free_plan_upgrade_try_for_price", table: "PaywallLocalizable")
+                return String(format: formatString, price)
+            }
+            
+            static func subscribeButtonTitle(product: FTProduct) -> String {
+                let price = product.priceString
+                let formatString = String(localized: "free_plan_upgrade_subscribe_for_price", table: "PaywallLocalizable")
+                return String(format: formatString, price)
+            }
+            
             static let pendingTitle = SharedConstants.Strings.pendingTitle
             static let subscribedTitle = SharedConstants.Strings.subscribedTitle
             

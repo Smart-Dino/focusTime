@@ -15,18 +15,22 @@ final class FreePlanUpgradeViewModel {
     // MARK: - Nested declarations
     struct State {
         let requestedProductID: String
+        
+        var proState: ProState
         var superState: SuperPaywallViewModel.State
         
         // Dynamic strings
         static let stringConstants = FreePlanUpgradeView.Constants.Strings.self
-        var purchaseButtonTitle    = stringConstants.tryButtonTitle
+        var purchaseButtonTitle    = stringConstants.loadingTitle
         var trialPeriodDescription = stringConstants.loadingTitle
         
         init(
             requestedProductID: String,
+            proState: ProState,
             superState: SuperPaywallViewModel.State = .init()
         ) {
             self.requestedProductID = requestedProductID
+            self.proState = proState
             self.superState = superState
         }
     }
@@ -47,7 +51,6 @@ final class FreePlanUpgradeViewModel {
         self.state = state
         self.superPaywallVM = superPaywallVM
         self.flowDelegate = flowDelegate
-        superPaywallVM.delegate = self
         
         setupView()
     }
@@ -88,10 +91,10 @@ final class FreePlanUpgradeViewModel {
             return
         }
         
-        state.purchaseButtonTitle = if product.trialPeriod != nil {
-            State.stringConstants.tryButtonTitle
+        state.purchaseButtonTitle = if product.trialPeriod != nil && state.superState.isEligibleForIntro {
+            State.stringConstants.tryButtonTitle(product: product)
         } else {
-            State.stringConstants.subscribeButtonTitle
+            State.stringConstants.subscribeButtonTitle(product: product)
         }
         state.trialPeriodDescription = product.offerDescription
     }
@@ -111,7 +114,7 @@ final class FreePlanUpgradeViewModel {
             state.superState.error = PaymentError.pending
             
         case .userCancelled:
-            state.purchaseButtonTitle = State.stringConstants.tryButtonTitle
+            setupProductInfo()
             state.superState.isButtonDisabled = false
         }
     }
@@ -128,17 +131,15 @@ final class FreePlanUpgradeViewModel {
     func viewAllPlans() {
         flowDelegate?.paywallDidRequestPlanSelection()
     }
-}
-
-extension FreePlanUpgradeViewModel: SuperPaywallViewModelDelegate {
-    func didChangeUserEntitlementStatus(isPro: Bool) {
+    
+    func onChangeOfIsPro() {
         Task {
             await self.superPaywallVM.updatePurchaseResultForSelectedProduct(
                 state: self.state.superState
             )
             updateUIBasedOnPurchaseResult()
             
-            if isPro { flowDelegate?.paywallDidRequestDismissal() }
+            if state.proState.status.isPro { flowDelegate?.paywallDidRequestDismissal() }
         }
     }
 }

@@ -74,7 +74,7 @@ struct FTProduct: Identifiable, Equatable, Sendable {
         if let trialPeriod {
             let trialStr = Self.periodDescription(from: trialPeriod)
             self.trialPeriodString = trialStr
-            self.trialPeriodDescription = String(localized: "\(trialStr) free trial, then \(priceString), cancel anytime",
+            self.trialPeriodDescription = String(localized: "\(trialStr) free trial, then \(priceAndPeriodString ?? priceString), cancel anytime",
                                                  table: "PaywallLocalizable",
                                                  comment: "Trial period description with price")
         } else {

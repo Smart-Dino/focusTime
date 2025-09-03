@@ -69,7 +69,6 @@ struct BlockListPickerSheetView: View {
         .onChange(of: viewModel.state.isFamilyActivitySheetPresented) {
             if !viewModel.state.isFamilyActivitySheetPresented && viewModel.state.blockItems.isEmpty {
                 viewModel.saveSelection()
-                dismiss.callAsFunction()
             }
         }
         .safeAreaInset(edge: .bottom) {
@@ -82,7 +81,6 @@ struct BlockListPickerSheetView: View {
                 } else {
                     Button(Constants.Strings.saveSelectionButton, systemImage: "checkmark") {
                         viewModel.saveSelection()
-                        dismiss()
                     }
                     .transition(.scale)
                 }
@@ -91,6 +89,11 @@ struct BlockListPickerSheetView: View {
             .buttonStyle(.ftPrimary)
             .padding()
             .backgroundGradientFade()
+        }
+        .onChange(of: viewModel.state.shouldDismiss) {
+            if viewModel.state.shouldDismiss {
+                dismiss.callAsFunction()
+            }
         }
     }
     
@@ -138,43 +141,16 @@ struct BlockListPickerSheetView: View {
 }
 
 #Preview("Populated list") {
-    let factory = MockPersistenceStoreFactory()
-    let manager = PreviewData.mockBlockItemPersistenceManager
-    let registrar = LiveDeviceActivityRegistrar(
-        blockItemPersistenceManager: manager,
-        shieldManager: LiveShieldManager()
-    )
     let viewModel = BlockListPickerSheetViewModel(
-        deviceActivityRegistrar: registrar,
-        blockItemPersistenceManager: manager
+        deviceActivityRegistrar: PreviewData.mockPopulatedActivityRegistrar,
+        blockItemPersistenceManager: PreviewData.mockPopulatedPersistenceManager
     )
     
-    var randomBlockItem: ProtectedBlockItem {
-        ProtectedBlockItem(
-            emoji: SharedConstants.Strings.defaultEmojis.randomElement()!,
-            name: "Test item",
-            days: Weekday.weekdays,
-            type: .duration(duration: .init(seconds: Int.random(in: 0..<3600))),
-            blockedContent: FamilyActivitySelection()
-        )
-    }
-    
-    NavigationStack {
-        VStack {
-            Text("Some View")
-        }
-        .sheet(isPresented: .constant(true)) {
-            BlockListPickerSheetView(viewModel: viewModel)
-                .onAppear {
-                    Task {
-                        for _ in 0..<100 {
-                            let blockItem = randomBlockItem
-                            try? await manager.insert(blockItem)
-                        }
-                        viewModel.fetchNextPage()
-                    }
-                }
-        }
-        .preferredColorScheme(.dark)
+    return NavigationStack {
+        Text("Parent View")
+            .sheet(isPresented: .constant(true)) {
+                BlockListPickerSheetView(viewModel: viewModel)
+            }
+            .preferredColorScheme(.dark)
     }
 }

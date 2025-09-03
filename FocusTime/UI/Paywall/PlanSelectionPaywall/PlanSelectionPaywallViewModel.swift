@@ -14,6 +14,7 @@ import SwiftUI
 final class PlanSelectionPaywallViewModel {
     // MARK: - Nested declarations
     struct State {
+        var proState: ProState
         var superState: SuperPaywallViewModel.State
         
         var selectedViewIndex: Int? = .zero
@@ -23,7 +24,11 @@ final class PlanSelectionPaywallViewModel {
         var primaryButtonTitle: String = stringConstants.loadingTitle
         var subscribeButtonTerms: String = String()
         
-        init(superState: SuperPaywallViewModel.State = .init()) {
+        init(
+            proState: ProState,
+            superState: SuperPaywallViewModel.State = .init()
+        ) {
+            self.proState = proState
             self.superState = superState
         }
     }
@@ -36,14 +41,13 @@ final class PlanSelectionPaywallViewModel {
     
     // MARK: - Initializers
     init(
-        state: State = State(),
+        state: State,
         superPaywallVM: SuperPaywallViewModel,
         flowDelegate: PaywallNavigationDelegate?
     ) {
         self.state = state
         self.superPaywallVM = superPaywallVM
         self.flowDelegate = flowDelegate
-        superPaywallVM.delegate = self
         
         setupView()
     }
@@ -52,7 +56,6 @@ final class PlanSelectionPaywallViewModel {
         Task {
             await fetchProducts()
             selectFirstProductIfNeeded()
-            await checkIfUserIsEligibleForFreeTrial()
             configureBottomSectionForSelectedProduct()
         }
     }
@@ -81,10 +84,6 @@ final class PlanSelectionPaywallViewModel {
         await superPaywallVM.fetchProducts(state: state.superState)
     }
     
-    func checkIfUserIsEligibleForFreeTrial() async {
-        await superPaywallVM.isUserEligibleForTrial(state: state.superState)
-    }
-    
     func selectFirstProductIfNeeded() {
         superPaywallVM.selectFirstProductIfNeeded(state: state.superState)
     }
@@ -100,7 +99,7 @@ final class PlanSelectionPaywallViewModel {
         if product.trialPeriod != nil && state.superState.isEligibleForIntro {
             // Product is trialable and the user is eligible for trial
             state.primaryButtonTitle = State.stringConstants.startFreeTrial
-            state.subscribeButtonTerms = State.stringConstants.noPaymentMessage
+            state.subscribeButtonTerms = product.trialPeriodDescription ?? product.priceString
         } else if product.trialPeriod == nil || !state.superState.isEligibleForIntro {
             // No trial on product or it is already used
             let periodDesc = product.subscriptionPeriodDescription ?? State.stringConstants.paidOnce
@@ -145,11 +144,8 @@ final class PlanSelectionPaywallViewModel {
     func dismissView() {
         flowDelegate?.paywallDidRequestDismissal()
     }
-}
-
-
-extension PlanSelectionPaywallViewModel: SuperPaywallViewModelDelegate {
-    func didChangeUserEntitlementStatus(isPro: Bool) {
+    
+    func onChangeOfIsPro() {
         Task {
             await self.superPaywallVM.updatePurchaseResultForSelectedProduct(
                 state: self.state.superState

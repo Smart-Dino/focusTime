@@ -54,6 +54,8 @@ final class ScheduleConfigurationViewModel {
     
     // MARK: - State
     struct State: Equatable {
+        let proState: ProState
+        
         var blockItem: ProtectedBlockItem
         var appsTokenSelectionCount: Int {
             blockItem.blockedContent.applicationTokens.count
@@ -72,31 +74,30 @@ final class ScheduleConfigurationViewModel {
         var activeSheet: ScheduleSheetType?
         
         init(
+            proState: ProState,
             blockItem: ProtectedBlockItem = .default,
-            durationHours: Int = ScheduleConfigurationView.Constants.DefaultValues.durationHours,
-            durationMinutes: Int = ScheduleConfigurationView.Constants.DefaultValues.durationMinutes,
-            startTime: Date = ScheduleConfigurationView.Constants.DefaultValues.startTime,
-            endTime: Date = ScheduleConfigurationView.Constants.DefaultValues.endTime,
+            durationHours: Int = FocusSessionView.Constants.DefaultValues.durationHours,
+            durationMinutes: Int = FocusSessionView.Constants.DefaultValues.durationMinutes,
+            startTime: Date = FocusSessionView.Constants.DefaultValues.startTime,
+            endTime: Date = FocusSessionView.Constants.DefaultValues.endTime,
+            isScheduledForLater: Bool = false,
             activeSheet: ScheduleSheetType? = nil
         ) {
+            self.proState = proState
             self.blockItem = blockItem
             self.durationHours = durationHours
             self.durationMinutes = durationMinutes
             self.startTime = startTime
             self.endTime = endTime
+            self.isScheduledForLater = isScheduledForLater
             self.activeSheet = activeSheet
-            
-            switch blockItem.type {
-            case .scheduled:
-                self.isScheduledForLater = true
-            case .duration:
-                self.isScheduledForLater = false
-            }
         }
     }
     
     // MARK: - Properties
     private(set) var state: State
+    
+    private let paywallPresenter: PaywallPresenter
     private let deviceActivityRegistrar: DeviceActivityRegistrar
     private let blockItemPersistenceManager: BlockItemPersistenceManager
     weak var delegate: ScheduleConfigurationDelegate?
@@ -104,13 +105,18 @@ final class ScheduleConfigurationViewModel {
 
     // MARK: - Initializers
     init(
-        state: State = State(),
+        state: State,
+        paywallPresenter: PaywallPresenter,
         deviceActivityRegistrar: DeviceActivityRegistrar,
         blockItemPersistenceManager: BlockItemPersistenceManager
     ) {
         self.state = state
+        self.paywallPresenter = paywallPresenter
         self.deviceActivityRegistrar = deviceActivityRegistrar
         self.blockItemPersistenceManager = blockItemPersistenceManager
+        
+        inheritSettingsFromInjectedBlock(from: state.blockItem)
+        refreshBlockItem()
     }
 
     // MARK: - Methods
@@ -281,6 +287,29 @@ final class ScheduleConfigurationViewModel {
             )
         }
     }
+    
+    func showPaywallIfNeeded() {
+        if !checkIfCanSetCustomApps() { paywallPresenter.requestOnboarding() }
+    }
+    
+    private func checkIfCanSetCustomApps() -> Bool {
+        return state.proState.status.isPro
+    }
+    
+    private func inheritSettingsFromInjectedBlock(from blockItem: ProtectedBlockItem) {
+        switch blockItem.type {
+        case .scheduled(let startTime, let endTime, _, _, _):
+            state.startTime = startTime.localizedDate
+            state.endTime = endTime.localizedDate
+        case .duration(let duration, _, _, _):
+            var components = DateComponents()
+            components = components.adding(seconds: duration.rawValue)
+            
+            state.durationHours = components.hour ?? 0
+            state.durationMinutes = components.minute ?? 0
+        }
+    }
+
 }
 
 extension ScheduleConfigurationViewModel: BlockListPickerSheetDelegate {

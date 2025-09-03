@@ -6,10 +6,12 @@
 //
 
 import Foundation
+import ManagedSettings
 
 enum SharedAppValues {
     static let appGroupIdentifier = "group.org.dino.smart.FocusTime"
     static let appName = Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String
+    static let appIdentifier = Bundle.main.bundleIdentifier ?? "No bundle name"
     
     static let splashScreenDuration: TimeInterval = 2
     #if DEBUG
@@ -28,6 +30,12 @@ enum SharedAppValues {
     static let activityRegistrarFallbackInterval: Int = 15 * 60
     
     static let amountOfItemsPerPage: Int = 100
+    
+    @MainActor
+    enum FreeUserLimits {
+        static let maximumAmountOfBlocks = 1
+        static let defaultCategorieSelection: ShieldSettings.ActivityCategoryPolicy<Application> = .all()
+    }
     
     enum DefaultsKeys: String {
         case isOnboardingFinished = "IS_ONBOARDING_FINISHED"

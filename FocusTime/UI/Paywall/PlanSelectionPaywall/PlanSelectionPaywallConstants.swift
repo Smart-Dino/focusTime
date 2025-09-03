@@ -26,8 +26,6 @@ extension PlanSelectionPaywallView {
             static let subscribedTitle = SharedConstants.Strings.subscribedTitle
             static let purchasedTitle = SharedConstants.Strings.purchasedTitle
             
-            static let noPaymentMessage = String(localized: "plan_selection_paywall_no_payment_message", table: "PaywallLocalizable")
-            
             // Lifetime
             static let paidOnce = SharedConstants.Strings.paidOnce
             

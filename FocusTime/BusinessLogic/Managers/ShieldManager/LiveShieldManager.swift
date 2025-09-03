@@ -35,6 +35,11 @@ actor LiveShieldManager: ShieldManager {
     func block(specific selection: FamilyActivitySelection) async throws {
         try await checkAuthorization()
         
+        guard !selection.isEmpty else {
+            try await block()
+            return
+        }
+        
         // Block selected applications.
         store.shield.applications = selection.applicationTokens
         
@@ -52,6 +57,11 @@ actor LiveShieldManager: ShieldManager {
         for selection in selections {
             applicationsToDiscourage.formUnion(selection.applicationTokens)
             applicationCategoriesToDiscourage.formUnion(selection.categoryTokens)
+        }
+        
+        guard !applicationsToDiscourage.isEmpty || !applicationsToDiscourage.isEmpty else {
+            try await block()
+            return
         }
         
         // Block selected applications.

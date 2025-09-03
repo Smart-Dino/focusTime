@@ -51,6 +51,8 @@ final class DraftsBlockItemListViewModel {
     }
     
     private(set) var state: State
+    private let proState: ProState
+    private let paywallPresenter: PaywallPresenter
     private let deviceActivityRegistrar: DeviceActivityRegistrar
     private let blockItemPersistenceManager: BlockItemPersistenceManager
     
@@ -59,10 +61,14 @@ final class DraftsBlockItemListViewModel {
     
     init(
         state: State,
+        proState: ProState,
+        paywallPresenter: PaywallPresenter,
         deviceActivityRegistrar: DeviceActivityRegistrar,
         blockItemPersistenceManager: BlockItemPersistenceManager
     ) {
         self.state = state
+        self.proState = proState
+        self.paywallPresenter = paywallPresenter
         self.deviceActivityRegistrar = deviceActivityRegistrar
         self.blockItemPersistenceManager = blockItemPersistenceManager
     }
@@ -164,6 +170,8 @@ final class DraftsBlockItemListViewModel {
     func makeFocusSessionViewModel(mode: FocusSessionMode) -> FocusSessionViewModel {
         FocusSessionViewModel(
             mode: mode,
+            proState: proState,
+            paywallPresenter: paywallPresenter,
             blockItemPersistenceManager: blockItemPersistenceManager,
             deviceActivityRegistrar: deviceActivityRegistrar
         )

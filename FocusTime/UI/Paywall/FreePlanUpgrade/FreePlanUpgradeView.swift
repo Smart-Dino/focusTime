@@ -28,26 +28,24 @@ struct FreePlanUpgradeView: View {
             .overlay {
                 Color.ftMainBlue.opacity(0.1)
             }
+            .ignoresSafeArea()
             // VStack to push the elements down with a spacer.
-            VStack {
+            VStack(spacing: Constants.Spacings.offerView) {
                 Spacer()
-                VStack(spacing: Constants.Spacings.offerView) {
-                    upgradePromptSection
-                    
-                    actionButtons
-                        .padding(.vertical)
-                    
-                    SubscriptionUtilityLinksView(
-                        viewModel: .init(
-                            paymentManager: viewModel.getCurrentPaymentManager()
-                        )
+                upgradePromptSection
+                
+                actionButtons
+                    .padding(.vertical)
+                
+                SubscriptionUtilityLinksView(
+                    viewModel: .init(
+                        paymentManager: viewModel.getCurrentPaymentManager()
                     )
-                }
-                .padding()
-                .padding(.bottom) // Padding, so we don't hit the safe area
+                )
             }
+            .padding()
+            .containerRelativeFrame([.vertical])
         }
-        .ignoresSafeArea()
         // Anything beyond xxLarge makes the UI look really bad.
         .dynamicTypeSize(...DynamicTypeSize.xxLarge)
         .toolbar {
@@ -62,6 +60,9 @@ struct FreePlanUpgradeView: View {
             actions: { /* OK dismissal button by default */ },
             message: { Text(viewModel.state.superState.error?.localizedDescription ?? String()) }
         )
+        .onChange(of: viewModel.state.proState.status) {
+            viewModel.onChangeOfIsPro()
+        }
     }
     
     /// Text to upsell the user.
@@ -110,12 +111,11 @@ struct FreePlanUpgradeView: View {
 // MARK: - Previews
 #Preview("MockPaymentManagerWithError") {
     if let productID = try? FTProduct.Mocks.weekly.product.id {
-        let paymentManager = MockPaymentManagerWithPurchaseError()
         NavigationStack {
             FreePlanUpgradeView(
                 viewModel: .init(
-                    state: .init(requestedProductID: productID),
-                    superPaywallVM: .init(paymentManager: paymentManager),
+                    state: .init(requestedProductID: productID, proState: PreviewData.mockProState),
+                    superPaywallVM: .init(paymentManager: PreviewData.mockPaymentManager),
                     flowDelegate: nil
                 )
             )
@@ -128,12 +128,11 @@ struct FreePlanUpgradeView: View {
 
 #Preview("NonTrialableProduct") {
     if let productID = try? FTProduct.Mocks.monthly.product.id {
-        let paymentManager = MockPaymentManagerWithPurchaseError()
         NavigationStack {
             FreePlanUpgradeView(
                 viewModel: .init(
-                    state: .init(requestedProductID: productID),
-                    superPaywallVM: .init(paymentManager: paymentManager),
+                    state: .init(requestedProductID: productID, proState: PreviewData.mockProState),
+                    superPaywallVM: .init(paymentManager: PreviewData.mockPaymentManager),
                     flowDelegate: nil
                 )
             )

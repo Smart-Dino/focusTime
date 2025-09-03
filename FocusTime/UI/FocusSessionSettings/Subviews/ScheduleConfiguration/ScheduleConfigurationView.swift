@@ -172,6 +172,10 @@ struct ScheduleConfigurationView: View {
                 }
             }
             .rowStyle()
+            .disabled(!viewModel.state.proState.status.isPro)
+            .simultaneousGesture(TapGesture().onEnded({ _ in
+                viewModel.showPaywallIfNeeded()
+            }))
         }
         .padding(.horizontal)
         .onChange(of: viewModel.state) {
@@ -236,16 +240,14 @@ struct ScheduleConfigurationView: View {
 }
 
 #Preview {
-    let manager = PreviewData.mockBlockItemPersistenceManager
-    let registrar = LiveDeviceActivityRegistrar(
-        blockItemPersistenceManager: manager,
-        shieldManager: LiveShieldManager()
+    let viewModel = ScheduleConfigurationViewModel(
+        state: .init(proState: PreviewData.mockProState),
+        paywallPresenter: PreviewData.mockPaywallPresenter,
+        deviceActivityRegistrar: PreviewData.mockEmptyActivityRegistrar,
+        blockItemPersistenceManager: PreviewData.mockEmptyPersistenceManager
     )
-    ScheduleConfigurationView(
-        viewModel: ScheduleConfigurationViewModel(
-            deviceActivityRegistrar: registrar,
-            blockItemPersistenceManager: manager
-        )
-    )
-    .preferredColorScheme(.dark)
+    
+    return ScheduleConfigurationView(viewModel: viewModel)
+        .preferredColorScheme(.dark)
+        .gradientBackground()
 }

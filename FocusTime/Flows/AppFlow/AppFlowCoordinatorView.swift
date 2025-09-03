@@ -47,18 +47,12 @@ struct AppFlowCoordinatorView: View {
 }
 
 #Preview {
-    let defaultsManager = LiveDefaultsManager()
-    let mockPaymentManagerFactory = MockPaymentManagerFactory()
-    let mockPersistenceStoreFactory = MockPersistenceStoreFactory()
-    
     let viewModel = AppFlowCoordinatorViewModel(
-        defaultsManager: defaultsManager,
-        paymentManagerFactory: mockPaymentManagerFactory,
-        persistenceStoreFactory: mockPersistenceStoreFactory
+        defaultsManager: PreviewData.mockDefaultsManager,
+        paymentManagerFactory: PreviewData.mockPaymentManagerFactory,
+        persistenceStoreFactory: PreviewData.mockPersistenceStoreFactory
     )
     
-    AppFlowCoordinatorView(
-        viewModel: viewModel
-    )
-    .preferredColorScheme(.dark)
+    return AppFlowCoordinatorView(viewModel: viewModel)
+        .preferredColorScheme(.dark)
 }
