@@ -10,19 +10,29 @@
 			<key>Type</key>
 			<string>PSTitleValueSpecifier</string>
 			<key>Title</key>
-			<string>LEAD_NAME</string> 
+			<string>LEAD_NAME</string>
 			<key>Key</key>
 			<string>lead_role_key</string>
 			<key>DefaultValue</key>
-			<string>Project Lead</string> 
+			<string>Project Lead</string>
 		</dict>
 		<dict>
 			<key>Type</key>
 			<string>PSTitleValueSpecifier</string>
 			<key>Title</key>
-			<string>DESIGNER_NAME</string>
+			<string>DESIGNER_1_NAME</string>
 			<key>Key</key>
-			<string>designer_role_key</string>
+			<string>designer1_role_key</string>
+			<key>DefaultValue</key>
+			<string>Designer</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSTitleValueSpecifier</string>
+			<key>Title</key>
+			<string>DESIGNER_2_NAME</string>
+			<key>Key</key>
+			<string>designer2_role_key</string>
 			<key>DefaultValue</key>
 			<string>Designer</string>
 		</dict>

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FocusTimeUI
 
 extension ScheduleConfigurationView {
     // MARK: - Constants for ScheduleConfigurationView
@@ -102,7 +103,7 @@ extension ScheduleConfigurationView {
         }
         
         enum Colors {
-            static let toggleTint = Color.green
+            static let toggleTint = Color.ftMainBlue
             static let chevronColor = Color.blue
         }
         
