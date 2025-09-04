@@ -34,7 +34,7 @@ enum DeviceActivityRegistrarError: LocalizedError {
         case .scheduleOverlap(let blockItems):
             String(
                 format: String(localized: "device_activity_registrar_schedule_overlap_description", table: "ErrorLocalizable"),
-                blockItems.map { $0.emoji + " " + $0.name }.joined(separator: ", ")
+                blockItems.map { "\n" + $0.emoji + " " + $0.name + " [" + $0.type.description + "]" }.joined(separator: ", ")
             )
         case .activityAlreadyRunning:
             String(localized: "device_activity_registrar_activity_already_running_description", table: "ErrorLocalizable")
