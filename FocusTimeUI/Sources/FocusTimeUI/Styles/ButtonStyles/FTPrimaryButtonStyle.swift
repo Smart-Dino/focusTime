@@ -31,7 +31,7 @@ public struct FTPrimaryButtonStyle: ButtonStyle {
         configuration.label
             .frame(maxWidth: .infinity)
             .padding(.vertical, 18)
-            .background(.ftMainBlue)
+            .background(isEnabled ? .ftMainBlue : .gray) // Color opacity acted like the regular opacity so I will just change color to gray to indicate the disabled state.
             .clipShape(.capsule)
             .opacity(isEnabled ? (configuration.isPressed ? 0.8 : 1) : 0.3)
     }
