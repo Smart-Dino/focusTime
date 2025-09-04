@@ -123,6 +123,9 @@ final class FocusSessionViewModel {
     
     // MARK: Primary Actions
     func saveTapped() {
+        
+        analyticsManager.logEvent(name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.saveButtonTapped.rawValue, parameters: nil)
+        
         Task {
             do {
                 switch state.mode {
@@ -183,6 +186,9 @@ final class FocusSessionViewModel {
     }
     
     func startFocusingTapped() {
+        
+        analyticsManager.logEvent(name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.startFocusingButtonTapped.rawValue, parameters: nil)
+        
         Task {
             do {
                 let scheduleItem = state.scheduleConfigViewModel.state.blockItem
@@ -204,11 +210,13 @@ final class FocusSessionViewModel {
     }
     
     func deleteButtonTapped() {
+        
+        analyticsManager.logEvent(name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.deleteButtonTapped.rawValue, parameters: nil)
+        
         Task {
             do {
                 let item = state.scheduleConfigViewModel.state.blockItem
                 
-                // An item can be unregistered so silently try to unschedule it.
                 try? await deviceActivityRegistrar.unregisterActivity(during: item)
                 try await blockItemPersistenceManager.delete(blockItem: item)
                 
@@ -223,31 +231,44 @@ final class FocusSessionViewModel {
     // MARK: State Modifiers
     func setDeletionAlertPresentation(_ isPresented: Bool) {
         state.isDeletionAlertPresented = isPresented
+        
+        analyticsManager.logEvent(name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.deletionAlertPresented.rawValue, parameters: [FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.isDeletionAlertPresented : isPresented])
     }
     
     func setErrorVisibility(_ isVisible: Bool) {
         if !isVisible {
             state.error = nil
         }
+        
+        analyticsManager.logEvent(name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.errorVisibility.rawValue, parameters: [FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.isErrorVisible : isVisible])
     }
     
     func setSelectedEmoji(_ emoji: String) {
         state.scheduleConfigViewModel.setCustomPresetEmoji(emoji: emoji)
+        
+        analyticsManager.logEvent(name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.setSelectedEmoji.rawValue, parameters: [FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.setSelectedEmoji : emoji])
     }
     
     func setSelectedPreset(selectedPreset: FocusPreset?) {
         state.scheduleConfigViewModel.setSelectedPreset(selectedPreset: selectedPreset)
+        
+        analyticsManager.logEvent(name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.setSelectedPreset.rawValue, parameters: [FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.selectedPreset : selectedPreset ?? FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.presetNotSelected ])
     }
     
     // MARK: Navigation
     func dismiss() {
         state.shouldDismiss = true
+        
+        analyticsManager.logEvent(name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.dismissed.rawValue, parameters: nil)
     }
     
     // MARK: - Private Helpers
     private func saveSelectedItemToStorage(isTemporary: Bool) async throws -> ProtectedBlockItem {
+        
+        analyticsManager.logEvent(name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.saveSelectedItemToStorage.rawValue, parameters: nil)
+        
         var item = state.scheduleConfigViewModel.state.blockItem
-        item.id = UUID() // Make sure we always get a different UUID no matter what.
+        item.id = UUID()
         
         if isTemporary {
             item.isTemporary = .oneTimeBlock
@@ -258,6 +279,7 @@ final class FocusSessionViewModel {
     }
     
     private func canAddMoreItems() async -> Bool {
+        
         let isPro = state.proState.status.isPro
         let trackedItemsCount = await deviceActivityRegistrar.trackedActivities.count
         let limit = SharedAppValues.FreeUserLimits.maximumAmountOfBlocks

@@ -80,6 +80,8 @@ final class HomeViewModel {
     private var fetchTask: Task<Void, Never>?
     private var dbChangesNotificationTask: Task<Void, Never>?
     
+    private var analyticsManager: AnalyticsManagerProtocol = LiveAnalyticsManager()
+    
     init(
         state: State,
         proState: ProState,
@@ -98,6 +100,9 @@ final class HomeViewModel {
         if !isVisible {
             state.error = nil
         }
+        
+        /// - Analytics
+        analyticsManager.logEvent(name: "home_screen_error_visibility_changed", parameters: ["is_visible": isVisible])
     }
     
     func subscribeToDB() {
@@ -110,6 +115,10 @@ final class HomeViewModel {
     }
     
     func checkAuthorization() {
+        
+        /// - Analytics
+        analyticsManager.logEvent(name: "home_screen_check_authorization", parameters: nil)
+        
         Task {
             do {
                 try await deviceActivityRegistrar.checkAuth()
@@ -145,16 +154,26 @@ final class HomeViewModel {
     }
     
     func showFocusSessionSetupView() {
+        /// - Analytics
+        analyticsManager.logEvent(name: "home_screen_show_focus_session_setup", parameters: nil)
+        
         state.nextNavigationScreen = .focusSession(
             makeFocusSessionViewModel(mode: .startFocusing)
         )
     }
     
     func showScheduledFocusView() {
+        /// - Analytics
+        analyticsManager.logEvent(name: "home_screen_show_scheduled_focus", parameters: nil)
+        
         state.nextNavigationScreen = .scheduledFocusList(makeScheduledFocusViewModel())
     }
     
     func showTaskConcentrationView(isPauseAction: Bool) {
+        
+        /// - Analytics
+        analyticsManager.logEvent(name: "home_screen_show_task_concentration", parameters: ["is_pause_action": isPauseAction])
+        
         if state.isPaused {
             if let viewModel = makeTaskConcentrationViewModel(with: .breakTime) {
                 state.nextNavigationScreen = .taskConcentration(viewModel)

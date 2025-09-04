@@ -83,6 +83,8 @@ final class MainFlowCoordinatorViewModel {
     private let blockItemPersistenceManager: BlockItemPersistenceManager
     private let paywallPresenter: PaywallPresenter
     
+    private var analyticsManager: AnalyticsManagerProtocol = LiveAnalyticsManager()
+    
     init(
         state: State,
         proState: ProState,
@@ -129,6 +131,13 @@ final class MainFlowCoordinatorViewModel {
         if !showing {
             state.nextNavigationScreen = nil
         }
+        
+        /// - Analytics
+        if showing {
+            if case let .focusSession(vm) = state.nextNavigationScreen {
+                analyticsManager.logEvent(name: "main_flow_to_focus_session", parameters: nil)
+            }
+        }
     }
     
     func showNewBlockListView() {
@@ -137,6 +146,16 @@ final class MainFlowCoordinatorViewModel {
     
     func setTabScreen(_ screen: State.MainTabScreens) {
         state.currentTabScreen = screen
+        
+        /// - Analytics
+        switch screen {
+        case .home:
+            analyticsManager.logEvent(name: "main_flow_tab_selected", parameters: ["tab_name": "Home"])
+        case .drafts:
+            analyticsManager.logEvent(name: "main_flow_tab_selected", parameters: ["tab_name": "Drafts"])
+        case .none:
+            break
+        }
     }
     
     func makeFocusSessionViewModel() -> FocusSessionViewModel {

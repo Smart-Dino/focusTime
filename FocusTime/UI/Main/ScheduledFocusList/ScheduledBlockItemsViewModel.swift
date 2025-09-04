@@ -50,6 +50,8 @@ final class ScheduledBlockItemsViewModel {
     private let deviceActivityRegistrar: DeviceActivityRegistrar
     private let blockItemPersistenceManager: BlockItemPersistenceManager
     private var fetchTask: Task<Void, Never>?
+    
+    private var analyticsManager: AnalyticsManagerProtocol = LiveAnalyticsManager()
 
     init(
         state: State,
@@ -71,6 +73,9 @@ final class ScheduledBlockItemsViewModel {
     }
     
     func navigateToFocusSessionNewItem() {
+        /// - Analytics
+        analyticsManager.logEvent(name: "scheduled_list_navigate_to_new_focus_session", parameters: nil)
+      
         state.nextNavigationScreen = .focusSession(makeFocusSessionViewModel(mode: .addScheduledBlockList))
     }
 
@@ -119,9 +124,15 @@ final class ScheduledBlockItemsViewModel {
         if !isVisible {
             state.error = nil
         }
+        
+        /// - Analytics
+        analyticsManager.logEvent(name: "scheduled_list_error_visibility_changed", parameters: ["is_visible": isVisible])
     }
 
     func loadData() {
+        /// - Analytics
+        analyticsManager.logEvent(name: "scheduled_list_screen_loaded", parameters: nil)
+        
         if state.items.isEmpty {
             state.page = 0
             fetchNextPage()

@@ -59,6 +59,8 @@ final class DraftsBlockItemListViewModel {
     private var fetchTask: Task<Void, Never>?
     private var dbChangesNotificationTask: Task<Void, Never>?
     
+    private var analyticsManager: AnalyticsManagerProtocol = LiveAnalyticsManager()
+    
     init(
         state: State,
         proState: ProState,
@@ -136,9 +138,15 @@ final class DraftsBlockItemListViewModel {
         if !isVisible {
             state.error = nil
         }
+        
+        /// - Analytics
+        analyticsManager.logEvent(name: "drafts_error_visibility_changed", parameters: ["is_visible": isVisible])
     }
     
     func loadData() {
+        /// - Analytics
+        analyticsManager.logEvent(name: "drafts_screen_loaded", parameters: nil)
+        
         if state.items.isEmpty {
             state.page = 0
             fetchNextPage()
@@ -160,10 +168,16 @@ final class DraftsBlockItemListViewModel {
     }
     
     func navigateToFocusSessionNewItem() {
+        /// - Analytics
+        analyticsManager.logEvent(name: "drafts_navigate_to_new_focus_session", parameters: nil)
+        
         state.nextNavigationScreen = .focusSession(makeFocusSessionViewModel(mode: .addBlockList))
     }
     
     func navigateToFocusSessionEditing(list: ProtectedBlockItem) {
+        /// - Analytics
+        analyticsManager.logEvent(name: "drafts_navigate_to_edit_focus_session", parameters: nil)
+        
         state.nextNavigationScreen = .focusSession(makeFocusSessionViewModel(mode: .editBlockList(list)))
     }
     

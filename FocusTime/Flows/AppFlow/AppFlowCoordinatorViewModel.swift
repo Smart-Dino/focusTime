@@ -92,6 +92,8 @@ final class AppFlowCoordinatorViewModel {
     private var paymentManager: PaymentManager?
     private var superPaywallVM: SuperPaywallViewModel?
     
+    private var analyticsManager: AnalyticsManagerProtocol = LiveAnalyticsManager()
+    
     init(
         state: State = State(currentFlow: .splash(viewModel: SplashScreenViewModel())),
         paywallPresenter: PaywallPresenter = LivePaywallPresenter(),
@@ -117,11 +119,37 @@ final class AppFlowCoordinatorViewModel {
         withAnimation {
             state.currentFlow = screen
         }
+        
+        /// - Analytics
+        switch screen {
+        case .onboarding:
+            analyticsManager.logEvent(name: "app_flow_onboarding_started", parameters: nil)
+        case .main:
+            analyticsManager.logEvent(name: "app_flow_main_flow_started", parameters: nil)
+        case .splash:
+            analyticsManager.logEvent(name: "app_flow_splash_screen_shown", parameters: nil)
+        case .none:
+            break
+        }
     }
     
     func setScreenCover(to cover: AppFullScreenCover?) {
         if state.screenCover != cover {
             state.screenCover = cover
+            
+            /// - Analytics
+            if let cover = cover {
+                switch cover {
+                case .freePlanPaywall:
+                    analyticsManager.logEvent(name: "paywall_free_plan_shown", parameters: nil)
+                case .onboardingPaywall:
+                    analyticsManager.logEvent(name: "paywall_onboarding_paywall_shown", parameters: nil)
+                case .planSelectionPaywall:
+                    analyticsManager.logEvent(name: "paywall_plan_selection_paywall_shown", parameters: nil)
+                }
+            } else {
+                analyticsManager.logEvent(name: "paywall_dismissed", parameters: nil)
+            }
         }
     }
     
@@ -241,12 +269,20 @@ final class AppFlowCoordinatorViewModel {
 // MARK: - MainFlowNavigationDelegate
 extension AppFlowCoordinatorViewModel: PaywallPresenterDelegate {
     func didRequestPlanSelectionPaywall() {
+        
+        /// - Analytics
+        analyticsManager.logEvent(name: "paywall_request_plan_selection", parameters: nil)
+        
         if let viewModel = makePlanSelectionPaywallViewModel() {
             setScreenCover(to: .planSelectionPaywall(viewModel: viewModel))
         }
     }
     
     func didRequestFreePlanPaywall() {
+        
+        /// - Analytics
+        analyticsManager.logEvent(name: "paywall_request_free_plan", parameters: nil)
+        
         if let viewModel = makeFreePlanUpgradeViewModel(
             requestedProductID: StoreKitProductIdentifiers.trialableWeekly.id
         ) {
@@ -255,6 +291,10 @@ extension AppFlowCoordinatorViewModel: PaywallPresenterDelegate {
     }
     
     func didRequestOnboardingPaywall() {
+        
+        /// - Analytics
+        analyticsManager.logEvent(name: "paywall_request_onboarding", parameters: nil)
+        
         if let viewModel = makeOnboardingPaywallViewModel(
             requestedProductID: StoreKitProductIdentifiers.trialableWeekly.id
         ) {
@@ -267,6 +307,9 @@ extension AppFlowCoordinatorViewModel: PaywallPresenterDelegate {
 extension AppFlowCoordinatorViewModel: OnboardingFlowNavigationDelegate {
     func didFinishOnboarding() {
         defaultsManager.setValue(for: .isOnboardingFinished, to: true)
+        
+        /// - Analytics
+        analyticsManager.logEvent(name: "onboarding_flow_finished", parameters: nil)
         
         if let mainVM = makeMainFlowCoordinatorViewModel() {
             setStateFlow(to: .main(viewModel: mainVM))
@@ -283,6 +326,10 @@ extension AppFlowCoordinatorViewModel: OnboardingFlowNavigationDelegate {
 // MARK: - PaywallNavigationDelegate
 extension AppFlowCoordinatorViewModel: PaywallNavigationDelegate {
     func paywallDidRequestPlanSelection() {
+        
+        /// - Analytics
+        analyticsManager.logEvent(name: "paywall_request_plan_selection_from_other_paywall", parameters: nil)
+        
         if let viewModel = makePlanSelectionPaywallViewModel() {
             setScreenCover(to: .planSelectionPaywall(viewModel: viewModel))
         }

@@ -89,6 +89,15 @@ extension FocusSessionView {
         // MARK: - Analytics Keys for Focus Session
         enum ScheduleSessionAnalyticsKeys: String {
             case startButtonTapped = "schedule_start_button_tapped"
+            case saveButtonTapped = "schedule_save_button_tapped"
+            case startFocusingButtonTapped = "schedule_start_focusing_button_tapped"
+            case deleteButtonTapped = "schedule_delete_button_tapped"
+            case deletionAlertPresented = "schedule_deletion_alert_presented"
+            case errorVisibility = "schedule_error_visibility"
+            case setSelectedEmoji = "schedule_set_selected_emoji"
+            case setSelectedPreset = "schedule_set_selected_preset"
+            case dismissed = "dismissed"
+            case saveSelectedItemToStorage = "save_selected_item_to_storage"
         }
         
         // MARK: - Analytics Parameter Keys for Focus Session
@@ -97,6 +106,11 @@ extension FocusSessionView {
             static let durationHours = "duration_hours"
             static let durationMinutes = "duration_minutes"
             static let isScheduled = "is_scheduled"
+            static let isDeletionAlertPresented = "is_deletion_alert_presented"
+            static let isErrorVisible = "is_error_visible"
+            static let setSelectedEmoji = "set_selected_emoji"
+            static let selectedPreset = "selected_preset"
+            static let presetNotSelected = "preset_not_selected"
         }
     }
 }

@@ -64,6 +64,8 @@ final class TaskConcentrationViewModel {
     
     private var dbChangesNotificationTask: Task<Void, Never>?
     
+    private var analyticsManager: AnalyticsManagerProtocol = LiveAnalyticsManager()
+    
     // MARK: - Initialization
     init(
         state: State,
@@ -82,19 +84,31 @@ final class TaskConcentrationViewModel {
         if !isVisible {
             state.error = nil
         }
+        
+        /// - Analytics
+        analyticsManager.logEvent(name: "task_concentration_error_visibility_changed", parameters: ["is_visible": isVisible])
     }
     
     func startBreakTimer() {
+        /// - Analytics
+        analyticsManager.logEvent(name: "task_concentration_start_break_timer", parameters: nil)
+        
         Task {
             await startABreak()
         }
     }
     
     func moveToPauseSessionScene() {
+        /// - Analytics
+        analyticsManager.logEvent(name: "task_concentration_move_to_pause_scene", parameters: nil)
+        
         moveTo(.breakTransition)
     }
     
     func moveToBreakTimeAndSetupBreakTimer() {
+        /// - Analytics
+        analyticsManager.logEvent(name: "task_concentration_move_to_break_time_and_setup_timer", parameters: nil)
+        
         moveTo(.breakTime)
         state.timer.start(
             deadline: .now.addingTimeInterval(TimeInterval(SharedAppValues.breakTimeDuration)),
@@ -103,14 +117,22 @@ final class TaskConcentrationViewModel {
     }
     
     func moveToEndSessionAlertScene() {
+        /// - Analytics
+        analyticsManager.logEvent(name: "task_concentration_move_to_end_session_alert", parameters: nil)
+        
         moveTo(.almostDone)
     }
     
     func dismiss() {
         state.shouldDismiss = true
+        /// - Analytics
+        analyticsManager.logEvent(name: "task_concentration_dismissed", parameters: nil)
     }
     
     func endBlock() {
+        /// - Analytics
+        analyticsManager.logEvent(name: "task_concentration_end_block", parameters: nil)
+        
         Task {
             do {
                 try await deviceActivityRegistrar.cancelIfRunning(state.item)
