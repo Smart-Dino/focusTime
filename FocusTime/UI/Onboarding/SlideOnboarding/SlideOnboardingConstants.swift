@@ -16,6 +16,7 @@ extension SlideOnboardingView {
             static let buttonVerticalPadding: CGFloat = 13
             static let progressBarInactiveColorOpacity: CGFloat = 0.3
             static let onboardingMaskOpacity: CGFloat = 0.3
+            static let buttonContainerHeight: CGFloat = 110
             
             // Constants for first slide blur
             static let blurRotationDegrees: Angle = .degrees(90)
