@@ -83,8 +83,12 @@ extension OnboardingPaywallView {
             
             static func subscribeButtonTitle(product: FTProduct) -> String {
                 let price = product.priceString
-                let formatString = String(localized: "free_plan_upgrade_subscribe_for_price", table: "PaywallLocalizable")
-                return String(format: formatString, price)
+                if product.isFreeTrialAvailable {
+                    let formatString = String(localized: "free_plan_upgrade_subscribe_for_price", table: "PaywallLocalizable")
+                    return String(format: formatString, price)
+                } else {
+                    return String(localized: "try_for_free_title", table: "PaywallLocalizable")
+                }
             }
             
             static let pendingTitle = SharedConstants.Strings.pendingTitle

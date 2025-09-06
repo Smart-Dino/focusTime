@@ -27,6 +27,10 @@ struct FTProduct: Identifiable, Equatable, Sendable {
     let subscriptionPeriod: Int?
     /// The trial period in seconds. Declares whether this product has a trial option on it.
     let trialPeriod: Int?
+    
+    var isFreeTrialAvailable: Bool {
+        self.trialPeriod != nil
+    }
     /// Tells if this product is meant to be a subscription.
     
     // MARK: - UI-specific properties
