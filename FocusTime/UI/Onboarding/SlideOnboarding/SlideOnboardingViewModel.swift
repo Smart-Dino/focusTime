@@ -73,7 +73,7 @@ final class SlideOnboardingViewModel {
     private(set) var state: State
     private let startAction: () -> Void
     weak var delegate: SlideOnboardingDelegate?
-    private var analyticsManager: AnalyticsManagerProtocol = LiveAnalyticsManager()
+    private var analyticsManager: AnalyticsManagerProtocol
     
     var nextButtonConfig: ButtonUIConfiguration {
         ButtonUIConfiguration(
@@ -111,10 +111,12 @@ final class SlideOnboardingViewModel {
             onboardingBackgroundImageName: SlideOnboardingView.SlideOnboardingConstants.Images.onboardingBackgroundImageName
         ),
         delegate: SlideOnboardingDelegate?,
-        onStart: @escaping () -> Void = {}
+        onStart: @escaping () -> Void = {},
+        analyticsManager: AnalyticsManagerProtocol = LiveAnalyticsManager()
     ) {
         self.state = state
         self.delegate = delegate
         self.startAction = onStart
+        self.analyticsManager = analyticsManager 
     }
 }

@@ -20,14 +20,18 @@ final class SubscriptionUtilityLinksViewModel {
     private let legalService: LegalService
     private let paymentManager: PaymentManager
     
+    private var analyticsManager: AnalyticsManagerProtocol
+    
     init(
         state: State = State(),
         legalService: LegalService = LiveLegalService(),
         paymentManager: PaymentManager,
+        analyticsManager: AnalyticsManagerProtocol = LiveAnalyticsManager()
     ) {
         self.state = state
         self.legalService = legalService
         self.paymentManager = paymentManager
+        self.analyticsManager = analyticsManager 
     }
     
     func setErrorVisibility(_ isVisible: Bool) {
@@ -43,6 +47,10 @@ final class SubscriptionUtilityLinksViewModel {
     }
     
     func restorePurchase() {
+        
+        /// - Analytics
+        analyticsManager.logEvent(name: "utility_links_restore_purchase_tapped", parameters: nil)
+        
         Task {
             do {
                 try await paymentManager.restorePurchases()
@@ -53,6 +61,10 @@ final class SubscriptionUtilityLinksViewModel {
     }
     
     func openTermsOfService() {
+        
+        /// - Analytics
+        analyticsManager.logEvent(name: "utility_links_terms_of_service_tapped", parameters: nil)
+        
         Task {
             do {
                 state.legalResult = try await legalService.requestContents(for: .termsOfService)
@@ -63,6 +75,10 @@ final class SubscriptionUtilityLinksViewModel {
     }
     
     func openPrivacy() {
+        
+        /// - Analytics
+        analyticsManager.logEvent(name: "utility_links_privacy_policy_tapped", parameters: nil)
+        
         Task {
             do {
                 state.legalResult = try await legalService.requestContents(for: .privacyPolicy)

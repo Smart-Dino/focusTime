@@ -83,7 +83,7 @@ final class MainFlowCoordinatorViewModel {
     private let blockItemPersistenceManager: BlockItemPersistenceManager
     private let paywallPresenter: PaywallPresenter
     
-    private var analyticsManager: AnalyticsManagerProtocol = LiveAnalyticsManager()
+    private var analyticsManager: AnalyticsManagerProtocol
     
     init(
         state: State,
@@ -91,7 +91,8 @@ final class MainFlowCoordinatorViewModel {
         timer: FTTimer = ConcurrencyTimer(),
         deviceActivityRegistrar: DeviceActivityRegistrar,
         blockItemPersistenceManager: BlockItemPersistenceManager,
-        paywallPresenter: PaywallPresenter
+        paywallPresenter: PaywallPresenter,
+        analyticsManager: AnalyticsManagerProtocol = LiveAnalyticsManager(),
     ) {
         self.state = state
         self.proState = proState
@@ -99,6 +100,7 @@ final class MainFlowCoordinatorViewModel {
         self.deviceActivityRegistrar = deviceActivityRegistrar
         self.blockItemPersistenceManager = blockItemPersistenceManager
         self.paywallPresenter = paywallPresenter
+        self.analyticsManager = analyticsManager
         
         setupFlow()
     }

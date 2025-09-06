@@ -83,7 +83,7 @@ final class FocusSessionViewModel {
     
     // MARK: - Properties
     private(set) var state: State
-    private var analyticsManager: AnalyticsManagerProtocol = LiveAnalyticsManager()
+    private var analyticsManager: AnalyticsManagerProtocol
     
     // MARK: Dependencies
     private let paywallPresenter: PaywallPresenter
@@ -96,11 +96,13 @@ final class FocusSessionViewModel {
         proState: ProState,
         paywallPresenter: PaywallPresenter,
         blockItemPersistenceManager: BlockItemPersistenceManager,
-        deviceActivityRegistrar: DeviceActivityRegistrar
+        deviceActivityRegistrar: DeviceActivityRegistrar,
+        analyticsManager: AnalyticsManagerProtocol = LiveAnalyticsManager()
     ) {
         self.paywallPresenter = paywallPresenter
         self.blockItemPersistenceManager = blockItemPersistenceManager
         self.deviceActivityRegistrar = deviceActivityRegistrar
+        self.analyticsManager = analyticsManager
         
         let scheduleConfigViewModel = Self.makeScheduleConfigurationViewModel(
             mode: mode,

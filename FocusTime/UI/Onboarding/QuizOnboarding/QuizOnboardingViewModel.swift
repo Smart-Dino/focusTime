@@ -21,14 +21,16 @@ final class QuizOnboardingViewModel {
     
     private(set) var state: State
     weak var delegate: QuizOnboardingDelegate?
-    var analyticsManager: AnalyticsManagerProtocol = LiveAnalyticsManager()
+    var analyticsManager: AnalyticsManagerProtocol
     
     init(
         state: State = State(),
-        delegate: QuizOnboardingDelegate?
+        delegate: QuizOnboardingDelegate?,
+        analyticsManager: AnalyticsManagerProtocol = LiveAnalyticsManager()
     ) {
         self.state = state
         self.delegate = delegate
+        self.analyticsManager = analyticsManager
     }
     
     func finishQuiz() {

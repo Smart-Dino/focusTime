@@ -29,6 +29,6 @@ struct FocusTimeApp: App {
     }
     
     init() {
-        self.appFlowViewModel = AppFlowCoordinatorViewModel()
+        self.appFlowViewModel = AppFlowCoordinatorViewModel(analyticsManager: LiveAnalyticsManager())
     }
 }

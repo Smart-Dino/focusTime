@@ -80,7 +80,7 @@ final class HomeViewModel {
     private var fetchTask: Task<Void, Never>?
     private var dbChangesNotificationTask: Task<Void, Never>?
     
-    private var analyticsManager: AnalyticsManagerProtocol = LiveAnalyticsManager()
+    private var analyticsManager: AnalyticsManagerProtocol
     
     init(
         state: State,
@@ -88,12 +88,14 @@ final class HomeViewModel {
         paywallPresenter: PaywallPresenter,
         deviceActivityRegistrar: DeviceActivityRegistrar,
         blockItemPersistenceManager: BlockItemPersistenceManager,
+        analyticsManager: AnalyticsManagerProtocol = LiveAnalyticsManager()
     ) {
         self.state = state
         self.proState = proState
         self.paywallPresenter = paywallPresenter
         self.deviceActivityRegistrar = deviceActivityRegistrar
         self.blockItemPersistenceManager = blockItemPersistenceManager
+        self.analyticsManager = analyticsManager 
     }
     
     func setErrorVisibility(_ isVisible: Bool) {

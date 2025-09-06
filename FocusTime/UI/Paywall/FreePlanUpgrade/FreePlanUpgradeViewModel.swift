@@ -42,15 +42,19 @@ final class FreePlanUpgradeViewModel {
     // The flow delegate property is accessed by SubscriptionUtilityLinksView in the view
     let flowDelegate: PaywallNavigationDelegate?
     
+    private var analyticsManager: AnalyticsManagerProtocol
+
     // MARK: - Initializers
     init(
         state: State,
         superPaywallVM: SuperPaywallViewModel,
-        flowDelegate: PaywallNavigationDelegate?
+        flowDelegate: PaywallNavigationDelegate?,
+        analyticsManager: AnalyticsManagerProtocol = LiveAnalyticsManager()
     ) {
         self.state = state
         self.superPaywallVM = superPaywallVM
         self.flowDelegate = flowDelegate
+        self.analyticsManager = analyticsManager
         
         setupView()
     }
@@ -120,6 +124,9 @@ final class FreePlanUpgradeViewModel {
     }
     
     func initiatePurchaseWithCurrentProduct() async {
+        /// - Analytics
+        analyticsManager.logEvent(name: "free_plan_upgrade_purchase_initiated", parameters: nil)
+        
         await superPaywallVM.subscribeToCurrentRequestedProduct(state: state.superState)
         updateUIBasedOnPurchaseResult()
     }
@@ -129,6 +136,9 @@ final class FreePlanUpgradeViewModel {
     }
     
     func viewAllPlans() {
+        /// - Analytics
+        analyticsManager.logEvent(name: "free_plan_upgrade_view_all_plans_tapped", parameters: nil)
+        
         flowDelegate?.paywallDidRequestPlanSelection()
     }
     

@@ -92,7 +92,7 @@ final class AppFlowCoordinatorViewModel {
     private var paymentManager: PaymentManager?
     private var superPaywallVM: SuperPaywallViewModel?
     
-    private var analyticsManager: AnalyticsManagerProtocol = LiveAnalyticsManager()
+    private let analyticsManager: AnalyticsManagerProtocol
     
     init(
         state: State = State(currentFlow: .splash(viewModel: SplashScreenViewModel())),
@@ -100,7 +100,8 @@ final class AppFlowCoordinatorViewModel {
         shieldManager: ShieldManager = LiveShieldManager(),
         defaultsManager: LiveDefaultsManager = LiveDefaultsManager(),
         paymentManagerFactory: PaymentManagerFactory = LivePaymentManagerFactory(),
-        persistenceStoreFactory: PersistenceStoreFactory = LivePersistenceStoreFactory()
+        persistenceStoreFactory: PersistenceStoreFactory = LivePersistenceStoreFactory(),
+        analyticsManager: AnalyticsManagerProtocol = LiveAnalyticsManager()
     ) {
         self.state = state
         self.shieldManager = shieldManager
@@ -108,6 +109,7 @@ final class AppFlowCoordinatorViewModel {
         self.paymentManagerFactory = paymentManagerFactory
         self.persistenceStoreFactory = persistenceStoreFactory
         self.paywallPresenter = paywallPresenter
+        self.analyticsManager = analyticsManager
         
         paywallPresenter.paywallCoordinator = self
         

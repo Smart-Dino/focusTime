@@ -64,17 +64,19 @@ final class TaskConcentrationViewModel {
     
     private var dbChangesNotificationTask: Task<Void, Never>?
     
-    private var analyticsManager: AnalyticsManagerProtocol = LiveAnalyticsManager()
+    private var analyticsManager: AnalyticsManagerProtocol
     
     // MARK: - Initialization
     init(
         state: State,
         deviceActivityRegistrar: DeviceActivityRegistrar,
-        blockItemPersistenceManager: BlockItemPersistenceManager
+        blockItemPersistenceManager: BlockItemPersistenceManager,
+        analyticsManager: AnalyticsManagerProtocol = LiveAnalyticsManager()
     ) {
         self.state = state
         self.deviceActivityRegistrar = deviceActivityRegistrar
         self.blockItemPersistenceManager = blockItemPersistenceManager
+        self.analyticsManager = analyticsManager
         
         subscribeToDB()
     }

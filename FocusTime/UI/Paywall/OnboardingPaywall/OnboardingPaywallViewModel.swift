@@ -40,15 +40,19 @@ final class OnboardingPaywallViewModel {
     private let superPaywallVM: SuperPaywallViewModel
     private let flowDelegate: PaywallNavigationDelegate?
     
+    private var analyticsManager: AnalyticsManagerProtocol
+    
     // MARK: - Initializers
     init(
         state: State,
         superPaywallVM: SuperPaywallViewModel,
-        flowDelegate: PaywallNavigationDelegate?
+        flowDelegate: PaywallNavigationDelegate?,
+        analyticsManager: AnalyticsManagerProtocol = LiveAnalyticsManager()
     ) {
         self.state = state
         self.superPaywallVM = superPaywallVM
         self.flowDelegate = flowDelegate
+        self.analyticsManager = analyticsManager
         
         setupView()
     }
@@ -122,6 +126,10 @@ final class OnboardingPaywallViewModel {
     
     // MARK: Actions
     func initiatePurchaseWithCurrentProduct() async {
+        
+        /// - Analytics
+        analyticsManager.logEvent(name: "onboarding_paywall_purchase_initiated", parameters: nil)
+        
         await superPaywallVM.subscribeToCurrentRequestedProduct(state: state.superState)
         updateUIBasedOnPurchaseResult()
     }
