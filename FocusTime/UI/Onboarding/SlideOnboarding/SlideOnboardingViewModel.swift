@@ -46,6 +46,10 @@ final class SlideOnboardingViewModel {
             )
         }
         
+        var sizeConfiguration: SizeUIConfiguration {
+            SizeUIConfiguration(buttonContainerHeight: SlideOnboardingView.SlideOnboardingConstants.Layout.buttonContainerHeight)
+        }
+        
         init(
             onboardingSlides: [OnboardingSlide] = SlideOnboardingStep.allCases.map { $0.slide },
             nextButtonTitle: String,
