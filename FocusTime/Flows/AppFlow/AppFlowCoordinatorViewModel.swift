@@ -125,11 +125,11 @@ final class AppFlowCoordinatorViewModel {
         /// - Analytics
         switch screen {
         case .onboarding:
-            analyticsManager.logEvent(name: "app_flow_onboarding_started", parameters: nil)
+            analyticsManager.logEvent(name: AnalyticsEventsConstants.AppFlowCoordinatorViewConstants.AnalyticsEvent.appFlowOnboardingStarted.rawValue, parameters: nil)
         case .main:
-            analyticsManager.logEvent(name: "app_flow_main_flow_started", parameters: nil)
+            analyticsManager.logEvent(name: AnalyticsEventsConstants.AppFlowCoordinatorViewConstants.AnalyticsEvent.appFlowMainFlowStarted.rawValue, parameters: nil)
         case .splash:
-            analyticsManager.logEvent(name: "app_flow_splash_screen_shown", parameters: nil)
+            analyticsManager.logEvent(name: AnalyticsEventsConstants.AppFlowCoordinatorViewConstants.AnalyticsEvent.appFlowSplashScreenShown.rawValue, parameters: nil)
         case .none:
             break
         }
@@ -143,14 +143,14 @@ final class AppFlowCoordinatorViewModel {
             if let cover = cover {
                 switch cover {
                 case .freePlanPaywall:
-                    analyticsManager.logEvent(name: "paywall_free_plan_shown", parameters: nil)
+                    analyticsManager.logEvent(name: AnalyticsEventsConstants.AppFlowCoordinatorViewConstants.AnalyticsEvent.freePlanPaywall.rawValue, parameters: nil)
                 case .onboardingPaywall:
-                    analyticsManager.logEvent(name: "paywall_onboarding_paywall_shown", parameters: nil)
+                    analyticsManager.logEvent(name: AnalyticsEventsConstants.AppFlowCoordinatorViewConstants.AnalyticsEvent.onboardingPayWall.rawValue, parameters: nil)
                 case .planSelectionPaywall:
-                    analyticsManager.logEvent(name: "paywall_plan_selection_paywall_shown", parameters: nil)
+                    analyticsManager.logEvent(name: AnalyticsEventsConstants.AppFlowCoordinatorViewConstants.AnalyticsEvent.planSelectionPaywall.rawValue, parameters: nil)
                 }
             } else {
-                analyticsManager.logEvent(name: "paywall_dismissed", parameters: nil)
+                analyticsManager.logEvent(name: AnalyticsEventsConstants.AppFlowCoordinatorViewConstants.AnalyticsEvent.paywallDismissed.rawValue, parameters: nil)
             }
         }
     }
@@ -273,7 +273,7 @@ extension AppFlowCoordinatorViewModel: PaywallPresenterDelegate {
     func didRequestPlanSelectionPaywall() {
         
         /// - Analytics
-        analyticsManager.logEvent(name: "paywall_request_plan_selection", parameters: nil)
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.AppFlowCoordinatorViewConstants.AnalyticsEvent.paywallRequestPlanSelections.rawValue, parameters: nil)
         
         if let viewModel = makePlanSelectionPaywallViewModel() {
             setScreenCover(to: .planSelectionPaywall(viewModel: viewModel))
@@ -283,7 +283,7 @@ extension AppFlowCoordinatorViewModel: PaywallPresenterDelegate {
     func didRequestFreePlanPaywall() {
         
         /// - Analytics
-        analyticsManager.logEvent(name: "paywall_request_free_plan", parameters: nil)
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.AppFlowCoordinatorViewConstants.AnalyticsEvent.paywallRequestFreePlan.rawValue, parameters: nil)
         
         if let viewModel = makeFreePlanUpgradeViewModel(
             requestedProductID: StoreKitProductIdentifiers.trialableWeekly.id
@@ -295,7 +295,7 @@ extension AppFlowCoordinatorViewModel: PaywallPresenterDelegate {
     func didRequestOnboardingPaywall() {
         
         /// - Analytics
-        analyticsManager.logEvent(name: "paywall_request_onboarding", parameters: nil)
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.AppFlowCoordinatorViewConstants.AnalyticsEvent.paywallRequestOnboarding.rawValue, parameters: nil)
         
         if let viewModel = makeOnboardingPaywallViewModel(
             requestedProductID: StoreKitProductIdentifiers.trialableWeekly.id
@@ -311,7 +311,7 @@ extension AppFlowCoordinatorViewModel: OnboardingFlowNavigationDelegate {
         defaultsManager.setValue(for: .isOnboardingFinished, to: true)
         
         /// - Analytics
-        analyticsManager.logEvent(name: "onboarding_flow_finished", parameters: nil)
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.AppFlowCoordinatorViewConstants.AnalyticsEvent.onboardingFlowFinished.rawValue, parameters: nil)
         
         if let mainVM = makeMainFlowCoordinatorViewModel() {
             setStateFlow(to: .main(viewModel: mainVM))
@@ -330,7 +330,7 @@ extension AppFlowCoordinatorViewModel: PaywallNavigationDelegate {
     func paywallDidRequestPlanSelection() {
         
         /// - Analytics
-        analyticsManager.logEvent(name: "paywall_request_plan_selection_from_other_paywall", parameters: nil)
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.AppFlowCoordinatorViewConstants.AnalyticsEvent.paywallRequestPlanSelectionFromOtherPaywall.rawValue, parameters: nil)
         
         if let viewModel = makePlanSelectionPaywallViewModel() {
             setScreenCover(to: .planSelectionPaywall(viewModel: viewModel))

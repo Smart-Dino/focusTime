@@ -95,7 +95,7 @@ final class PlanSelectionPaywallViewModel {
     func selectProduct(_ product: FTProduct) {
         
         /// - Analytics
-        analyticsManager.logEvent(name: "plan_selection_product_selected", parameters: ["product_id": product.id])
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEvents.planSelectionProductSelected.rawValue, parameters: [AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEventsParameters.productId.rawValue: product.id])
         
         superPaywallVM.selectProduct(product, state: state.superState)
         configureBottomSectionForSelectedProduct()
@@ -146,7 +146,7 @@ final class PlanSelectionPaywallViewModel {
     // MARK: Actions
     func initiatePurchaseWithCurrentProduct() async {
         /// - Analytics
-        analyticsManager.logEvent(name: "plan_selection_purchase_initiated", parameters: nil)
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEvents.planSelectionPurchaseInitiated.rawValue, parameters: nil)
         
         
         await superPaywallVM.subscribeToCurrentRequestedProduct(state: state.superState)

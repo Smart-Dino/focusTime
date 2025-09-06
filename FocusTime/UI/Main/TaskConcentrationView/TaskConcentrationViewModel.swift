@@ -88,12 +88,12 @@ final class TaskConcentrationViewModel {
         }
         
         /// - Analytics
-        analyticsManager.logEvent(name: "task_concentration_error_visibility_changed", parameters: ["is_visible": isVisible])
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.TaskConcentrationViewAnalyticsConstants.AnalyticsEvents.taskConcentrationErrorVisibilityChanged.rawValue, parameters: [AnalyticsEventsConstants.TaskConcentrationViewAnalyticsConstants.AnalyticsEventsParameters.isVisible.rawValue: isVisible])
     }
     
     func startBreakTimer() {
         /// - Analytics
-        analyticsManager.logEvent(name: "task_concentration_start_break_timer", parameters: nil)
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.TaskConcentrationViewAnalyticsConstants.AnalyticsEvents.taskConcentrationStartBreakTimer.rawValue, parameters: nil)
         
         Task {
             await startABreak()
@@ -102,14 +102,14 @@ final class TaskConcentrationViewModel {
     
     func moveToPauseSessionScene() {
         /// - Analytics
-        analyticsManager.logEvent(name: "task_concentration_move_to_pause_scene", parameters: nil)
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.TaskConcentrationViewAnalyticsConstants.AnalyticsEvents.taskConcentrationMoveToPauseScene.rawValue, parameters: nil)
         
         moveTo(.breakTransition)
     }
     
     func moveToBreakTimeAndSetupBreakTimer() {
         /// - Analytics
-        analyticsManager.logEvent(name: "task_concentration_move_to_break_time_and_setup_timer", parameters: nil)
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.TaskConcentrationViewAnalyticsConstants.AnalyticsEvents.taskConcentrationMoveToBreakTimeAndSetupTimer.rawValue, parameters: nil)
         
         moveTo(.breakTime)
         state.timer.start(
@@ -120,7 +120,7 @@ final class TaskConcentrationViewModel {
     
     func moveToEndSessionAlertScene() {
         /// - Analytics
-        analyticsManager.logEvent(name: "task_concentration_move_to_end_session_alert", parameters: nil)
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.TaskConcentrationViewAnalyticsConstants.AnalyticsEvents.taskConcentrationMoveToEndSessionAlert.rawValue, parameters: nil)
         
         moveTo(.almostDone)
     }
@@ -128,12 +128,12 @@ final class TaskConcentrationViewModel {
     func dismiss() {
         state.shouldDismiss = true
         /// - Analytics
-        analyticsManager.logEvent(name: "task_concentration_dismissed", parameters: nil)
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.TaskConcentrationViewAnalyticsConstants.AnalyticsEvents.taskConcentrationDismissed.rawValue, parameters: nil)
     }
     
     func endBlock() {
         /// - Analytics
-        analyticsManager.logEvent(name: "task_concentration_end_block", parameters: nil)
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.TaskConcentrationViewAnalyticsConstants.AnalyticsEvents.taskConcentrationEndBlock.rawValue, parameters: nil)
         
         Task {
             do {

@@ -126,7 +126,7 @@ final class FocusSessionViewModel {
     // MARK: Primary Actions
     func saveTapped() {
         
-        analyticsManager.logEvent(name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.saveButtonTapped.rawValue, parameters: nil)
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.FocusSessionViewAnalyticsConstants.ScheduleSessionAnalyticsKeys.saveButtonTapped.rawValue, parameters: nil)
         
         Task {
             do {
@@ -164,14 +164,14 @@ final class FocusSessionViewModel {
         let configState = state.scheduleConfigViewModel.state
         
         let parameters: [String: Any] = [
-            FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.presetName: state.selectedPreset?.name ?? "Custom",
-            FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.durationHours: configState.durationHours,
-            FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.durationMinutes: configState.durationMinutes,
-            FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.isScheduled: configState.isScheduledForLater
+            AnalyticsEventsConstants.FocusSessionViewAnalyticsConstants.ScheduleSessionAnalyticsParameterKey.presetName: state.selectedPreset?.name ?? "Custom",
+            AnalyticsEventsConstants.FocusSessionViewAnalyticsConstants.ScheduleSessionAnalyticsParameterKey.durationHours: configState.durationHours,
+            AnalyticsEventsConstants.FocusSessionViewAnalyticsConstants.ScheduleSessionAnalyticsParameterKey.durationMinutes: configState.durationMinutes,
+            AnalyticsEventsConstants.FocusSessionViewAnalyticsConstants.ScheduleSessionAnalyticsParameterKey.isScheduled: configState.isScheduledForLater
         ]
         
         analyticsManager.logEvent(
-            name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.startButtonTapped.rawValue,
+            name: AnalyticsEventsConstants.FocusSessionViewAnalyticsConstants.ScheduleSessionAnalyticsKeys.startButtonTapped.rawValue,
             parameters: parameters
         )
         
@@ -189,7 +189,7 @@ final class FocusSessionViewModel {
     
     func startFocusingTapped() {
         
-        analyticsManager.logEvent(name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.startFocusingButtonTapped.rawValue, parameters: nil)
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.FocusSessionViewAnalyticsConstants.ScheduleSessionAnalyticsKeys.startFocusingButtonTapped.rawValue, parameters: nil)
         
         Task {
             do {
@@ -213,7 +213,7 @@ final class FocusSessionViewModel {
     
     func deleteButtonTapped() {
         
-        analyticsManager.logEvent(name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.deleteButtonTapped.rawValue, parameters: nil)
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.FocusSessionViewAnalyticsConstants.ScheduleSessionAnalyticsKeys.deleteButtonTapped.rawValue, parameters: nil)
         
         Task {
             do {
@@ -234,7 +234,7 @@ final class FocusSessionViewModel {
     func setDeletionAlertPresentation(_ isPresented: Bool) {
         state.isDeletionAlertPresented = isPresented
         
-        analyticsManager.logEvent(name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.deletionAlertPresented.rawValue, parameters: [FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.isDeletionAlertPresented : isPresented])
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.FocusSessionViewAnalyticsConstants.ScheduleSessionAnalyticsKeys.deletionAlertPresented.rawValue, parameters: [AnalyticsEventsConstants.FocusSessionViewAnalyticsConstants.ScheduleSessionAnalyticsParameterKey.isDeletionAlertPresented : isPresented])
     }
     
     func setErrorVisibility(_ isVisible: Bool) {
@@ -242,32 +242,32 @@ final class FocusSessionViewModel {
             state.error = nil
         }
         
-        analyticsManager.logEvent(name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.errorVisibility.rawValue, parameters: [FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.isErrorVisible : isVisible])
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.FocusSessionViewAnalyticsConstants.ScheduleSessionAnalyticsKeys.errorVisibility.rawValue, parameters: [AnalyticsEventsConstants.FocusSessionViewAnalyticsConstants.ScheduleSessionAnalyticsParameterKey.isErrorVisible : isVisible])
     }
     
     func setSelectedEmoji(_ emoji: String) {
         state.scheduleConfigViewModel.setCustomPresetEmoji(emoji: emoji)
         
-        analyticsManager.logEvent(name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.setSelectedEmoji.rawValue, parameters: [FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.setSelectedEmoji : emoji])
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.FocusSessionViewAnalyticsConstants.ScheduleSessionAnalyticsKeys.setSelectedEmoji.rawValue, parameters: [AnalyticsEventsConstants.FocusSessionViewAnalyticsConstants.ScheduleSessionAnalyticsParameterKey.setSelectedEmoji : emoji])
     }
     
     func setSelectedPreset(selectedPreset: FocusPreset?) {
         state.scheduleConfigViewModel.setSelectedPreset(selectedPreset: selectedPreset)
         
-        analyticsManager.logEvent(name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.setSelectedPreset.rawValue, parameters: [FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.selectedPreset : selectedPreset ?? FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.presetNotSelected ])
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.FocusSessionViewAnalyticsConstants.ScheduleSessionAnalyticsKeys.setSelectedPreset.rawValue, parameters: [AnalyticsEventsConstants.FocusSessionViewAnalyticsConstants.ScheduleSessionAnalyticsParameterKey.selectedPreset : selectedPreset ?? AnalyticsEventsConstants.FocusSessionViewAnalyticsConstants.ScheduleSessionAnalyticsParameterKey.presetNotSelected ])
     }
     
     // MARK: Navigation
     func dismiss() {
         state.shouldDismiss = true
         
-        analyticsManager.logEvent(name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.dismissed.rawValue, parameters: nil)
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.FocusSessionViewAnalyticsConstants.ScheduleSessionAnalyticsKeys.dismissed.rawValue, parameters: nil)
     }
     
     // MARK: - Private Helpers
     private func saveSelectedItemToStorage(isTemporary: Bool) async throws -> ProtectedBlockItem {
         
-        analyticsManager.logEvent(name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.saveSelectedItemToStorage.rawValue, parameters: nil)
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.FocusSessionViewAnalyticsConstants.ScheduleSessionAnalyticsKeys.saveSelectedItemToStorage.rawValue, parameters: nil)
         
         var item = state.scheduleConfigViewModel.state.blockItem
         item.id = UUID()

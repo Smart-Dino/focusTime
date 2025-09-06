@@ -128,7 +128,7 @@ final class OnboardingPaywallViewModel {
     func initiatePurchaseWithCurrentProduct() async {
         
         /// - Analytics
-        analyticsManager.logEvent(name: "onboarding_paywall_purchase_initiated", parameters: nil)
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEvents.onboardingPaywallPurchaseInitiated.rawValue, parameters: nil)
         
         await superPaywallVM.subscribeToCurrentRequestedProduct(state: state.superState)
         updateUIBasedOnPurchaseResult()

@@ -49,7 +49,7 @@ final class SubscriptionUtilityLinksViewModel {
     func restorePurchase() {
         
         /// - Analytics
-        analyticsManager.logEvent(name: "utility_links_restore_purchase_tapped", parameters: nil)
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEvents.utilityLinksRestorePurchaseTapped.rawValue, parameters: nil)
         
         Task {
             do {
@@ -63,7 +63,7 @@ final class SubscriptionUtilityLinksViewModel {
     func openTermsOfService() {
         
         /// - Analytics
-        analyticsManager.logEvent(name: "utility_links_terms_of_service_tapped", parameters: nil)
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEvents.utilityLinksTermsOfServiceTapped.rawValue, parameters: nil)
         
         Task {
             do {
@@ -77,7 +77,7 @@ final class SubscriptionUtilityLinksViewModel {
     func openPrivacy() {
         
         /// - Analytics
-        analyticsManager.logEvent(name: "utility_links_privacy_policy_tapped", parameters: nil)
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEvents.utilityLinksPrivacyPolicyTapped.rawValue, parameters: nil)
         
         Task {
             do {

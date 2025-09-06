@@ -137,7 +137,7 @@ final class MainFlowCoordinatorViewModel {
         /// - Analytics
         if showing {
             if case let .focusSession(vm) = state.nextNavigationScreen {
-                analyticsManager.logEvent(name: "main_flow_to_focus_session", parameters: nil)
+                analyticsManager.logEvent(name: AnalyticsEventsConstants.MainFlowCoordinatorViewAnalyticsConstants.AnalyticsEvents.mainFlowToFocusSession.rawValue, parameters: nil)
             }
         }
     }
@@ -152,9 +152,9 @@ final class MainFlowCoordinatorViewModel {
         /// - Analytics
         switch screen {
         case .home:
-            analyticsManager.logEvent(name: "main_flow_tab_selected", parameters: ["tab_name": "Home"])
+            analyticsManager.logEvent(name: AnalyticsEventsConstants.MainFlowCoordinatorViewAnalyticsConstants.AnalyticsEvents.mainFlowTabSelected.rawValue, parameters: [AnalyticsEventsConstants.MainFlowCoordinatorViewAnalyticsConstants.AnalyticsEventsParameters.tabName.rawValue: AnalyticsEventsConstants.MainFlowCoordinatorViewAnalyticsConstants.AnalyticsEventsParameters.home.rawValue])
         case .drafts:
-            analyticsManager.logEvent(name: "main_flow_tab_selected", parameters: ["tab_name": "Drafts"])
+            analyticsManager.logEvent(name: AnalyticsEventsConstants.MainFlowCoordinatorViewAnalyticsConstants.AnalyticsEvents.mainFlowTabSelected.rawValue, parameters: [AnalyticsEventsConstants.MainFlowCoordinatorViewAnalyticsConstants.AnalyticsEventsParameters.tabName.rawValue: AnalyticsEventsConstants.MainFlowCoordinatorViewAnalyticsConstants.AnalyticsEventsParameters.drafts.rawValue])
         case .none:
             break
         }

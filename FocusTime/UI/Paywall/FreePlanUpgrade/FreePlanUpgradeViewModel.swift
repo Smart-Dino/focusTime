@@ -125,7 +125,7 @@ final class FreePlanUpgradeViewModel {
     
     func initiatePurchaseWithCurrentProduct() async {
         /// - Analytics
-        analyticsManager.logEvent(name: "free_plan_upgrade_purchase_initiated", parameters: nil)
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEvents.freePlanUpgradePurchaseInitiated.rawValue, parameters: nil)
         
         await superPaywallVM.subscribeToCurrentRequestedProduct(state: state.superState)
         updateUIBasedOnPurchaseResult()
@@ -137,7 +137,7 @@ final class FreePlanUpgradeViewModel {
     
     func viewAllPlans() {
         /// - Analytics
-        analyticsManager.logEvent(name: "free_plan_upgrade_view_all_plans_tapped", parameters: nil)
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEvents.freePlanUpgradeViewAllPlansTapped.rawValue, parameters: nil)
         
         flowDelegate?.paywallDidRequestPlanSelection()
     }

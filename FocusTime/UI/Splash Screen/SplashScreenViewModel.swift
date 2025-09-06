@@ -69,14 +69,14 @@ final class SplashScreenViewModel {
     
     func playMedia() {
         /// - Analytics
-        analyticsManager.logEvent(name: "splash_screen_video_played", parameters: nil)
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.SplashScreenViewAnalyticsConstants.AnalyticsEvents.splashScreenVideoPlayed.rawValue, parameters: nil)
         
         state.player?.play()
     }
     
     func startIncreaseOpacityAnimation() {
         /// - Analytics
-        analyticsManager.logEvent(name: "splash_screen_animation_started", parameters: nil)
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.SplashScreenViewAnalyticsConstants.AnalyticsEvents.splashScreenAnimationStarted.rawValue, parameters: nil)
         
         withAnimation(.easeIn(duration: SharedAppValues.splashScreenDuration)) {
             state.viewOpacity = 1

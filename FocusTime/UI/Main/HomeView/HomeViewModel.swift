@@ -104,7 +104,7 @@ final class HomeViewModel {
         }
         
         /// - Analytics
-        analyticsManager.logEvent(name: "home_screen_error_visibility_changed", parameters: ["is_visible": isVisible])
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.HomeViewAnalyticsConstants.AnalyticsEvents.homeScreenErrorVisibilityChanged.rawValue, parameters: [AnalyticsEventsConstants.HomeViewAnalyticsConstants.AnalyticsEventsParameters.isVisible.rawValue: isVisible])
     }
     
     func subscribeToDB() {
@@ -119,7 +119,7 @@ final class HomeViewModel {
     func checkAuthorization() {
         
         /// - Analytics
-        analyticsManager.logEvent(name: "home_screen_check_authorization", parameters: nil)
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.HomeViewAnalyticsConstants.AnalyticsEvents.homeScreenCheckAuthorization.rawValue, parameters: nil)
         
         Task {
             do {
@@ -157,7 +157,7 @@ final class HomeViewModel {
     
     func showFocusSessionSetupView() {
         /// - Analytics
-        analyticsManager.logEvent(name: "home_screen_show_focus_session_setup", parameters: nil)
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.HomeViewAnalyticsConstants.AnalyticsEvents.homeScreenShowFocusSessionSetup.rawValue, parameters: nil)
         
         state.nextNavigationScreen = .focusSession(
             makeFocusSessionViewModel(mode: .startFocusing)
@@ -166,7 +166,7 @@ final class HomeViewModel {
     
     func showScheduledFocusView() {
         /// - Analytics
-        analyticsManager.logEvent(name: "home_screen_show_scheduled_focus", parameters: nil)
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.HomeViewAnalyticsConstants.AnalyticsEvents.homeScreenShowScheduledFocus.rawValue, parameters: nil)
         
         state.nextNavigationScreen = .scheduledFocusList(makeScheduledFocusViewModel())
     }
@@ -174,7 +174,7 @@ final class HomeViewModel {
     func showTaskConcentrationView(isPauseAction: Bool) {
         
         /// - Analytics
-        analyticsManager.logEvent(name: "home_screen_show_task_concentration", parameters: ["is_pause_action": isPauseAction])
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.HomeViewAnalyticsConstants.AnalyticsEvents.homeScreenShowTaskConcentration.rawValue, parameters: [AnalyticsEventsConstants.HomeViewAnalyticsConstants.AnalyticsEventsParameters.isPauseAction.rawValue: isPauseAction])
         
         if state.isPaused {
             if let viewModel = makeTaskConcentrationViewModel(with: .breakTime) {

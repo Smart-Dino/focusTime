@@ -76,7 +76,7 @@ final class ScheduledBlockItemsViewModel {
     
     func navigateToFocusSessionNewItem() {
         /// - Analytics
-        analyticsManager.logEvent(name: "scheduled_list_navigate_to_new_focus_session", parameters: nil)
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.ScheduledBlockItemsViewAnalyticsConstants.AnalyticsEvents.scheduledListNavigateToNewFocusSession.rawValue, parameters: nil)
       
         state.nextNavigationScreen = .focusSession(makeFocusSessionViewModel(mode: .addScheduledBlockList))
     }
@@ -128,12 +128,12 @@ final class ScheduledBlockItemsViewModel {
         }
         
         /// - Analytics
-        analyticsManager.logEvent(name: "scheduled_list_error_visibility_changed", parameters: ["is_visible": isVisible])
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.ScheduledBlockItemsViewAnalyticsConstants.AnalyticsEvents.scheduledListErrorVisibilityChanged.rawValue, parameters: [AnalyticsEventsConstants.ScheduledBlockItemsViewAnalyticsConstants.AnalyticsEventsParameters.isVisible.rawValue: isVisible])
     }
 
     func loadData() {
         /// - Analytics
-        analyticsManager.logEvent(name: "scheduled_list_screen_loaded", parameters: nil)
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.ScheduledBlockItemsViewAnalyticsConstants.AnalyticsEvents.scheduledListScreenLoaded.rawValue, parameters: nil)
         
         if state.items.isEmpty {
             state.page = 0

@@ -115,13 +115,13 @@ final class SuperPaywallViewModel {
             }
             
             /// - Analytics
-            analyticsManager.logEvent(name: "paywall_products_fetched", parameters: ["product_count": products.count])
+            analyticsManager.logEvent(name: AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEvents.superPaywallProductsFetched.rawValue, parameters: [AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEventsParameters.productCount.rawValue: products.count])
             
         } catch {
             state.error = error
             
             /// - Analytics
-            analyticsManager.logEvent(name: "paywall_products_fetch_failed", parameters: ["error": error.localizedDescription])
+            analyticsManager.logEvent(name: AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEvents.superPaywallFetchFailed.rawValue, parameters: [AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEventsParameters.error.rawValue: error.localizedDescription])
         }
     }
     
@@ -139,7 +139,7 @@ final class SuperPaywallViewModel {
             state.error = PaymentError.productNotFound
             
             /// - Analytics
-            analyticsManager.logEvent(name: "paywall_purchase_failed", parameters: ["error": "Product not found"])
+            analyticsManager.logEvent(name: AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEvents.superPaywallPurchaseFailed.rawValue, parameters: [AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEventsParameters.error.rawValue: AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEventsParameters.productNotFound.rawValue])
             
             return
         }
@@ -149,7 +149,7 @@ final class SuperPaywallViewModel {
                 state.error = PaymentError.unknown
                 
                 /// - Analytics
-                analyticsManager.logEvent(name: "paywall_purchase_failed", parameters: ["error": "Unknown"])
+                analyticsManager.logEvent(name: AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEvents.superPaywallPurchaseFailed.rawValue, parameters: [AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEventsParameters.error.rawValue: AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEventsParameters.unknown.rawValue])
                 
                 return
             }
@@ -158,24 +158,24 @@ final class SuperPaywallViewModel {
             case .success:
                 state.purchaseResult = .success
                 /// - Analytics
-                analyticsManager.logEvent(name: "paywall_purchase_success", parameters: ["product_id": product.id])
+                analyticsManager.logEvent(name: AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEvents.superPaywallPurchaseSucceeded.rawValue, parameters: [AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEventsParameters.productId.rawValue: product.id])
                 
             case .userCancelled:
                 state.purchaseResult = .userCancelled
                 /// - Analytics
-                analyticsManager.logEvent(name: "paywall_purchase_cancelled", parameters: ["product_id": product.id])
+                analyticsManager.logEvent(name: AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEvents.superPaywallPurchaseCancelled.rawValue, parameters: [AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEventsParameters.productId.rawValue: product.id])
            
             case .pending:
                 state.purchaseResult = .pending
                 state.error = PaymentError.pending
                 /// - Analytics
-                analyticsManager.logEvent(name: "paywall_purchase_pending", parameters: ["product_id": product.id])
+                analyticsManager.logEvent(name: AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEvents.superPaywallPurchasePending.rawValue, parameters: [AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEventsParameters.productId.rawValue: product.id])
             
             }
         } catch {
             state.error = error
             /// - Analytics
-            analyticsManager.logEvent(name: "paywall_purchase_failed", parameters: ["error": error.localizedDescription])
+            analyticsManager.logEvent(name: AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEvents.superPaywallPurchaseFailed.rawValue, parameters: [AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEventsParameters.error.rawValue: error.localizedDescription])
         }
     }
     

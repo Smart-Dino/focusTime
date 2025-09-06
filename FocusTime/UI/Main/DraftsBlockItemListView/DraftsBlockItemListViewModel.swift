@@ -142,12 +142,12 @@ final class DraftsBlockItemListViewModel {
         }
         
         /// - Analytics
-        analyticsManager.logEvent(name: "drafts_error_visibility_changed", parameters: ["is_visible": isVisible])
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.DraftsBlockItemListViewAnalyticsConstants.AnalyticsEvents.draftsErrorVisibilityChanged.rawValue, parameters: [AnalyticsEventsConstants.DraftsBlockItemListViewAnalyticsConstants.AnalyticsEventsParameters.isVisible.rawValue: isVisible])
     }
     
     func loadData() {
         /// - Analytics
-        analyticsManager.logEvent(name: "drafts_screen_loaded", parameters: nil)
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.DraftsBlockItemListViewAnalyticsConstants.AnalyticsEvents.draftScreenLoaded.rawValue, parameters: nil)
         
         if state.items.isEmpty {
             state.page = 0
@@ -171,14 +171,14 @@ final class DraftsBlockItemListViewModel {
     
     func navigateToFocusSessionNewItem() {
         /// - Analytics
-        analyticsManager.logEvent(name: "drafts_navigate_to_new_focus_session", parameters: nil)
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.DraftsBlockItemListViewAnalyticsConstants.AnalyticsEvents.draftsNavigateNewFocusSession.rawValue, parameters: nil)
         
         state.nextNavigationScreen = .focusSession(makeFocusSessionViewModel(mode: .addBlockList))
     }
     
     func navigateToFocusSessionEditing(list: ProtectedBlockItem) {
         /// - Analytics
-        analyticsManager.logEvent(name: "drafts_navigate_to_edit_focus_session", parameters: nil)
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.DraftsBlockItemListViewAnalyticsConstants.AnalyticsEvents.draftsNavigateEditFocusSession.rawValue, parameters: nil)
         
         state.nextNavigationScreen = .focusSession(makeFocusSessionViewModel(mode: .editBlockList(list)))
     }
