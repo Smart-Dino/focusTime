@@ -39,5 +39,7 @@ enum SharedAppValues {
     
     enum DefaultsKeys: String {
         case isOnboardingFinished = "IS_ONBOARDING_FINISHED"
+        case lastReviewDate = "LAST_REVIEW_DATE"
+        case countOfReviews = "COUNT_OF_REVIEWS"
     }
 }

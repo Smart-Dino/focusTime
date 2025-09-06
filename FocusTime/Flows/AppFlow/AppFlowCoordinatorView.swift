@@ -6,9 +6,11 @@
 //
 
 import SwiftUI
+import StoreKit
 
 struct AppFlowCoordinatorView: View {
     @State var viewModel: AppFlowCoordinatorViewModel
+    @Environment(\.requestReview) private var requestReview
     
     var body: some View {
         Group {
@@ -27,7 +29,12 @@ struct AppFlowCoordinatorView: View {
             item: .binding(
                 get: viewModel.state.screenCover,
                 set: viewModel.setScreenCover(to:)
-            )
+            ),
+            onDismiss: {
+                if viewModel.isNeedToShowRateUsAlert() {
+                    requestReview()
+                }
+            }
         ) { cover in
             NavigationStack {
                 // Full screen cover makes view .opAppear get called twice.

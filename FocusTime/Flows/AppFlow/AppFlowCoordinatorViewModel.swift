@@ -137,6 +137,10 @@ final class AppFlowCoordinatorViewModel {
         }
     }
     
+    func isNeedToShowRateUsAlert() -> Bool {
+       return paymentManager?.state.status.isPro ?? false
+    }
+    
     // MARK: - Launch Sequence
     private func startLaunchSequence() async {
         async let splashDelay: Void = delayIfNeeded()

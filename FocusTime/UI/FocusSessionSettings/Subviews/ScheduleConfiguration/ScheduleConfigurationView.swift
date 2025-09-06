@@ -8,11 +8,13 @@
 
 import SwiftUI
 import FocusTimeUI
+import StoreKit
 
 struct ScheduleConfigurationView: View {
     // MARK: - Properties
     @FocusState var isFocusedEmojiField
     @State var viewModel: ScheduleConfigurationViewModel
+    @Environment(\.requestReview) private var requestReview
     
     // MARK: - Body
     var body: some View {
@@ -187,7 +189,12 @@ struct ScheduleConfigurationView: View {
             item: .binding(
                 get: viewModel.state.activeSheet,
                 set: viewModel.dismissSheet
-            )
+            ),
+            onDismiss: {
+                if viewModel.state.isNeedToAskReview {
+                    requestReview()
+                }
+            }
         ) { sheetType in
             NavigationStack {
                 switch sheetType {

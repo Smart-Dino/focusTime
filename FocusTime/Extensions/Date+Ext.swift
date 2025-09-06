@@ -8,6 +8,10 @@
 import Foundation
 
 extension Date {
+    var isToday: Bool {
+        Calendar.current.isDateInToday(self)
+    }
+    
     func secondsSinceMidnight() -> Int {
         Self.secondsSinceMidnight(now: self)
     }

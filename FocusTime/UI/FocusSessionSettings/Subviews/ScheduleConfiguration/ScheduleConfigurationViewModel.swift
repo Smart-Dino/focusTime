@@ -69,6 +69,8 @@ final class ScheduleConfigurationViewModel {
         var startTime: Date
         var endTime: Date
         
+        var isNeedToAskReview: Bool
+        
         var isScheduledForLater: Bool
         
         var activeSheet: ScheduleSheetType?
@@ -80,6 +82,7 @@ final class ScheduleConfigurationViewModel {
             durationMinutes: Int = FocusSessionView.Constants.DefaultValues.durationMinutes,
             startTime: Date = FocusSessionView.Constants.DefaultValues.startTime,
             endTime: Date = FocusSessionView.Constants.DefaultValues.endTime,
+            isNeedToAskReview: Bool = false,
             isScheduledForLater: Bool = false,
             activeSheet: ScheduleSheetType? = nil
         ) {
@@ -89,6 +92,7 @@ final class ScheduleConfigurationViewModel {
             self.durationMinutes = durationMinutes
             self.startTime = startTime
             self.endTime = endTime
+            self.isNeedToAskReview = isNeedToAskReview
             self.isScheduledForLater = isScheduledForLater
             self.activeSheet = activeSheet
         }
@@ -100,20 +104,23 @@ final class ScheduleConfigurationViewModel {
     private let paywallPresenter: PaywallPresenter
     private let deviceActivityRegistrar: DeviceActivityRegistrar
     private let blockItemPersistenceManager: BlockItemPersistenceManager
-    weak var delegate: ScheduleConfigurationDelegate?
+    private let reviewRequestManager: ReviewRequestManager
     private var analyticsManager: AnalyticsManagerProtocol = LiveAnalyticsManager()
+    weak var delegate: ScheduleConfigurationDelegate?
 
     // MARK: - Initializers
     init(
         state: State,
         paywallPresenter: PaywallPresenter,
         deviceActivityRegistrar: DeviceActivityRegistrar,
-        blockItemPersistenceManager: BlockItemPersistenceManager
+        blockItemPersistenceManager: BlockItemPersistenceManager,
+        reviewRequestManager: ReviewRequestManager = LiveReviewRequestManager()
     ) {
         self.state = state
         self.paywallPresenter = paywallPresenter
         self.deviceActivityRegistrar = deviceActivityRegistrar
         self.blockItemPersistenceManager = blockItemPersistenceManager
+        self.reviewRequestManager = reviewRequestManager
         
         inheritSettingsFromInjectedBlock(from: state.blockItem)
         refreshBlockItem()
@@ -239,6 +246,7 @@ final class ScheduleConfigurationViewModel {
     /// Dismisses any currently presented sheet by setting the active sheet to nil.
     func dismissSheet(_ sheet: ScheduleSheetType?) {
         state.activeSheet = nil
+        state.isNeedToAskReview = reviewRequestManager.isNeedToRequestReview
         analyticsManager.logEvent(name: ScheduleConfigurationView.Constants.ScheduleSessionAnalyticsKeys.dismissSheet.rawValue, parameters: nil)
     }
     
