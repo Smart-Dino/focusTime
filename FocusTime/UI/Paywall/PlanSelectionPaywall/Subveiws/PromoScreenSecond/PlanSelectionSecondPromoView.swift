@@ -47,6 +47,7 @@ struct PlanSelectionSecondPromoView: View {
                     
             }
         }
+        .clipped()
     }
 }
 

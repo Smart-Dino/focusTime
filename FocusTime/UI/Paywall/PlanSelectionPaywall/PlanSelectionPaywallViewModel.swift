@@ -151,6 +151,8 @@ final class PlanSelectionPaywallViewModel {
                 state: self.state.superState
             )
             configurePurchaseButtonAvailabilityBasedOnSelectedProduct()
+            
+            if state.proState.status.isPro { flowDelegate?.paywallDidRequestDismissal() }
         }
     }
 }

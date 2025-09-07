@@ -21,6 +21,7 @@ struct PlanSelectionFirstPromoView: View {
                     .font(PlanSelectionFirstPromoView.Constants.Fonts.subtitle)
             }
         }
+        .clipped()
     }
 }
 
