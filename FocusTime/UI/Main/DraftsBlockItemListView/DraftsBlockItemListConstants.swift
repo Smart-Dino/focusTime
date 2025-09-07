@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import Lottie
 
 extension DraftsBlockItemListView {
     enum Constants {
@@ -28,6 +29,17 @@ extension DraftsBlockItemListView {
         enum Icons {
             static let waveImage = ImageResource.MainImages.appBlockingListWave
             static let newBlocklistSymbol = "plus.circle"
+        }
+        
+        enum Layout {
+            static let animationScale: CGPoint = .init(x: 1.3, y: 0.9)
+            static let animationOpacity: CGFloat = 0.3
+        }
+        
+        enum Animations {
+            static let waveAnimation: LottieAnimation? = .filepath(
+                Bundle.main.url(forResource: "Wave Animation", withExtension: "json")?.relativePath ?? String()
+            )
         }
     }
 }

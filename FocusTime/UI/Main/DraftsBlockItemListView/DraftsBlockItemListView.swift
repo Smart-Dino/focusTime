@@ -7,6 +7,7 @@
 
 import SwiftUI
 import FocusTimeUI
+import Lottie
 
 struct DraftsBlockItemListView: View {
     @State var viewModel: DraftsBlockItemListViewModel
@@ -15,9 +16,12 @@ struct DraftsBlockItemListView: View {
         ZStack {
             // MARK: - Wave image
             VStack {
-                Image(Constants.Icons.waveImage)
-                    .resizable()
-                    .scaledToFit()
+                LottieView(animation: Constants.Animations.waveAnimation)
+                    .playing(loopMode: .loop)
+                    .scaleEffect(x: Constants.Layout.animationScale.x,
+                                 y: Constants.Layout.animationScale.y)
+                    .opacity(Constants.Layout.animationOpacity)
+                
                 Spacer()
             }
             .ignoresSafeArea()

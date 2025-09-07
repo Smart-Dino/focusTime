@@ -8,6 +8,7 @@
 import SwiftUI
 import FocusTimeUI
 import DeviceActivity
+import Lottie
 
 struct HomeView: View {
     @State var viewModel: HomeViewModel
@@ -23,9 +24,11 @@ struct HomeView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal)
                 
-                Image(Constants.Icons.waveImage)
-                    .resizable()
-                    .scaledToFit()
+                LottieView(animation: Constants.Animations.waveAnimation)
+                    .playing(loopMode: .loop)
+                    .scaleEffect(x: Constants.Layout.animationScale.x,
+                                 y: Constants.Layout.animationScale.y)
+                    .opacity(Constants.Layout.animationOpacity)
                 
                 Spacer()
             }

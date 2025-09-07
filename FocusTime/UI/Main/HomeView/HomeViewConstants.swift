@@ -7,6 +7,7 @@
 
 import SwiftUI
 import DeviceActivity
+import Lottie
 
 extension HomeView {
     enum Constants {
@@ -33,7 +34,6 @@ extension HomeView {
 
         // MARK: - Icons
         enum Icons {
-            static let waveImage = ImageResource.SharedImages.wave
             static let chevronRight = "chevron.right"
             static let hourglass = "hourglass"
         }
@@ -46,6 +46,14 @@ extension HomeView {
         // MARK: - Layout
         enum Layout {
             static let activityReportSceneHeight: CGFloat = 50
+            static let animationScale: CGPoint = .init(x: 1.3, y: 0.9)
+            static let animationOpacity: CGFloat = 0.3
+        }
+        
+        enum Animations {
+            static let waveAnimation: LottieAnimation? = .filepath(
+                Bundle.main.url(forResource: "Wave Animation", withExtension: "json")?.relativePath ?? String()
+            )
         }
     }
 }

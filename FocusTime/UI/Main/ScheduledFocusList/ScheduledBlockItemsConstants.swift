@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Lottie
 
 extension ScheduledBlockItemsView {
     enum Constants {
@@ -20,6 +21,17 @@ extension ScheduledBlockItemsView {
         enum Icons {
             static let waveImage = ImageResource.MainImages.scheduledFocusWave
             static let newSessionSymbol = "plus.circle"
+        }
+        
+        enum Layout {
+            static let animationScale: CGPoint = .init(x: 1.3, y: 0.9)
+            static let animationOpacity: CGFloat = 0.3
+        }
+        
+        enum Animations {
+            static let waveAnimation: LottieAnimation? = .filepath(
+                Bundle.main.url(forResource: "Wave Animation", withExtension: "json")?.relativePath ?? String()
+            )
         }
     }
 }

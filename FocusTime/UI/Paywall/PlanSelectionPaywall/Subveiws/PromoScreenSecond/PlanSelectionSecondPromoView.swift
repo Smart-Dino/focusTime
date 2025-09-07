@@ -7,17 +7,19 @@
 
 import SwiftUI
 import FocusTimeUI
+import Lottie
 
 struct PlanSelectionSecondPromoView: View {
     var body: some View {
         ZStack {
             Constants.Colors.background
                 .overlay {
-                    Image(Constants.Images.background)
-                        .resizable()
-                        .scaledToFill()
-                        .rotationEffect(Angle(degrees: -21))
-                        .opacity(0.6)
+                    LottieView(animation: Constants.Animations.waveAnimation)
+                        .playing(loopMode: .loop)
+                        .scaleEffect(x: Constants.Layout.animationScale.x,
+                                     y: Constants.Layout.animationScale.y)
+                        .opacity(Constants.Layout.animationOpacity)
+                    
                 }
             
             HStack {

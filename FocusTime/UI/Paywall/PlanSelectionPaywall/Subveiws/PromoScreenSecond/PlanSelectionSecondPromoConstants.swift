@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Lottie
 
 extension PlanSelectionSecondPromoView {
     enum Constants {
@@ -18,7 +19,6 @@ extension PlanSelectionSecondPromoView {
             }()
         }
         enum Images {
-            static let background = ImageResource.SharedImages.wave
             static let icons = ImageResource.PaywallImages.promoScreenSecondIcons
         }
         enum Colors {
@@ -27,6 +27,17 @@ extension PlanSelectionSecondPromoView {
         }
         enum Fonts {
             static let headline = Font.title.bold()
+        }
+        
+        enum Layout {
+            static let animationScale: CGPoint = .init(x: 1.6, y: 0.9)
+            static let animationOpacity: CGFloat = 0.3
+        }
+        
+        enum Animations {
+            static let waveAnimation: LottieAnimation? = .filepath(
+                Bundle.main.url(forResource: "Wave Animation", withExtension: "json")?.relativePath ?? String()
+            )
         }
     }
 }
