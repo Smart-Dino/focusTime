@@ -12,7 +12,7 @@ struct PlanSelectionFirstPromoView: View {
         ZStack {
             Image(PlanSelectionFirstPromoView.Constants.Images.background)
                 .resizable()
-                .scaledToFit()
+                .scaledToFill()
             
             VStack {
                 Text(PlanSelectionFirstPromoView.Constants.Strings.headline)

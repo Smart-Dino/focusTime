@@ -19,6 +19,7 @@ public struct FTSubscribeButtonView: View {
                 .font(.headline)
                 .foregroundStyle(.ftGray3Light)
                 .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
             Button(buttonTitle, action: buttonAction)
                 .buttonStyle(.ftPrimary)
         }
