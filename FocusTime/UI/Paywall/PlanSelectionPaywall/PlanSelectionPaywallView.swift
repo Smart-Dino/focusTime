@@ -117,6 +117,10 @@ struct PlanSelectionPaywallView: View {
             ForEach(viewModel.state.superState.allProducts) { product in
                 setupCell(for: product)
             }
+            .transaction { transaction in
+                // Removes option jumps on small screens.
+                transaction.disablesAnimations = true
+            }
         }
         // Add this padding to make sure the views don't get clipped
         // Feel like this does not have to be carried over to the
