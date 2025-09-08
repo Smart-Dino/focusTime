@@ -137,7 +137,7 @@ final class MainFlowCoordinatorViewModel {
         /// - Analytics
         if showing {
             if case let .focusSession(vm) = state.nextNavigationScreen {
-                analyticsManager.logEvent(name: AnalyticsEventsConstants.MainFlowCoordinatorViewAnalyticsConstants.AnalyticsEvents.mainFlowToFocusSession.rawValue, parameters: nil)
+                AnalyticsEvent.mainFlowToFocusSession.log()
             }
         }
     }
@@ -152,9 +152,9 @@ final class MainFlowCoordinatorViewModel {
         /// - Analytics
         switch screen {
         case .home:
-            analyticsManager.logEvent(name: AnalyticsEventsConstants.MainFlowCoordinatorViewAnalyticsConstants.AnalyticsEvents.mainFlowTabSelected.rawValue, parameters: [AnalyticsEventsConstants.MainFlowCoordinatorViewAnalyticsConstants.AnalyticsEventsParameters.tabName.rawValue: AnalyticsEventsConstants.MainFlowCoordinatorViewAnalyticsConstants.AnalyticsEventsParameters.home.rawValue])
+            AnalyticsEvent.mainFlowTabSelected(tabName: "Home").log()
         case .drafts:
-            analyticsManager.logEvent(name: AnalyticsEventsConstants.MainFlowCoordinatorViewAnalyticsConstants.AnalyticsEvents.mainFlowTabSelected.rawValue, parameters: [AnalyticsEventsConstants.MainFlowCoordinatorViewAnalyticsConstants.AnalyticsEventsParameters.tabName.rawValue: AnalyticsEventsConstants.MainFlowCoordinatorViewAnalyticsConstants.AnalyticsEventsParameters.drafts.rawValue])
+            AnalyticsEvent.mainFlowTabSelected(tabName: "Drafts").log()
         case .none:
             break
         }
