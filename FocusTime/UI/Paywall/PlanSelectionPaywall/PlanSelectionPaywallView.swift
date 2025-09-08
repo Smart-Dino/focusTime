@@ -36,16 +36,14 @@ struct PlanSelectionPaywallView: View {
                 }
                 .scrollTargetBehavior(.paging)
                 .scrollPosition(id: selectedViewIndex)
-            }
-            .overlay {
-                VStack {
-                    Spacer()
-                    FTPageControlView(
-                        [0, 1],
-                        selectedItem: selectedViewIndex
-                    )
-                    // Should tell the design team to make it brighter?
-                    .foregroundTint(.ftMainBlue)
+                .overlay {
+                        FTPageControlView(
+                            [0, 1],
+                            selectedItem: selectedViewIndex
+                        )
+                        // Should tell the design team to make it brighter?
+                        .foregroundTint(.ftMainBlue)
+                        .frame(maxHeight: .infinity, alignment: .bottom)
                 }
             }
             
@@ -76,9 +74,6 @@ struct PlanSelectionPaywallView: View {
                     )
                 )
             }
-            .containerRelativeFrame(.vertical, { amount, _ in
-                amount / 2.5
-            })
             .padding()
             .padding(.bottom) // Padding, so we don't hit the safe area
             .background {
@@ -118,19 +113,15 @@ struct PlanSelectionPaywallView: View {
     
     /// List of features.
     private var features: some View {
-        ScrollView(.vertical) {
-            VStack(spacing: Constants.Padding.featuresSpacing) {
-                ForEach(viewModel.state.superState.allProducts) { product in
-                    setupCell(for: product)
-                }
+        VStack(spacing: Constants.Padding.featuresSpacing) {
+            ForEach(viewModel.state.superState.allProducts) { product in
+                setupCell(for: product)
             }
-            // Add this padding to make sure the views don't get clipped
-            // Feel like this does not have to be carried over to the
-            // constants file since it will always be 1
-            .padding(1)
         }
-        // Disable scroll if all items fit on top of the contentCard
-        .scrollBounceBehavior(.basedOnSize, axes: [.vertical])
+        // Add this padding to make sure the views don't get clipped
+        // Feel like this does not have to be carried over to the
+        // constants file since it will always be 1
+        .padding(1)
     }
     
     /// Toolbar items.
