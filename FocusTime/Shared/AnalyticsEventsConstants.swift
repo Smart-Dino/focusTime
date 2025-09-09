@@ -8,6 +8,40 @@
 import Foundation
 
 enum AnalyticsEventsConstants{
+    // MARK: - AppFlowCoordinatorView
+    enum AppFlowCoordinatorViewConstants {
+        enum AnalyticsEvent: String {
+            case appFlowOnboardingStarted = "app_flow_onboarding_started"
+            case appFlowMainFlowStarted = "app_flow_main_flow_started"
+            case appFlowSplashScreenShown = "app_flow_splash_screen_shown"
+
+            case freePlanPaywall = "paywall_free_plan_shown"
+            case onboardingPayWall = "paywall_onboarding_paywall_shown"
+            case planSelectionPaywall = "paywall_plan_selection_paywall_shown"
+            case paywallDismissed = "paywall_dismissed"
+            case paywallRequestPlanSelections = "paywall_request_plan_selection"
+            case paywallRequestFreePlan = "paywall_request_free_plan"
+            case paywallRequestOnboarding = "paywall_request_onboarding"
+
+            case onboardingFlowFinished = "onboarding_flow_finished"
+
+            case paywallRequestPlanSelectionFromOtherPaywall = "paywall_request_plan_selection_from_other_paywall"
+        }
+    }
+
+    // MARK: - MainFlowCoordinatorView
+    enum MainFlowCoordinatorViewAnalyticsConstants {
+        enum AnalyticsEvents: String {
+            case mainFlowToFocusSession = "main_flow_to_focus_session"
+            case mainFlowTabSelected = "main_flow_tab_selected"
+        }
+
+        enum AnalyticsEventsParameters: String {
+            case tabName = "tab_name"
+            case home = "Home"
+            case drafts = "Drafts"
+        }
+    }
     
     // MARK: - FocusSessionView
     enum FocusSessionViewAnalyticsConstants {
@@ -135,69 +169,6 @@ enum AnalyticsEventsConstants{
         enum AnalyticsEvents: String {
             case splashScreenVideoPlayed = "splash_screen_video_played"
             case splashScreenAnimationStarted = "splash_screen_animation_started"
-        }
-    }
-}
-
-enum AnalyticsEvent {
-    // MARK: - App Flow Events
-    case appFlowOnboardingStarted
-    case appFlowMainFlowStarted
-    case appFlowSplashScreenShown
-    
-    // MARK: - Paywall Events
-    case freePlanPaywallShown
-    case onboardingPaywallShown
-    case planSelectionPaywallShown
-    case paywallDismissed
-    case paywallRequestPlanSelection
-    case paywallRequestFreePlan
-    case paywallRequestOnboarding
-    case onboardingFlowFinished
-    case paywallRequestPlanSelectionFromOtherPaywall
-    
-    // MARK: - Main Flow Events
-    case mainFlowToFocusSession
-    case mainFlowTabSelected(tabName: String)
-    
-    // MARK: - Logging Method
-    /// Logs the specific analytics event to the configured analytics manager.
-    func log() {
-        let manager: AnalyticsManagerProtocol = LiveAnalyticsManager()
-        
-        switch self {
-        case .appFlowOnboardingStarted:
-            manager.logEvent(name: "app_flow_onboarding_started", parameters: nil)
-        case .appFlowMainFlowStarted:
-            manager.logEvent(name: "app_flow_main_flow_started", parameters: nil)
-        case .appFlowSplashScreenShown:
-            manager.logEvent(name: "app_flow_splash_screen_shown", parameters: nil)
-            
-        // Paywall events
-        case .freePlanPaywallShown:
-            manager.logEvent(name: "paywall_free_plan_shown", parameters: nil)
-        case .onboardingPaywallShown:
-            manager.logEvent(name: "paywall_onboarding_paywall_shown", parameters: nil)
-        case .planSelectionPaywallShown:
-            manager.logEvent(name: "paywall_plan_selection_paywall_shown", parameters: nil)
-        case .paywallDismissed:
-            manager.logEvent(name: "paywall_dismissed", parameters: nil)
-        case .paywallRequestPlanSelection:
-            manager.logEvent(name: "paywall_request_plan_selection", parameters: nil)
-        case .paywallRequestFreePlan:
-            manager.logEvent(name: "paywall_request_free_plan", parameters: nil)
-        case .paywallRequestOnboarding:
-            manager.logEvent(name: "paywall_request_onboarding", parameters: nil)
-        case .onboardingFlowFinished:
-            manager.logEvent(name: "onboarding_flow_finished", parameters: nil)
-        case .paywallRequestPlanSelectionFromOtherPaywall:
-            manager.logEvent(name: "paywall_request_plan_selection_from_other_paywall", parameters: nil)
-            
-        // Main flow events
-        case .mainFlowToFocusSession:
-            manager.logEvent(name: "main_flow_to_focus_session", parameters: nil)
-        case .mainFlowTabSelected(let tabName):
-            manager.logEvent(name: "main_flow_tab_selected", parameters: ["tab_name": tabName])
         }
     }
 }

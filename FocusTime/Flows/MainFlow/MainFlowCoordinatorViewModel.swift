@@ -40,6 +40,23 @@ final class MainFlowCoordinatorViewModel {
             case none
 
             var id: Int { hashValue }
+            
+            var analyticsEvent: String {
+                AnalyticsEventsConstants.MainFlowCoordinatorViewAnalyticsConstants.AnalyticsEvents.mainFlowTabSelected.rawValue
+            }
+            
+            var analyticsParameters: [String: Any] {
+                switch self {
+                case .home:
+                    return [AnalyticsEventsConstants.MainFlowCoordinatorViewAnalyticsConstants.AnalyticsEventsParameters.tabName.rawValue:
+                            AnalyticsEventsConstants.MainFlowCoordinatorViewAnalyticsConstants.AnalyticsEventsParameters.home.rawValue]
+                case .drafts:
+                    return [AnalyticsEventsConstants.MainFlowCoordinatorViewAnalyticsConstants.AnalyticsEventsParameters.tabName.rawValue:
+                            AnalyticsEventsConstants.MainFlowCoordinatorViewAnalyticsConstants.AnalyticsEventsParameters.drafts.rawValue]
+                case .none:
+                    return [:]
+                }
+            }
 
             static func == (lhs: MainTabScreens, rhs: MainTabScreens) -> Bool {
                 switch (lhs, rhs) {
@@ -67,6 +84,7 @@ final class MainFlowCoordinatorViewModel {
                 }
             }
         }
+        
         var currentTabScreen: MainTabScreens
         var tabViewModels: [MainTabScreens] = .init()
         
@@ -137,7 +155,7 @@ final class MainFlowCoordinatorViewModel {
         /// - Analytics
         if showing {
             if case let .focusSession(vm) = state.nextNavigationScreen {
-                AnalyticsEvent.mainFlowToFocusSession.log()
+                analyticsManager.logEvent(name: AnalyticsEventsConstants.MainFlowCoordinatorViewAnalyticsConstants.AnalyticsEvents.mainFlowToFocusSession.rawValue, parameters: nil)
             }
         }
     }
@@ -150,14 +168,10 @@ final class MainFlowCoordinatorViewModel {
         state.currentTabScreen = screen
         
         /// - Analytics
-        switch screen {
-        case .home:
-            AnalyticsEvent.mainFlowTabSelected(tabName: "Home").log()
-        case .drafts:
-            AnalyticsEvent.mainFlowTabSelected(tabName: "Drafts").log()
-        case .none:
-            break
-        }
+        analyticsManager.logEvent(
+            name: screen.analyticsEvent,
+            parameters: screen.analyticsParameters
+        )
     }
     
     func makeFocusSessionViewModel() -> FocusSessionViewModel {
