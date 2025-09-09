@@ -83,7 +83,7 @@ final class FocusSessionViewModel {
     
     // MARK: - Properties
     private(set) var state: State
-    private var analyticsManager: AnalyticsManagerProtocol = LiveAnalyticsManager()
+    private var analyticsManager: AnalyticsManagerProtocol
     
     // MARK: Dependencies
     private let paywallPresenter: PaywallPresenter
@@ -96,11 +96,13 @@ final class FocusSessionViewModel {
         proState: ProState,
         paywallPresenter: PaywallPresenter,
         blockItemPersistenceManager: BlockItemPersistenceManager,
-        deviceActivityRegistrar: DeviceActivityRegistrar
+        deviceActivityRegistrar: DeviceActivityRegistrar,
+        analyticsManager: AnalyticsManagerProtocol = LiveAnalyticsManager()
     ) {
         self.paywallPresenter = paywallPresenter
         self.blockItemPersistenceManager = blockItemPersistenceManager
         self.deviceActivityRegistrar = deviceActivityRegistrar
+        self.analyticsManager = analyticsManager
         
         let scheduleConfigViewModel = Self.makeScheduleConfigurationViewModel(
             mode: mode,
@@ -123,6 +125,9 @@ final class FocusSessionViewModel {
     
     // MARK: Primary Actions
     func saveTapped() {
+        
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.FocusSessionViewAnalyticsConstants.ScheduleSessionAnalyticsKeys.saveButtonTapped.rawValue, parameters: nil)
+        
         Task {
             do {
                 switch state.mode {
@@ -159,14 +164,14 @@ final class FocusSessionViewModel {
         let configState = state.scheduleConfigViewModel.state
         
         let parameters: [String: Any] = [
-            FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.presetName: state.selectedPreset?.name ?? "Custom",
-            FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.durationHours: configState.durationHours,
-            FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.durationMinutes: configState.durationMinutes,
-            FocusSessionView.Constants.ScheduleSessionAnalyticsParameterKey.isScheduled: configState.isScheduledForLater
+            AnalyticsEventsConstants.FocusSessionViewAnalyticsConstants.ScheduleSessionAnalyticsParameterKey.presetName: state.selectedPreset?.name ?? "Custom",
+            AnalyticsEventsConstants.FocusSessionViewAnalyticsConstants.ScheduleSessionAnalyticsParameterKey.durationHours: configState.durationHours,
+            AnalyticsEventsConstants.FocusSessionViewAnalyticsConstants.ScheduleSessionAnalyticsParameterKey.durationMinutes: configState.durationMinutes,
+            AnalyticsEventsConstants.FocusSessionViewAnalyticsConstants.ScheduleSessionAnalyticsParameterKey.isScheduled: configState.isScheduledForLater
         ]
         
         analyticsManager.logEvent(
-            name: FocusSessionView.Constants.ScheduleSessionAnalyticsKeys.startButtonTapped.rawValue,
+            name: AnalyticsEventsConstants.FocusSessionViewAnalyticsConstants.ScheduleSessionAnalyticsKeys.startButtonTapped.rawValue,
             parameters: parameters
         )
         
@@ -183,6 +188,9 @@ final class FocusSessionViewModel {
     }
     
     func startFocusingTapped() {
+        
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.FocusSessionViewAnalyticsConstants.ScheduleSessionAnalyticsKeys.startFocusingButtonTapped.rawValue, parameters: nil)
+        
         Task {
             do {
                 let scheduleItem = state.scheduleConfigViewModel.state.blockItem
@@ -204,11 +212,13 @@ final class FocusSessionViewModel {
     }
     
     func deleteButtonTapped() {
+        
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.FocusSessionViewAnalyticsConstants.ScheduleSessionAnalyticsKeys.deleteButtonTapped.rawValue, parameters: nil)
+        
         Task {
             do {
                 let item = state.scheduleConfigViewModel.state.blockItem
                 
-                // An item can be unregistered so silently try to unschedule it.
                 try? await deviceActivityRegistrar.unregisterActivity(during: item)
                 try await blockItemPersistenceManager.delete(blockItem: item)
                 
@@ -223,31 +233,44 @@ final class FocusSessionViewModel {
     // MARK: State Modifiers
     func setDeletionAlertPresentation(_ isPresented: Bool) {
         state.isDeletionAlertPresented = isPresented
+        
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.FocusSessionViewAnalyticsConstants.ScheduleSessionAnalyticsKeys.deletionAlertPresented.rawValue, parameters: [AnalyticsEventsConstants.FocusSessionViewAnalyticsConstants.ScheduleSessionAnalyticsParameterKey.isDeletionAlertPresented : isPresented])
     }
     
     func setErrorVisibility(_ isVisible: Bool) {
         if !isVisible {
             state.error = nil
         }
+        
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.FocusSessionViewAnalyticsConstants.ScheduleSessionAnalyticsKeys.errorVisibility.rawValue, parameters: [AnalyticsEventsConstants.FocusSessionViewAnalyticsConstants.ScheduleSessionAnalyticsParameterKey.isErrorVisible : isVisible])
     }
     
     func setSelectedEmoji(_ emoji: String) {
         state.scheduleConfigViewModel.setCustomPresetEmoji(emoji: emoji)
+        
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.FocusSessionViewAnalyticsConstants.ScheduleSessionAnalyticsKeys.setSelectedEmoji.rawValue, parameters: [AnalyticsEventsConstants.FocusSessionViewAnalyticsConstants.ScheduleSessionAnalyticsParameterKey.setSelectedEmoji : emoji])
     }
     
     func setSelectedPreset(selectedPreset: FocusPreset?) {
         state.scheduleConfigViewModel.setSelectedPreset(selectedPreset: selectedPreset)
+        
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.FocusSessionViewAnalyticsConstants.ScheduleSessionAnalyticsKeys.setSelectedPreset.rawValue, parameters: [AnalyticsEventsConstants.FocusSessionViewAnalyticsConstants.ScheduleSessionAnalyticsParameterKey.selectedPreset : selectedPreset ?? AnalyticsEventsConstants.FocusSessionViewAnalyticsConstants.ScheduleSessionAnalyticsParameterKey.presetNotSelected ])
     }
     
     // MARK: Navigation
     func dismiss() {
         state.shouldDismiss = true
+        
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.FocusSessionViewAnalyticsConstants.ScheduleSessionAnalyticsKeys.dismissed.rawValue, parameters: nil)
     }
     
     // MARK: - Private Helpers
     private func saveSelectedItemToStorage(isTemporary: Bool) async throws -> ProtectedBlockItem {
+        
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.FocusSessionViewAnalyticsConstants.ScheduleSessionAnalyticsKeys.saveSelectedItemToStorage.rawValue, parameters: nil)
+        
         var item = state.scheduleConfigViewModel.state.blockItem
-        item.id = UUID() // Make sure we always get a different UUID no matter what.
+        item.id = UUID()
         
         if isTemporary {
             item.isTemporary = .oneTimeBlock
@@ -258,6 +281,7 @@ final class FocusSessionViewModel {
     }
     
     private func canAddMoreItems() async -> Bool {
+        
         let isPro = state.proState.status.isPro
         let trackedItemsCount = await deviceActivityRegistrar.trackedActivities.count
         let limit = SharedAppValues.FreeUserLimits.maximumAmountOfBlocks

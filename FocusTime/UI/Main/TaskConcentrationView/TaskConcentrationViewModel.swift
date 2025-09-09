@@ -64,15 +64,19 @@ final class TaskConcentrationViewModel {
     
     private var dbChangesNotificationTask: Task<Void, Never>?
     
+    private var analyticsManager: AnalyticsManagerProtocol
+    
     // MARK: - Initialization
     init(
         state: State,
         deviceActivityRegistrar: DeviceActivityRegistrar,
-        blockItemPersistenceManager: BlockItemPersistenceManager
+        blockItemPersistenceManager: BlockItemPersistenceManager,
+        analyticsManager: AnalyticsManagerProtocol = LiveAnalyticsManager()
     ) {
         self.state = state
         self.deviceActivityRegistrar = deviceActivityRegistrar
         self.blockItemPersistenceManager = blockItemPersistenceManager
+        self.analyticsManager = analyticsManager
         
         subscribeToDB()
     }
@@ -82,19 +86,31 @@ final class TaskConcentrationViewModel {
         if !isVisible {
             state.error = nil
         }
+        
+        /// - Analytics
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.TaskConcentrationViewAnalyticsConstants.AnalyticsEvents.taskConcentrationErrorVisibilityChanged.rawValue, parameters: [AnalyticsEventsConstants.TaskConcentrationViewAnalyticsConstants.AnalyticsEventsParameters.isVisible.rawValue: isVisible])
     }
     
     func startBreakTimer() {
+        /// - Analytics
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.TaskConcentrationViewAnalyticsConstants.AnalyticsEvents.taskConcentrationStartBreakTimer.rawValue, parameters: nil)
+        
         Task {
             await startABreak()
         }
     }
     
     func moveToPauseSessionScene() {
+        /// - Analytics
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.TaskConcentrationViewAnalyticsConstants.AnalyticsEvents.taskConcentrationMoveToPauseScene.rawValue, parameters: nil)
+        
         moveTo(.breakTransition)
     }
     
     func moveToBreakTimeAndSetupBreakTimer() {
+        /// - Analytics
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.TaskConcentrationViewAnalyticsConstants.AnalyticsEvents.taskConcentrationMoveToBreakTimeAndSetupTimer.rawValue, parameters: nil)
+        
         moveTo(.breakTime)
         state.timer.start(
             deadline: .now.addingTimeInterval(TimeInterval(SharedAppValues.breakTimeDuration)),
@@ -103,14 +119,22 @@ final class TaskConcentrationViewModel {
     }
     
     func moveToEndSessionAlertScene() {
+        /// - Analytics
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.TaskConcentrationViewAnalyticsConstants.AnalyticsEvents.taskConcentrationMoveToEndSessionAlert.rawValue, parameters: nil)
+        
         moveTo(.almostDone)
     }
     
     func dismiss() {
         state.shouldDismiss = true
+        /// - Analytics
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.TaskConcentrationViewAnalyticsConstants.AnalyticsEvents.taskConcentrationDismissed.rawValue, parameters: nil)
     }
     
     func endBlock() {
+        /// - Analytics
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.TaskConcentrationViewAnalyticsConstants.AnalyticsEvents.taskConcentrationEndBlock.rawValue, parameters: nil)
+        
         Task {
             do {
                 try await deviceActivityRegistrar.cancelIfRunning(state.item)

@@ -85,18 +85,5 @@ extension FocusSessionView {
             static let startTime: Date = Calendar.current.date(from: DateComponents(hour: 9, minute: 0))!
             static let endTime: Date = Calendar.current.date(from: DateComponents(hour: 17, minute: 0))!
         }
-        
-        // MARK: - Analytics Keys for Focus Session
-        enum ScheduleSessionAnalyticsKeys: String {
-            case startButtonTapped = "schedule_start_button_tapped"
-        }
-        
-        // MARK: - Analytics Parameter Keys for Focus Session
-        enum ScheduleSessionAnalyticsParameterKey {
-            static let presetName = "preset_name"
-            static let durationHours = "duration_hours"
-            static let durationMinutes = "duration_minutes"
-            static let isScheduled = "is_scheduled"
-        }
     }
 }

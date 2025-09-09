@@ -59,18 +59,22 @@ final class DraftsBlockItemListViewModel {
     private var fetchTask: Task<Void, Never>?
     private var dbChangesNotificationTask: Task<Void, Never>?
     
+    private var analyticsManager: AnalyticsManagerProtocol
+    
     init(
         state: State,
         proState: ProState,
         paywallPresenter: PaywallPresenter,
         deviceActivityRegistrar: DeviceActivityRegistrar,
-        blockItemPersistenceManager: BlockItemPersistenceManager
+        blockItemPersistenceManager: BlockItemPersistenceManager,
+        analyticsManager: AnalyticsManagerProtocol = LiveAnalyticsManager()
     ) {
         self.state = state
         self.proState = proState
         self.paywallPresenter = paywallPresenter
         self.deviceActivityRegistrar = deviceActivityRegistrar
         self.blockItemPersistenceManager = blockItemPersistenceManager
+        self.analyticsManager = analyticsManager
     }
     
     func setNextNavigationScreen(_ showing: Bool) {
@@ -136,9 +140,15 @@ final class DraftsBlockItemListViewModel {
         if !isVisible {
             state.error = nil
         }
+        
+        /// - Analytics
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.DraftsBlockItemListViewAnalyticsConstants.AnalyticsEvents.draftsErrorVisibilityChanged.rawValue, parameters: [AnalyticsEventsConstants.DraftsBlockItemListViewAnalyticsConstants.AnalyticsEventsParameters.isVisible.rawValue: isVisible])
     }
     
     func loadData() {
+        /// - Analytics
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.DraftsBlockItemListViewAnalyticsConstants.AnalyticsEvents.draftScreenLoaded.rawValue, parameters: nil)
+        
         if state.items.isEmpty {
             state.page = 0
             fetchNextPage()
@@ -160,10 +170,16 @@ final class DraftsBlockItemListViewModel {
     }
     
     func navigateToFocusSessionNewItem() {
+        /// - Analytics
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.DraftsBlockItemListViewAnalyticsConstants.AnalyticsEvents.draftsNavigateNewFocusSession.rawValue, parameters: nil)
+        
         state.nextNavigationScreen = .focusSession(makeFocusSessionViewModel(mode: .addBlockList))
     }
     
     func navigateToFocusSessionEditing(list: ProtectedBlockItem) {
+        /// - Analytics
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.DraftsBlockItemListViewAnalyticsConstants.AnalyticsEvents.draftsNavigateEditFocusSession.rawValue, parameters: nil)
+        
         state.nextNavigationScreen = .focusSession(makeFocusSessionViewModel(mode: .editBlockList(list)))
     }
     

@@ -26,3 +26,10 @@ final class LiveAnalyticsManager: AnalyticsManagerProtocol {
         print("Logged event: \(name); parameters: \(parameters ?? [:])")
     }
 }
+
+// MARK: - Mock Analytics Manager
+final class MockAnalyticsManager: AnalyticsManagerProtocol {
+    func logEvent(name: String, parameters: [String: Any]?) {
+        print("MOCK ANALYTICS - Logged event: \(name); parameters: \(parameters ?? [:])")
+    }
+}

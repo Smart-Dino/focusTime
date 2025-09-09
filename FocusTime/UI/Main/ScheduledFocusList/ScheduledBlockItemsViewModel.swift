@@ -50,18 +50,22 @@ final class ScheduledBlockItemsViewModel {
     private let deviceActivityRegistrar: DeviceActivityRegistrar
     private let blockItemPersistenceManager: BlockItemPersistenceManager
     private var fetchTask: Task<Void, Never>?
+    
+    private var analyticsManager: AnalyticsManagerProtocol
 
     init(
         state: State,
         paywallPresenter: PaywallPresenter,
         deviceActivityRegistrar: DeviceActivityRegistrar,
-        blockItemPersistenceManager: BlockItemPersistenceManager
+        blockItemPersistenceManager: BlockItemPersistenceManager,
+        analyticsManager: AnalyticsManagerProtocol = LiveAnalyticsManager()
     ) {
         self.state = state
         
         self.paywallPresenter = paywallPresenter
         self.deviceActivityRegistrar = deviceActivityRegistrar
         self.blockItemPersistenceManager = blockItemPersistenceManager
+        self.analyticsManager = analyticsManager
     }
     
     func setNextNavigationScreen(_ showing: Bool) {
@@ -71,6 +75,9 @@ final class ScheduledBlockItemsViewModel {
     }
     
     func navigateToFocusSessionNewItem() {
+        /// - Analytics
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.ScheduledBlockItemsViewAnalyticsConstants.AnalyticsEvents.scheduledListNavigateToNewFocusSession.rawValue, parameters: nil)
+      
         state.nextNavigationScreen = .focusSession(makeFocusSessionViewModel(mode: .addScheduledBlockList))
     }
 
@@ -119,9 +126,15 @@ final class ScheduledBlockItemsViewModel {
         if !isVisible {
             state.error = nil
         }
+        
+        /// - Analytics
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.ScheduledBlockItemsViewAnalyticsConstants.AnalyticsEvents.scheduledListErrorVisibilityChanged.rawValue, parameters: [AnalyticsEventsConstants.ScheduledBlockItemsViewAnalyticsConstants.AnalyticsEventsParameters.isVisible.rawValue: isVisible])
     }
 
     func loadData() {
+        /// - Analytics
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.ScheduledBlockItemsViewAnalyticsConstants.AnalyticsEvents.scheduledListScreenLoaded.rawValue, parameters: nil)
+        
         if state.items.isEmpty {
             state.page = 0
             fetchNextPage()

@@ -34,6 +34,21 @@ enum AppFullScreenCover: Identifiable, Equatable {
         default: false
         }
     }
+    
+    var analyticsEventName: String {
+        switch self {
+        case .freePlanPaywall:
+            return AnalyticsEventsConstants.AppFlowCoordinatorViewConstants.AnalyticsEvent.freePlanPaywall.rawValue
+        case .onboardingPaywall:
+            return AnalyticsEventsConstants.AppFlowCoordinatorViewConstants.AnalyticsEvent.onboardingPayWall.rawValue
+        case .planSelectionPaywall:
+            return AnalyticsEventsConstants.AppFlowCoordinatorViewConstants.AnalyticsEvent.planSelectionPaywall.rawValue
+        }
+    }
+    
+    static var dismissalEvent: String {
+        return AnalyticsEventsConstants.AppFlowCoordinatorViewConstants.AnalyticsEvent.paywallDismissed.rawValue
+    }
 }
 
 // MARK: - Implementation
@@ -49,6 +64,19 @@ final class AppFlowCoordinatorViewModel {
             case main(viewModel: MainFlowCoordinatorViewModel)
             case splash(viewModel: SplashScreenViewModel)
             case none
+            
+            var analyticsEventName: String {
+                switch self {
+                case .onboarding:
+                    return AnalyticsEventsConstants.AppFlowCoordinatorViewConstants.AnalyticsEvent.appFlowOnboardingStarted.rawValue
+                case .main:
+                    return AnalyticsEventsConstants.AppFlowCoordinatorViewConstants.AnalyticsEvent.appFlowMainFlowStarted.rawValue
+                case .splash:
+                    return AnalyticsEventsConstants.AppFlowCoordinatorViewConstants.AnalyticsEvent.appFlowSplashScreenShown.rawValue
+                case .none:
+                    return ""
+                }
+            }
             
             static func == (lhs: AppScreen, rhs: AppScreen) -> Bool {
                 switch (lhs, rhs) {
@@ -92,13 +120,16 @@ final class AppFlowCoordinatorViewModel {
     private var paymentManager: PaymentManager?
     private var superPaywallVM: SuperPaywallViewModel?
     
+    private let analyticsManager: AnalyticsManagerProtocol
+    
     init(
         state: State = State(currentFlow: .splash(viewModel: SplashScreenViewModel())),
         paywallPresenter: PaywallPresenter = LivePaywallPresenter(),
         shieldManager: ShieldManager = LiveShieldManager(),
         defaultsManager: LiveDefaultsManager = LiveDefaultsManager(),
         paymentManagerFactory: PaymentManagerFactory = LivePaymentManagerFactory(),
-        persistenceStoreFactory: PersistenceStoreFactory = LivePersistenceStoreFactory()
+        persistenceStoreFactory: PersistenceStoreFactory = LivePersistenceStoreFactory(),
+        analyticsManager: AnalyticsManagerProtocol = LiveAnalyticsManager()
     ) {
         self.state = state
         self.shieldManager = shieldManager
@@ -106,6 +137,7 @@ final class AppFlowCoordinatorViewModel {
         self.paymentManagerFactory = paymentManagerFactory
         self.persistenceStoreFactory = persistenceStoreFactory
         self.paywallPresenter = paywallPresenter
+        self.analyticsManager = analyticsManager
         
         paywallPresenter.paywallCoordinator = self
         
@@ -117,11 +149,23 @@ final class AppFlowCoordinatorViewModel {
         withAnimation {
             state.currentFlow = screen
         }
+        
+        /// - Analytics
+        if !screen.analyticsEventName.isEmpty {
+            analyticsManager.logEvent(name: screen.analyticsEventName, parameters: nil)
+        }
     }
     
     func setScreenCover(to cover: AppFullScreenCover?) {
         if state.screenCover != cover {
             state.screenCover = cover
+            
+            /// - Analytics
+            if let cover = cover {
+                analyticsManager.logEvent(name: cover.analyticsEventName, parameters: nil)
+             } else {
+                 analyticsManager.logEvent(name: AppFullScreenCover.dismissalEvent, parameters: nil)
+            }
         }
     }
     
@@ -245,12 +289,20 @@ final class AppFlowCoordinatorViewModel {
 // MARK: - MainFlowNavigationDelegate
 extension AppFlowCoordinatorViewModel: PaywallPresenterDelegate {
     func didRequestPlanSelectionPaywall() {
+        
+        /// - Analytics
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.AppFlowCoordinatorViewConstants.AnalyticsEvent.paywallRequestPlanSelections.rawValue, parameters: nil)
+        
         if let viewModel = makePlanSelectionPaywallViewModel() {
             setScreenCover(to: .planSelectionPaywall(viewModel: viewModel))
         }
     }
     
     func didRequestFreePlanPaywall() {
+        
+        /// - Analytics
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.AppFlowCoordinatorViewConstants.AnalyticsEvent.paywallRequestFreePlan.rawValue, parameters: nil)
+        
         if let viewModel = makeFreePlanUpgradeViewModel(
             requestedProductID: StoreKitProductIdentifiers.trialableWeekly.id
         ) {
@@ -259,6 +311,10 @@ extension AppFlowCoordinatorViewModel: PaywallPresenterDelegate {
     }
     
     func didRequestOnboardingPaywall() {
+        
+        /// - Analytics
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.AppFlowCoordinatorViewConstants.AnalyticsEvent.paywallRequestOnboarding.rawValue, parameters: nil)
+        
         if let viewModel = makeOnboardingPaywallViewModel(
             requestedProductID: StoreKitProductIdentifiers.trialableWeekly.id
         ) {
@@ -271,6 +327,9 @@ extension AppFlowCoordinatorViewModel: PaywallPresenterDelegate {
 extension AppFlowCoordinatorViewModel: OnboardingFlowNavigationDelegate {
     func didFinishOnboarding() {
         defaultsManager.setValue(for: .isOnboardingFinished, to: true)
+        
+        /// - Analytics
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.AppFlowCoordinatorViewConstants.AnalyticsEvent.onboardingFlowFinished.rawValue, parameters: nil)
         
         if let mainVM = makeMainFlowCoordinatorViewModel() {
             setStateFlow(to: .main(viewModel: mainVM))
@@ -287,6 +346,10 @@ extension AppFlowCoordinatorViewModel: OnboardingFlowNavigationDelegate {
 // MARK: - PaywallNavigationDelegate
 extension AppFlowCoordinatorViewModel: PaywallNavigationDelegate {
     func paywallDidRequestPlanSelection() {
+        
+        /// - Analytics
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.AppFlowCoordinatorViewConstants.AnalyticsEvent.paywallRequestPlanSelectionFromOtherPaywall.rawValue, parameters: nil)
+        
         if let viewModel = makePlanSelectionPaywallViewModel() {
             setScreenCover(to: .planSelectionPaywall(viewModel: viewModel))
         }

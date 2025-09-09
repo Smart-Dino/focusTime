@@ -80,24 +80,31 @@ final class HomeViewModel {
     private var fetchTask: Task<Void, Never>?
     private var dbChangesNotificationTask: Task<Void, Never>?
     
+    private var analyticsManager: AnalyticsManagerProtocol
+    
     init(
         state: State,
         proState: ProState,
         paywallPresenter: PaywallPresenter,
         deviceActivityRegistrar: DeviceActivityRegistrar,
         blockItemPersistenceManager: BlockItemPersistenceManager,
+        analyticsManager: AnalyticsManagerProtocol = LiveAnalyticsManager()
     ) {
         self.state = state
         self.proState = proState
         self.paywallPresenter = paywallPresenter
         self.deviceActivityRegistrar = deviceActivityRegistrar
         self.blockItemPersistenceManager = blockItemPersistenceManager
+        self.analyticsManager = analyticsManager 
     }
     
     func setErrorVisibility(_ isVisible: Bool) {
         if !isVisible {
             state.error = nil
         }
+        
+        /// - Analytics
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.HomeViewAnalyticsConstants.AnalyticsEvents.homeScreenErrorVisibilityChanged.rawValue, parameters: [AnalyticsEventsConstants.HomeViewAnalyticsConstants.AnalyticsEventsParameters.isVisible.rawValue: isVisible])
     }
     
     func subscribeToDB() {
@@ -110,6 +117,10 @@ final class HomeViewModel {
     }
     
     func checkAuthorization() {
+        
+        /// - Analytics
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.HomeViewAnalyticsConstants.AnalyticsEvents.homeScreenCheckAuthorization.rawValue, parameters: nil)
+        
         Task {
             do {
                 try await deviceActivityRegistrar.checkAuth()
@@ -145,16 +156,26 @@ final class HomeViewModel {
     }
     
     func showFocusSessionSetupView() {
+        /// - Analytics
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.HomeViewAnalyticsConstants.AnalyticsEvents.homeScreenShowFocusSessionSetup.rawValue, parameters: nil)
+        
         state.nextNavigationScreen = .focusSession(
             makeFocusSessionViewModel(mode: .startFocusing)
         )
     }
     
     func showScheduledFocusView() {
+        /// - Analytics
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.HomeViewAnalyticsConstants.AnalyticsEvents.homeScreenShowScheduledFocus.rawValue, parameters: nil)
+        
         state.nextNavigationScreen = .scheduledFocusList(makeScheduledFocusViewModel())
     }
     
     func showTaskConcentrationView(isPauseAction: Bool) {
+        
+        /// - Analytics
+        analyticsManager.logEvent(name: AnalyticsEventsConstants.HomeViewAnalyticsConstants.AnalyticsEvents.homeScreenShowTaskConcentration.rawValue, parameters: [AnalyticsEventsConstants.HomeViewAnalyticsConstants.AnalyticsEventsParameters.isPauseAction.rawValue: isPauseAction])
+        
         if state.isPaused {
             if let viewModel = makeTaskConcentrationViewModel(with: .breakTime) {
                 state.nextNavigationScreen = .taskConcentration(viewModel)

@@ -48,11 +48,15 @@ final class SuperPaywallViewModel {
     private let paymentManager: PaymentManager
     private var subscriptionTask: Task<Void, Never>?
     
+    private var analyticsManager: AnalyticsManagerProtocol
+    
     // MARK: - Init, Deinit
     init(
-        paymentManager: PaymentManager
+        paymentManager: PaymentManager,
+        analyticsManager: AnalyticsManagerProtocol = LiveAnalyticsManager()
     ) {
         self.paymentManager = paymentManager
+        self.analyticsManager = analyticsManager
     }
     
     deinit {
@@ -109,8 +113,15 @@ final class SuperPaywallViewModel {
             if let first = products.first {
                 state.isEligibleForIntro = try await paymentManager.eligibleForIntro(product: first)
             }
+            
+            /// - Analytics
+            analyticsManager.logEvent(name: AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEvents.superPaywallProductsFetched.rawValue, parameters: [AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEventsParameters.productCount.rawValue: products.count])
+            
         } catch {
             state.error = error
+            
+            /// - Analytics
+            analyticsManager.logEvent(name: AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEvents.superPaywallFetchFailed.rawValue, parameters: [AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEventsParameters.error.rawValue: error.localizedDescription])
         }
     }
     
@@ -126,26 +137,45 @@ final class SuperPaywallViewModel {
     func subscribeToCurrentRequestedProduct(state: State) async {
         guard let product = state.selectedProduct else {
             state.error = PaymentError.productNotFound
+            
+            /// - Analytics
+            analyticsManager.logEvent(name: AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEvents.superPaywallPurchaseFailed.rawValue, parameters: [AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEventsParameters.error.rawValue: AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEventsParameters.productNotFound.rawValue])
+            
             return
         }
         
         do {
             guard let result = try await paymentManager.purchase(product) else {
                 state.error = PaymentError.unknown
+                
+                /// - Analytics
+                analyticsManager.logEvent(name: AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEvents.superPaywallPurchaseFailed.rawValue, parameters: [AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEventsParameters.error.rawValue: AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEventsParameters.unknown.rawValue])
+                
                 return
             }
             
             switch result {
             case .success:
                 state.purchaseResult = .success
+                /// - Analytics
+                analyticsManager.logEvent(name: AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEvents.superPaywallPurchaseSucceeded.rawValue, parameters: [AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEventsParameters.productId.rawValue: product.id])
+                
             case .userCancelled:
                 state.purchaseResult = .userCancelled
+                /// - Analytics
+                analyticsManager.logEvent(name: AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEvents.superPaywallPurchaseCancelled.rawValue, parameters: [AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEventsParameters.productId.rawValue: product.id])
+           
             case .pending:
                 state.purchaseResult = .pending
                 state.error = PaymentError.pending
+                /// - Analytics
+                analyticsManager.logEvent(name: AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEvents.superPaywallPurchasePending.rawValue, parameters: [AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEventsParameters.productId.rawValue: product.id])
+            
             }
         } catch {
             state.error = error
+            /// - Analytics
+            analyticsManager.logEvent(name: AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEvents.superPaywallPurchaseFailed.rawValue, parameters: [AnalyticsEventsConstants.PaywallViewModelsAnalyticsConstants.AnalyticsEventsParameters.error.rawValue: error.localizedDescription])
         }
     }
     

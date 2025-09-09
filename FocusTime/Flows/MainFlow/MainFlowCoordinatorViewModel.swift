@@ -40,6 +40,23 @@ final class MainFlowCoordinatorViewModel {
             case none
 
             var id: Int { hashValue }
+            
+            var analyticsEvent: String {
+                AnalyticsEventsConstants.MainFlowCoordinatorViewAnalyticsConstants.AnalyticsEvents.mainFlowTabSelected.rawValue
+            }
+            
+            var analyticsParameters: [String: Any] {
+                switch self {
+                case .home:
+                    return [AnalyticsEventsConstants.MainFlowCoordinatorViewAnalyticsConstants.AnalyticsEventsParameters.tabName.rawValue:
+                            AnalyticsEventsConstants.MainFlowCoordinatorViewAnalyticsConstants.AnalyticsEventsParameters.home.rawValue]
+                case .drafts:
+                    return [AnalyticsEventsConstants.MainFlowCoordinatorViewAnalyticsConstants.AnalyticsEventsParameters.tabName.rawValue:
+                            AnalyticsEventsConstants.MainFlowCoordinatorViewAnalyticsConstants.AnalyticsEventsParameters.drafts.rawValue]
+                case .none:
+                    return [:]
+                }
+            }
 
             static func == (lhs: MainTabScreens, rhs: MainTabScreens) -> Bool {
                 switch (lhs, rhs) {
@@ -67,6 +84,7 @@ final class MainFlowCoordinatorViewModel {
                 }
             }
         }
+        
         var currentTabScreen: MainTabScreens
         var tabViewModels: [MainTabScreens] = .init()
         
@@ -83,13 +101,16 @@ final class MainFlowCoordinatorViewModel {
     private let blockItemPersistenceManager: BlockItemPersistenceManager
     private let paywallPresenter: PaywallPresenter
     
+    private var analyticsManager: AnalyticsManagerProtocol
+    
     init(
         state: State,
         proState: ProState,
         timer: FTTimer = ConcurrencyTimer(),
         deviceActivityRegistrar: DeviceActivityRegistrar,
         blockItemPersistenceManager: BlockItemPersistenceManager,
-        paywallPresenter: PaywallPresenter
+        paywallPresenter: PaywallPresenter,
+        analyticsManager: AnalyticsManagerProtocol = LiveAnalyticsManager(),
     ) {
         self.state = state
         self.proState = proState
@@ -97,6 +118,7 @@ final class MainFlowCoordinatorViewModel {
         self.deviceActivityRegistrar = deviceActivityRegistrar
         self.blockItemPersistenceManager = blockItemPersistenceManager
         self.paywallPresenter = paywallPresenter
+        self.analyticsManager = analyticsManager
         
         setupFlow()
     }
@@ -129,6 +151,13 @@ final class MainFlowCoordinatorViewModel {
         if !showing {
             state.nextNavigationScreen = nil
         }
+        
+        /// - Analytics
+        if showing {
+            if case let .focusSession(vm) = state.nextNavigationScreen {
+                analyticsManager.logEvent(name: AnalyticsEventsConstants.MainFlowCoordinatorViewAnalyticsConstants.AnalyticsEvents.mainFlowToFocusSession.rawValue, parameters: nil)
+            }
+        }
     }
     
     func showNewBlockListView() {
@@ -137,6 +166,12 @@ final class MainFlowCoordinatorViewModel {
     
     func setTabScreen(_ screen: State.MainTabScreens) {
         state.currentTabScreen = screen
+        
+        /// - Analytics
+        analyticsManager.logEvent(
+            name: screen.analyticsEvent,
+            parameters: screen.analyticsParameters
+        )
     }
     
     func makeFocusSessionViewModel() -> FocusSessionViewModel {
