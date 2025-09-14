@@ -19,38 +19,26 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Find and bump versions
+      - name: Bump MARKETING_VERSION in project.pbxproj
         run: |
-          NEXT=""
-          for plist in $(find . -name "Info.plist"); do
-            CURRENT=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$plist" 2>/dev/null || true)
+          FILE=$(find . -name "project.pbxproj")
+          echo "Editing $FILE"
 
-            if [ -z "$CURRENT" ]; then
-              echo "⚠️ Skipping $plist (no CFBundleShortVersionString)"
-              continue
-            fi
+          CURRENT=$(grep -m1 "MARKETING_VERSION =" "$FILE" | sed -E 's/.*MARKETING_VERSION = ([0-9.]+);/\1/')
+          echo "Current version: $CURRENT"
 
-            echo "Found $plist → $CURRENT"
-
-            # Support x.y or x.y.z
-            PARTS=(${CURRENT//./ })
-            major=${PARTS[0]}
-            minor=${PARTS[1]:-0}
-            patch=${PARTS[2]:-0}
-
-            NEW="$major.$minor.$((patch+1))"
-
-            /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $NEW" "$plist"
-            echo "Updated $plist → $NEW"
-
-            NEXT=$NEW
-          done
-
-          if [ -z "$NEXT" ]; then
-            echo "❌ No versions updated"
+          if [[ ! $CURRENT =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "❌ Unexpected version format: $CURRENT"
             exit 1
           fi
 
+          IFS='.' read -r major minor patch <<< "$CURRENT"
+          NEXT="$major.$minor.$((patch+1))"
+
+          # Replace all MARKETING_VERSION occurrences
+          sed -i '' -E "s/(MARKETING_VERSION = )$CURRENT;/\1$NEXT;/g" "$FILE"
+
+          echo "✅ Updated MARKETING_VERSION: $CURRENT → $NEXT"
           echo "NEXT=$NEXT" >> $GITHUB_ENV
 
       - name: Commit changes
