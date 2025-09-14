@@ -2,7 +2,7 @@ name: Weekly App Version Bump
 
 on:
   schedule:
-    - cron: "0 6 * * 1"
+    - cron: "0 6 * * 1" # Every Monday at 06:00 UTC
   workflow_dispatch:
 
 permissions:
@@ -12,7 +12,7 @@ jobs:
   bump:
     runs-on: macos-latest
     steps:
-      - name: Checkout
+      - name: Checkout main
         uses: actions/checkout@v4
         with:
           ref: main
@@ -22,14 +22,27 @@ jobs:
       - name: Setup Xcode
         run: sudo xcode-select -s /Applications/Xcode.app
 
-      - name: Bump app version
+      - name: Bump app version (patch)
         run: |
-          CURRENT=$(agvtool what-marketing-version -terse1 | tail -1)
+          # Read current version, strip whitespace
+          CURRENT=$(agvtool what-marketing-version -terse1 | xargs)
+          echo "Current version: $CURRENT"
+
+          # Validate format
+          if [[ ! $CURRENT =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "❌ Unexpected version format: $CURRENT"
+            exit 1
+          fi
+
+          # Split into major.minor.patch
           IFS='.' read -r major minor patch <<< "$CURRENT"
           NEXT="$major.$minor.$((patch+1))"
 
+          # Apply new version to all targets
           agvtool new-marketing-version $NEXT
-          echo "Bumped version from $CURRENT to $NEXT"
+          echo "✅ Bumped version from $CURRENT to $NEXT"
+
+          # Save for commit message
           echo "NEXT=$NEXT" >> $GITHUB_ENV
 
       - name: Commit changes
