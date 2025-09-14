@@ -1,4 +1,4 @@
-name: Weekly Build Number Bump
+name: Weekly App Version Bump
 
 on:
   schedule:
@@ -20,12 +20,14 @@ jobs:
       - name: Setup Xcode
         run: sudo xcode-select -s /Applications/Xcode.app
 
-      - name: Bump build number for all targets
+      - name: Bump app version
         run: |
-          CURRENT=$(agvtool what-version -terse | tail -1)
-          NEXT=$((CURRENT+1))
-          agvtool new-version -all $NEXT
-          echo "Bumped build number from $CURRENT to $NEXT for all targets"
+          CURRENT=$(agvtool what-marketing-version -terse1 | tail -1)
+          IFS='.' read -r major minor patch <<< "$CURRENT"
+          NEXT="$major.$minor.$((patch+1))"
+
+          agvtool new-marketing-version $NEXT
+          echo "Bumped version from $CURRENT to $NEXT"
           echo "NEXT=$NEXT" >> $GITHUB_ENV
 
       - name: Commit changes
@@ -33,5 +35,5 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add .
-          git commit -m "chore: bump build number to $NEXT [skip ci]" || echo "No changes to commit"
+          git commit -m "chore: bump app version to $NEXT [skip ci]" || echo "No changes to commit"
           git push origin main
