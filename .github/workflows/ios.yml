@@ -5,6 +5,9 @@ on:
     - cron: "0 6 * * 1" # Every Monday at 06:00 UTC
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   bump:
     runs-on: macos-latest
@@ -23,6 +26,7 @@ jobs:
           NEXT=$((CURRENT+1))
           agvtool new-version -all $NEXT
           echo "Bumped build number from $CURRENT to $NEXT for all targets"
+          echo "NEXT=$NEXT" >> $GITHUB_ENV
 
       - name: Commit changes
         run: |
